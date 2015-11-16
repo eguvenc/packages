@@ -1,0 +1,19 @@
+{
+    "name": "obullo/obullo",
+    "type": "library",
+    "description": "Obullo Framework",
+    "keywords": ["obullo","framework"],
+    "homepage": "https://github.com/obullo/obullo",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Obullo\\": "Obullo"
+        },
+        "psr-0": {
+            "": "Obullo/"
+        }
+    }
+}
