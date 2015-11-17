@@ -89,7 +89,6 @@ class MiddlewarePipe implements MiddlewareInterface
         
             $err = $e;
         }
-
         return $done($request, $response, $err);
     }
 

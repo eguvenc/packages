@@ -57,19 +57,22 @@ class Http extends Application
 
         $method = $router->getMethod();
 
-        if (! class_exists($className)) {
+        if (! class_exists($className, false)) {
+
             $router->clear();  // Fix layer errors.
             $this->error = true;
-            return;
-        }
-        $this->controller = new $className;
-        $this->controller->__setContainer($this->c);
 
-        if (! method_exists($this->controller, $method)
-            || substr($method, 0, 1) == '_'
-        ) {
-            $this->error = true;
-            return;
+        } else {
+
+            $this->controller = new $className;
+            $this->controller->__setContainer($this->c);
+
+            if (! method_exists($this->controller, $method)
+                || substr($method, 0, 1) == '_'
+            ) {
+                $router->clear();  // Fix layer errors.
+                $this->error = true;
+            }
         }
         $this->bootAnnotations($method);
         $this->bootMiddlewares();
@@ -121,7 +124,7 @@ class Http extends Application
             if ($object instanceof ContainerAwareInterface) {
                 $object->setContainer($this->c);
             }
-            if ($object instanceof ControllerAwareInterface) {
+            if ($this->controller != null && $object instanceof ControllerAwareInterface) {
                 $object->setController($this->controller);
             }
         }

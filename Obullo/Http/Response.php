@@ -17,14 +17,7 @@ use Psr\Http\Message\StreamInterface;
 class Response implements ResponseInterface
 {
     use MessageTrait;
-
-    /**
-     * Zend stratigility support
-     * 
-     * @var bool
-     */
-    private $complete = false;
-
+    
     /**
      * Map of standard HTTP status code/reason phrases
      *

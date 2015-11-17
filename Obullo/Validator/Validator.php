@@ -5,9 +5,9 @@ namespace Obullo\Validator;
 use Closure;
 use Controller;
 use RuntimeException;
-use Obullo\Log\LoggerInterface;
-use Obullo\Config\ConfigInterface;
-use Obullo\Translation\TranslatorInterface;
+use Obullo\Log\LoggerInterface as Logger;
+use Obullo\Config\ConfigInterface as Config;
+use Obullo\Translation\TranslatorInterface as Translator;
 
 /**
  * Validator Class
@@ -43,7 +43,7 @@ class Validator
      * @param TranslatorInterface $translator \Obullo\Translation\TranslatorInterface
      * @param LoggerInterface     $logger     \Obullo\Logger\LoggerInterface
      */
-    public function __construct(ConfigInterface $config, TranslatorInterface $translator, LoggerInterface $logger)
+    public function __construct(Config $config, Translator $translator, Logger $logger)
     {    
         mb_internal_encoding($config['locale']['charset']);
         
