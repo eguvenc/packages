@@ -10,7 +10,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Obullo\\": "Obullo"
+            "Obullo\\": "Obullo/"
         },
         "psr-0": {
             "": "Obullo/"
