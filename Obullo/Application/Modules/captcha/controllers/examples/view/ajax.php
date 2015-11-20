@@ -118,14 +118,12 @@ function submitAjax(formId){
                     <tr>
                         <td>Username</td>
                         <td>
-                        <?php echo $this->form->getError('username') ?>
-                        <input type="text" name="username" value="<?php echo $this->form->getValue('username')?>" />
+                        <input type="text" name="username" value="" />
                         </td>
                     </tr>
                     <tr>
                         <td>Captcha</td>
                         <td>
-                        <?php echo $this->form->getError($this->captcha->getInputName()) ?>
                         <?php echo $this->captcha->printHtml() ?>
                         <?php echo $this->captcha->printRefreshButton() ?>
                         </td>

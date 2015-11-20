@@ -4,7 +4,9 @@ namespace Obullo\Captcha;
 
 use Obullo\Captcha\Provider\Image;
 use Obullo\Captcha\Provider\ReCaptcha;
-use Obullo\Container\ContainerInterface;
+
+use Obullo\Container\ContainerInterface as Container;
+use Obullo\Container\ServiceInterface;
 
 /**
  * CaptchaManager Class
@@ -23,22 +25,25 @@ class CaptchaManager implements ServiceInterface
     protected $c;
 
     /**
-     * Service parameters
-     * 
-     * @var array
-     */
-    protected $params;
-
-    /**
      * Constructor
      * 
-     * @param ContainerInterface $c      container
-     * @param array              $params service parameters
+     * @param Container $container container
      */
-    public function __construct(ContainerInterface $c, array $params)
+    public function __construct(Container $container)
     {
-        $this->c = $c;
-        $this->params = $params;
+        $this->c = $container;
+    }
+
+    /**
+     * Set service parameters
+     * 
+     * @param array $params service configuration
+     *
+     * @return void
+     */
+    public function setParams(array $params)
+    {
+        $this->c['captcha.params'] = $params;
     }
 
     /**
@@ -49,8 +54,6 @@ class CaptchaManager implements ServiceInterface
     public function register()
     {
         $this->c['captcha'] = function () {
-            
-            $this->c['captcha.params'] = array_merge($this->params, $this->c['config']->load('captcha/image'));
 
             return new Image(
                 $this->c,
@@ -59,7 +62,7 @@ class CaptchaManager implements ServiceInterface
                 $this->c['session'],
                 $this->c['translator'],
                 $this->c['logger'],
-                $this->params
+                $this->c['captcha.params']
             );
         };
 

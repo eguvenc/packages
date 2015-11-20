@@ -43,14 +43,15 @@ class Template implements TemplateInterface
     /**
      * Constructor
      * 
-     * @param object $c      \Obullo\Container\ContainerInterface
-     * @param object $view   \Obullo\View\View
-     * @param object $logger \Obullo\Log\LoggerInterface
+     * @param object $container \Obullo\Container\ContainerInterface
+     * @param object $view      \Obullo\View\View
+     * @param object $logger    \Obullo\Log\LoggerInterface
      */
-    public function __construct(Container $c, View $view, Logger $logger)
+    public function __construct(Container $container, View $view, Logger $logger)
     {
-        $this->c = $c;
+        $this->c = $container;
         $this->view = $view;
+        
         $this->logger = $logger;
         $this->logger->debug('Template Class Initialized');
     }

@@ -114,7 +114,6 @@ class Router implements RouterInterface
     public function init()
     {
         if ($this->uri->getPath() == '/') {     // Is there a URI string ? If not, the default controller specified in the "routes" file will be shown.
-
             if (empty($this->defaultController)) {
                 return;
             }

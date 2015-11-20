@@ -6,18 +6,14 @@ use Obullo\Captcha\CaptchaResult;
 use Obullo\Captcha\AbstractProvider;
 use Obullo\Captcha\ProviderInterface;
 
-use Obullo\Log\LoggerInterface;
-use Obullo\Container\ContainerInterface;
-use Obullo\Translation\TranslatorInterface;
+use Obullo\Log\LoggerInterface as Logger;
+use Obullo\Container\ContainerInterface as Container;
+use Obullo\Translation\TranslatorInterface as Translator;
 
-use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\RequestInterface as Request;
 
 /**
- * Captcha Recaptcha Provider
- *
- * The new reCAPTCHA is here. A significant number of your users can now attest they are human without having to solve a CAPTCHA 
- * Insteadwith just a single click they’ll confirm they are not a robot. We’re calling it the No CAPTCHA reCAPTCHA experience.
- * You can follow label to "@see" for more details.
+ * Google ReCaptcha
  * 
  * @author    Obullo Framework <obulloframework@gmail.com>
  * @copyright 2009-2015 Obullo
@@ -93,10 +89,10 @@ class ReCaptcha extends AbstractProvider implements AdapterInterface
      * @param array  $params     service parameters
      */
     public function __construct(
-        ContainerInterface $c,
-        RequestInterface $request,
-        TranslatorInterface $translator,
-        LoggerInterface $logger,
+        Container $c,
+        Request $request,
+        Translator $translator,
+        Logger $logger,
         array $params
     ) {
         $this->c = $c;

@@ -2,8 +2,8 @@
 
 namespace Obullo\Layer;
 
-use Obullo\Log\LoggerInterface;
-use Obullo\Cache\CacheInterface;
+use Obullo\Log\LoggerInterface as Logger;
+use Obullo\Cache\CacheInterface as Cache;
 
 /**
  * Flush cache remove handler
@@ -34,7 +34,7 @@ class Flush
      * @param object $logger \Obullo\Log\LoggerInterface
      * @param object $cache  \Obullo\Cache\CacheInterface
      */
-    public function __construct(LoggerInterface $logger, CacheInterface $cache)
+    public function __construct(Logger $logger, Cache $cache)
     {
         $this->cache = $cache;
         $logger->debug('Layer Flush Class Initialized');

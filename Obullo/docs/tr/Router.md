@@ -99,20 +99,22 @@ myproject.com
 Bu dosyanın tarayıcıda gözükmemesini istiyorsanız bir <kbd>.htaccess</kbd> dosyası içerisine aşağıdaki kuralları yazmanız yeterli olacaktır.
 
 ```php
+
+# Disable directory indexing
+
 Options -Indexes
 
 RewriteEngine on
+
+# Disables all access to files and directories, sends all request to index.php
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php/$1 [L]
-
-RewriteCond $1 !^(index\.php|resources/assets|robots\.txt)
-RewriteRule ^(.*)$ ./index.php/$1 [L,QSA]
 ```
 
 * Dosyadaki ilk kod bloğu güvenlik amacıyla dizin indexlemeyi kapatır.
-* İkinci kod bloğu tüm dosya ve dizin isteklerini güvenlik amacıyla index.php dosyasına yönlendirir.
-* Son kod bloğu ise sadece parentezler ( ) içerisinde olan dosya ve dizinler için direkt dosya erişimine izin verir.
+* Son kod bloğu ise dosya ve dizin haricindeki tüm istekleri index.php dosyasına yönlendirir.
 
 > **Not:** .htaccess dosyanızın çalışabilmesi için sunucunuzda apache mod_rewrite modülünün etkin olması gerekir.
 

@@ -74,21 +74,9 @@ Konteyner nesnesi ile yüklenmesi gerekir. Response sınıfı <kbd>app/component
 
 Çıktıyı kontrol etmenizi sağlayan fonksiyonlardır.
 
-<a name="enableOutput"></a>
-
-##### $this->response->enableOutput();
-
-Çıktılamayı aktif hale getirir bu opsiyon açık olduğunda tarayıcıya çıktı gönderilir.
-
-<a name="disableOutput"></a>
-
-##### $this->response->disableOutput();
-
-Çıktılamayı pasif hale getirir bu opsiyon açık olduğunda tarayıcıya çıktı gönderilmez.
-
 <a name="write"></a>
 
-##### $this->response->write(string $output);
+##### $this->response->getbody()->write(string $output);
 
 Çıktı gövdesine oluşturduğunuz çıktıları ekler.
 
@@ -98,44 +86,9 @@ $this->response->write('<p>example append data</p>');
 ```
 > **Not:** View paketi çıktıları oluştururken write fonksiyonunu kullanır. 
 
-<a name="setOutput"></a>
+##### $this->response->newInstance($body = 'php://memory', $status = 200, array $headers = []);
 
-##### $this->response->setOutput(string $data);
-
-En son oluşan çıktıyı belirlemenizi sağlar. Bir örnek:
-
-```php
-$this->response->setOutput($data);
-```
-> **Not:** Eğer bu fonksiyonu kullanırsanız tüm çıktı girilen veri ile değiştirilir bu yüzden fonksiyon içerisinde en son çağrılan fonksiyon olmalıdır.
-
-<a name="getOutput"></a>
-
-##### $this->response->getOutput();
-
-En son oluşturulmuş çıktı verisini almanızı sağlar. Bir örnek:
-
-```php
-$string = $this->response->getOutput();
-```
-
-<a name="final-methods"></a>
-
-### Çıktı Sonlandırma Fonksiyonları
-
-Aşağıdaki metotlar yalnızca çıktıyı kontrol etmek için kullanılırlar.
-
-<a name="finalize"></a>
-
-##### $this->response->finalize();
-
-Çıktıyı oluşturduktan sonra sırasıyla http durum kodu, http başlıkları ve opsiyonlarını ve çıktının kendisini bir dizi içerisinde verir.
-
-<a name="sendHeaders"></a>
-
-##### $this->response->sendHeaders();
-
-Tarayıcıya http başlıklarını göndermeyi sağlar.
+Yeni bir response nesnesi oluşturur.
 
 
 <a name="header-methods"></a>

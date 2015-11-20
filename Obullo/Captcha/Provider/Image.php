@@ -7,14 +7,14 @@ use Obullo\Captcha\CaptchaResult;
 use Obullo\Captcha\AbstractProvider;
 use Obullo\Captcha\ProviderInterface;
 
-use Obullo\Log\LoggerInterface;
-use Obullo\Url\UrlInterface;
-use Obullo\Session\SessionInterface;
-use Obullo\Container\ContainerInterface;
-use Obullo\Translation\TranslatorInterface;
+use Obullo\Url\UrlInterface as Url;
+use Obullo\Log\LoggerInterface as Logger;
+use Obullo\Session\SessionInterface as Session;
+use Obullo\Container\ContainerInterface as Container;
+use Obullo\Translation\TranslatorInterface as Translator;
 
-use Psr\Http\Message\UriInterface;
-use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\UriInterface as Uri;
+use Psr\Http\Message\RequestInterface as Request;
 
 /**
  * Captcha Image Provider
@@ -64,12 +64,12 @@ class Image extends AbstractProvider implements ProviderInterface
      * @param array  $params     service parameters
      */
     public function __construct(
-        ContainerInterface $c,
-        UrlInterface $url,
-        RequestInterface $request,
-        SessionInterface $session,
-        TranslatorInterface $translator,
-        LoggerInterface $logger,
+        Container $c,
+        Url $url,
+        Request $request,
+        Session $session,
+        Translator $translator,
+        Logger $logger,
         array $params
     ) {
         $this->c = $c;
@@ -82,6 +82,7 @@ class Image extends AbstractProvider implements ProviderInterface
         $this->translator->load('captcha');
         $this->config['mod'] = 'cool';
         $this->init();
+        
         $this->logger->debug('Captcha Class Initialized');
     }
 
@@ -110,7 +111,7 @@ class Image extends AbstractProvider implements ProviderInterface
     {
         $this->buildHtml();
         $this->fonts = array_keys($this->config['fonts']);
-        $this->imageUrl = $this->url->getSiteUrl($this->config['form']['img']['attributes']['src']); // add Directory Seperator ( / )
+        $this->imageUrl = $this->url->siteUrl($this->config['form']['img']['attributes']['src']); // add Directory Seperator ( / )
         $this->configFontPath  = ROOT . $this->config['font']['path'] . '/';
         $this->defaultFontPath = OBULLO . 'Captcha/Fonts/';
     }
@@ -595,7 +596,6 @@ class Image extends AbstractProvider implements ProviderInterface
      */
     protected function imageGenerate()
     {
-        header('Content-Type: image/png');
         imagepng($this->image);
         imagedestroy($this->image);
     }

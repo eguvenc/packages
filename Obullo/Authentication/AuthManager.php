@@ -29,13 +29,23 @@ class AuthManager implements ServiceInterface, UserInterface
     /**
      * Constructor
      * 
-     * @param ContainerInterface $c      container
-     * @param array              $params service parameters
+     * @param Container $container container
      */
-    public function __construct(Container $c, array $params)
+    public function __construct(Container $container)
     {
-        $c['auth.params'] = $params;
-        $this->c = $c;
+        $this->c = $container;
+    }
+
+    /**
+     * Set service parameters
+     * 
+     * @param array $params service configuration
+     *
+     * @return void
+     */
+    public function setParams(array $params)
+    {
+        $this->c['auth.params'] = $params;
     }
 
     /**
@@ -45,8 +55,6 @@ class AuthManager implements ServiceInterface, UserInterface
      */
     public function register()
     {
-        include VENDOR .'ircmaxell/password-compat/lib/password.php';
-
         $this->init();
 
         $this->c['user'] = function () {
@@ -72,7 +80,7 @@ class AuthManager implements ServiceInterface, UserInterface
         };
 
         $this->c['auth.login'] = function () use ($parameters) {
-            return new Login($this->c, $this->c['event'], $this->c['auth.storage'], $parameters);
+            return new Login($this->c, $this->c['auth.storage'], $parameters);
         };
 
         $this->c['auth.activity'] = function () {

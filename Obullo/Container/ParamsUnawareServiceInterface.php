@@ -8,17 +8,8 @@ namespace Obullo\Container;
  * @copyright 2009-2015 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-interface ServiceInterface
+interface ParamsUnawareServiceInterface
 {
-    /**
-     * Set service parameters
-     * 
-     * @param array $params service configuration
-     *
-     * @return void
-     */
-    public function setParams(array $params);
-
     /**
      * Registry
      * 

@@ -2,11 +2,10 @@
 
 namespace Obullo\Security;
 
-use Obullo\Log\LoggerInterface;
-use Obullo\Config\ConfigInterface;
-use Obullo\Session\SessionInterface;
+use Obullo\Log\LoggerInterface as Logger;
+use Obullo\Session\SessionInterface as Session;
 
-use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\RequestInterface as Request;
 
 /**
  * ABOUT CSRF
@@ -39,13 +38,6 @@ class Csrf
      protected $logger;
 
      /**
-      * Request
-      * 
-      * @var object
-      */
-     protected $request;
-
-     /**
       * Session class
       * 
       * @var object
@@ -75,25 +67,22 @@ class Csrf
 
     /**
      * Constructor
-     *
-     * @param object $config  ConfigInterface
-     * @param object $logger  LoggerInterface
-     * @param object $request RequestInterface
+     * 
      * @param object $session SessionInterface
+     * @param object $logger  LoggerInterface
+     * @param array  $params  service parameters
      * 
      * @return void
      */
-    public function __construct(ConfigInterface $config, LoggerInterface $logger, RequestInterface $request, SessionInterface $session)
+    public function __construct(Session $session, Logger $logger, array $params)
     {
-        $this->logger = $logger;
-        $this->request = $request;
+        $this->logger  = $logger;
+        $this->params  = $params;
         $this->session = $session;
 
-        $this->config = $config['security'];
-        $this->refresh = $this->config['csrf']['token']['refresh'];
-        $this->tokenName = $this->config['csrf']['token']['name'];
+        $this->refresh   = $this->params['token']['refresh'];
+        $this->tokenName = $this->params['token']['name'];
         $this->tokenData = $this->session->get($this->tokenName);
-        $this->setCsrfToken();
 
         $this->logger->channel('security');
         $this->logger->debug('Csrf Class Initialized');
@@ -102,21 +91,23 @@ class Csrf
     /**
      * Verify Cross Site Request Forgery Protection
      *
+     * @param Request $request request
+     * 
      * @return boolean
      */
-    public function verify()
+    public function verify(Request $request)
     {
-        if ($this->setCsrfToken()) {
+        if ($this->setCsrfToken($request)) {
             return true;
         }
-        if (! isset($_POST[$this->tokenName]) 
+        $post = $request->getParsedBody();
+
+        if (! isset($post[$this->tokenName]) 
             || ! isset($this->tokenData['value'])
-            || ($_POST[$this->tokenName] != $this->tokenData['value'])
+            || ($post[$this->tokenName] != $this->tokenData['value'])
         ) {
             return false;
         }
-        unset($_POST[$this->tokenName]); // We kill this since we're done and we don't want to  polute the _POST array
-
         $this->logger->channel('security');
         $this->logger->debug('Csrf token verified');
         return true;
@@ -125,11 +116,13 @@ class Csrf
     /**
      * Set csrf token if method not POST
      *
+     * @param Request $request request
+     *
      * @return bool
      */
-    protected function setCsrfToken()
+    public function setCsrfToken(Request $request)
     {
-        if ($this->request->getMethod() !== 'POST') { // If it's not a POST request we will set the CSRF token
+        if ($request->getMethod() !== 'POST') { // If it's not a POST request we will set the CSRF token
             $this->setSession();     // Set token to session if we have empty data
             return true;
         }
@@ -144,6 +137,7 @@ class Csrf
     protected function setSession()
     {
         if (empty($this->tokenData['value'])) {
+
             $this->tokenData = [
                 'value' => $this->generateHash(),
                 'time' => time()

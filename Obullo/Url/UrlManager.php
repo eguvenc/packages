@@ -24,13 +24,24 @@ class UrlManager implements ServiceInterface
     /**
      * Constructor
      * 
-     * @param ContainerInterface $c      container
-     * @param array              $params service parameters
+     * @param ContainerInterface $c container
      */
-    public function __construct(Container $c, array $params)
+    public function __construct(Container $c)
     {
         $this->c = $c;
-        $params['webhost'] = $c['config']['http']['webhost'];
+    }
+
+    /**
+     * Set service parameters
+     * 
+     * @param array $params service configuration
+     *
+     * @return void
+     */
+    public function setParams(array $params)
+    {
+        $params['webhost'] = $this->c['config']['http']['webhost'];
+        
         $this->c['url.params'] = $params;
     }
 

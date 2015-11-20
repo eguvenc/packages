@@ -87,19 +87,26 @@ class Loader implements ContainerAwareInterface
         if (isset($this->services[$cid])) {  // Resolve services
 
             $Class = '\\'.ltrim($this->services[$cid], '\\');
+
             if (! isset($this->registered[$cid])) {  // Service lazy loader
 
-                $loaderClass = '\\Obullo\Container\Loader\\'.ucfirst($this->ext).'ServiceLoader';
-                $loader = new $loaderClass;
-                $config = $loader->load($this->getFile($cid));
+                $service = new $Class($this->c);
 
-                if (! isset($config['params'])) {
-                    $config['params'] = array();
-                }
-                $service = new $Class($this->c, $config['params']);
                 if ($service instanceof ServiceInterface) {
-                    $service->register();
-                }
+                    
+                    $loaderClass = '\\Obullo\Container\Loader\\'.ucfirst($this->ext).'ServiceLoader';
+                    $loader = new $loaderClass;
+                    $config = $loader->load($this->getFile($cid));
+
+                    if (! isset($config['params'])) {
+                        $config['params'] = array();
+                    }
+                    $params = $config['params'];
+                    $service->setParams($params);
+                } 
+
+                $service->register();
+                
                 if (! $this->c->has($cid)) {
                     throw new RuntimeException(
                         sprintf(
@@ -108,7 +115,10 @@ class Loader implements ContainerAwareInterface
                         )
                     );
                 }
-                $loader->callMethods($this->c[$cid], $config);  // Run service methods
+
+                if ($service instanceof ServiceInterface) {
+                    $loader->callMethods($this->c[$cid], $config);  // Run service methods
+                }
                 $this->registered[$cid] = true;
             }
             return true;

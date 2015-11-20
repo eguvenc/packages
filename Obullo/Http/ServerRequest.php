@@ -62,13 +62,6 @@ class ServerRequest implements ServerRequestInterface
     private $uploadedFiles;
 
     /**
-     * Note : This variable is not Psr7 standart
-     * 
-     * @var mixed
-     */
-    private $body;
-
-    /**
      * @param array $serverParams Server parameters, typically from $server
      * @param array $uploadedFiles Upload file information, a tree of UploadedFiles
      * @param null|string $uri URI for the request, if any.
@@ -87,7 +80,8 @@ class ServerRequest implements ServerRequestInterface
     ) {
         $this->validateUploadedFiles($uploadedFiles);
 
-        $this->body = $this->getStream($body);
+        // $this->body = $this->getStream($body);
+        // 
         $this->initialize($uri, $method, $body, $headers);
         $this->serverParams  = $serverParams;
         $this->uploadedFiles = $uploadedFiles;
@@ -208,24 +202,6 @@ class ServerRequest implements ServerRequestInterface
      */
     public function getParsedBody()
     {
-        // @todo should be middleware
-        // Begin none Psr7 standart ( This part is not PSR 7 standart  )
-        
-        $mediaType = $this->getMediaType();
-
-        if (empty($this->parsedBody)) {
-            $body = (string)$this->body;
-            switch ($mediaType) {   // Parse media types ( JSON, XML, FORM-DATA)
-            case 'application/json':
-                $this->parsedBody = json_decode($body, true);
-                break;
-            case 'application/xml':
-                $this->parsedBody = simplexml_load_string($body);
-                break;
-            }
-        }
-        // End none Psr7 standart
-
         return $this->parsedBody;
     }
 
@@ -377,55 +353,6 @@ class ServerRequest implements ServerRequestInterface
     {
         $this->c = $c;
         return $this;
-    }
-
-    // /**
-    //  * Returns to Cookie object
-    //  *
-    //  * @param array|null $cookieParams null or inject cookies
-    //  *
-    //  * @return object
-    //  */
-    // public function getCookie($cookieParams = null)
-    // {
-    //     $cookie = $this->c['cookie'];
-
-    //     $cookie->setCookieParams((empty($cookieParams)) ? $this->getCookieParams() : $cookieParams);
-    //     return $cookie;
-    // }
-
-    /**
-     * This method borrowed from slim framework
-     * 
-     * Get request content type.
-     *
-     * Note: This method is not part of the PSR-7 standard.
-     *
-     * @return string|null The request content type, if known
-     */
-    public function getContentType()
-    {
-        $result = $this->getHeader('Content-Type');
-        return $result ? $result[0] : null;
-    }
-
-    /**
-     * This method borrowed from slim framework
-     * 
-     * Get request media type, if known.
-     *
-     * Note: This method is not part of the PSR-7 standard.
-     *
-     * @return string|null The request media type, minus content-type params
-     */
-    public function getMediaType()
-    {
-        $contentType = $this->getContentType();
-        if ($contentType) {
-            $contentTypeParts = preg_split('/\s*[;,]\s*/', $contentType);
-            return strtolower($contentTypeParts[0]);
-        }
-        return null;
     }
 
     /**

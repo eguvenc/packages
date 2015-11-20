@@ -99,14 +99,14 @@ class Database extends AbstractAdapter
     /**
      * Constructor
      * 
-     * @param object $c       container
-     * @param object $session session
-     * @param object $storage storage
-     * @param array  $params  config parameters
+     * @param object $container container
+     * @param object $session   session
+     * @param object $storage   storage
+     * @param array  $params    config parameters
      */
-    public function __construct(Container $c, Session $session, Storage $storage, array $params)
+    public function __construct(Container $container, Session $session, Storage $storage, array $params)
     {
-        $this->c = $c;
+        $this->c = $container;
         $this->params = $params;
         $this->storage = $storage;
         $this->session = $session;

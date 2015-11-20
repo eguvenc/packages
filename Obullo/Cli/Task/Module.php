@@ -55,16 +55,20 @@ class Module extends Controller
         if (is_dir($moduleFolder.'/controllers')) {
             $this->recursiveCopy($moduleFolder. '/controllers', MODULES .$module);
         }
-        if (is_dir($moduleFolder. DS .'config')) {
+        if (is_dir($moduleFolder.'/config')) {
             $this->recursiveCopy($moduleFolder. '/config', CONFIG .$module);
         }
-        if (is_dir($moduleFolder. DS .'tasks')) {
+        if (is_dir($moduleFolder.'/tasks')) {
             $this->recursiveCopy($moduleFolder. '/tasks', TASKS, false);
         }
-        if (is_dir($moduleFolder. DS .'service')) {
-            copy($moduleFolder.'/service/'.ucfirst($module).'.php', APP .'classes/Service/' .ucfirst($module).'.php');
-            chmod(APP .'classes/Service/' .ucfirst($module).'.php', 0777);
+
+        $serviceFile = CONFIG .$this->c['app.env'].'/service/' .strtolower($module).'.php';
+
+        if (is_dir($moduleFolder.'/service')) {
+            copy($moduleFolder.'/service/'.strtolower($module).'.php', $serviceFile);
+            chmod($serviceFile, 0777);
         }
+
         echo Console::success("New module #$module added successfully.");
     }
 
@@ -108,8 +112,11 @@ class Module extends Controller
         if (is_dir($moduleFolder. '/tasks') && is_file(MODULES .'tasks/' .ucfirst($module).'.php')) {
             unlink(MODULES .'tasks/' .ucfirst($module).'.php');
         }
-        if (is_dir($moduleFolder .'/service') && is_file(APP .'classes/Service/' .ucfirst($module).'.php')) {
-            unlink(APP .'classes/Service/'.ucfirst($module).'.php');
+
+        $serviceFile = CONFIG .$this->c['app.env'].'/service/' .strtolower($module).'.php';
+
+        if (is_dir($moduleFolder .'/service') && is_file($serviceFile)) {
+            unlink($serviceFile);
         }
         echo Console::success("Module #$module removed successfully.");
     }

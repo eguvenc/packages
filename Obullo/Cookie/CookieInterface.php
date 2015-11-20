@@ -116,4 +116,13 @@ interface CookieInterface
     */
     public function delete($name = null, $prefix = null);
 
+    /**
+     * Removes cookie from response headers
+     * 
+     * @param string $name   cookie name
+     * @param string $prefix cookie name
+     * 
+     * @return void
+     */
+    public function remove($name, $prefix = null);
 }

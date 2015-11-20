@@ -7,20 +7,23 @@ Cross Request Forgery güvenlik tehdidi hakkında daha detaylı bilgi için <a h
 
 ### Konfigürasyon
 
-<kbd>config/security.php</kbd> dosyasından csrf protection değerini true olarak değiştirin.
+<kbd>local/service/csrf.php</kbd> dosyasından csrf protection değerini true olarak değiştirin.
 
 ```php
 return array(
             
-    'csrf' => [                      
-        'protection' => true,
-     ],                                 
+    'params' => [
+    
+        'protection' => false,
+        'token' => [
+            'name' => 'csrf_token',
+            'refresh' => 30,
+        ],   
+    ]                            
 
 );
 
-/* End of file config.php */
-/* Location: .config/security.php */
-
+/* Location: .local/service/csrf.php */
 ```
 
 Eğer <kbd>Form/Element</kbd> paketini kullanmıyorsanız uygulamanızdaki csrf güvenliği gereken form taglarına aşağıdaki gibi güvenlik değeri oluşturmanız gerekir.
@@ -60,17 +63,12 @@ Csrf doğrulama katmanının uygulamanın her yerinde çalışmasını istiyorsa
 ```php
 /*
 |--------------------------------------------------------------------------
-| Csrf
-|--------------------------------------------------------------------------
-*/
-$c['app']->middleware('Http\Middlewares\Csrf');
-/*
-|--------------------------------------------------------------------------
 | Request
 |--------------------------------------------------------------------------
 */
-$c['app']->middleware('Http\Middlewares\Request');
-
+$c['app']->middleware(
+    'Csrf'
+);
 
 /* Location: .app/middlewares.php */
 ```

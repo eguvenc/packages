@@ -5,9 +5,11 @@ namespace Obullo\Authentication\User;
 use Auth\Identities\AuthorizedUser;
 use Obullo\Authentication\AuthResult;
 
-use Obullo\Event\EventInterface as Event;
 use Obullo\Container\ContainerInterface as Container;
 use Obullo\Authentication\Storage\StorageInterface as Storage;
+
+use Event\LoginEvent;
+use Event\LoginResultListener;
 
 /**
  * Login
@@ -28,17 +30,15 @@ class Login
     /**
      * Constructor
      *
-     * @param object $c       \Obullo\Container\Container
-     * @param object $event   \Obullo\Event\Event
-     * @param object $storage \Obullo\Authentication\Storage\Storage
-     * @param array  $params  Auth config parameters
+     * @param object $container container
+     * @param object $storage   storage
+     * @param array  $params    Auth config parameters
      */
-    public function __construct(Container $c, Event $event, Storage $storage, array $params)
+    public function __construct(Container $container, Storage $storage, array $params)
     {
-        $this->c = $c;
-        $this->event = $event;
-        $this->storage = $storage;
+        $this->c = $container;
         $this->params = $params;
+        $this->storage = $storage;
     }
 
     /**
@@ -56,19 +56,20 @@ class Login
         $credentials['__rememberMe'] = ($rememberMe) ? 1 : 0;
 
         $credentials = $this->formatCredentials($credentials);
+
         if ($credentials == false) {
+
             $message = sprintf(
                 'Login attempt requires "%s" and "%s" credentials.', 
                 $credentials['db.identifier'],
                 $credentials['db.password']
             );
-            return new AuthResult(AuthResult::FAILURE, null, $message);
+            return new AuthResult(
+                AuthResult::FAILURE, 
+                null,
+                $message
+            );
         }
-        /**
-         * Create Event: login.before
-         */
-        $this->event->fire('login.before', array($credentials)); 
-
         /**
          * Create AuthResult Object
          */
@@ -149,18 +150,30 @@ class Login
         $this->c['auth.identity']->initialize();
 
         /**
-         * Create Event: login.after
-         *
-         * Returns to overriden auth result object
-         * 
-         * @var object
+         * Create event
          */
-        $eventResult = $this->event->fire('login.after', array($authResult));
+        $event = new LoginEvent;
 
         /**
-         * Event fire returns multiple array response but we use one.
+         * Event variables
          */
-        return isset($eventResult[0]) ? current($eventResult) : $authResult;
+        $name    = $event->getName();
+        $emitter = $event->getEmitter();
+
+        /**
+         * Event listener
+         */
+        $emitter->addListener($name, new LoginResultListener);
+
+        /**
+         * Emit data
+         */
+        $emitter->emit($name, $this->c, $authResult);
+
+        /**
+         * Event result returns multiple array response but we use one.
+         */
+        return $authResult;
     }
 
     /**

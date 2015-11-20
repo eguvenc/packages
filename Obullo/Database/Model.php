@@ -2,8 +2,6 @@
 
 namespace Obullo\Database;
 
-use Controller;
-
 /**
  * Model Class ( Default Model )
  * 

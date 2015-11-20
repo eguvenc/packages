@@ -1,18 +1,18 @@
 <?php
 
-namespace Obullo\Database;
+namespace Obullo\Security;
 
-use Obullo\Container\ServiceInterface;
 use Obullo\Container\ContainerInterface as Container;
+use Obullo\Container\ServiceInterface;
 
 /**
- * Database Service Manager
+ * Csrf Manager
  * 
  * @author    Obullo Framework <obulloframework@gmail.com>
  * @copyright 2009-2015 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class DatabaseManager implements ServiceInterface
+class CsrfManager implements ServiceInterface
 {
     /**
      * Container class
@@ -40,10 +40,7 @@ class DatabaseManager implements ServiceInterface
      */
     public function setParams(array $params)
     {
-        $this->c['db.params'] = array_merge(
-            $params,
-            $this->c['config']->load('database')
-        );
+        $this->c['csrf.params'] = $params;
     }
 
     /**
@@ -53,17 +50,15 @@ class DatabaseManager implements ServiceInterface
      */
     public function register()
     {
-        $this->c['db'] = function () {
+        $this->c['csrf'] = function () {
 
-            $name   = $this->c['db.params']['provider']['name'];
-            $params = $this->c['db.params']['provider']['params'];
-
-            return $this->c[$name]->get(
-                [
-                    $params
-                ]
+            return new Csrf(
+                $this->c['session'],
+                $this->c['logger'],
+                $this->c['csrf.params']
             );
         };
+
     }
 
 }

@@ -2,7 +2,9 @@
 
 namespace Captcha\Examples;
 
-class Ajax extends \Controller
+use Obullo\Http\Controller;
+
+class Ajax extends Controller
 {
     /**
      * Index
@@ -20,9 +22,11 @@ class Ajax extends \Controller
                 $this->form->success('Form Validation Success.');
             }
             $this->form->setErrors($this->validator);
-            echo $this->response->json($this->form->outputArray());
+
+            $this->response->json($this->form->outputArray());
             return;
         }
+
         $this->view->load(
             'ajax',
             [

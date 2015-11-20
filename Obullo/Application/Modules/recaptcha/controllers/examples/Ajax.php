@@ -20,7 +20,8 @@ class Ajax extends \Controller
                 $this->form->success('Form Validation Success.');
             }
             $this->form->setErrors($this->validator);
-            echo $this->response->json($this->form->outputArray());
+            
+            $this->response->json($this->form->outputArray());
             return;
         }
 

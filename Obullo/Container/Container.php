@@ -201,6 +201,7 @@ class Container implements ContainerInterface, ArrayAccess
         if (is_object($this->loader) && count($this->services) > 0) {
 
             $this->loader->setContainer($this);
+            
             if ($this->loader->resolveServices($class)) {
                 $isService = true;
             }

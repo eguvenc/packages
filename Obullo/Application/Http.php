@@ -2,6 +2,7 @@
 
 namespace Obullo\Application;
 
+use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
 use Obullo\Container\ContainerAwareInterface;
@@ -36,7 +37,6 @@ class Http extends Application
         $this->registerErrorHandlers();
 
         include APP .'middlewares.php';
-        include APP .'events.php';
         include APP .'routes.php';
 
         $this->boot();
@@ -89,8 +89,9 @@ class Http extends Application
         $request    = $this->c['request'];
         $middleware = $this->c['middleware'];
 
+        $object = null;
         $uriString = $request->getUri()->getPath();
-
+        
         foreach ($router->getAttachedMiddlewares() as $value) {
 
             $attachedRoute = str_replace('#', '\#', $value['attachedRoute']);  // Ignore delimiter
@@ -139,7 +140,7 @@ class Http extends Application
      */
     protected function bootAnnotations($method)
     {
-        if ($this->c['config']['controller']['annotation']) {
+        if ($this->c['config']['extra']['annotations']) {
 
             $reflector = new ReflectionClass($this->controller);
 
@@ -156,11 +157,12 @@ class Http extends Application
     /**
      * Execute the controller
      *
+     * @param Psr\Http\Message\RequestInterface  $request  request
      * @param Psr\Http\Message\ResponseInterface $response response
      * 
      * @return mixed
      */
-    public function call(Response $response)
+    public function call(Request $request, Response $response)
     {
         if ($this->error) {
             return false;
@@ -168,6 +170,10 @@ class Http extends Application
         unset($this->c['response']);
         $this->c['response'] = function () use ($response) {
             return $response;
+        };
+        unset($this->c['request']);
+        $this->c['request'] = function () use ($request) {
+            return $request;
         };
         $result = call_user_func_array(
             array(

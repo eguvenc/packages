@@ -32,8 +32,6 @@ class Cli extends Application
         $c['router'] = function () use ($request, $logger) {
             return new \Obullo\Cli\Router($request->getUri(), $logger);
         };
-        include APP .'events.php';
-
         $translator->setLocale($translator->getDefault());  // Set default translation
 
         register_shutdown_function(

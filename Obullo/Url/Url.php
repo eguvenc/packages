@@ -140,9 +140,9 @@ class Url implements UrlInterface
             $uriStr = implode('/', $uriStr);
         }
         if ($uriStr == '') {
-            return $this->baseUrl() . $this->params['rewrite']['index.php'];
+            return $this->baseUrl();
         } 
-        return $this->baseUrl() . $this->params['rewrite']['index.php'] . trim($uriStr, '/');
+        return $this->baseUrl(). trim($uriStr, '/');
     }
 
     /**

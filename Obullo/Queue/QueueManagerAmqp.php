@@ -25,12 +25,22 @@ class QueueManagerAmqp implements ServiceInterface
     /**
      * Constructor
      * 
-     * @param ContainerInterface $c      container
-     * @param array              $params service parameters
+     * @param ContainerInterface $container container
      */
-    public function __construct(Container $c, array $params)
+    public function __construct(Container $container)
     {
-        $this->c = $c;
+        $this->c = $container;
+    }
+
+    /**
+     * Set service parameters
+     * 
+     * @param array $params service configuration
+     *
+     * @return void
+     */
+    public function setParams(array $params)
+    {
         $this->c['queue.params'] = $params;
     }
 
@@ -43,7 +53,7 @@ class QueueManagerAmqp implements ServiceInterface
     {
         $this->c['queue'] = function () {
 
-            $name = $this->c['queue.params']['provider']['name'];
+            $name   = $this->c['queue.params']['provider']['name'];
             $params = $this->c['queue.params']['provider']['params'];
 
             return new Amqp(

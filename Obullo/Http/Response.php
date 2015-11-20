@@ -215,6 +215,21 @@ class Response implements ResponseInterface
     //----------- OBULLO METHODS ----------//
 
     /**
+     * Create new instance
+     * 
+     * @param mixed $body    Stream  identifier and/or actual stream resource
+     * @param int   $status  Status  code for the response, if any.
+     * @param array $headers Headers for the response, if any.
+     * 
+     * @return object
+     */
+    public function newInstance($body = 'php://memory', $status = 200, array $headers = [])
+    {
+        $this->__construct($body, $status, $headers);
+        return $this;
+    }
+
+    /**
      * Create a JSON response with the given data.
      *
      * Default JSON encoding is performed with the following options, which
