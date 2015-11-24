@@ -55,8 +55,8 @@ class MiddlewarePipe implements MiddlewareInterface
         $this->c = $container;
         $this->pipeline = new SplQueue();
         
-        $this->c['middleware']->queue('Error')->setContainer($container);  // Error middleware must be defined end of the queue.
-        
+        $this->c['middleware']->add('Error')->setContainer($container);  // Error middleware must be defined end of the queue.
+
         foreach ($this->c['middleware']->getQueue() as $middleware) {
             $this->pipe($middleware);
         }

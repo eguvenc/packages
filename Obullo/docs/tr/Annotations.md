@@ -5,7 +5,7 @@ Bir anotasyon aslında bir metadata yı (örneğin yorum,  açıklama, tanıtım
 
 > **Not:** Anotasyonlar herhangi bir kurulum yapmayı gerektirmez ve uygulamanıza performans açısından ek bir yük getirmez. Php ReflectionClass sınıfı ile okunan anotasyonlar çekirdekte herhangi bir düzenli ifade işlemi kullanılmadan kolayca çözümlenir.
 
-Şu anki sürümde biz anotasyonları sadece <kbd>Http Katmanlarını</kbd> atamak ve <kbd>Event</kbd> sınıfına tayin edilen <b>Olayları Dinlemek</b> için kullanıyoruz.
+Şu anki sürümde biz anotasyonları sadece <kbd>Http Katmanlarını</kbd> atamak ve mevcut katmanları kaldırmak için kullanıyoruz.
 
 <ul>
     <li>
@@ -14,7 +14,6 @@ Bir anotasyon aslında bir metadata yı (örneğin yorum,  açıklama, tanıtım
             <li><a href="#enabling-annotations">Anotasyonları aktif etmek</a></li>
             <li><a href="#available-annotations">Mevcut Anotasyonlar</a></li>
             <li><a href="#middleware">Middleware</a></li>
-            <li><a href="#event">Event</a></li>
             <li><a href="#loader-annotations">Yükleyici Anotasyonları</a></li>
         </ul>
     </li>
@@ -67,11 +66,11 @@ public function index()
     </thead>
     <tbody>
         <tr>
-            <td><b>@middleware->queue();</b></td>
+            <td><b>@middleware->add();</b></td>
             <td>Bir middleware katmanını uygulamaya ekler. Virgül ile birden fazla katman ismi gönderebilirsiniz.</td>
         </tr>
         <tr>
-            <td><b>@middleware->unqueue();</b></td>
+            <td><b>@middleware->remove();</b></td>
             <td>Varolan bir middleware katmanını uygulamadan çıkarır. Virgül ile birden fazla katman ismi gönderebilirsiniz.</td>
         </tr>
         <tr>
@@ -79,12 +78,8 @@ public function index()
             <td>Http protokolü tarafından gönderilen istek metodu belirlenen metotlardan biri ile eşleşmez ise sayfaya erişime izin verilmez. Virgül ile birden fazla katman ismi gönderebilirsiniz.</td>
         </tr>
          <tr>
-            <td><b>@middleware->when()->queue()</b></td>
+            <td><b>@middleware->when()->add()</b></td>
             <td>Katmanı koşullu olarak uygulamaya ekler. Eğer http protokolü tarafından gönderilen istek metodu when metodu içerisine yazılan metotlardan biri ile eşleşmez ise bu anotasyonun kullanıldığı katman uygulumaya eklenmez.</td>
-        </tr>
-        <tr>
-            <td><b>@event->subscribe();</b></td>
-            <td>Event sınıfını çağırarak subscribe metodu ile varsayılan controller için bir dinleyici atamanızı sağlar.</td>
         </tr>
     </tbody>
 </table>
@@ -99,7 +94,7 @@ public function index()
 /**
  * Index
  *
- * @middleware->queue("Example");
+ * @middleware->add("Example");
  * @middleware->method("get", "post");
  *
  * @return void
@@ -112,7 +107,7 @@ Yukarıdaki örnek Controller sınıfı index ( middleware call ) metodundan ön
 /**
  * Index
  *
- * @middleware->when("post")->queue("Xss");
+ * @middleware->when("post")->add("Xss");
  * 
  * @return void
  */
@@ -125,31 +120,13 @@ Yukarıdaki örnek sadece http <b>post</b> isteklerinde ve index() metodunun ça
 /**
  * Index
  *
- * @middleware->when("post")->unqueue("Csrf");
+ * @middleware->when("post")->remove("Csrf");
  *
  * @return void
  */
 ```
 
 Yukarıdaki örnek sadece http <b>post</b> ve <b>get</b> isteklerinde index() metodunun çalışmasından önce varolan <b>Csrf</b> katmanını uygulamadan siler.
-
-<a name="event"></a>
-
-#### Event
-
-```php
-/**
- * Index
- *
- * @event->when("post")->subscribe('Event\Login\Attempt');
- *
- * @return void
- */
-```
-
-Bu örnekte index metodu çalıştığında <kbd>@event->subscribe</kbd> anotasyonu arkaplanda <kbd>\Obullo\Event->subscribe()</kbd> metodunu çalıştırır ve uygulama  <kbd>app/classes/Event/Login/Attemp.php</kbd> sınıfı içerisine tanımlanmış olayları dinlemeye başlar.
-
-> **Not:** Olaylar hakkında daha detaylı bilgiye [Event.md](Event.md) dökümentasyonundan ulaşabilirsiniz.
 
 <a name="loader-annotations"></a>
 

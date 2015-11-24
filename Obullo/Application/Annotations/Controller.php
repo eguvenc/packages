@@ -38,19 +38,20 @@ class Controller
     /**
      * Set container 
      * 
-     * @param Container $c container
+     * @param Container $container container
      *
      * @return void
      */
-    public function setContainer(Container $c)
+    public function setContainer(Container $container)
     {
-        $this->c = $c;
-        $c['annotation.middleware'] = function () use ($c) {
-            return new Middleware(
-                $c['event'],
-                $c['request'],
-                $c['dependency'],
-                $c['middleware']
+        $this->c = $container;
+        $this->c['annotation.middleware'] = function () {
+
+            return new Methods(
+
+                $this->c['request'],
+                $this->c['dependency'],
+                $this->c['middleware']
             );
         };
     }
@@ -95,7 +96,7 @@ class Controller
         $docs = str_replace('*', '', $blocks);
         $docs = explode("@", $docs);
 
-        if (strpos($blocks, 'middleware->') > 0 || strpos($blocks, 'event->')) {
+        if (strpos($blocks, 'middleware->') > 0) {
             foreach ($docs as $line) {
                 $methods = explode('->', $line);  // explode every methods
                 array_shift($methods);            // remove class name "filter"

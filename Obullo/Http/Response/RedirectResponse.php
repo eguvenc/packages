@@ -40,6 +40,8 @@ class RedirectResponse
             );
         }
         $uri = (string) $uri;
+        $uri = '/'.ltrim($uri, '/');
+
         $headers['location'] = [$uri];
         $this->headers = $headers;
     }

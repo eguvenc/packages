@@ -5,13 +5,13 @@ namespace Obullo\Application;
 use RuntimeException;
 
 /**
- * Middleware
+ * Middleware stack
  * 
  * @author    Obullo Framework <obulloframework@gmail.com>
  * @copyright 2009-2015 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Middleware
+class MiddlewareStack implements MiddlewareStackInterface
 {
     /**
      * Count
@@ -19,6 +19,13 @@ class Middleware
      * @var integer
      */
     protected $count;
+
+    /**
+     * Names
+     * 
+     * @var array
+     */
+    protected $names = array();
 
     /**
      * Middleware stack
@@ -33,13 +40,6 @@ class Middleware
      * @var array
      */
     protected $registered = array();
-
-    /**
-     * Names
-     * 
-     * @var array
-     */
-    protected $names;
 
     /**
      * Constructor
@@ -58,7 +58,7 @@ class Middleware
      * 
      * @return object Middleware
      */
-    public function configure(array $array)
+    public function register(array $array)
     {
         $this->registered = $array;
         return $this;
@@ -71,7 +71,7 @@ class Middleware
      * 
      * @return boolean
      */
-    public function isConfigured($name)
+    public function has($name)
     {
         if (isset($this->registered[$name])) {
             return true;
@@ -86,28 +86,29 @@ class Middleware
      * 
      * @return object Middleware
      */
-    public function queue($name)
+    public function add($name)
     {
         if (is_string($name)) {
-            return $this->resolveMiddleware($name);
+            return $this->queueMiddleware($name);
         } elseif (is_array($name)) { 
             foreach ($name as $key) {
-                $this->resolveMiddleware($key);
+                $this->queueMiddleware($key);
             }
         }
         return $this;
     }
 
     /**
-     * Check middleware is loaded returns true if registered otherwise false
+     * Check middleware is active
      * 
      * @param string $name middleware name
      * 
      * @return boolean
      */
-    public function has($name)
+    public function active($name)
     {
         $this->validateMiddleware($name);
+
         if (isset($this->names[$name]) 
             && isset($this->queue[$this->names[$name]]) 
             && $this->getClassNameByIndex($this->names[$name]) == $name
@@ -152,12 +153,13 @@ class Middleware
      * 
      * @return object mixed
      */
-    protected function resolveMiddleware($name)
+    protected function queueMiddleware($name)
     {
+        ++$this->count;
         $this->validateMiddleware($name);
         $Class = $this->registered[$name];
-        ++$this->count;
         $this->names[$name] = $this->count;
+
         return $this->queue[$this->count] = $this->dependency->resolveDependencies($Class);  // Store middlewares
     }
 
@@ -168,17 +170,25 @@ class Middleware
      * 
      * @return void
      */
-    public function unqueue($name)
+    public function remove($name)
     {
         if (is_string($name)) {
             $this->validateMiddleware($name);
-            $index = $this->queueNames[$name];
+
+            if (! isset($this->names[$name])) {
+                throw new RuntimeException(
+                    sprintf(
+                        'Middleware "%s" is not available',
+                        $name
+                    )
+                );
+            }
+            $index = $this->names[$name];
             unset($this->queue[$index], $this->names[$name]);
-            --$this->count;
         }
         if (is_array($name)) {
             foreach ($name as $key) {
-                $this->unqueue($key);
+                $this->remove($key);
             }
         }
     }

@@ -97,16 +97,16 @@ class Http extends Application
             $attachedRoute = str_replace('#', '\#', $value['attachedRoute']);  // Ignore delimiter
 
             if ($value['route'] == $uriString) {     // if we have natural route match
-                $object = $middleware->queue($value['name']);
+                $object = $middleware->add($value['name']);
             } elseif (ltrim($attachedRoute, '.') == '*' || preg_match('#'. $attachedRoute .'#', $uriString)) {
-                $object = $middleware->queue($value['name']);
+                $object = $middleware->add($value['name']);
             }
             if ($object instanceof ParamsAwareInterface && ! empty($value['options'])) {  // Inject parameters
                 $object->setParams($value['options']);
             }
         }
         if ($this->c['config']['http']['debugger']['enabled']) {  // Boot debugger
-            $middleware->queue('Debugger');
+            $middleware->add('Debugger');
         }
         $this->inject($middleware);
     }

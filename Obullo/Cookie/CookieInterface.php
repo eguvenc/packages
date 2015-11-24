@@ -85,17 +85,13 @@ interface CookieInterface
 
     /**
      * Set cookie
+     * 
+     * @param array|null $params mixed parameters
      *
-     * Accepts six parameter, or you can submit an associative
-     * array in the first parameter containing all the values.
-     * 
-     * @param string $name  cookie name
-     * @param string $value cookie value
-     * 
-     * @return array
+     * @return object cookie
      */
-    public function set($name = null, $value = null);
-
+    public function set($params = null);
+    
     /**
      * Get cookie
      * 

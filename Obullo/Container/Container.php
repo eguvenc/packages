@@ -91,7 +91,7 @@ class Container implements ContainerInterface, ArrayAccess
     }
 
     /**
-     * Checks package is old / loaded before
+     * Checks package is active / already loaded
      * 
      * @param string $cid package id
      * 

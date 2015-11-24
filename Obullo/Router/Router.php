@@ -81,7 +81,7 @@ class Router implements RouterInterface
      * 
      * @return void
      */
-    public function configuration(array $params)
+    public function configure(array $params)
     {
         if (! isset($params['domain'])) {
             throw new RuntimeException("Domain not configured in routes.php");
@@ -376,7 +376,7 @@ class Router implements RouterInterface
     protected function dispatchRouteMatches($uri, $val, $parameters)
     {
         if (count($val['when']) > 0) {  //  Dynamically add method not allowed middleware
-            $this->c['middleware']->queue('NotAllowed')->setParams($val['when']);
+            $this->c['middleware']->add('NotAllowed')->setParams($val['when']);
         }
         if (! empty($val['rewrite']) && strpos($val['rewrite'], '$') !== false && strpos($val['match'], '(') !== false) {  // Do we have a back-reference ?
             $val['rewrite'] = preg_replace('#^'.$val['match'].'$#', $val['rewrite'], $uri);

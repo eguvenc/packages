@@ -306,7 +306,8 @@ class Form
      */
     public function getValidationErrors($prefix = '', $suffix = '')
     {
-        if ($this->c->has('validator')) {
+        if ($this->c->active('validator')) {
+            
             return $this->c['validator']->getErrorString($prefix, $suffix);
         }
     }
@@ -322,7 +323,8 @@ class Form
      */
     public function getError($field, $prefix = '', $suffix = '')
     {
-        if ($this->c->has('validator')) {  // If we have validator object
+        if ($this->c->active('validator')) {  // If we have validator object
+
             return $this->c['validator']->getError($field, $prefix, $suffix);
         }
     }
@@ -340,7 +342,8 @@ class Form
      */    
     public function getValue($field = '', $default = '')
     {
-        if ($this->c->has('validator')) { // If we have validator object
+        if ($this->c->active('validator')) { // If we have validator object
+
             return $this->c['validator']->getValue($field, $default);
         }
         return $default;
@@ -375,6 +378,7 @@ class Form
     public function setSelect($field = '', $value = '', $default = false, $selectedString = ' selected="selected"')
     {
         $validator = $this->c['validator'];
+
         if (! isset($validator->fieldData[$field]) || ! isset($validator->fieldData[$field]['postdata'])) {
             if ($default === true && count($validator->fieldData) === 0) {
                 return $selectedString;

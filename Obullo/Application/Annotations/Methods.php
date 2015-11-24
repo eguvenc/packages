@@ -2,25 +2,17 @@
 
 namespace Obullo\Application\Annotations;
 
-use Obullo\Event\EventInterface as Event;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
- * Annotations Middleware Class
+ * Annotations Methods
  * 
  * @author    Obullo Framework <obulloframework@gmail.com>
  * @copyright 2009-2015 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Middleware
+class Methods
 {
-    /**
-     * Event
-     * 
-     * @var object
-     */
-    protected $event;
-
     /**
      * When counter
      * 
@@ -50,26 +42,24 @@ class Middleware
     protected $dependency;
 
     /**
-     * Application middleware
+     * Middleware stack
      * 
      * @var object
      */
-    protected $middleware;
+    protected $middlewareStack;
 
     /**
      * Constructor
      * 
-     * @param EventInterface                 $event      event
      * @param ServerRequestInterface         $request    request
-     * @param \Obullo\Container\Dependency   $dependency object
-     * @param \Obullo\Application\Middleware $middleware object
+     * @param \Obullo\Container\Dependency   $dependency manager
+     * @param \Obullo\Application\Middleware $middleware stack object
      */
-    public function __construct(Event $event, Request $request, $dependency, $middleware)
+    public function __construct(Request $request, $dependency, $middleware)
     {
-        $this->event = $event;
         $this->request = $request;
         $this->dependency = $dependency;
-        $this->middleware = $middleware;
+        $this->middlewareStack = $middleware;
     }
 
     /**
@@ -84,16 +74,7 @@ class Middleware
         if (! is_array($middleware)) {      // Do we have any possible parameters ?
             $middleware = array($middleware);
         }
-        $allowedMethods = end($this->when);  // Get the last used when method values
-        $when = count($this->when);
-
-        if ($when > 0 && in_array($this->request->getMethod(), $allowedMethods)) {
-            $this->addMiddleware($middleware);
-            $this->when = array();  // reset when
-            return $this;
-        } elseif ($when == 0) {
-            $this->addMiddleware($middleware);
-        }
+        $this->doWhen($middleware, 'add');
         return $this;
     }
 
@@ -109,9 +90,8 @@ class Middleware
         if (! is_array($middleware)) {      // Do we have any possible parameters ?
             $middleware = array($middleware);
         }
-        foreach ($middleware as $name) {
-            $this->middleware->remove(ucfirst($name));
-        }
+        $this->doWhen($middleware, 'remove');
+        return $this;
     }
 
     /**
@@ -142,45 +122,53 @@ class Middleware
         if (is_string($params)) {
             $params = array($params);
         }
-        $this->middleware->queue('NotAllowed')->setParams($params);
+        $this->middlewareStack
+            ->add('NotAllowed')
+            ->setParams($params);
         return;
     }
 
     /**
-     * Subscribe to events
+     * Do when filter
      *
-     * @param string $namespace event subscribe listener
+     * @param array  $middlewares names
+     * @param string $method      operation name
      * 
      * @return void
      */
-    public function subscribe($namespace)
+    protected function doWhen(array $middlewares, $method = 'add')
     {
-        $Class = '\\'.ltrim($namespace, '\\');
-        $allowedMethods = end($this->when);  // Get the last used when method values
         $when = count($this->when);
 
-        if ($when > 0 && in_array($this->request->getMethod(), $allowedMethods)) {
-            $event = new $Class;
-            $this->dependency->resolveDependencies($Class);
-            $this->event->subscribe($event);
-            $this->when = array();  // Reset when
-            return $this;
-        } elseif ($when == 0) {
-            $this->event->subscribe(new $Class);
+        if ($when == 0) {
+            $this->callMiddlewareStack($middlewares, $method);
+            return;
+        }
+        $allowedMethods = array_map(
+            function ($value) { 
+                return strtoupper($value);
+            },
+            end($this->when)
+        );
+        if (in_array($this->request->getMethod(), $allowedMethods)) {
+
+            $this->callMiddlewareStack($middlewares, $method);
+            $this->when = array();  // reset when
         }
     }
 
     /**
      * Add middlewares to application
      * 
-     * @param array $middlewares names
+     * @param array  $middlewares names
+     * @param string $method      add / remove
      * 
      * @return void
      */
-    protected function addMiddleware(array $middlewares)
+    protected function callMiddlewareStack(array $middlewares, $method = 'add')
     {
         foreach ($middlewares as $name) {
-            $this->middleware->queue(ucfirst($name));
+            $this->middlewareStack->$method(ucfirst($name));
         }
     }
     

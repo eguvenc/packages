@@ -66,8 +66,6 @@ class View implements ViewInterface
     public function getBody($_Vpath, $_Vfilename, $_VData = null, $_VInclude = true)
     {
         $_VInclude = ($_VData === false) ? false : $_VInclude;
-        $fileExtension = substr($_Vfilename, strrpos($_Vfilename, '.')); // Detect extension ( e.g. '.tpl' )
-        $ext = (strpos($fileExtension, '.') === 0) ? '' : '.php';
 
         $this->assignVariables($_VData);
 
@@ -77,7 +75,7 @@ class View implements ViewInterface
         extract($this->_boolStack, EXTR_SKIP);
 
         ob_start();   // Please open short tags in your php.ini file. ( it must be short_tag = On ).
-        include $_Vpath . $_Vfilename . $ext;
+        include $_Vpath . $_Vfilename . '.php';
         $body = ob_get_clean();
         
         if ($_VData === false || $_VInclude === false) {

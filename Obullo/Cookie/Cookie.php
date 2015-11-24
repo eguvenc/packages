@@ -193,32 +193,21 @@ class Cookie implements CookieInterface
 
     /**
      * Set cookie
-     *
-     * Accepts six parameter, or you can submit an associative
-     * array in the first parameter containing all the values.
      * 
-     * @param string $name  cookie name
-     * @param string $value cookie value
+     * @param array|null $params mixed parameters
      *
-     * @return array
+     * @return object cookie
      */
-    public function set($name = null, $value = null)
+    public function set($params = null)
     {
-        if (is_string($name) && $name != null) {    // Build method chain parameters
-
-            if (! isset($this->responseCookies[$this->id]['name'])) {
-                $this->name($name);   // Set cookie name
-            }
-            if (! isset($this->responseCookies[$this->id]['value'])) {
-                $this->value($value); // Set cookie value
-            }
-            $properties = $this->buildParameters($this->responseCookies[$this->id]);
-        }
-        if ($name == null && $value == null) {  // If user want to use this way $this->cookie->name()->value()->set();
-
-            $properties = $this->buildParameters($this->responseCookies[$this->id]);
+        if (empty($params)) {
+            $properties = $this->buildParams($this->responseCookies[$this->id]);
+        } else {
+            $properties = $this->buildParams($params);
         }
         $this->toHeader($this->id, $properties);
+
+        return $this;
     }
 
     /**
@@ -228,9 +217,9 @@ class Cookie implements CookieInterface
      * 
      * @return array
      */
-    protected function buildParameters($params)
+    public function buildParams(array $params)
     {
-        if (! is_array($params) || ! isset($params['name'])) {
+        if (! isset($params['name'])) {
             throw new RuntimeException("Cookie name can't be empty.");
         }
         $cookie = array();

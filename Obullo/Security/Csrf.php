@@ -24,11 +24,11 @@ use Psr\Http\Message\RequestInterface as Request;
 class Csrf 
 {
      /**
-      * Config
+      * Service parameters
       * 
       * @var array
       */
-     protected $config;
+     protected $params;
 
      /**
       * Logger
@@ -97,9 +97,6 @@ class Csrf
      */
     public function verify(Request $request)
     {
-        if ($this->setCsrfToken($request)) {
-            return true;
-        }
         $post = $request->getParsedBody();
 
         if (! isset($post[$this->tokenName]) 
@@ -114,40 +111,15 @@ class Csrf
     }
 
     /**
-     * Set csrf token if method not POST
-     *
-     * @param Request $request request
-     *
-     * @return bool
-     */
-    public function setCsrfToken(Request $request)
-    {
-        if ($request->getMethod() !== 'POST') { // If it's not a POST request we will set the CSRF token
-            $this->setSession();     // Set token to session if we have empty data
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Set Cross Site Request Forgery Protection Cookie
+     * Set Csrf cookie if not available in session
      *
      * @return object
      */
-    protected function setSession()
+    protected function setToken()
     {
         if (empty($this->tokenData['value'])) {
-
-            $this->tokenData = [
-                'value' => $this->generateHash(),
-                'time' => time()
-            ];
-            $this->session->set($this->tokenName, $this->tokenData);
-
-            $this->logger->channel('security');
-            $this->logger->debug('Csrf token session set');
+            $this->createToken();
         }
-        $this->refreshToken();
         return $this;
     }
 
@@ -162,10 +134,22 @@ class Csrf
         $tokenRefresh = strtotime('- '.$this->refresh.' seconds'); // Create a old time belonging to refresh seconds.
 
         if (isset($this->tokenData['time']) && $tokenRefresh > $this->tokenData['time']) {  // Refresh token
-            $this->tokenData = array();  // Reset data for update the token
-            $this->setSession();
+            $this->createToken();
         }
-        return $this->getToken();
+    }
+
+    /**
+     * Create new token in session
+     * 
+     * @return void
+     */
+    protected function createToken()
+    {
+        $this->tokenData = [
+                'value' => $this->generateHash(),
+                'time' => time()
+            ];
+        $this->session->set($this->tokenName, $this->tokenData);
     }
 
     /**
@@ -177,6 +161,9 @@ class Csrf
      */
     public function getToken()
     {
+        $this->setToken();
+        $this->refreshToken();
+
         return $this->tokenData['value'];
     }
 
