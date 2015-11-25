@@ -2,20 +2,16 @@
 
 namespace Obullo\Form;
 
-use Controller;
-use Obullo\Log\LoggerInterface;
-use Obullo\Config\ConfigInterface;
-use Obullo\Container\ContainerInterface;
+use Obullo\Log\LoggerInterface as Logger;
+use Obullo\Config\ConfigInterface as Config;
+use Obullo\Container\ContainerInterface as Container;
 
 /**
  * Form Class
  * 
- * @category  Form
- * @package   Form
  * @author    Obullo Framework <obulloframework@gmail.com>
  * @copyright 2009-2015 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
- * @link      http://obullo.com/package/form
  */
 class Form
 {
@@ -56,18 +52,19 @@ class Form
     /**
      * Constructor
      *
-     * @param object $c      \Obullo\Container\ContainerInterface
-     * @param object $config \Obullo\Config\ConfigInterface
-     * @param object $logger \Obullo\Log\LoggerInterface
+     * @param object $container \Obullo\Container\ContainerInterface
+     * @param object $config    \Obullo\Config\ConfigInterface
+     * @param object $logger    \Obullo\Log\LoggerInterface
      */
-    public function __construct(ContainerInterface $c, ConfigInterface $config, LoggerInterface $logger)
+    public function __construct(Container $container, Config $config, Logger $logger)
     {
-        $this->c = $c;
-        $this->notification = $config->load('notification')['form'];
-        $this->logger = $logger;
+        $this->c = $container;
+        $this->notification = $config->load('form')['notification'];
+
         $this->messages['success'] = static::ERROR;
         $this->messages['code'] = 0;
 
+        $this->logger = $logger;
         $this->logger->debug('Form Class Initialized');
     }
 

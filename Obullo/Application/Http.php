@@ -52,8 +52,8 @@ class Http extends Application
         $router = $this->c['router'];
         $router->init();
 
-        include MODULES .$router->getModule('/').$router->getDirectory().'/'.$router->getClass().'.php';
-        $className = '\\'.$router->getNamespace().'\\'.$router->getClass();
+        include MODULES .$router->getModule('/').$router->getDirectory('/').$router->getClass().'.php';;
+        $className = '\\'.$router->getNamespace().$router->getClass();
 
         $method = $router->getMethod();
 
@@ -61,6 +61,7 @@ class Http extends Application
 
             $router->clear();  // Fix layer errors.
             $this->error = true;
+
 
         } else {
 
@@ -140,7 +141,7 @@ class Http extends Application
      */
     protected function bootAnnotations($method)
     {
-        if ($this->c['config']['extra']['annotations']) {
+        if ($this->c['config']['extra']['annotations'] && $this->controller != null) {
 
             $reflector = new ReflectionClass($this->controller);
 

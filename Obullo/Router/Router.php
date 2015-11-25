@@ -12,6 +12,7 @@ use Obullo\Container\ContainerInterface as Container;
 
 use Obullo\Router\Resolver\DirectoryResolver;
 use Obullo\Router\Resolver\ModuleResolver;
+use Obullo\Router\Resolver\ClassResolver;
 
 /**
  * Http Router Class ( Modeled after Codeigniter router )
@@ -117,8 +118,13 @@ class Router implements RouterInterface
             if (empty($this->defaultController)) {
                 return;
             }
-            $segments = $this->resolve(explode('/', $this->defaultController));  // Turn the default route into an array.
-            $this->setClass($segments[1]);
+            // $segments = $this->resolve(explode('/', $this->defaultController));  // Turn the default route into an array.
+            $resolver = $this->resolve(explode('/', $this->defaultController));  // Turn the default route into an array.
+            $segments = $resolver->getSegments();
+
+            $class = empty($segments[1]) ? $segments[0] : $segments[1];
+
+            $this->setClass($class);
             $this->setMethod('index');
             $this->uri->setRoutedSegments($segments);  // Assign the segments to the URI class
             $this->logger->debug('No URI present. Default controller set.');
@@ -247,18 +253,25 @@ class Router implements RouterInterface
      */
     public function setRequest($segments = array())
     {
-        $segments = $this->resolve($segments);
-
-        if (count($segments) == 0) {
+        $resolver = $this->resolve($segments);
+        if ($resolver == null) {
             return;
         }
-        if (isset($segments[1])) {
-            $this->setClass($segments[1]);
+        $factor   = $resolver->getFactor();
+        $segments = $resolver->getSegments();
+
+        // print_r($segments);
+
+        $one = 1 + $factor;
+        $two = 2 + $factor;
+
+        if (isset($segments[$one])) {
+            $this->setClass($segments[$one]);
         }
-        if (! empty($segments[2])) {
-            $this->setMethod($segments[2]); // A standard method request
+        if (! empty($segments[$two])) {
+            $this->setMethod($segments[$two]); // A standard method request
         } else {
-            $segments[2] = 'index';         // This lets the "routed" segment array identify that the default index method is being used.
+            $segments[$two] = 'index';         // This lets the "routed" segment array identify that the default index method is being used.
             $this->setMethod('index');
         }
         $this->uri->setRoutedSegments($segments);  // Update our "routed" segment array to contain the segments.
@@ -269,27 +282,32 @@ class Router implements RouterInterface
      * 
      * @param array $segments uri parts
      * 
-     * @return array
+     * @return array|null
      */
     protected function resolve($segments)
     {
         if (empty($segments[0])) {
-            return $segments;
+            return null;
         }
         $this->setDirectory($segments[0]);      // Set first segment as default "top" directory 
         $segments = $this->detectModule($segments);
         $module = $this->getModule('/');
 
-        if (empty($module)) {  // If we have directory request
+        if (empty($module)) {
             
-            $resolver = new DirectoryResolver($this);
-            return $resolver->resolve($segments);
+            if (is_dir(MODULES .$this->getDirectory().'/')) {
 
-        } else {  // If we have module request
+                $resolver = new DirectoryResolver($this);
+                return $resolver->resolve($segments);
+            } 
 
-            $resolver = new ModuleResolver($this);
+            $this->setDirectory(null);
+            $resolver = new ClassResolver($this);
             return $resolver->resolve($segments);
         }
+
+        $resolver = new ModuleResolver($this);
+        return $resolver->resolve($segments);
     }
 
     /**
@@ -500,11 +518,13 @@ class Router implements RouterInterface
     /**
      * Fetch the directory
      *
+     * @param string $separator directory seperator
+     * 
      * @return string
      */
-    public function getDirectory()
+    public function getDirectory($separator = '')
     {
-        return htmlspecialchars($this->directory);
+        return (empty($this->directory)) ? '' : htmlspecialchars($this->directory).$separator;
     }
 
     /**
@@ -536,7 +556,8 @@ class Router implements RouterInterface
     {
         $namespace = $this->ucwordsUnderscore($this->getModule()).'\\'.$this->ucwordsUnderscore($this->getDirectory());
         $namespace = trim($namespace, '\\');
-        return $namespace;
+
+        return (empty($namespace)) ? '' : $namespace.'\\';
     }
 
     /**

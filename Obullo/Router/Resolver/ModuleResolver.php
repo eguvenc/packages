@@ -20,6 +20,8 @@ class ModuleResolver
      */
     protected $router;
 
+    protected $segments;
+
     /**
      * Constructor
      * 
@@ -45,9 +47,12 @@ class ModuleResolver
         
         // Add support e.g http://project/widgets/tutorials/helloWorld.php
 
-        if ($hasSegmentOne && is_file(MODULES.$module.$directory.'/'.$this->router->ucwordsUnderscore($segments[1]).'.php')) {
+        if ($hasSegmentOne && is_file(MODULES .$module.$directory.'/'.$this->router->ucwordsUnderscore($segments[1]).'.php')) {
 
-            return $segments;
+            $this->segments = $segments;
+
+            return $this;
+            // return $segments;
 
         } else {
             
@@ -55,10 +60,28 @@ class ModuleResolver
             //  Rewrite /widgets/tutorials/tutorials/test to /widgets/tutorials/test
 
             array_unshift($segments, $directory); 
-            return $segments;
+
+            $this->segments = $segments;
+
+            return $this;
+            // return $segments;
         }
 
-        return $segments;
+        $this->segments = $segments;
+
+        return $this;
+        // return $segments;
     }
+
+    public function getFactor()
+    {
+        return 0;
+    }
+
+    public function getSegments()
+    {
+        return $this->segments;
+    }
+
 
 }

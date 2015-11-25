@@ -212,11 +212,15 @@ class View implements ViewInterface
         } else {
             $router = &Controller::$instance->router;  // Use nested controller router ( @see the Layer package. )
         }
+
+        $path = $router->getModule('/') . $router->getDirectory();
+        $path = (empty($path)) ? 'views' : $path;  // Read view file from /modules/views/ folder
+
         /**
          * Fetch view ( also it can be nested )
          */
         $return = $this->getBody(
-            MODULES .$router->getModule('/') . $router->getDirectory() .'/view/',
+            MODULES .$path .'/view/',
             $filename,
             $data,
             $include

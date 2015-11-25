@@ -2,21 +2,18 @@
 
 namespace Obullo\Form;
 
-use Obullo\Log\LoggerInterface;
-use Obullo\Config\ConfigInterface;
-use Obullo\Container\ContainerInterface;
+use Psr\Http\Message\ServerRequestInterface as Request;
+
+use Obullo\Log\LoggerInterface as Logger;
+use Obullo\Config\ConfigInterface as Config;
+use Obullo\Container\ContainerInterface as Container;
 
 /**
  * Element Class
  *
- * Modeled after Codeigniter form helper 
- * 
- * @category  Form
- * @package   Element
  * @author    Obullo Framework <obulloframework@gmail.com>
  * @copyright 2009-2015 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
- * @link      http://obullo.com/package/form
  */
 class Element
 {
@@ -30,21 +27,31 @@ class Element
     /**
      * Config
      * 
-     * @var config
+     * @var object
      */
     protected $config;
 
     /**
+     * Request
+     * 
+     * @var object
+     */
+    protected $request;
+
+    /**
      * Constructor
      *
-     * @param object $c      \Obullo\Container\ContainerInterface
-     * @param object $config \Obullo\Config\ConfigInterface
-     * @param object $logger \Obullo\Log\LoggerInterface
+     * @param object $container \Obullo\Container\ContainerInterface
+     * @param object $request   ServerRequestInterface
+     * @param object $config    \Obullo\Config\ConfigInterface
+     * @param object $logger    \Obullo\Log\LoggerInterface
      */
-    public function __construct(ContainerInterface $c, ConfigInterface $config, LoggerInterface $logger)
+    public function __construct(Container $container, Request $request, Config $config, Logger $logger)
     {
-        $this->c = $c;
+        $this->c = $container;
         $this->config = $config;
+        $this->request = $request;
+
         $logger->debug('Form Element Class Initialized');
     }
 
@@ -63,17 +70,17 @@ class Element
         if ($attributes == '') {
             $attributes = 'method="post"';
         }
-        $action = ( strpos($action, '://') === false) ? $this->c['uri']->getSiteUrl($action) : $action;
+        $action = ( strpos($action, '://') === false) ? $this->c['url']->siteUrl($action) : $action;
         $form  = '<form action="'.$action.'"';
         $form .= $this->attributesToString($attributes, true);
         $form .= '>';
 
-        $security = $this->config['security'];
+        $csrf = $this->config->load('service/csrf')['params'];
         $form = str_replace(array('"method=\'get\'"', "method=\'GET\'"), 'method="get"', $form);
 
         // Add CSRF field if enabled, but leave it out for GET requests and requests to external websites
 
-        if ($security['csrf']['protection'] && ! stripos($form, 'method="get"')) {
+        if ($csrf['protection'] && ! stripos($form, 'method="get"')) {
             $hidden[$this->c['csrf']->getTokenName()] = $this->c['csrf']->getToken();
         }
         if (is_array($hidden) && count($hidden) > 0) {
@@ -126,6 +133,7 @@ class Element
     public function button($data = '', $content = '', $extra = '')
     {
         $defaults = array('name' => (( ! is_array($data)) ? $data : ''), 'type' => 'button');
+
         if (is_array($data) && isset($data['content'])) {
             $content = $data['content'];
             unset($data['content']); // content is not an attribute
@@ -182,6 +190,8 @@ class Element
      */
     public function dropdown($name = '', $options = '', $selected = array(), $extra = '', $data = array())
     {
+        $post = $this->request->getParsedBody();
+
         if (is_object($selected)) { // $_POST & Db value
             $selected = $this->getRowValue($selected, $name);
         }
@@ -193,8 +203,8 @@ class Element
             $selected = array($selected);
         }
         if (sizeof($selected) === 0) { // If no selected state was submitted we will attempt to set it automatically
-            if (isset($_POST[$name])) { // If the form name appears in the $_POST array we have a winner !
-                $selected = array($_POST[$name]);
+            if (isset($post[$name])) { // If the form name appears in the $_POST array we have a winner !
+                $selected = array($post[$name]);
             }
         }
         if ($extra != '') {
@@ -413,6 +423,7 @@ class Element
             $data = array('name' => $data); 
         }
         $data['type'] = 'radio';
+
         return $this->checkbox($data, $value, $checked, $extra);
     }
    
@@ -428,6 +439,7 @@ class Element
     public function reset($data = '', $value = '', $extra = '')
     {
         $defaults = array('type' => 'reset', 'name' => (( ! is_array($data)) ? $data : ''), 'value' => $value);
+
         return '<input ' . $this->parseFormAttributes($data, $defaults) . $extra ." />";
     }
 
@@ -443,6 +455,7 @@ class Element
     public function submit($data = '', $value = '', $extra = '')
     {
         $defaults = array('type' => 'submit', 'name' => (( ! is_array($data)) ? $data : ''), 'value' => $this->c['translator'][$value]);
+
         return '<input ' . $this->parseFormAttributes($data, $defaults) . $extra . ' />';
     }
    
@@ -472,6 +485,7 @@ class Element
         }
         $name     = (is_array($data)) ? $data['name'] : $data;
         $textarea = '<textarea '. $this->parseFormAttributes($data, $defaults) . $extra . ">" . $this->prep($val, $name) . '</textarea>';
+
         return $textarea;
     }
 
@@ -491,6 +505,7 @@ class Element
             $data = array('name' => $data);
         }
         $data['type'] = 'file';
+
         return $this->input($data, $value, $extra);
     }
 
@@ -537,6 +552,7 @@ class Element
     public function attributesToString($attributes)
     {
         if (is_string($attributes) && strlen($attributes) > 0) {
+
             $attributes = str_replace('\'', '"', $attributes); // convert to double quotes.
             if (strpos($attributes, 'method=') === false) {
                 $attributes.= ' method="post"';
@@ -547,9 +563,11 @@ class Element
             return ' '.ltrim($attributes);
         }
         if (is_object($attributes) && count($attributes) > 0) {
+
             $attributes = (array)$attributes;
         }
         if (is_array($attributes) && count($attributes) > 0) {
+
             $atts = '';
             if (! isset($attributes['method'])) {
                 $atts.= ' method="post"';
@@ -577,11 +595,17 @@ class Element
         if (is_array($field)) {
             $field = $field['name'];
         }
-        $value = (isset($_REQUEST[$field])) ? $this->c['form']->getValue($field) : '';
-        if (! isset($_REQUEST[$field])) { // If POST data not available use Database $row
+        $request = $this->request->getParameters();
+        $value   = (isset($request[$field])) ? $this->c['form']->getValue($field) : '';
+
+        if (! isset($request[$field])) { // If POST data not available use Database $row
+
             if (is_object($row) && isset($row->{$field})) { // If field available in database $row Object
+
                 $value = $row->{$field};
+
             } elseif (is_array($row) && isset($row[$field])) { // If field available in database $row Array
+
                 $value = $row[$field];   
             }
         }

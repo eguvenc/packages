@@ -2,10 +2,10 @@
 
 namespace Obullo\Flash;
 
-use Obullo\Log\LoggerInterface;
-use Obullo\Config\ConfigInterface;
-use Obullo\Session\SessionInterface;
-use Obullo\Container\ContainerInterface;
+use Obullo\Log\LoggerInterface as Logger;
+use Obullo\Config\ConfigInterface as Config;
+use Obullo\Session\SessionInterface as Session;
+use Obullo\Container\ContainerInterface as Container;
 
 /**
  * Flash Session
@@ -59,21 +59,21 @@ class Session
     /**
      * Constructor
      *
-     * @param object $c       \Obullo\Container\ContainerInterface
-     * @param object $config  \Obullo\Config\ConfigInterface
-     * @param object $logger  \Obullo\Log\LoggerInterface
-     * @param object $session \Obullo\Session\SessionInterface
+     * @param object $container \Obullo\Container\ContainerInterface
+     * @param object $config    \Obullo\Config\ConfigInterface
+     * @param object $logger    \Obullo\Log\LoggerInterface
+     * @param object $session   \Obullo\Session\SessionInterface
      */
-    public function __construct(ContainerInterface $c, ConfigInterface $config, LoggerInterface $logger, SessionInterface $session) 
+    public function __construct(Container $container, Config $config, Logger $logger, Session $session) 
     {
-        $this->c = $c;
+        $this->c = $container;
         $this->session = $session;
-        $this->notification = $config->load('notification')['flash'];
+        $this->notification = $config->load('flash')['notification'];
 
         $this->flashdataSweep();  // Delete old flashdata (from last request)
         $this->flashdataMark();   // Marks all new flashdata as old (data will be deleted before next request)
         
-        $logger->debug('Session Flash Class Initialized');
+        $logger->debug('Flash Class Initialized');
     }
 
     /**
