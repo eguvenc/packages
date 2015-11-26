@@ -20,6 +20,11 @@ class DirectoryResolver
      */
     protected $router;
 
+    /**
+     * Segments
+     * 
+     * @var array
+     */
     protected $segments;
 
     /**
@@ -48,28 +53,36 @@ class DirectoryResolver
 
         if (is_file($file)) {
 
-            if ($hasSegmentOne == false || $hasSegmentOne && $segments[1] == 'index') {  // welcome/hello support
+            $index = ($hasSegmentOne && $segments[1] == 'index');
+
+            if ($hasSegmentOne == false || $index) {  // welcome/hello support
                 array_unshift($segments, $directory);
             }
-
             $this->segments = $segments;
 
             return $this;
-            // return $segments;
         }
 
         $this->segments = $segments;
 
         return $this;
-        // return $segments;
     }
 
-
+    /**
+     * Get segment factor
+     * 
+     * @return int
+     */
     public function getFactor()
     {
         return 0;
     }
 
+    /**
+     * Get uri segments
+     * 
+     * @return array
+     */
     public function getSegments()
     {
         return $this->segments;

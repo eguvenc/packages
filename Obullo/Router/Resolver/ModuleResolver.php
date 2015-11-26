@@ -20,6 +20,11 @@ class ModuleResolver
      */
     protected $router;
 
+    /**
+     * Segments
+     * 
+     * @var array
+     */
     protected $segments;
 
     /**
@@ -52,7 +57,6 @@ class ModuleResolver
             $this->segments = $segments;
 
             return $this;
-            // return $segments;
 
         } else {
             
@@ -60,28 +64,34 @@ class ModuleResolver
             //  Rewrite /widgets/tutorials/tutorials/test to /widgets/tutorials/test
 
             array_unshift($segments, $directory); 
-
             $this->segments = $segments;
 
             return $this;
-            // return $segments;
         }
 
         $this->segments = $segments;
 
         return $this;
-        // return $segments;
     }
 
+    /**
+     * Get segment factor
+     * 
+     * @return int
+     */
     public function getFactor()
     {
         return 0;
     }
 
+    /**
+     * Get uri segments
+     * 
+     * @return array
+     */
     public function getSegments()
     {
         return $this->segments;
     }
-
 
 }

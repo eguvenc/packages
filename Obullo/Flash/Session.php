@@ -2,9 +2,9 @@
 
 namespace Obullo\Flash;
 
+use Obullo\Session\SessionInterface;
 use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Config\ConfigInterface as Config;
-use Obullo\Session\SessionInterface as Session;
 use Obullo\Container\ContainerInterface as Container;
 
 /**
@@ -64,7 +64,7 @@ class Session
      * @param object $logger    \Obullo\Log\LoggerInterface
      * @param object $session   \Obullo\Session\SessionInterface
      */
-    public function __construct(Container $container, Config $config, Logger $logger, Session $session) 
+    public function __construct(Container $container, Config $config, Logger $logger, SessionInterface $session) 
     {
         $this->c = $container;
         $this->session = $session;

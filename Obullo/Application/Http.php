@@ -62,7 +62,6 @@ class Http extends Application
             $router->clear();  // Fix layer errors.
             $this->error = true;
 
-
         } else {
 
             $this->controller = new $className;
@@ -93,19 +92,23 @@ class Http extends Application
         $object = null;
         $uriString = $request->getUri()->getPath();
         
-        foreach ($router->getAttachedMiddlewares() as $value) {
+        if ($attach = $router->getAttach()) {
 
-            $attachedRoute = str_replace('#', '\#', $value['attachedRoute']);  // Ignore delimiter
+            foreach ($attach->getArray() as $value) {
 
-            if ($value['route'] == $uriString) {     // if we have natural route match
-                $object = $middleware->add($value['name']);
-            } elseif (ltrim($attachedRoute, '.') == '*' || preg_match('#'. $attachedRoute .'#', $uriString)) {
-                $object = $middleware->add($value['name']);
-            }
-            if ($object instanceof ParamsAwareInterface && ! empty($value['options'])) {  // Inject parameters
-                $object->setParams($value['options']);
+                $attachedRoute = str_replace('#', '\#', $value['attachedRoute']);  // Ignore delimiter
+
+                if ($value['route'] == $uriString) {     // if we have natural route match
+                    $object = $middleware->add($value['name']);
+                } elseif (ltrim($attachedRoute, '.') == '*' || preg_match('#'. $attachedRoute .'#', $uriString)) {
+                    $object = $middleware->add($value['name']);
+                }
+                if ($object instanceof ParamsAwareInterface && ! empty($value['options'])) {  // Inject parameters
+                    $object->setParams($value['options']);
+                }
             }
         }
+
         if ($this->c['config']['http']['debugger']['enabled']) {  // Boot debugger
             $middleware->add('Debugger');
         }

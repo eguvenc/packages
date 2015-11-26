@@ -20,6 +20,11 @@ class ClassResolver
      */
     protected $router;
 
+    /**
+     * Segments
+     * 
+     * @var array
+     */
     protected $segments;
 
     /**
@@ -44,14 +49,23 @@ class ClassResolver
         $this->segments = $segments;
 
         return $this;
-        // return $segments;
     }
 
+    /**
+     * Get segment factor
+     * 
+     * @return int
+     */
     public function getFactor()
     {
         return -1;
     }
 
+    /**
+     * Uri segments
+     * 
+     * @return array
+     */
     public function getSegments()
     {
         return $this->segments;
