@@ -74,7 +74,7 @@ class View implements ViewInterface
         extract($this->_objectStack, EXTR_SKIP);
         extract($this->_boolStack, EXTR_SKIP);
 
-        ob_start();   // Please open short tags in your php.ini file. ( it must be short_tag = On ).
+        ob_start();
         include $_Vpath . $_Vfilename . '.php';
         $body = ob_get_clean();
         

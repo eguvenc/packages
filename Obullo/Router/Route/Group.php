@@ -6,7 +6,6 @@ use Closure;
 use Psr\Http\Message\UriInterface as Uri;
 use Obullo\Router\RouterInterface as Router;
 
-
 /**
  * Group functionality
  * 

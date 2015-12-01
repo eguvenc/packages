@@ -13,27 +13,40 @@ $getError = function ($message) {
 }
 ?>
 <div id="middle">
-
-<span><?php echo $getError($e->getMessage()); ?></span>
-<h2>Details</h2>
-<div><strong>Type:</strong> <?php echo get_class($e) ?></div>
-<div><strong>Code:</strong> <?php echo $e->getCode() ?></div>
-<div><strong>File:</strong> <?php echo $getError($e->getFile()) ?></div>
-<div><strong>Line:</strong> <?php echo $e->getLine() ?></div>
+    <h1><?php echo $getError($e->getMessage()); ?></h1>
+    <h2>Details</h2>
+    <div><strong>Type:</strong> <?php echo get_class($e) ?></div>
+    <div><strong>Code:</strong> <?php echo $e->getCode() ?></div>
+    <div><strong>File:</strong> <?php echo $getError($e->getFile()) ?></div>
+    <div><strong>Line:</strong> <?php echo $e->getLine() ?></div>
 </div>
 
+<?php
+$traceID = md5($e->getFile().$e->getLine().$e->getCode().$e->getMessage());
+?>
 <div id="debug">
     <div id="exceptionContent">
-    <?php if (isset($fatalError)) :  ?>
+    <?php if (isset($fatalError))  { ?>
         <h1>Fatal Error</h1>
         <h2><?php echo $getError($e->getMessage()) ?></h2>
         <div class="errorFile errorLine"><?php $getError($e->getFile()). '  Line : ' . $e->getLine() ?>
         </div>
     </div>
+
 <?php
 exit; // Shutdown error exit.
-else: echo '<h1>Trace</h1>';
-endif;
+} else {
+    $fullTraces  = $e->getTrace();
+    $debugTraces = array();
+    foreach ($fullTraces as $key => $val) {
+        if (isset($val['file']) && isset($val['line'])) {
+            $debugTraces[] = $val;
+        }
+    }
+    if ($e->getCode() != E_PARSE) {
+        echo '<h1><a href="javascript:void(0);" onclick="TraceToggle(\''.$traceID.'\')">debug_backtrace ('.sizeof($debugTraces).')</a></h1>';
+    }
+}
 ?>
 
 <?php
@@ -42,15 +55,9 @@ if (isset($lastQuery) && ! empty($lastQuery)) {
 }
 ?>
 <div class="errorFile errorLine"></div>
-<?php
-    $fullTraces  = $e->getTrace();
-    $debugTraces = array();
 
-    foreach ($fullTraces as $key => $val) {
-        if (isset($val['file']) && isset($val['line'])) {
-            $debugTraces[] = $val;
-        }
-    }
+<div id="<?php echo $traceID ?>" style="display:none;">
+<?php
     if (isset($debugTraces[0]['file']) && isset($debugTraces[0]['line'])) {
 
         if (isset($debugTraces[1]['file']) && isset($debugTraces[1]['line'])) {
@@ -67,10 +74,12 @@ if (isset($lastQuery) && ! empty($lastQuery)) {
                         $html.= $trace['function'];
                     }
                     if (isset($trace['args'])) {
+                        
                         if (count($trace['args']) > 0) {
-                            $html.= '(<a href="javascript:void(0);" style="color:#E53528;" ';
+
+                            $html.= '(<a href="javascript:void(0);" style="color:#BF342A;" ';
                             $html.= 'onclick="ExceptionToggle(\'arg_toggle_' . $prefix . $key . '\');">';
-                            $html.= 'arg';
+                            $html.= 'args';
                             $html.= '</a>)';
                             $html.= '<div id="arg_toggle_' . $prefix . $key . '" class="collapsed">';
                             $html.= '<div class="arguments">';
@@ -85,7 +94,6 @@ if (isset($lastQuery) && ! empty($lastQuery)) {
                                 } else {
                                     $html.= '<td>' . Utils::dumpArgument($arg_val) . '</td>';
                                 }
-                                
                                 $html.= '</tr>';
                             }
                             $html.= '</table>';
@@ -100,12 +108,11 @@ if (isset($lastQuery) && ! empty($lastQuery)) {
                     }
                     echo '<div class="errorFile" style="line-height: 2em;">' . $html . '</div>';
                 }
-
                 ++$key;
                 
                 ?>
                 <div class="errorFile" style="line-height: 1.8em;">
-                    <a href="javascript:void(0);" style="color:#E53528;" onclick="ExceptionToggle('error_toggle_' + '<?php echo $prefix . $key ?>');"><?php echo addslashes($getError($trace['file']));
+                    <a href="javascript:void(0);" style="color:#BF342A;" onclick="ExceptionToggle('error_toggle_' + '<?php echo $prefix . $key ?>');"><?php echo addslashes($getError($trace['file']));
                 echo ' ( ' ?><?php echo ' Line : ' . $trace['line'] . ' ) '; ?></a>
                 </div>
 
@@ -115,5 +122,6 @@ if (isset($lastQuery) && ! empty($lastQuery)) {
 
     <?php }   // end if isset ?>     
 <?php }   // end if isset ?>
+</div>
 </div>
 </div>

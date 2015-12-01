@@ -6,6 +6,8 @@ use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Config\ConfigInterface as Config;
 use Obullo\Container\ContainerInterface as Container;
 
+use Psr\Http\Message\RequestInterface as Request;
+
 /**
  * Form Class
  * 
@@ -36,11 +38,18 @@ class Form
     protected $c;
 
     /**
-     * Config Parameters
+     * Notification config
      * 
      * @var array
      */
     protected $notification = array();
+
+    /**
+     * Error config
+     * 
+     * @var array
+     */
+    protected $error = array();
 
     /**
      * Store form notification and errors
@@ -50,16 +59,28 @@ class Form
     protected $messages = array();
 
     /**
+     * Request
+     * 
+     * @var object
+     */
+    protected $request;
+
+    /**
      * Constructor
      *
      * @param object $container \Obullo\Container\ContainerInterface
+     * @param object $request   \Obullo\
      * @param object $config    \Obullo\Config\ConfigInterface
      * @param object $logger    \Obullo\Log\LoggerInterface
      */
-    public function __construct(Container $container, Config $config, Logger $logger)
+    public function __construct(Container $container, Request $request, Config $config, Logger $logger)
     {
         $this->c = $container;
-        $this->notification = $config->load('form')['notification'];
+        $this->request = $request;
+
+        $form = $config->load('form');
+        $this->error        = $form['error'];
+        $this->notification = $form['notification'];
 
         $this->messages['success'] = static::ERROR;
         $this->messages['code'] = 0;
@@ -327,6 +348,34 @@ class Form
     }
 
     /**
+     * Get error css class attribute
+     * 
+     * @param string $field fieldname
+     * 
+     * @return mixed string or null
+     */
+    public function getErrorClass($field)
+    {
+        if ($this->getError($field)) {
+            return $this->error['class'];
+        }
+    }
+
+    /**
+     * Get error with css label tag
+     * 
+     * @param string $field fieldname
+     * 
+     * @return mixed string or null
+     */
+    public function getErrorLabel($field)
+    {
+        if ($error = $this->getError($field)) {
+            return sprintf($this->error['label'], $field, $error);
+        }
+    }
+
+    /**
      * Get filtered value from validator data
      *
      * Permits you to repopulate a form field with the value it was submitted
@@ -339,9 +388,13 @@ class Form
      */    
     public function getValue($field = '', $default = '')
     {
-        if ($this->c->active('validator')) { // If we have validator object
+        if ($this->c->active('validator') && isset($this->c['validator']->fieldData[$field])) { // If we have validator object
 
             return $this->c['validator']->getValue($field, $default);
+
+        } elseif ($value = $this->request->post($field)) {
+
+            return $value;
         }
         return $default;
     }
@@ -377,12 +430,19 @@ class Form
         $validator = $this->c['validator'];
 
         if (! isset($validator->fieldData[$field]) || ! isset($validator->fieldData[$field]['postdata'])) {
+
             if ($default === true && count($validator->fieldData) === 0) {
                 return $selectedString;
             }
-            return '';
+            if ($default === false) {
+                $field = $this->request->post($field);
+            }
         }
-        $field = $validator->fieldData[$field]['postdata'];
+
+        if (isset($validator->fieldData[$field]['postdata'])) {
+            $field = $validator->fieldData[$field]['postdata'];
+        }
+
         if (is_array($field)) {
             if (! in_array($value, $field)) {
                 return '';

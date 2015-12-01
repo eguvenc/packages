@@ -55,7 +55,6 @@ class Router implements RouterInterface
         $this->c = $container;
         $this->uri = $request->getUri();
         $this->logger = $logger;
-
         $this->domain = new Domain;
         $this->domain->setHost($this->uri->getHost());
 
@@ -89,10 +88,8 @@ class Router implements RouterInterface
             throw new RuntimeException("Domain not configured in routes.php");
         }
         $name = trim($params['domain'], '.');
-
         $this->domain->setName($name);
         $this->domain->setImmutable($name);
-
         $this->defaultController = $params['defaultPage'];
     }
 

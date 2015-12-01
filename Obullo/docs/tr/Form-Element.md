@@ -680,7 +680,7 @@ $string = 'Tehlikeli girdiler içeren <strong>"alıntılı"</strong> yazı.';
 Yukarıdaki veri çift tırnak karakterleri içerir ve form girdi yapısını bozar. <kbd>$this->c['clean']->escape()</kbd> metodu ise aşağıdaki gibi HTML karakterlerini kodlayarak form içinde güvenli bir şekilde kullanılmasını sağlar.
 
 ```php
-<input type="text" name="myform" value="<?php echo $this->c['clean']->escape($string); ?>" />
+<input type="text" name="myform" value="<?php echo $this->clean->escape($string); ?>" />
 ```
 
 > **Not:** Eğer form element sınıfı fonksiyonlarını zaten kullanıyorsanız bu fonksiyonu kullanmaya ihtiyacınız kalmaz çünkü form değerleri otomatik olarak güvenli formata dönüştürülür. Bu fonksiyonu yalnızca kendi form elementlerinizi oluşturduğunuz zaman kullanmanız önerilir.

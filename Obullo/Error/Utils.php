@@ -28,7 +28,7 @@ class Utils
         } elseif (is_float($var)) {
             return '<small>float</small> ' . $var;
         } elseif (is_resource($var)) {
-            if (($type = get_resource_type($var)) === 'stream' AND $meta = stream_get_meta_data($var)) {
+            if (($type = get_resource_type($var)) === 'stream' && $meta = stream_get_meta_data($var)) {
                 $meta  = stream_get_meta_data($var);
 
                 if (isset($meta['uri'])) {
