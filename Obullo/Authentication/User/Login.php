@@ -116,7 +116,7 @@ class Login
         $p = $this->c['auth.params']['db.password'];
 
         if (isset($credentials[$i]) && isset($credentials[$p])) {
-
+            
             return $credentials;
 
         } elseif (isset($credentials['db.identifier']) && isset($credentials['db.password'])) {

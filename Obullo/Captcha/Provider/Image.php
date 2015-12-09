@@ -28,6 +28,7 @@ class Image extends AbstractProvider implements ProviderInterface
     protected $c;
     protected $url;
     protected $request;
+    protected $params = array();
     protected $session;
     protected $logger;
     protected $captcha;
@@ -51,11 +52,12 @@ class Image extends AbstractProvider implements ProviderInterface
     protected $noiseColor;        // Noise color
     protected $textColor;         // Text color
     protected $imgName;           // Image name
+    protected $validation = false;  // Form validation callback
 
     /**
      * Constructor
      *
-     * @param object $c          \Obullo\Container\ContainerInterface
+     * @param object $container  \Obullo\Container\ContainerInterface
      * @param object $url        \Obullo\Url\UrlInterface
      * @param object $request    \Psr\Http\Message\RequestInterface
      * @param object $session    \Obullo\Session\SessionInterface
@@ -64,7 +66,7 @@ class Image extends AbstractProvider implements ProviderInterface
      * @param array  $params     service parameters
      */
     public function __construct(
-        Container $c,
+        Container $container,
         Url $url,
         Request $request,
         Session $session,
@@ -72,15 +74,15 @@ class Image extends AbstractProvider implements ProviderInterface
         Logger $logger,
         array $params
     ) {
-        $this->c = $c;
+        $this->c = $container;
         $this->url = $url;
         $this->request = $request;
-        $this->config = $params;
+        $this->params = $params;
         $this->logger = $logger;
         $this->session = $session;
         $this->translator = $translator;
         $this->translator->load('captcha');
-        $this->config['mod'] = 'cool';
+        $this->params['mod'] = 'cool';
         $this->init();
         
         $this->logger->debug('Captcha Class Initialized');
@@ -110,9 +112,9 @@ class Image extends AbstractProvider implements ProviderInterface
     public function init()
     {
         $this->buildHtml();
-        $this->fonts = array_keys($this->config['fonts']);
-        $this->imageUrl = $this->url->siteUrl($this->config['form']['img']['attributes']['src']); // add Directory Seperator ( / )
-        $this->configFontPath  = ROOT . $this->config['font']['path'] . '/';
+        $this->fonts = array_keys($this->params['fonts']);
+        $this->imageUrl = $this->url->siteUrl($this->params['form']['img']['attributes']['src']); // add Directory Seperator ( / )
+        $this->paramsFontPath  = ROOT . $this->params['font']['path'] . '/';
         $this->defaultFontPath = OBULLO . 'Captcha/Fonts/';
     }
 
@@ -135,7 +137,7 @@ class Image extends AbstractProvider implements ProviderInterface
                 )
             );
         }
-        $this->config['mod'] = $mod;
+        $this->params['mod'] = $mod;
         return $this;
     }
 
@@ -148,7 +150,7 @@ class Image extends AbstractProvider implements ProviderInterface
      */
     public function setCaptchaId($captchaId)
     {
-        $this->config['form']['input']['attributes']['id'] = $captchaId;
+        $this->params['form']['input']['attributes']['id'] = $captchaId;
         return $this;
     }
 
@@ -163,7 +165,7 @@ class Image extends AbstractProvider implements ProviderInterface
     public function setNoiseColor($color)
     {
         $validColors = $this->isValidColors($color);
-        $this->config['text']['colors']['noise'] = $validColors;
+        $this->params['text']['colors']['noise'] = $validColors;
         return $this;
     }
 
@@ -178,7 +180,7 @@ class Image extends AbstractProvider implements ProviderInterface
     public function setColor($color)
     {
         $validColors = $this->isValidColors($color);
-        $this->config['text']['colors']['text'] = $validColors;
+        $this->params['text']['colors']['text'] = $validColors;
         return $this;
     }
 
@@ -191,7 +193,7 @@ class Image extends AbstractProvider implements ProviderInterface
      */
     public function setTrueColor($bool)
     {
-        $this->config['image']['trueColor'] = $bool;
+        $this->params['image']['trueColor'] = $bool;
     }
 
     /**
@@ -203,7 +205,7 @@ class Image extends AbstractProvider implements ProviderInterface
      */
     public function setFontSize($size)
     {
-        $this->config['font']['size'] = (int)$size;
+        $this->params['font']['size'] = (int)$size;
         return $this;
     }
 
@@ -216,7 +218,7 @@ class Image extends AbstractProvider implements ProviderInterface
      */
     public function setHeight($height)
     {
-        $this->config['image']['height'] = (int)$height;
+        $this->params['image']['height'] = (int)$height;
         return $this;
     }
 
@@ -229,8 +231,8 @@ class Image extends AbstractProvider implements ProviderInterface
      */
     public function setPool($pool)
     {
-        if (isset($this->config['characters']['pools'][$pool])) {
-            $this->config['characters']['default']['pool'] = $pool;
+        if (isset($this->params['characters']['pools'][$pool])) {
+            $this->params['characters']['default']['pool'] = $pool;
         }
         return $this;
     }
@@ -244,7 +246,7 @@ class Image extends AbstractProvider implements ProviderInterface
      */
     public function setChar($length)
     {
-        $this->config['characters']['length'] = (int)$length;
+        $this->params['characters']['length'] = (int)$length;
         return $this;
     }
 
@@ -257,7 +259,7 @@ class Image extends AbstractProvider implements ProviderInterface
      */
     public function setWave($wave)
     {
-        $this->config['image']['wave'] = (bool)$wave;
+        $this->params['image']['wave'] = (bool)$wave;
         return $this;
     }
 
@@ -349,7 +351,7 @@ class Image extends AbstractProvider implements ProviderInterface
      */
     public function getInputName()
     {
-        return $this->config['form']['input']['attributes']['name'];
+        return $this->params['form']['input']['attributes']['name'];
     }
 
     /**
@@ -410,7 +412,7 @@ class Image extends AbstractProvider implements ProviderInterface
             $colors = array($colors);
         }
         foreach ($colors as $val) {
-            if (! isset($this->config['colors'][$val])) {
+            if (! isset($this->params['colors'][$val])) {
                 $invalidColors[] = $val;
             }
         }
@@ -419,7 +421,7 @@ class Image extends AbstractProvider implements ProviderInterface
                 sprintf(
                     'You can not use an unsupported "%s" color(s). It must be chosen from the following colors "%s".',
                     implode(',', $invalidColors),
-                    implode(',', array_keys($this->config['colors']))
+                    implode(',', array_keys($this->params['colors']))
                 )
             );
         }
@@ -434,13 +436,13 @@ class Image extends AbstractProvider implements ProviderInterface
     protected function generateCode()
     {
         $code  = '';
-        $defaultPool = $this->config['characters']['default']['pool'];
-        $possible = $this->config['characters']['pools'][$defaultPool];
+        $defaultPool = $this->params['characters']['default']['pool'];
+        $possible = $this->params['characters']['pools'][$defaultPool];
 
-        for ($i = 0; $i < $this->config['characters']['length']; $i++) {
+        for ($i = 0; $i < $this->params['characters']['length']; $i++) {
             $code .= mb_substr(
                 $possible,
-                mt_rand(0, mb_strlen($possible, $this->config['locale']['charset']) - 1), 1, $this->config['locale']['charset']
+                mt_rand(0, mb_strlen($possible, $this->params['locale']['charset']) - 1), 1, $this->params['locale']['charset']
             );
         }
         $this->setCode($code);
@@ -457,18 +459,18 @@ class Image extends AbstractProvider implements ProviderInterface
         $this->generateCode();  // generate captcha code
         $this->imageCreate();
         $this->filledEllipse();
-        if ($this->config['image']['wave']) {
+        if ($this->params['image']['wave']) {
             $this->waveImage();
         }
         $this->imageLine();
         $this->imageGenerate(); // The last function for image.
         
         $this->session->set(
-            $this->config['form']['input']['attributes']['name'],
+            $this->params['form']['input']['attributes']['name'],
             array(
                 'image_name' => $this->getImageId(),
                 'code'       => $this->getCode(),
-                'expiration' => time() + $this->config['image']['expiration']
+                'expiration' => time() + $this->params['image']['expiration']
             )
         );
         $this->init(); // Reset variables
@@ -481,20 +483,20 @@ class Image extends AbstractProvider implements ProviderInterface
      */
     protected function imageCreate()
     {
-        $randTextColor  = $this->config['text']['colors']['text'][array_rand($this->config['text']['colors']['text'])];
-        $randNoiseColor = $this->config['text']['colors']['noise'][array_rand($this->config['text']['colors']['noise'])];
+        $randTextColor  = $this->params['text']['colors']['text'][array_rand($this->params['text']['colors']['text'])];
+        $randNoiseColor = $this->params['text']['colors']['noise'][array_rand($this->params['text']['colors']['noise'])];
         $this->calculateWidth();
         // PHP.net recommends imagecreatetruecolor()
         // but it isn't always available
-        if (function_exists('imagecreatetruecolor') && $this->config['image']['trueColor']) {
-            $this->image = imagecreatetruecolor($this->width, $this->config['image']['height']);
+        if (function_exists('imagecreatetruecolor') && $this->params['image']['trueColor']) {
+            $this->image = imagecreatetruecolor($this->width, $this->params['image']['height']);
         } else {
-            $this->image = imagecreate($this->width, $this->config['image']['height']) or die('Cannot initialize new GD image stream');
+            $this->image = imagecreate($this->width, $this->params['image']['height']) or die('Cannot initialize new GD image stream');
         }
         imagecolorallocate($this->image, 255, 255, 255);
-        $explodeColor     = explode(',', $this->config['colors'][$randTextColor]);
+        $explodeColor     = explode(',', $this->params['colors'][$randTextColor]);
         $this->textColor  = imagecolorallocate($this->image, $explodeColor['0'], $explodeColor['1'], $explodeColor['2']);
-        $explodeColor     = explode(',', $this->config['colors'][$randNoiseColor]);
+        $explodeColor     = explode(',', $this->params['colors'][$randNoiseColor]);
         $this->noiseColor = imagecolorallocate($this->image, $explodeColor['0'], $explodeColor['1'], $explodeColor['2']);
     }
 
@@ -508,11 +510,11 @@ class Image extends AbstractProvider implements ProviderInterface
         $xp = $this->scale * $this->xPeriod * rand(1, 3);   // X-axis wave generation
         $k  = rand(0, 10);
         for ($i = 0; $i < ($this->width * $this->scale); $i++) {
-            imagecopy($this->image, $this->image, $i - 1, sin($k + $i / $xp) * ($this->scale * $this->xAmplitude), $i, 0, 1, $this->config['image']['height'] * $this->scale);
+            imagecopy($this->image, $this->image, $i - 1, sin($k + $i / $xp) * ($this->scale * $this->xAmplitude), $i, 0, 1, $this->params['image']['height'] * $this->scale);
         }
         $k  = rand(0, 10);                                   // Y-axis wave generation
         $yp = $this->scale * $this->yPeriod * rand(1, 2);
-        for ($i = 0; $i < ($this->config['image']['height'] * $this->scale); $i++) {
+        for ($i = 0; $i < ($this->params['image']['height'] * $this->scale); $i++) {
             imagecopy($this->image, $this->image, sin($k + $i / $yp) * ($this->scale * $this->yAmplitude), $i - 1, 0, $i, $this->width * $this->scale, 1);
         }
     }
@@ -524,7 +526,7 @@ class Image extends AbstractProvider implements ProviderInterface
      */
     protected function calculateWidth()
     {
-        $this->width = ($this->config['font']['size'] * $this->config['characters']['length']) + 40;
+        $this->width = ($this->params['font']['size'] * $this->params['characters']['length']) + 40;
     }
 
     /**
@@ -539,31 +541,31 @@ class Image extends AbstractProvider implements ProviderInterface
             throw new RuntimeException('Image CAPTCHA requires fonts.');
         }
         $randFont = array_rand($fonts);
-        $fontPath = $this->defaultFontPath . $this->config['fonts'][$fonts[$randFont]];
+        $fontPath = $this->defaultFontPath . $this->params['fonts'][$fonts[$randFont]];
 
         if (strpos($fonts[$randFont], '.ttf')) {
-            $fontPath = $this->configFontPath . $this->config['fonts'][$fonts[$randFont]];
+            $fontPath = $this->paramsFontPath . $this->params['fonts'][$fonts[$randFont]];
         }
-        if ($this->config['mod'] != 'cool') {
-            $wHvalue = $this->width / $this->config['image']['height'];
-            $wHvalue = $this->config['image']['height'] * $wHvalue;
+        if ($this->params['mod'] != 'cool') {
+            $wHvalue = $this->width / $this->params['image']['height'];
+            $wHvalue = $this->params['image']['height'] * $wHvalue;
             for ($i = 0; $i < $wHvalue; $i++) {
                 imagefilledellipse(
                     $this->image,
                     mt_rand(0, $this->width),
-                    mt_rand(0, $this->config['image']['height']),
+                    mt_rand(0, $this->params['image']['height']),
                     1,
                     1,
                     $this->noiseColor
                 );
             }
         }
-        $textbox = imagettfbbox($this->config['font']['size'], 0, $fontPath, $this->getCode()) or die('Error in imagettfbbox function');
+        $textbox = imagettfbbox($this->params['font']['size'], 0, $fontPath, $this->getCode()) or die('Error in imagettfbbox function');
         $x = ($this->width - $textbox[4]) / 2;
-        $y = ($this->config['image']['height'] - $textbox[5]) / 2;
+        $y = ($this->params['image']['height'] - $textbox[5]) / 2;
 
         $this->setImageId(md5($this->session->get('session_id') . uniqid(time())));  // Generate an unique image id using the session id, an unique id and time.
-        imagettftext($this->image, $this->config['font']['size'], 0, $x, $y, $this->textColor, $fontPath, $this->getCode()) or die('Error in imagettftext function');
+        imagettftext($this->image, $this->params['font']['size'], 0, $x, $y, $this->textColor, $fontPath, $this->getCode()) or die('Error in imagettftext function');
     }
 
     /**
@@ -573,16 +575,16 @@ class Image extends AbstractProvider implements ProviderInterface
      */
     protected function imageLine()
     {
-        if ($this->config['mod'] != 'cool') {
-            $wHvalue = $this->width / $this->config['image']['height'];
+        if ($this->params['mod'] != 'cool') {
+            $wHvalue = $this->width / $this->params['image']['height'];
             $wHvalue = $wHvalue / 2;
             for ($i = 0; $i < $wHvalue; $i++) {
                 imageline(
                     $this->image,
                     mt_rand(0, $this->width),
-                    mt_rand(0, $this->config['image']['height']),
+                    mt_rand(0, $this->params['image']['height']),
                     mt_rand(0, $this->width),
-                    mt_rand(0, $this->config['image']['height']),
+                    mt_rand(0, $this->params['image']['height']),
                     $this->noiseColor
                 );
             }
@@ -610,9 +612,9 @@ class Image extends AbstractProvider implements ProviderInterface
     public function result($code = null)
     {
         if ($code == null) {
-            $code = $this->request->post($this->config['form']['input']['attributes']['name']);
+            $code = $this->request->post($this->params['form']['input']['attributes']['name']);
         }
-        if ($data = $this->session->get($this->config['form']['input']['attributes']['name'])) {
+        if ($data = $this->session->get($this->params['form']['input']['attributes']['name'])) {
             return $this->validateCode($data, $code);
         }
         $this->result['code'] = CaptchaResult::FAILURE_CAPTCHA_NOT_FOUND;
@@ -631,13 +633,13 @@ class Image extends AbstractProvider implements ProviderInterface
     protected function validateCode($data, $code)
     {
         if ($data['expiration'] < time()) { // Expiration time of captcha ( second )
-            $this->session->remove($this->config['form']['input']['attributes']['name']); // Remove captcha data from session.
+            $this->session->remove($this->params['form']['input']['attributes']['name']); // Remove captcha data from session.
             $this->result['code'] = CaptchaResult::FAILURE_EXPIRED;
             $this->result['messages'][] = $this->translator['OBULLO:CAPTCHA:EXPIRED'];
             return $this->createResult();
         }
         if ($code == $data['code']) {  // Is code correct ?
-            $this->session->remove($this->config['form']['input']['attributes']['name']); // Remove
+            $this->session->remove($this->params['form']['input']['attributes']['name']); // Remove
             $this->result['code'] = CaptchaResult::SUCCESS;
             $this->result['messages'][] = $this->translator['OBULLO:CAPTCHA:SUCCESS'];
             return $this->createResult();
@@ -654,7 +656,9 @@ class Image extends AbstractProvider implements ProviderInterface
      */
     protected function buildHtml()
     {
-        foreach ($this->config['form'] as $key => $val) {
+        $this->validation = $this->params['form']['validation'];
+        unset($this->params['form']['validation']);
+        foreach ($this->params['form'] as $key => $val) {
             if (isset($val['attributes'])) {
                 $this->html .= vsprintf(
                     '<%s %s/>',
@@ -700,7 +704,7 @@ class Image extends AbstractProvider implements ProviderInterface
      */
     public function printRefreshButton()
     {
-        return sprintf($this->config['form']['refresh']['button'], $this->translator['OBULLO:CAPTCHA:REFRESH_BUTTON_LABEL']);
+        return sprintf($this->params['form']['refresh']['button'], $this->translator['OBULLO:CAPTCHA:REFRESH_BUTTON_LABEL']);
     }
 
     /**
@@ -710,12 +714,7 @@ class Image extends AbstractProvider implements ProviderInterface
      */
     public function printJs()
     {
-        return sprintf(
-            $this->config['form']['refresh']['script'],
-            $this->config['form']['img']['attributes']['id'],
-            $this->config['form']['img']['attributes']['src'],
-            $this->config['form']['input']['attributes']['id']
-        );
+        return;
     }
 
     /**
@@ -727,9 +726,9 @@ class Image extends AbstractProvider implements ProviderInterface
     {
         $post  = $this->request->isPost();
         $label = $this->translator['OBULLO:CAPTCHA:LABEL'];
-        $rules = 'required|exact('.$this->config['characters']['length'].')|trim';
+        $rules = 'required|exact('.$this->params['characters']['length'].')|trim';
 
-        if ($this->config['form']['validation']['callback'] && $post) {  // Add callback if we have http post
+        if ($this->validation && $post) {  // Add callback if we have http post
             $rules.= '|callback_captcha';  // Add callback validation rule
             $self = $this;
             $this->c['validator']->func(
@@ -745,7 +744,7 @@ class Image extends AbstractProvider implements ProviderInterface
         }
         if ($post) {
             $this->c['validator']->setRules(
-                $this->config['form']['input']['attributes']['name'],
+                $this->params['form']['input']['attributes']['name'],
                 $label,
                 $rules
             );

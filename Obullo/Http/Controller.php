@@ -18,7 +18,7 @@ class Controller implements ControllerInterface
      * 
      * @var object
      */
-    protected $c; 
+    protected $c;
 
     /**
      * Controller instance
@@ -30,14 +30,14 @@ class Controller implements ControllerInterface
     /**
      * Set container
      * 
-     * @param Container $c container object
+     * @param Container $container container object
      * 
      * @return void
      */
-    public function __setContainer(Container $c = null)
+    public function __setContainer(Container $container = null)
     {
         if ($this->c == null) {
-            $this->c = &$c;
+            $this->c = &$container;
         }
     }
 

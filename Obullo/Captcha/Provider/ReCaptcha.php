@@ -19,7 +19,7 @@ use Psr\Http\Message\RequestInterface as Request;
  * @copyright 2009-2015 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class ReCaptcha extends AbstractProvider implements AdapterInterface
+class ReCaptcha extends AbstractProvider implements ProviderInterface
 {
     /**
      * Api data
@@ -80,22 +80,29 @@ class ReCaptcha extends AbstractProvider implements AdapterInterface
     protected $params = array();
 
     /**
+     * Validation callback
+     * 
+     * @var boolean
+     */
+    protected $validation = false;
+
+    /**
      * Constructor
      *
-     * @param object $c          \Obullo\Container\ContainerInterface
+     * @param object $container  \Obullo\Container\ContainerInterface
      * @param object $request    \Psr\Http\Message\RequestInterface
      * @param object $translator \Obullo\Translation\TranslatorInterface
      * @param object $logger     \Obullo\Log\LoggerInterface
      * @param array  $params     service parameters
      */
     public function __construct(
-        Container $c,
+        Container $container,
         Request $request,
         Translator $translator,
         Logger $logger,
         array $params
     ) {
-        $this->c = $c;
+        $this->c = $container;
         $this->params = $params;
         $this->request = $request;
         $this->translator = $translator;
@@ -270,6 +277,16 @@ class ReCaptcha extends AbstractProvider implements AdapterInterface
     }
 
     /**
+     * Disabled
+     * 
+     * @return string
+     */
+    public function printRefreshButton()
+    {
+        return;
+    }
+
+    /**
      * Validation captcha
      * 
      * @param string $response response
@@ -345,6 +362,7 @@ class ReCaptcha extends AbstractProvider implements AdapterInterface
      */
     protected function buildHtml()
     {
+        $this->validation = $this->params['form']['validation'];
         unset($this->params['form']['validation']);
         foreach ($this->params['form'] as $key => $val) {
             $this->html .= vsprintf(
@@ -383,13 +401,13 @@ class ReCaptcha extends AbstractProvider implements AdapterInterface
      * 
      * @return void
      */
-    protected function callbackFunction()
+    public function callbackFunction()
     {
+        $post  = $this->request->isPost();
         $label = $this->translator['OBULLO:CAPTCHA:LABEL'];
         $rules = 'required';
-        $post  = $this->request->isPost();
 
-        if ($this->params['form']['validation']['callback'] && $post) {  // Add callback if we have http post
+        if ($this->validation && $post) {  // Add callback if we have http post
             $rules.= '|callback_captcha';  // Add callback validation rule
             $self = $this;
             $this->c['validator']->func(

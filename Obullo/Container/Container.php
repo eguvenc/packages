@@ -87,7 +87,13 @@ class Container implements ContainerInterface, ArrayAccess
      */
     public function has($cid) 
     {
-        return $this->offsetExists($cid);   // Is it component ?
+        if ($this->offsetExists($cid)) {
+            return true;
+        }
+        if (isset($this->services[$cid])) {
+            return true;
+        }
+        return false;
     }
 
     /**

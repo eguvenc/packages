@@ -76,7 +76,7 @@ class AuthManager implements ServiceInterface, UserInterface
         };
         
         $this->c['auth.identity'] = function () use ($parameters) {
-            return new Identity($this->c, $this->c['session'], $this->c['auth.storage'], $parameters);
+            return new Identity($this->c, $this->c['request'], $this->c['session'], $this->c['auth.storage'], $parameters);
         };
 
         $this->c['auth.login'] = function () use ($parameters) {

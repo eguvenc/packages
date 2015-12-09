@@ -22,7 +22,6 @@ class Create extends Controller
                 'Content-Type' => 'image/png',
             ]
         );
-
         $this->captcha->create();
     }
 }

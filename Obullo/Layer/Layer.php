@@ -203,7 +203,7 @@ class Layer
         $method    = $this->c['router']->getMethod();
 
         $class = MODULES .$this->c['router']->getModule('/') .$directory.'/'.$className. '.php';
-        $className = '\\'.$this->c['router']->getNamespace().'\\'.$className;
+        $className = '\\'.$this->c['router']->getNamespace().$className;
 
         if (! class_exists($className, false)) {
             include $class;

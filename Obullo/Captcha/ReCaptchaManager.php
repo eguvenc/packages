@@ -14,7 +14,7 @@ use Obullo\Container\ContainerInterface as Container;
  * @copyright 2009-2015 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class RecaptchaManager implements ServiceInterface
+class ReCaptchaManager implements ServiceInterface
 {
     /**
      * Container class

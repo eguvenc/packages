@@ -2,6 +2,7 @@
 
 namespace Obullo\Authentication\User;
 
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Obullo\Session\SessionInterface as Session;
 use Obullo\Container\ContainerInterface as Container;
 use Obullo\Authentication\Storage\StorageInterface as Storage;
@@ -19,11 +20,12 @@ interface IdentityInterface
      * Constructor
      *
      * @param object $c       container
+     * @param object $request psr7 request
      * @param object $session storage
      * @param object $storage auth storage
      * @param object $params  auth config parameters
      */
-    public function __construct(Container $c, Session $session, Storage $storage, array $params);
+    public function __construct(Container $c, Request $request, Session $session, Storage $storage, array $params);
 
     /**
      * Initializer

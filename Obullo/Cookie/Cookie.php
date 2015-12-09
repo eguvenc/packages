@@ -5,6 +5,7 @@ namespace Obullo\Cookie;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 use RuntimeException;
+use InvalidArgumentException;
 use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Config\ConfigInterface as Config;
 
@@ -199,14 +200,13 @@ class Cookie implements CookieInterface
      * @return object cookie
      */
     public function set($params = null)
-    {
+    {        
         if (empty($params)) {
             $properties = $this->buildParams($this->responseCookies[$this->id]);
         } else {
             $properties = $this->buildParams($params);
         }
         $this->toHeader($this->id, $properties);
-
         return $this;
     }
 
@@ -322,7 +322,7 @@ class Cookie implements CookieInterface
     }
 
     /**
-     * Returns to id of response cookie
+     * Returns to id of cookie
      * 
      * @return string
      */
@@ -393,6 +393,4 @@ class Cookie implements CookieInterface
             }
         }
     }
-
-
 }

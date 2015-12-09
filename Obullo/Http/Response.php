@@ -4,8 +4,8 @@ namespace Obullo\Http;
 
 use Closure;
 use InvalidArgumentException;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Http response Class. Set Http Response Code, Write Outputs, Set & Finalize Headers
@@ -101,6 +101,13 @@ class Response implements ResponseInterface
      * @var string
      */
     protected $reasonPhrase;
+
+    /**
+     * Response cookie headers
+     * 
+     * @var array
+     */
+    protected $cookieHeaders = null;
 
     /**
      * Constructor
@@ -225,8 +232,29 @@ class Response implements ResponseInterface
      */
     public function newInstance($body = 'php://memory', $status = 200, array $headers = [])
     {
-        $this->__construct($body, $status, $headers);
-        return $this;
+        return new Self($body, $status, $headers);
+    }
+
+    /**
+     * Set http cookie headers
+     *
+     * @param array $headers cookie headers
+     *
+     * @return void
+     */
+    public function setCookies(array $headers)
+    {
+        $this->cookieHeaders = $headers;
+    }
+
+    /**
+     * Get http cookie headers
+     * 
+     * @return array
+     */
+    public function getCookies()
+    {
+        return $this->cookieHeaders;
     }
 
     /**
@@ -252,8 +280,7 @@ class Response implements ResponseInterface
         $this->validateStatus($status);
         $json = new \Obullo\Http\Response\JsonResponse($data, $headers, $encodingOptions);
 
-        $this->__construct($json->getBody(), $status, $json->getHeaders());  // Invoke response
-        return $this;
+        return new Self($json->getBody(), $status, $json->getHeaders());  // Invoke response
     }
 
     /**
@@ -273,8 +300,7 @@ class Response implements ResponseInterface
         $this->validateStatus($status);
         $html = new \Obullo\Http\Response\HtmlResponse($html, $headers);
 
-        $this->__construct($html->getBody(), $status, $html->getHeaders());  // Invoke response
-        return $this;
+        return new Self($html->getBody(), $status, $html->getHeaders());  // Invoke response
     }
 
     /**
@@ -291,8 +317,7 @@ class Response implements ResponseInterface
         $this->validateStatus($status);
         $redirect = new \Obullo\Http\Response\RedirectResponse($uri, $headers);
 
-        $this->__construct('php://temp', $status, $redirect->getHeaders());  // Invoke response
-        return $this;
+        return new Self('php://temp', $status, $redirect->getHeaders());  // Invoke response
     }
 
     /**
@@ -308,8 +333,7 @@ class Response implements ResponseInterface
         $this->validateStatus($status);
         $empty = new \Obullo\Http\Response\EmptyResponse($status, $headers);
 
-        $this->__construct($empty->getBody(), $status, $empty->getHeaders());  // Invoke response
-        return $this;
+        return new Self($empty->getBody(), $status, $empty->getHeaders());  // Invoke response
     }
 
 }

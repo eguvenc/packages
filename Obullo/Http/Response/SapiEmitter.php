@@ -2,8 +2,8 @@
 
 namespace Obullo\Http\Response;
 
-use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
+use Psr\Http\Message\ResponseInterface;
 
 class SapiEmitter implements EmitterInterface
 {
@@ -13,18 +13,37 @@ class SapiEmitter implements EmitterInterface
      * Emits the status line and headers via the header() function, and the
      * body content via the output buffer.
      *
-     * @param ResponseInterface $response
-     * @param null|int $maxBufferLevel Maximum output buffering level to unwrap.
+     * @param ResponseInterface $response       response
+     * @param null|int          $maxBufferLevel Maximum output buffering level to unwrap.
      */
     public function emit(ResponseInterface $response, $maxBufferLevel = null)
     {
         if (headers_sent()) {
             throw new RuntimeException('Unable to emit response; headers already sent');
         }
-
+        $this->emitCookieHeaders($response);  // This is not zend standart require for Obullo
         $this->emitStatusLine($response);
         $this->emitHeaders($response);
         $this->emitBody($response, $maxBufferLevel);
+    }
+
+    /**
+     * Set cookie headers
+     * 
+     * @param Response $response Response
+     * 
+     * @return object ResponseInterface
+     */
+    protected function emitCookieHeaders(ResponseInterface $response)
+    {
+        if ($headers = $response->getCookies()) {
+            foreach ($headers as $value) {
+                header(
+                    sprintf("%s: %s", 'Set-Cookie', $value),
+                    false
+                );
+            }
+        }
     }
 
     /**
@@ -33,17 +52,20 @@ class SapiEmitter implements EmitterInterface
      * Emits the status line using the protocol version and status code from
      * the response; if a reason phrase is availble, it, too, is emitted.
      *
-     * @param ResponseInterface $response
+     * @param ResponseInterface $response response
      */
     private function emitStatusLine(ResponseInterface $response)
     {
         $reasonPhrase = $response->getReasonPhrase();
-        header(sprintf(
-            'HTTP/%s %d%s',
-            $response->getProtocolVersion(),
-            $response->getStatusCode(),
-            ($reasonPhrase ? ' ' . $reasonPhrase : '')
-        ));
+
+        header(
+            sprintf(
+                'HTTP/%s %d%s',
+                $response->getProtocolVersion(),
+                $response->getStatusCode(),
+                ($reasonPhrase ? ' ' . $reasonPhrase : '')
+            )
+        );
     }
 
     /**
@@ -54,7 +76,7 @@ class SapiEmitter implements EmitterInterface
      * in such a way as to create aggregate headers (instead of replace
      * the previous).
      *
-     * @param ResponseInterface $response
+     * @param ResponseInterface $response response
      */
     private function emitHeaders(ResponseInterface $response)
     {
@@ -62,11 +84,14 @@ class SapiEmitter implements EmitterInterface
             $name  = $this->filterHeader($header);
             $first = true;
             foreach ($values as $value) {
-                header(sprintf(
-                    '%s: %s',
-                    $name,
-                    $value
-                ), $first);
+                header(
+                    sprintf(
+                        '%s: %s',
+                        $name,
+                        $value
+                    ),
+                    $first
+                );
                 $first = false;
             }
         }
@@ -78,8 +103,8 @@ class SapiEmitter implements EmitterInterface
      * Loops through the output buffer, flushing each, before emitting
      * the response body using `echo()`.
      *
-     * @param ResponseInterface $response
-     * @param int $maxBufferLevel Flush up to this buffer level.
+     * @param ResponseInterface $response       response
+     * @param int               $maxBufferLevel Flush up to this buffer level.
      */
     private function emitBody(ResponseInterface $response, $maxBufferLevel)
     {
@@ -97,7 +122,8 @@ class SapiEmitter implements EmitterInterface
     /**
      * Filter a header name to wordcase
      *
-     * @param string $header
+     * @param string $header header
+     * 
      * @return string
      */
     private function filterHeader($header)

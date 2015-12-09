@@ -6,6 +6,7 @@ use Obullo\Authentication\Token;
 use Obullo\Authentication\Recaller;
 use Auth\Identities\AuthorizedUser;
 
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Obullo\Session\SessionInterface as Session;
 use Obullo\Container\ContainerInterface as Container;
 use Obullo\Authentication\Storage\StorageInterface as Storage;
@@ -48,6 +49,13 @@ class Identity extends AuthorizedUser implements IdentityInterface
     protected $storage;
 
     /**
+     * Request
+     * 
+     * @var object
+     */
+    protected $request;
+
+    /**
      * Keeps unique session login ids to destroy them
      * in destruct method.
      * 
@@ -59,21 +67,23 @@ class Identity extends AuthorizedUser implements IdentityInterface
      * Constructor
      *
      * @param object $c       container
+     * @param object $request psr7 request
      * @param object $session storage
      * @param object $storage auth storage
      * @param object $params  auth config parameters
      */
-    public function __construct(Container $c, Session $session, Storage $storage, array $params)
+    public function __construct(Container $c, Request $request, Session $session, Storage $storage, array $params)
     {
         $this->c = $c;
         $this->params = $params;
+        $this->request = $request;
         $this->session = $session;
         $this->storage = $storage;
 
         $this->initialize();
 
         if ($rememberToken = $this->recallerExists()) {   // Remember the user if recaller cookie exists
-            
+
             $recaller = new Recaller($c, $storage, $c['auth.model'], $this, $params);
             $recaller->recallUser($rememberToken);
 
@@ -142,8 +152,9 @@ class Identity extends AuthorizedUser implements IdentityInterface
             $this->session->remove('Auth/IgnoreRecaller');
             return false;
         }
-        $name = $this->params['login']['rememberMe']['cookie']['name'];
-        $token = isset($_COOKIE[$name]) ? $_COOKIE[$name] : false;
+        $name  = $this->params['login']['rememberMe']['cookie']['name'];
+        $cookies = $this->request->getCookieParams();
+        $token = isset($cookies[$name]) ? $cookies[$name] : false;
 
         if ($this->guest() && ctype_alnum($token) && strlen($token) == 32) {  // Check recaller cookie value is alfanumeric
             return $token;

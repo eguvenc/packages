@@ -42,26 +42,24 @@ return array(
                 'attributes' => [
                     'type'  => 'text',
                     'name'  => 'captcha_answer',
-                    'class' => 'captcha',
-                    'id'    => 'captcha_answer'         
+                    'class' => 'form-control',
+                    'id'    => 'captcha_answer',      
+                    'placeholder' => 'Security Code'
                 ]
             ],
             'img' => [
                 'attributes' => [             
-                    'src'   =>  '/captcha/create',
-                    'style' => 'display:block;',
+                    'src'   =>  '/captcha/create/index/',
+                    'style' => 'display:block;float:left;margin-right:10px;margin-top:10px;',
                     'id'    => 'captcha_image',
                     'class' => ''
                 ]
             ],
             'refresh' => [
-                'button' => '<input type="button" value="%s" onclick="oResetCaptcha(this.form);" style="margin-bottom:5px;" />',
-                'script' => '<script type="text/javascript">
-                    function oResetCaptcha(form) {
-                      form.%s.src="%s?noCache=" + Math.random();
-                      form.%s.value = "";
-                    }
-                </script>',
+                'button' => '<button type="button" style="margin-top:10px;" onclick="refreshCaptcha(this.form);" class="btn btn-default" aria-label="Left Align">
+                  <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
+                  Refresh
+                </button>',
             ],
             'validation' => [
                 'callback' => true,

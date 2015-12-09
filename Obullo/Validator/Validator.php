@@ -3,8 +3,8 @@
 namespace Obullo\Validator;
 
 use Closure;
-use Controller;
 use RuntimeException;
+use Obullo\Http\Controller;
 use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Config\ConfigInterface as Config;
 use Obullo\Translation\TranslatorInterface as Translator;
@@ -334,7 +334,7 @@ class Validator
                 $postdata = $this->fieldData[$row['field']]['postdata'];
             }
             $callback = false;
-            if (substr($rule, 0, 9) == 'callback_') {  // Is the rule a callback? 
+            if (substr($rule, 0, 9) == 'callback_') {  // Is the rule has a callback? 
                 $callback = true;
             }
             $param = false;                                             // Strip the parameter (if exists) from the rule

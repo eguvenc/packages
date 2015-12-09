@@ -211,7 +211,7 @@ class Database extends AbstractAdapter
      */
     public function generateUser(array $credentials, $resultRowArray, $passwordNeedsRehash = array())
     {
-        $rememberMe = $this->c['auth.identity']->getRememberMe();
+        $rememberMe = $credentials['__rememberMe'];
 
         $attributes = array(
             $this->columnIdentifier => $credentials[$this->columnIdentifier],
@@ -228,7 +228,6 @@ class Database extends AbstractAdapter
             $this->regenerateSessionId(true); // Delete old session after regenerate !
         }
         if ($rememberMe) {  // If user choosed remember feature
-
             $token = Token::getRememberToken($this->c['cookie'], $this->params);
             $this->c['auth.model']->updateRememberToken($token, $credentials); // refresh rememberToken
         }

@@ -25,8 +25,8 @@ class Token
     public static function getRememberToken(Cookie $cookie, array $params)
     {
         $cookieParams = $params['login']['rememberMe']['cookie'];
-
         $token = $cookieParams['value'] = Random::generate('alnum', 32);
+
         $cookie->set($cookieParams);
         return $token;
     }
