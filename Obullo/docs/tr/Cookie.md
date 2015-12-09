@@ -16,7 +16,6 @@
     <li><a href="#parameters">Parametre Açıklamaları</a></li>
     <li><a href="#readcookie">Bir Çerez Verisini Okumak</a></li>
     <li><a href="#removecookie">Bir Çerezi Silmek</a></li>
-    <li><a href="#queue">Çerezleri Kuyruğa Göndermek</a></li>
     <li><a href="#method-reference">Fonksiyon Referansı</a></li>
 </ul>
 
@@ -165,22 +164,6 @@ Veya
 $this->cookie->name('name')->prefix('prf_')->domain('my.subdomain.com')->path('/')->delete();
 ```
 
-<a name="queue"></a>
-
-#### Çerezleri Kuyruğa Göndermek
-
-Uygulamada bir http çıktısı yaratılmış olsa bile çerezleri queue komutu ile tarayıcıya sonradan kaydedebilirsiniz. Böyle bir durumda kuyruğa atılan çerezler bir konteyner içerisinde toplanırlar ve en son http çıktısından sonra <b>Application/Http</b> sınıfı tarafından http başlıklarına kaydedilirler ve bir sonraki http isteğinde mevcut olurlar.
-
-```php
-$this->cookie->queue("name", "value");
-```
-
-Queue komutu parametreleri set metodu parametreleri ile eşdeğerdir. Kuyruktan bir çerezi silmek için ise <b>unqueue</b> komutu kullanılır.
-
-```php
-$this->cookie->unqueue("name");
-```
-
 <a name="method-reference"></a>
 
 #### Fonksiyon Referansı
@@ -231,22 +214,10 @@ Kayıtlı bir çerezi okur eğer çerez mevcut değilese <b>false</b> değerine 
 
 Gönderilen parametrelere göre bir çerezi tarayıcıdan siler.
 
-##### $this->cookie->queue(string $name = null, mixed $value = null);
+##### $this->cookie->getHeaders();
 
-Gönderilen parametrelere göre bir çerezi bir sonraki http isteğinde mevcut olmak üzere kuyruğa gönderir.
-
-##### $this->cookie->queued(string $name, string $prefix = '');
-
-Kuyruğa gönderilmiş olan çerezin değerine döner.
-
-##### $this->cookie->unqueue(string $name, string $prefix = '');
-
-Kuyruğa gönderilen çerezi kuyruktan siler.
+Kuyruğa gönderilmiş çerezlerin raw değerilerine array formatında geri döner.
 
 ##### $this->cookie->getId();
 
 Çerez sınıfı tarafından rastgele üretilen geçerli çerezin kimlik değerine geri döner.
-
-##### $this->cookie->getQueuedCookies();
-
-Kuyruktaki tüm çerezlerin listesine bir dizi içerisinde geri döner.
