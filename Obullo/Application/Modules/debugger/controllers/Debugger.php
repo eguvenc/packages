@@ -31,7 +31,10 @@ class Debugger extends Controller
      */
     public function index()
     {
-        echo $this->debugger->printIndex();
+        return $this->response->html(
+            $this->debugger->printIndex(),
+            200
+        );
     }
 
     /**
@@ -41,7 +44,10 @@ class Debugger extends Controller
      */
     public function body()
     {
-        echo $this->debugger->printBody();
+        return $this->response->html(
+            $this->debugger->printBody(),
+            200
+        );
     }
 
     /**
@@ -51,7 +57,10 @@ class Debugger extends Controller
      */
     public function ping()
     {
-        echo $this->debugger->ping();
+        return $this->response->html(
+            (string)$this->debugger->ping(),
+            200
+        );
     }
 
     /**
@@ -61,7 +70,7 @@ class Debugger extends Controller
      */
     public function clear()
     {
-        $this->index();
+        return $this->index();
     }
 
 }

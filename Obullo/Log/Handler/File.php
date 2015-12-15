@@ -68,6 +68,8 @@ class File extends AbstractHandler implements HandlerInterface
         fwrite($fop, $lines);
         flock($fop, LOCK_UN);
         fclose($fop);
+        chown($path, CHOWN);
+        chmod($path, 0666);
     }
 
     /**

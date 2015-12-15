@@ -20,18 +20,18 @@ class HtmlResponse
     use InjectContentTypeTrait;
 
     /**
-     * Http headers
-     * 
-     * @var array
-     */
-    protected $headers;
-
-    /**
      * Raw body
      * 
      * @var string
      */
     protected $body;
+
+    /**
+     * Http headers
+     * 
+     * @var array
+     */
+    protected $headers;
     
     /**
      * Create an HTML response.

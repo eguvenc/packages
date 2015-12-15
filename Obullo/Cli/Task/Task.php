@@ -3,6 +3,7 @@
 namespace Obullo\Cli\Task;
 
 use Obullo\Log\LoggerInterface as Logger;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 class Task
 {
@@ -23,12 +24,17 @@ class Task
     /**
      * Constructor
      *
-     * @param object $logger \Obullo\Log\LoggerInterface
+     * @param object $request ServerRequestInterface
+     * @param object $logger  LoggerInterface
+     *
+     * @return void
      */
-    public function __construct(Logger $logger)
+    public function __construct(Request $request, Logger $logger)
     {
-        $this->logger = $logger;
+        $this->request = $request;
+        $this->logger  = $logger;
         $this->loggerExists();
+
         if ($this->exist) {
             $this->logger->debug('Cli Task Class Initialized');
         }
@@ -50,22 +56,31 @@ class Task
         $uri = explode($delimiter, trim($uri));
         $directory = array_shift($uri);
         $segments = self::getSegments($uri);
+        $server = $this->request->getServerParams();
 
-        $host = isset($_SERVER['HTTP_HOST']) ? '--host='.$_SERVER['HTTP_HOST'] : '';  // Add http host variable if request comes from http
+        $host  = isset($server['HTTP_HOST']) ? '--host='.$server['HTTP_HOST'] : '';  // Add http host variable if request comes from http
         $shell = PHP_PATH .' '. FPATH .'/'. TASK_FILE .' '.$directory.' '. implode('/', $segments).' '. $host;
 
         if ($debug) {  // Enable debug output to log folder.
             $output = preg_replace(array('/\033\[36m/', '/\033\[31m/', '/\033\[0m/'), array('', '', ''), shell_exec($shell)); // Clean cli color codes
             if ($this->exist) {
-                $this->logger->debug('Cli task request', array('command' => $shell, 'output' => $output));
+                $this->logger->debug(
+                    'Cli task request',
+                    array(
+                        'command' => $shell,
+                        'output' => $output
+                    )
+                );
             }
             return $output;
         }
-        shell_exec($shell . ' > /dev/null &');  // Async task
-
         if ($this->exist) {
-            $this->logger->debug('Cli task executed', array('shell' => $shell));
+            $this->logger->debug(
+                'Cli task executed', 
+                array('shell' => $shell)
+            );
         }
+        shell_exec($shell . ' > /dev/null &');  // Async task
     }
 
     /**

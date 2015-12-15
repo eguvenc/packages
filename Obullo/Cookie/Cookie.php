@@ -195,17 +195,33 @@ class Cookie implements CookieInterface
     /**
      * Set cookie
      * 
-     * @param array|null $params mixed parameters
+     * @param array|null|string $name  mixed name or parameters
+     * @param mixed             $value value
      *
      * @return object cookie
      */
-    public function set($params = null)
+    public function set($name = null, $value = null)
     {        
-        if (empty($params)) {
-            $properties = $this->buildParams($this->responseCookies[$this->id]);
-        } else {
-            $properties = $this->buildParams($params);
+        if (is_array($name)) {
+
+            $params = $name;
+
+        } elseif (empty($name)) {
+
+            $params = $this->responseCookies[$this->id];
+
+        } elseif (is_string($name)) {
+
+            if ($name != null) {
+                $this->name($name);
+            }
+            if ($value != null) {
+                $this->value($value);
+            }
+            $params = $this->responseCookies[$this->id];
         }
+        $properties = $this->buildParams($params);
+
         $this->toHeader($this->id, $properties);
         return $this;
     }
@@ -254,7 +270,6 @@ class Cookie implements CookieInterface
         if (isset($properties['path'])) {
             $result .= '; path=' . $properties['path'];
         }
-
         $timestamp = $this->getTimestamp($properties);
 
         if ($timestamp !== 0) {
@@ -353,8 +368,8 @@ class Cookie implements CookieInterface
     /**
     * Delete a cookie
     *
-    * @param string $name   cookie
-    * @param string $prefix custom prefix
+    * @param string|array $name   cookie
+    * @param string       $prefix custom prefix
     * 
     * @return void
     */
@@ -362,6 +377,12 @@ class Cookie implements CookieInterface
     {
         $prefix = ($prefix == null) ? $this->config['cookie']['prefix'] : $prefix;
 
+        if (is_array($name)) {
+            $name['expire'] = -1;
+            $this->prefix($prefix);
+            $this->set($name);
+            return;
+        }
         if ($name != null) {
             $this->name($name);
         }

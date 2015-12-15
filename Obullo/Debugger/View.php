@@ -506,7 +506,7 @@ function disconnect(){
 function load(refresh){
     if (debuggerOff == 0) {
         document.getElementById("obulloDebugger-http-log").innerHTML = debuggerOffMessage;
-        document.getElementById("obulloDebugger-console-log").innerHTML = debuggerOffMessage;
+        // document.getElementById("obulloDebugger-console-log").innerHTML = debuggerOffMessage;
         document.getElementById("obulloDebugger-ajax-log").innerHTML = debuggerOffMessage;
         document.getElementById("obulloDebugger-environment").innerHTML = debuggerOffMessage;
     }

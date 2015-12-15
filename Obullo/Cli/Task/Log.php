@@ -52,6 +52,8 @@ class Log extends Controller
     }
 
     /**
+     * Cli log
+     * 
      * Follow cli log data
      * 
      * @return void
@@ -73,10 +75,11 @@ class Log extends Controller
         $files = \Obullo\Cli\LogReader\File::getPathArray();
 
         foreach ($files as $file) {
-            $file = ROOT. $file;
+
+            $file = ROOT. ltrim($file, '/');
             $exp = explode('/', $file);
             $filename = array_pop($exp);
-            $path = implode('/', $exp). '/';
+            $path = implode('/', $exp).'/';
 
             if (is_file($path.$filename)) {
                 unlink($path.$filename);

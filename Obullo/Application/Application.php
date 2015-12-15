@@ -304,7 +304,7 @@ class Application implements ApplicationInterface
      * Returns 
      *
      * This function similar with Codeigniter getInstance(); 
-     * instead of getInstance()->class->method() we use $this->c['app']->class->metod();
+     * instead of getInstance()->class->method() we use $this->c['app']->class->method();
      * 
      * @param string $key application object
      * 

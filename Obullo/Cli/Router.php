@@ -2,8 +2,8 @@
 
 namespace Obullo\Cli;
 
-use Obullo\Cli\UriInterface;
-use Obullo\Log\LoggerInterface;
+use Obullo\Cli\UriInterface as Uri;
+use Obullo\Log\LoggerInterface as Logger;
 
 /**
  * Cli Router Class ( ! Warning : Midllewares & Layers Disabled in CLI mode )
@@ -33,7 +33,7 @@ class Router
      * @param object $uri    \Obullo\Cli\UriInterface
      * @param array  $logger \Obullo\Log\LoggerInterface
      */
-    public function __construct(UriInterface $uri, LoggerInterface $logger)
+    public function __construct(Uri $uri, Logger $logger)
     {
         $this->uri = $uri;
         $this->logger = $logger;

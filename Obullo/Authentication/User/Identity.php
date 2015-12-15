@@ -365,16 +365,7 @@ class Identity extends AuthorizedUser implements IdentityInterface
      */
     public function forgetMe()
     {
-        $cookie = $this->params['login']['rememberMe']['cookie']; // Delete rememberMe cookie if exists
-        setcookie(
-            $cookie['prefix'].$cookie['name'], 
-            null,
-            -1,
-            $cookie['path'],
-            $cookie['domain'],   //  Get domain from global config
-            $cookie['secure'], 
-            $cookie['httpOnly']
-        );
+        $this->c['cookie']->delete($this->params['login']['rememberMe']['cookie']);  // Delete rememberMe cookie if exists
     }
 
     /**

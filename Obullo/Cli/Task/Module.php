@@ -61,14 +61,12 @@ class Module extends Controller
         if (is_dir($moduleFolder.'/tasks')) {
             $this->recursiveCopy($moduleFolder. '/tasks', TASKS, false);
         }
-
         $serviceFile = CONFIG .$this->c['app.env'].'/service/' .strtolower($module).'.php';
 
         if (is_dir($moduleFolder.'/service')) {
             copy($moduleFolder.'/service/'.strtolower($module).'.php', $serviceFile);
             chmod($serviceFile, 0777);
         }
-
         echo Console::success("New module #$module added successfully.");
     }
 

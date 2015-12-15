@@ -30,13 +30,6 @@ interface TranslatorInterface extends ArrayAccess
     public function get();
 
     /**
-     * Get translator class cookie
-     *
-     * @return string
-     */
-    public function getCookie();
-
-    /**
      * Set locale name
      *
      * @param string  $locale      language ( en, es )
@@ -84,11 +77,4 @@ interface TranslatorInterface extends ArrayAccess
      * @return void
      */
     public function setFallback($fallback);
-
-    /**
-     * Write to cookies
-     *
-     * @return void
-     */
-    public function setCookie();
 }

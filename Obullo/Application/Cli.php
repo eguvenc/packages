@@ -70,8 +70,10 @@ class Cli extends Application
         if (! method_exists($className, $router->getMethod())) {
             $this->router->methodNotFound();
         }
-        $arguments = array_slice($request->getUri()->getSegments(), 2);
-
+        $arguments = array_slice(
+            $request->getUri()->getSegments(),
+            2
+        );
         call_user_func_array(
             array(
                 $controller,
@@ -79,7 +81,6 @@ class Cli extends Application
             ), 
             $arguments
         );
-
         if (isset($_SERVER['argv'])) {
             $logger->debug('php '.implode(' ', $_SERVER['argv']));
         }

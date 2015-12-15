@@ -24,11 +24,11 @@ class UrlManager implements ServiceInterface
     /**
      * Constructor
      * 
-     * @param ContainerInterface $c container
+     * @param ContainerInterface $container container
      */
-    public function __construct(Container $c)
+    public function __construct(Container $container)
     {
-        $this->c = $c;
+        $this->c = $container;
     }
 
     /**
