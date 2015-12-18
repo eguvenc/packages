@@ -187,9 +187,8 @@ li.favicon img
 }
 .p:hover
 {
-    background:rgb(234, 234, 234);
+/*    background:rgb(234, 234, 234);*/
     color:#000;
-
 }
 .p:hover span.date
 {
@@ -295,9 +294,8 @@ pre span.string {color: #cc0000;}
     background: none;
     border: none;
 }
-.title { color: #5A5A5F; font-weight: bold; margin-top: 5px; margin-bottom: 3px; }
-.error { color: #E53528; }
-.alert { color: #E53528; }
+.title { color: #5A5A5F; margin-top: 5px; margin-bottom: 0px; }
+.error, alert, emergency, warning, notice { color: #E53528; }
 .info { color: blue; }
 
 #obulloDebugger-http-log,
@@ -311,7 +309,7 @@ pre span.string {color: #cc0000;}
 
 <?php 
 $getDebuggerURl = function ($method = 'index') {
-    return $this->c['app']->url->baseUrl('/debugger/debugger/'.$method);
+    return $this->c['url']->baseUrl('/debugger/debugger/'.$method);
 };
 ?>
 <script type="text/javascript">
@@ -443,10 +441,12 @@ function refreshDebugger(msg) {
         // http://stackoverflow.com/questions/10418644/creating-an-iframe-with-given-html-dynamically
     
         var css = decode64(msg.css);
-        var head = "<html><head><style type='text/css'>";
+        
+        var head = "<html><head>";
         head += css;
-        head += 'html, body{ float:left; background: white; }</style>';
-
+        head += "<style type='text/css'>";
+        head += 'html, body{ background: white; margin: 0; padding: 0; }</style>';
+        // console.log(head);
         createIframe(head, msg.id);
     }
 }
@@ -471,6 +471,7 @@ function createIframe(head, msgID) {
         }
         var tempHtml = heads[layer[i].dataset.unique];
         var iframe = document.createElement('iframe');
+
         iframe.frameBorder=0;
         tempHtml += '</head>';
         tempHtml += '<body>' + layers[layer[i].dataset.unique] + '</body></html>';
@@ -482,12 +483,20 @@ function createIframe(head, msgID) {
         layer[i].appendChild(iframe);
         iframe.contentWindow.document.write(tempHtml);
 
-        if (navigator.appName == "Netscape") {  // Firefox iframe unlimited loading bug fix
-            setTimeout(function () {
-                iframe.contentWindow.stop();
-            }, 3000);
+        if (typeof iframe.contentWindow == "object") {
+            if (navigator.appName == "Netscape") {  // Firefox iframe unlimited loading bug fix
+                setTimeout(function () {
+                    if (iframe.contentWindow !== null) {
+                        iframe.contentWindow.stop();
+                    }
+                }, 3000);
+                iframe.height = iframe.contentWindow.document.body.scrollHeight + 80 + "px"; 
+            } else {
+                iframe.height = iframe.contentWindow.document.body.scrollHeight + "px";
+            }
+            
         }
-        iframe.height = iframe.contentWindow.document.body.scrollHeight + "px";
+
     }
 }
 
@@ -504,6 +513,7 @@ function disconnect(){
     document.getElementById("obulloDebuggerSocket").src = base64DeactiveSrc;
 }
 function load(refresh){
+
     if (debuggerOff == 0) {
         document.getElementById("obulloDebugger-http-log").innerHTML = debuggerOffMessage;
         // document.getElementById("obulloDebugger-console-log").innerHTML = debuggerOffMessage;
@@ -518,6 +528,9 @@ function load(refresh){
         }
         websocket.onmessage = function(response) { // Received messages from server
             var msg = JSON.parse(response.data);   // Php sends Json data
+
+            // console.log(decode64(msg.log));
+            // console.log(msg.log);
 
             if (msg.type == "system") {
                 if (msg.message == "HTTP_REQUEST") {

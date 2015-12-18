@@ -77,6 +77,9 @@
     case E_STRICT:
         echo 'Strict Error';
         break;
+    case E_NOTICE:
+        echo 'Notice';
+        break;
     default:
         echo 'Error';
         break;

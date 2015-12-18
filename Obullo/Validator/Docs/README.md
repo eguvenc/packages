@@ -912,3 +912,52 @@ Permits you to display radio buttons in the state they were submitted. This func
 <input type="radio" name="myradio" value="1" <?php echo $this->form->setRadio('myradio', '1', true); ?> />
 <input type="radio" name="myradio" value="2" <?php echo $this->form->setRadio('myradio', '2'); ?> />
 ```
+
+Kendi doğrulama kurallarınızı oluşturmak.
+
+
+```php
+namespace Form\Validator;
+
+use Obullo\Container\ContainerInterface as Container;
+
+/**
+ * Test
+ * 
+ * @author    Obullo Framework <obulloframework@gmail.com>
+ * @copyright 2009-2015 Obullo
+ * @license   http://opensource.org/licenses/MIT MIT license
+ */
+class Test
+{
+    /**
+     * Container
+     * 
+     * @var object
+     */
+    protected $c;
+
+    /**
+     * Container
+     * 
+     * @param Container $container contaienr
+     */
+    public function __construct(Container $container)
+    {
+        $this->c = $container;
+    }
+
+    /**
+     * Match one field to another
+     * 
+     * @param string $str   string
+     * @param string $field field
+     * 
+     * @return bool
+     */    
+    public function isValid($str)
+    {   
+        return false;
+    }
+}
+```

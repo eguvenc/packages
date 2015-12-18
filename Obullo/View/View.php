@@ -81,8 +81,9 @@ class View implements ViewInterface
         if ($_VData === false || $_VInclude === false) {
             return $body;
         }
-        $this->c['response']->getBody()->write($body);
-        return;
+        $response = $this->c['response'];
+        $response->getBody()->write($body);
+        return $response;
     }
 
     /**

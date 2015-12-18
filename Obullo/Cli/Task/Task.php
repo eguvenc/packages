@@ -56,6 +56,7 @@ class Task
         $uri = explode($delimiter, trim($uri));
         $directory = array_shift($uri);
         $segments = self::getSegments($uri);
+        
         $server = $this->request->getServerParams();
 
         $host  = isset($server['HTTP_HOST']) ? '--host='.$server['HTTP_HOST'] : '';  // Add http host variable if request comes from http

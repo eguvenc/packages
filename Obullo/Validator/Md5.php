@@ -3,23 +3,23 @@
 namespace Obullo\Validator;
 
 /**
- * IsBool
+ * Md5
  * 
  * @author    Obullo Framework <obulloframework@gmail.com>
  * @copyright 2009-2015 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class IsBool
+class Md5
 {
     /**
-     * Is Boolean
+     * Md5 str
      * 
-     * @param string $str string
+     * @param string $val value
      * 
      * @return bool
      */    
-    public function isValid($str)
+    public function func($val)
     {
-        return ( is_bool($str) || $str == 0 || $str == 1 ) ? true : false;
+        return md5($val);
     }
 }

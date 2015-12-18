@@ -10,7 +10,16 @@ $getError = function ($message) {
         array('APP/', 'DATA/', 'CLASSES/', 'ROOT/', 'OBULLO/', 'MODULES/', 'VENDOR/'),
         $message
     );
-}
+};
+$getTrace = function($e) {
+    $debugTraces = array();
+    foreach ($e->getTrace() as $key => $val) {
+        if (isset($val['file']) && isset($val['line'])) {
+            $debugTraces[] = $val;
+        }
+    }
+    return $debugTraces;
+};
 ?>
 <div id="middle">
     <h1><?php echo $getError($e->getMessage()); ?></h1>
@@ -36,15 +45,15 @@ $traceID = md5($e->getFile().$e->getLine().$e->getCode().$e->getMessage());
 <?php
 exit; // Shutdown error exit.
 } else {
-    $fullTraces  = $e->getTrace();
-    $debugTraces = array();
-    foreach ($fullTraces as $key => $val) {
-        if (isset($val['file']) && isset($val['line'])) {
-            $debugTraces[] = $val;
-        }
-    }
+
     if ($e->getCode() != E_PARSE) {
-        echo '<h1><a href="javascript:void(0);" onclick="TraceToggle(\''.$traceID.'\')">debug_backtrace ('.sizeof($debugTraces).')</a></h1>';
+
+        $config = include APP. 'local/config.php';
+
+        if ($config['http']['debugger']['enabled'] == false) {  // disable backtrace if websocket enabled otherwise we get memory error.
+            $debugTraces = $getTrace($e);
+            echo '<h1><a href="javascript:void(0);" onclick="TraceToggle(\''.$traceID.'\')">debug_backtrace ('.sizeof($debugTraces).')</a></h1>';
+        }
     }
 }
 ?>
@@ -58,7 +67,7 @@ if (isset($lastQuery) && ! empty($lastQuery)) {
 
 <div id="<?php echo $traceID ?>" style="display:none;">
 <?php
-    if (isset($debugTraces[0]['file']) && isset($debugTraces[0]['line'])) {
+    if (isset($debugTraces) && isset($debugTraces[0]['file']) && isset($debugTraces[0]['line'])) {
 
         if (isset($debugTraces[1]['file']) && isset($debugTraces[1]['line'])) {
             

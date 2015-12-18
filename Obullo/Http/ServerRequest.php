@@ -80,8 +80,6 @@ class ServerRequest implements ServerRequestInterface
     ) {
         $this->validateUploadedFiles($uploadedFiles);
 
-        // $this->body = $this->getStream($body);
-        // 
         $this->initialize($uri, $method, $body, $headers);
         $this->serverParams  = $serverParams;
         $this->uploadedFiles = $uploadedFiles;
@@ -358,15 +356,16 @@ class ServerRequest implements ServerRequestInterface
     /**
      * GET wrapper
      * 
-     * @param string  $key    key
-     * @param boolean $filter name
+     * @param string|null $key    key
+     * @param boolean     $filter name
      * 
      * @return mixed
      */
-    public function get($key, $filter = null)
+    public function get($key = null, $filter = null)
     {
         $get = $this->getQueryParams();
-        if (is_bool($key)) {
+
+        if (is_null($key)) {
             return $get;
         }
         $value = isset($get[$key]) ? $get[$key] : false;
@@ -381,18 +380,20 @@ class ServerRequest implements ServerRequestInterface
     /**
      * POST wrapper
      * 
-     * @param string  $key    key
-     * @param boolean $filter name
+     * @param string|null $key    key
+     * @param boolean     $filter name
      * 
      * @return mixed
      */
-    public function post($key, $filter = null)
+    public function post($key = null, $filter = null)
     {
         $post = $this->getParsedBody();
-        if (is_bool($key)) {
+
+        if (is_null($key)) {
             return $post;
         }
         $value = isset($post[$key]) ? $post[$key] : false;
+
         if (is_string($filter)) {
             $inputFilter = new InputFilter;
             $inputFilter->setContainer($this->c);
@@ -404,18 +405,22 @@ class ServerRequest implements ServerRequestInterface
     /**
      * REQUEST wrapper
      * 
-     * @param string  $key    key
-     * @param boolean $filter name
+     * @param string|null $key    key
+     * @param boolean     $filter name
      * 
      * @return mixed
      */
-    public function all($key, $filter = null)
+    public function all($key = null, $filter = null)
     {
-        $request = $this->getParameters();
-        if (is_bool($key)) {
+        $get = $this->get();
+        $post = $this->post();
+        $request = array_merge($post, $get);
+
+        if (is_null($key)) {
             return $request;
         }
         $value = isset($request[$key]) ? $request[$key] : false;
+
         if (is_string($filter)) {
             $inputFilter = new InputFilter;
             $inputFilter->setContainer($this->c);
@@ -425,41 +430,17 @@ class ServerRequest implements ServerRequestInterface
     }
 
     /**
-     * Fetch request parameter value from body or query string (in that order).
-     *
-     * @param string $key     The parameter key.
-     * @param string $default The default value.
-     *
-     * @return mixed The parameter value.
-     */
-    public function getParameters($key, $default = null)
-    {
-        $postParams = $this->getParsedBody();
-        $getParams  = $this->getQueryParams();
-        $result = $default;
-
-        if (is_array($postParams) && isset($postParams[$key])) {
-            $result = $postParams[$key];
-        } elseif (is_object($postParams) && property_exists($postParams, $key)) {
-            $result = $postParams->$key;
-        } elseif (isset($getParams[$key])) {
-            $result = $getParams[$key];
-        }
-        return $result;
-    }
-
-    /**
      * Get $server variable items
      * 
-     * @param string $key server key
+     * @param string|null $key server key
      * 
      * @return void
      */
-    public function server($key) 
+    public function server($key = null) 
     {
         $server = $this->getServerParams();
         
-        if (is_bool($key)) {
+        if (is_null($key)) {
             return $server;
         }
         if (isset($server[$key])) {

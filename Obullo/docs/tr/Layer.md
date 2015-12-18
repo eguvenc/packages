@@ -304,7 +304,7 @@ Aşağıdaki resimde görüldüğü üzere yarattığınız gezinme çubuğuna a
 
 Debugger <kbd>http://myproject/debugger</kbd> modülünü çalıştırdığınızda aşağıdaki gibi bir çıktı almanız gerekir.
 
-![Hata Ayıklama](images/layer-debugger.gif?raw=true "Hata Ayıklama")
+![Hata Ayıklama](images/debugger.png?raw=true "Hata Ayıklama")
 
 Debugger modülü kurulu değilse kurmak için [Debugger.md](Debugger.md) dökümentasyonunu inceleyebilirsiniz.
 

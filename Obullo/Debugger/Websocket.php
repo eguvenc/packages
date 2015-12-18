@@ -5,7 +5,6 @@ namespace Obullo\Debugger;
 use DOMDocument;
 use RuntimeException;
 use Obullo\Log\Handler\Debugger;
-
 use Obullo\Config\ConfigInterface as Config;
 use Psr\Http\Message\RequestInterface as Request;
 use Obullo\Application\ApplicationInterface as Application;
@@ -118,9 +117,12 @@ class Websocket
         if (isset($_SERVER['argv'][0]) && substr($_SERVER['argv'][0], -4) == 'task') {  // Ignore for php task commands
             return;                                                                     // we use substr() for Windows and linux support
         }
-        $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        $this->connect = @socket_connect($this->socket, $this->host, $this->port);
-
+        $this->socket  = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        $this->connect = @socket_connect(
+            $this->socket,
+            $this->host,
+            $this->port
+        );
         if ($this->connect == false) {
             $message = "Debugger enabled but socket server is not running. 
             Run debug server or disable debugger. <pre>php task debugger</pre>";
@@ -206,7 +208,6 @@ class Websocket
         "Msg-id: ".uniqid()."\r\n";
 
         $css = self::parseCss($this->output);
-
         if (! empty($css)) {
             $upgrade.= "Page-css: ".base64_encode($css)."\r\n";
         }
@@ -230,6 +231,11 @@ class Websocket
      */
     protected static function parseCss($html)
     {
+        // Preg match version
+        // (<link .*)(type=(.*))(href="(.*?)")
+    
+        //  Dom version
+        //  
         $doc = new DOMDocument;
         libxml_use_internal_errors(true);
         $doc->loadHTML('<?xml encoding="UTF-8">' . $html);
@@ -247,29 +253,27 @@ class Websocket
         if ($head->length == 0) { // If page has not got head tags return to null
             return;
         }
-        $link = $head->item(0)->getElementsByTagName('link'); 
+        $link = $head->item(0)->getElementsByTagName('link');
         $css = '';
         if ($link->length > 0) {
             foreach ($link as $linkRow) { 
-                if ($linkRow->getAttribute('type') == 'text/css') {
-                    $href = $linkRow->getAttribute('href');
-                    if (strpos($href, 'http') === false) {
-                        $css.= file_get_contents(ROOT.'public/'.ltrim($href, '/'));
-                    } else {
-                        $css.= file_get_contents($href);
-                    }
-                } 
+                $href = $linkRow->getAttribute('href');
+                if (! empty($href) && substr($href, -3) == 'css') {  // Check file type
+                    $css.= '<link href="'.$href.'" type="text/css" rel="stylesheet">';
+                }
             }
         }
-        $style = $head->item(0)->getElementsByTagName('style'); // Include inlie styles
+        $style = $head->item(0)->getElementsByTagName('style'); // Include inline styles
+
+        $inlineCss = '';
         if ($style->length > 0) {
             foreach ($style as $styleRow) {
-                $css.= $styleRow->nodeValue."\n";
+                $inlineCss.= $styleRow->nodeValue."\n";
             }
+            $css = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $css);
+            $css = str_replace(array("\r\n", "\r", "\n", "\t", '  ', '    ', '    '), '', $css);
         }
-        $buffer = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $css);
-        $buffer = str_replace(array("\r\n", "\r", "\n", "\t", '  ', '    ', '    '), '', $buffer);
-        return $buffer;
+        return $css;
     }
 
 }

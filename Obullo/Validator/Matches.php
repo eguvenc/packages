@@ -2,18 +2,34 @@
 
 namespace Obullo\Validator;
 
+use Obullo\Container\ContainerInterface as Container;
+
 /**
- * Matches Class
+ * Matches
  * 
- * @category  Validator
- * @package   Matches
  * @author    Obullo Framework <obulloframework@gmail.com>
  * @copyright 2009-2015 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
- * @link      http://obullo.com/package/validator
  */
 class Matches
 {
+    /**
+     * Container
+     * 
+     * @var object
+     */
+    protected $c;
+
+    /**
+     * Container
+     * 
+     * @param Container $container contaienr
+     */
+    public function __construct(Container $container)
+    {
+        $this->c = $container;
+    }
+
     /**
      * Match one field to another
      * 
@@ -24,9 +40,11 @@ class Matches
      */    
     public function isValid($str, $field)
     {   
-        if ( ! isset($_REQUEST[$field])) {
+        $request = $this->c['request']->all();
+
+        if (! isset($request[$field])) {
             return false;                
         }
-        return ($str !== $_REQUEST[$field]) ? false : true;
+        return ($str !== $request[$field]) ? false : true;
     }
 }

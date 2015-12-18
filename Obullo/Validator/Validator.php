@@ -7,25 +7,27 @@ use RuntimeException;
 use Obullo\Http\Controller;
 use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Config\ConfigInterface as Config;
+use Obullo\Container\ContainerInterface as Container;
 use Obullo\Translation\TranslatorInterface as Translator;
 
+use Psr\Http\Message\ServerRequestInterface as Request;
+
 /**
- * Validator Class
- *
- * Modeled after Codeigniter form validation library 
+ * Validator
  * 
- * @category  Validator
- * @package   Validator
  * @author    Obullo Framework <obulloframework@gmail.com>
  * @copyright 2009-2015 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
- * @link      http://obullo.com/package/validator
  */
 class Validator 
 {
     public $fieldData = array();
     
+    protected $c;
+    protected $config;
+    protected $logger;
     protected $translator;
+    protected $requestParams;
     protected $errorArray = array();
     protected $errorMessages = array();    
     protected $errorPrefix = '<div>';
@@ -39,17 +41,22 @@ class Validator
     /**
      * Constructor
      * 
-     * @param ConfigInterface     $config     \Obullo\Config\ConfigInterface
-     * @param TranslatorInterface $translator \Obullo\Translation\TranslatorInterface
-     * @param LoggerInterface     $logger     \Obullo\Logger\LoggerInterface
+     * @param Container  $container  ContainerInterface
+     * @param Config     $config     ConfigInterface
+     * @param Request    $request    ServerRequestInterface
+     * @param Translator $translator TranslatorInterface
+     * @param Logger     $logger     LoggerInterface
      */
-    public function __construct(Config $config, Translator $translator, Logger $logger)
+    public function __construct(Container $container, Config $config, Request $request, Translator $translator, Logger $logger)
     {    
         mb_internal_encoding($config['locale']['charset']);
         
+        $this->c = $container;
+        $this->requestParams = $request->post();
         $this->config = $config;
         $this->logger = $logger;
         $this->translator = $translator;
+
         $this->translator->load('validator');
         $this->logger->debug('Validator Class Initialized');
     }
@@ -77,20 +84,16 @@ class Validator
      * This function takes an array of field names && validation
      * rules as input, validates the info, && stores it
      *
-     * @param mixed  $field   input fieldname
-     * @param string $label   input label
-     * @param mixed  $rules   rules string
-     * @param mixed  $filters php5 filters array
+     * @param mixed  $field input fieldname
+     * @param string $label input label
+     * @param mixed  $rules rules string
      * 
      * @return void
      */
-    public function setRules($field, $label = '', $rules = '', $filters = array())
+    public function setRules($field, $label = '', $rules = '')
     {        
-        if (count($_REQUEST) == 0) {  // No reason to set rules if we have no POST or GET data
+        if (count($this->requestParams) == 0) {  // No reason to set rules if we have no POST or GET data
             return;
-        }
-        if (! empty($filters)) {
-            $this->filters[$field] = $filters;
         }
                                  // If an array was passed via the first parameter instead of indidual string
         if (is_array($field)) {  // values we cycle through it && recursively call this function.
@@ -103,7 +106,7 @@ class Validator
             }
             return;
         }
-        if (! is_string($field) ||  ! is_string($rules) || $field == '') { // No fields? Nothing to do...
+        if (! is_string($field) || ! is_string($rules) || $field == '') { // No fields? Nothing to do...
             return;
         }
         $label = ($label == '') ? $this->createLabel($field) : $label;  // If the field label wasn't passed we use the field name
@@ -146,7 +149,7 @@ class Validator
      */        
     public function isValid()
     {
-        if (count($_REQUEST) == 0) { // Do we even have any data to process ?
+        if (count($this->requestParams) == 0) { // Do we even have any data to process ?
             return false;
         }                                     // Does the fieldDataarray containing the validation rules exist ?     
         if (count($this->fieldData) == 0) {   // If not, we look to see if they were assigned via a config file              
@@ -158,23 +161,20 @@ class Validator
             }
         }
         // Cycle through the rules for each field, match the 
-        // corresponding $_REQUEST item && test for errors
-        foreach ($this->fieldData as $field => $row) {  // Fetch the data from the corresponding $_REQUEST array && cache it in the fieldDataarray.
+        // corresponding $this->requestParams item && test for errors
+        foreach ($this->fieldData as $field => $row) {  // Fetch the data from the corresponding $this->requestParams array && cache it in the fieldDataarray.
                                                         // Depending on whether the field name is an array or a string will determine where we get it from.
             if (isset($row['isArray']) && $row['isArray'] == true) {
-                $this->fieldData[$field]['postdata'] = $this->reduceArray($_REQUEST, $row['keys']);
+                $this->fieldData[$field]['postdata'] = $this->reduceArray($this->requestParams, $row['keys']);
             } else {
-                if (isset($_REQUEST[$field]) && $_REQUEST[$field] != '') {
-                    $this->fieldData[$field]['postdata'] = $_REQUEST[$field];
+                if (isset($this->requestParams[$field]) && $this->requestParams[$field] != '') {
+                    $this->fieldData[$field]['postdata'] = $this->requestParams[$field];
                 }
             }
             if (isset($row['rules'])) {  // If we have no rule don't run validation ( e.g. we can set errors using setError() function without validation set rules.)
                 $this->execute($row, explode('|', $row['rules']), $this->fieldData[$field]['postdata']);       
             } 
         }
-
-        // $this->validateInputFilters();  // Execute the filters.
-
         $totalErrors = sizeof($this->errorArray);         // Did we end up with any errors?
         if ($totalErrors > 0) {
             $this->safeFormData = true;
@@ -188,7 +188,7 @@ class Validator
     }
 
     /**
-     * Traverse a multidimensional $_REQUEST array index until the data is found
+     * Traverse a multidimensional $this->requestParams array index until the data is found
      *
      * @param array   $array data
      * @param array   $keys  keys
@@ -222,11 +222,11 @@ class Validator
         foreach ($this->fieldData as $row) {
             if (isset($row['postdata']) && ! is_null($row['postdata'])) {
                 if (isset($row['isArray']) && $row['isArray'] == false) {
-                    if (isset($_REQUEST[$row['field']])) {
-                        $_REQUEST[$row['field']] = $this->prepForForm($row['postdata']);
+                    if (isset($this->requestParams[$row['field']])) {
+                        $this->requestParams[$row['field']] = $this->prepForForm($row['postdata']);
                     }
                 } else {
-                    $post_ref =& $_REQUEST;   // start with a reference
+                    $post_ref =& $this->requestParams;   // start with a reference
                     if (isset($row['keys'])) {
                         if (count($row['keys']) == 1) { // before we assign values, make a reference to the right POST key
                             $post_ref =& $post_ref[current($row['keys'])];
@@ -286,7 +286,7 @@ class Validator
      */
     protected function execute($row, $rules, $postdata = null, $cycles = 0)
     {                   
-        if (is_array($postdata)) {  // If the $_REQUEST data is an array we will run a recursive call
+        if (is_array($postdata)) {  // If the $this->requestParams data is an array we will run a recursive call
             foreach ($postdata as $val) {
                 $this->execute($row, $rules, $val, $cycles);
                 $cycles++;
@@ -321,6 +321,7 @@ class Validator
             return;
         }
         foreach ($rules as $rule) {   // Cycle through each rule && run it
+
             $inArray = false;         // We set the $postdata variable with the current data in our master array so that
                                       // each cycle of the loop is dealing with the processed data from the last cycle
             if ($row['isArray'] == true && is_array($this->fieldData[$row['field']]['postdata'])) {
@@ -357,30 +358,11 @@ class Validator
                 if (! in_array('required', $rules, true) && $result !== false) {
                     continue;
                 }
+
             } else {
 
-                $ruleClass = ucfirst($rule);
-                $className = 'Obullo\\Validator\\'.ucfirst($rule);
+                $result = $this->callRuleClass($rule, $postdata, $param);
 
-                if (! file_exists(OBULLO .'Validator/' .$ruleClass. '.php')) {  // If our own wrapper function doesn't exist we see if a native PHP function does. 
-                                                                                 // Users can use any native PHP function call that has one param.
-                    if (function_exists($rule)) { // Native php func.
-                        $result = $rule($postdata);
-                        if ($inArray == true) {
-                            $this->fieldData[$row['field']]['postdata'][$cycles] = (is_bool($result)) ? $postdata : $result;
-                        } else {
-                            $this->fieldData[$row['field']]['postdata'] = (is_bool($result)) ? $postdata : $result;
-                        }
-                    } else {
-                        $this->errorMessages['message'] = 'The '.ucfirst($rule).' is not a valid rule, if you have new validation function do pull request on the github.';
-                        $this->logger->error($this->errorMessages['message']);
-                    } 
-                    continue;
-                }
-                if (! class_exists($className)) {
-                    include OBULLO .'Validator/' .$ruleClass. '.php';
-                }
-                $result = call_user_func_array(array(new $className($this->config, $this->logger), 'isValid'), array($postdata, $param));
                 if ($inArray == true) {
                     $this->fieldData[$row['field']]['postdata'][$cycles] = (is_bool($result)) ? $postdata : $result;
                 } else {
@@ -390,16 +372,19 @@ class Validator
             if ($result === false) { // Did the rule test negatively?  If so, grab the error.
                 
                 if (! isset($this->errorMessages[$rule])) {
+
                     $RULE = strtoupper($rule);
                     $line = $this->translator['OBULLO:VALIDATOR:'.$RULE];
                     if ($this->translator[$rule] == false) {
                         $line = 'Error message is not set correctly or unable to translation access an error message.';
                         $this->logger->error($line);
                     }
+
                 } else {
                     $line = $this->errorMessages[$rule];
                 }
-                if (isset($this->fieldData[$param]) && isset($this->fieldData[$param]['label'])) { 
+                if (isset($this->fieldData[$param]) && isset($this->fieldData[$param]['label'])) {
+
                     // Is the parameter we are inserting into the error message the name                                                                                  
                     // of another field?  If so we need to grab its "field label"
                     $param = $this->translateFieldname($this->fieldData[$param]['label']);
@@ -413,6 +398,65 @@ class Validator
                 return;
             }
         }
+    }
+
+    /**
+     * Call rules
+     * 
+     * @param string $rule     string
+     * @param array  $postdata postdata
+     * @param mixed  $param    param
+     * 
+     * @return boolean
+     */
+    protected function callRuleClass($rule, $postdata, $param)
+    {
+        $ruleClass = ucfirst($rule);
+        $classes = [
+            'Alpha',
+            'Date',
+            'Email',
+            'Exact',
+            'IsBool',
+            'IsDecimal',
+            'IsJson',
+            'IsNumeric',
+            'Matches',
+            'Max',
+            'Md5',
+            'Min',
+            'Required',
+            'Trim'
+        ];
+        if (in_array($ruleClass, $classes)) {  // Load validation rule from app/classes/Form/Validator/Rules
+            
+            $className = 'Obullo\Validator\\'.ucfirst($rule);
+
+        } elseif (file_exists(CLASSES.'Form/Validator/'.$ruleClass.'.php')) {
+
+            $className = '\Form\Validator\\'.ucfirst($rule);
+
+        } else {
+            throw new RuntimeException(
+                sprintf(
+                    "Validator rule class '%s' is not exists.",
+                    $ruleClass
+                )
+            );
+        }
+        $object = new $className($this->c);
+        $method = 'isValid';
+
+        if (method_exists($object, 'func')) {
+            $method = 'func';
+        }
+        return call_user_func_array(
+            array(
+                $object,
+                $method
+            ),
+            array($postdata, $param)
+        );
     }
 
     /**
@@ -522,8 +566,8 @@ class Validator
         }
         if (isset($this->fieldData[$field]['postdata'])) { 
             return $this->fieldData[$field]['postdata'];
-        } elseif (isset($_REQUEST[$field])) {
-            return $_REQUEST[$field];
+        } elseif (isset($this->requestParams[$field])) {
+            return $this->requestParams[$field];
         }
         return;
     }
@@ -696,7 +740,7 @@ class Validator
         if (! method_exists($object, $method)) {
             throw new RuntimeException(
                 sprintf(
-                    "The object %s does not contain %s method.",
+                    "The callback object %s does not contain %s method.",
                     get_class($object),
                     $method
                 )

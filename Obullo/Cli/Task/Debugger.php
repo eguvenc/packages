@@ -3,13 +3,13 @@
 namespace Obullo\Cli\Task;
 
 use RuntimeException;
-use Obullo\Cli\Controller;
 use Obullo\Cli\Console;
+use Obullo\Cli\Controller;
 
 class Debugger extends Controller
 {
-    protected $socket;
     protected $msg;
+    protected $socket;
     protected $length;
     protected $connection;
     protected $maxByte = 10242880;  // 10 Mb
@@ -99,7 +99,6 @@ class Debugger extends Controller
                     echo "socket_accept() failed: " . socket_strerror(socket_last_error($newSocket)) . "\n";
                     break;
                 }
-                
                 $header = socket_read($newSocket, $this->maxByte); // Read data sent by the socket
                 $headers = $this->handshake($header, $newSocket, $host, $port, $url); // Perform websocket handshake
                 
@@ -158,12 +157,17 @@ class Debugger extends Controller
             $data['uri'] = $headers['Page-uri'];
         }
         if ($headers['Request'] == 'Http') {
+
             $data['message'] = 'HTTP_REQUEST';
             return $this->send($data);
+
         } elseif ($headers['Request'] == 'Ajax') {
+
             $data['message'] = 'AJAX_REQUEST';
             return $this->send($data);
+
         } elseif ($headers['Request'] == 'Cli') {
+
             $data['message'] = 'CLI_REQUEST';
             return $this->send($data);
         }
@@ -194,7 +198,6 @@ class Debugger extends Controller
     {
         $this->msg = $msg;
         $this->length = strlen($this->msg);
-
         $sent = true;
         foreach ($this->clients as $socket) {
             if (is_resource($socket) && get_resource_type($socket) == 'Socket') {
@@ -304,6 +307,7 @@ class Debugger extends Controller
     {
         $headers = array();
         $lines = preg_split("/\r\n/", $header);
+
         foreach ($lines as $line) {
             $line = chop($line);
             if (preg_match('/\A(\S+): (.*)\z/', $line, $matches)) {
@@ -311,6 +315,7 @@ class Debugger extends Controller
             }
         }
         if (isset($headers['Sec-WebSocket-Key'])) {
+
             $secKey = $headers['Sec-WebSocket-Key'];
             $secAccept = base64_encode(pack('H*', sha1($secKey . '258EAFA5-E914-47DA-95CA-C5AB0DC85B11')));
             $upgrade  = "HTTP/1.1 101 Web Socket Protocol Handshake\r\n" .
@@ -337,6 +342,7 @@ class Debugger extends Controller
     public function socketWrite($socket)
     {
         $sent = socket_write($socket, $this->msg, $this->length);
+
         if ($sent === false) {
             return false;
         }
