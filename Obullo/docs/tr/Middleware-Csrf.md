@@ -7,7 +7,7 @@ Cross Request Forgery güvenlik tehdidi hakkında daha detaylı bilgi için <a h
 
 ### Konfigürasyon
 
-<kbd>local/service/csrf.php</kbd> dosyasından csrf protection değerini true olarak değiştirin.
+<kbd>local/service/csrf.php</kbd> dosyasından csrf protection değerini <b>true</b> olarak değiştirin.
 
 ```php
 return array(
@@ -28,35 +28,34 @@ return array(
 
 Eğer <kbd>Form/Element</kbd> paketini kullanmıyorsanız uygulamanızdaki csrf güvenliği gereken form taglarına aşağıdaki gibi güvenlik değeri oluşturmanız gerekir.
 
-```php
-<form action="/buy" method="post">
+
+```html
+<form action="buy.php" method="post">
 <input type="hidden" name="<?php echo $this->c['csrf']->getTokenName() ?>" 
 value="<?php echo $this->c['csrf']->getToken(); ?>" />
+<p>
+Symbol: <input type="text" name="symbol" /><br />
+Shares: <input type="text" name="shares" /><br />
+<input type="submit" value="Buy" />
+</p>
 </form>
-``` 
+```
 
 Eğer form element paketini kullanıyorsanız form metodu sizin için csrf değerini kendiliğinden oluşturur.
-
 
 ```php
 echo $this->element->form('/buy', array('method' => 'post'));
 ```
 
-### Kurulum
+#### Kurulum
+
+Aşağıdaki kaynaktan <b>Csrf.php</b> dosyasını uygulamanızın <kbd>app/classes/Http/Middlewares/</kbd> klasörüne kopyalayın.
 
 ```php
-php task middleware add csrf
+http://github.com/obullo/http-middlewares/
 ```
 
-### Kaldırma
-
-```php
-php task middleware remove csrf
-```
-
-Katmanı ayrıca <kbd>app/middlewares.php</kbd> dosyasından kaldırmanız gerekir.
-
-### Çalıştırma
+#### Çalıştırma
 
 Csrf doğrulama katmanının uygulamanın her yerinde çalışmasını istiyorsanız katmanı <kbd>app/middlewares.php</kbd> dosyasına ekleyin.
 
@@ -66,8 +65,12 @@ Csrf doğrulama katmanının uygulamanın her yerinde çalışmasını istiyorsa
 | Request
 |--------------------------------------------------------------------------
 */
-$c['app']->middleware(
-    'Csrf'
+$c['middleware']->add(
+    [
+        // 'View',
+        'Router',
+        'Csrf'
+    ]
 );
 
 /* Location: .app/middlewares.php */
@@ -97,9 +100,9 @@ Eğer Csrf katmanının uygulamanın sadece belirli yerlerinde doğrulama yapmas
 ```php
 $c['router']->group(
     [
-        'name' => 'Membership', 
-        'domain' => $c['config']['domain']['mydomain.com'], 
-        'middleware' => array('Maintenance')
+        'name' => 'Orders', 
+        'domain' => 'mydomain.com', 
+        'middleware' => array()
     ],
     function () use ($c) {
 
@@ -113,4 +116,28 @@ $c['router']->group(
 );
 ```
 
-Bu örnekte sadece üye hesapları modülü altında siparişler sınıfına ait post metodunda csrf katmanını çalıştırmış olduk.
+Bu örnekte sadece siparişler sınıfına ait post metodunda csrf katmanını çalıştırmış olduk.
+
+
+#### İstisnai Durumlarda Csrf Katmanını Kaldırmak
+
+Csrf katmanı global olarak tanımlandığında tüm http POST isteklerinde çalışır. Fakat bu katmanı istenmeyen yerlerde anotasyonlar yardımı ile kaldırabilirsiniz.
+
+```php
+/**
+ * Index
+ *
+ * @middleware->remove("Csrf");
+ * 
+ * @return void
+ */
+public function index()
+{
+    $this->view->load(
+        'welcome',
+        [
+            'title' => 'Welcome to Obullo !',
+        ]
+    );
+}
+```

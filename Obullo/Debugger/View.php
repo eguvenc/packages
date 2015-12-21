@@ -323,7 +323,7 @@ $getDebuggerURl = function ($method = 'index') {
  * @license   http://opensource.org/licenses/MIT MIT license
  */
 var debuggerOff = <?php echo "'".$debuggerOff."'" ?>;
-var debuggerOffMessage = '<span class="error">Debugger seems disabled. Please enable debugger from application config.</span>';
+var debuggerOffMessage = '<span class="error">Debugger seems disabled. Please enable debugger from your config.php.</span>';
 var ajax = {
     post : function(url, closure, params){
         xmlHttpRequest(url, closure, params, "POST");

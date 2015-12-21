@@ -6,6 +6,7 @@
     }
     #middle { font-size:12px;font-family:Arial,Verdana,sans-serif;font-weight:normal;padding:5px;}
     #middle h1 {font-size:20px;margin:0;}
+    #middle h1 pre { margin-top: 10px;}
     #middle h2 {font-size:18px;margin:0;margin-top:10px;margin-bottom:6px;}
     #middle strong{display:inline-block;width:65px; line-height: 18px; }
     #middle span { font-size:22px; display:block; margin-top:0px !important; }
@@ -31,11 +32,12 @@
     #exceptionContent pre.source span.highlight { background: #F5F5F5; color:#BF342A; font-weight: bold;}
     #exceptionContent pre.source span.line span.number { color: none; }
     #exceptionContent pre.source span.line span.number { color: none; }
-    a{color:#BF342A; }
-    body{color:#666;}
-    code,kbd{ background:#EEE;border:1px solid #DDD;border:1px solid #DDD;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;padding:0 4px;color:#666;font-size:12px;}
-    pre{ color:#E53528; font-weight: normal; background:#fff;border:1px solid #DDD;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;padding:5px 10px;color:#666;font-size:12px;}
-    pre code{ border:none;padding:0; }
+
+    a { color:#BF342A; }
+    body { color:#666; }
+    code,kbd { background:#EEE;border:1px solid #DDD;border:1px solid #DDD;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;padding:0 4px;color:#666;font-size:12px;}
+    pre { color:#E53528; font-weight: normal; background:#fff;border:1px solid #DDD;border-radius:4px;-moz-border-radius:4px;-webkit-border-radius:4px;padding:5px 10px;color:#666;font-size:12px;}
+    pre code { border:none;padding:0; }
 </style>
 <script type="text/javascript">
     function ExceptionElement() {

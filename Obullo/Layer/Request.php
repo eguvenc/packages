@@ -230,7 +230,7 @@ class Request
         $uriString = md5($this->c['app']->request->getUri()->getPath());
 
         $this->logger->debug(
-            '$_LAYER: '.strtolower($uri), 
+            'Layer: '.strtolower($uri), 
             array(
                 'id' => $id, 
                 'output' => '<div class="obullo-layer" data-unique="u'.uniqid().'" data-id="'.$id.'" data-uristring="'.$uriString.'">' .$response. '</div>',

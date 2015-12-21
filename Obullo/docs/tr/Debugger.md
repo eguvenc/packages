@@ -1,11 +1,11 @@
 
-## Debugger
+## Çıktır Görüntüleyici (Debugger)
 
 Debugger paketi uygulamanın geliştirilmesi esnasında uygulama isteklerinden sonra oluşan ortam bileşenleri ve arka plan log verilerini görselleştirir. Debugger modülü aktifken uygulama ziyaret edildir ve uygulama çalışırken bir başka yeni pencerede <kbd>http://yourproject/debugger</kbd> adresine girilerek bu sayfada http, konsol, ajax log verileri ve ortam bilgileri ( $_POST, $_SERVER, $_GET, $_SESSION, $_COOKIE, http başlıkları, http gövdesi ) websocket bağlantısı ile dinamik olarak görüntülenir.
 
 ### Konfigürasyon
 
-<kbd>config/env/local/config.php</kbd> dosyasından debugger modülü websocket bağlantısını aktif edin.
+<kbd>app/local/config.php</kbd> dosyasından debugger modülü websocket bağlantısını aktif edin.
 
 ```php
 return array(
@@ -20,42 +20,32 @@ return array(
 )
 ```
 
-File sürücüsünün logger servisinizde <kbd>$logger->registerHandler(5, 'file');</kbd> metodu ile aşağıdaki gibi tanımlı olması gerekir.
+Logların okunabilmesi için <kbd>File</kbd> sürücüsünün logger servisinizde <kbd>'registerHandler' => [5, 'file']]</kbd> konfigürasyonu ile aşağıdaki gibi tanımlı olması gerekir.
 
 ```php
-namespace Service\Logger\Env;
-
-class Local implements ServiceInterface
-{
-    public function register(ContainerInterface $c)
-    {
-        $c['logger'] = function () use ($c) {
-            
-            /*
-            .
-            .
-            */
-
-            /*
-            |--------------------------------------------------------------------------
-            | Register Handlers
-            |--------------------------------------------------------------------------
-            */
-            $logger->registerHandler(5, 'file');
-
-            /*
-            |--------------------------------------------------------------------------
-            | Add Writers - Primary file writer should be available on local server
-            |--------------------------------------------------------------------------
-            */
-            $logger->addWriter('file')->filter('priority@notIn', array());
-            return $logger;
-        };
-    }
-}
+    'methods' => [
+        ['registerFilter' => ['priority', 'Obullo\Log\Filter\PriorityFilter']],
+        ['registerHandler' => [5, 'file']],
+        ['registerHandler' => [4, 'mongo']],
+        ['filter' => ['priority@notIn', array(LOG_DEBUG)]],
+        ['registerHandler' => [3, 'email']],
+        ['filter' => ['priority@notIn', array(LOG_DEBUG)]],
+        ['setWriter' => ['file']],
+        ['filter' => ['priority@notIn', array()]],
+    ]
 ```
 
-### Linux Kullanıcıları
+### Middleware
+
+Aşağıdaki kaynaktan <b>Debugger.php</b> dosyasını uygulamanızın <kbd>app/classes/Http/Middlewares/</kbd> klasörüne kopyalayın.
+
+```php
+http://github.com/obullo/http-middlewares/
+```
+
+### Linux
+
+----
 
 #### Kurulum
 
@@ -93,13 +83,14 @@ Eğer debugger kurulumu doğru gerçekleşti ise aşağıdaki gibi bir sayfa ile
 
 Websocket bağlantısı bazı tarayıcılarda kendiliğinden kopabilir panel üzerindeki ![Closed](images/socket-closed.png?raw=true "Socket Closed") simgesi debugger sunucusuna ait bağlantının koptuğunu ![Open](images/socket-open.png?raw=true "Socket Open") simgesi ise bağlantının aktif olduğunu gösterir. Eğer bağlantı koparsa verileri sayfa yenilemesi olmadan takip edemezsiniz. Böyle bir durumda debugger sunucunuzu ve tarayıcınızı yeniden başlatmayı deneyin.
 
-### Windows Kullanıcıları
 
-Bu örnekte Xampp Programı baz alınmıştır.
+### Windows
 
-#### Kurulum
+----
 
-Aşağıdaki komutu konsoldan çalıştırın.
+#### Kurulum 
+
+Bu örnekte Xampp Programı baz alınmıştır. Aşağıdaki komutu konsoldan çalıştırın.
 
 ```php
 C:\xampp\php\php.exe -f "C:\xampp\htdocs\myproject\task" module add debugger
