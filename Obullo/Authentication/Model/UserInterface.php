@@ -2,13 +2,12 @@
 
 namespace Obullo\Authentication\Model;
 
-use Obullo\Container\ServiceProviderInterface;
+use Obullo\Container\ServiceProviderInterface as Provider;
 
 /**
  * User Provider Interface
  * 
- * @author    Obullo Framework <obulloframework@gmail.com>
- * @copyright 2009-2015 Obullo
+ * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
 interface UserInterface
@@ -19,7 +18,7 @@ interface UserInterface
      * @param object $provider ServiceProviderInterface
      * @param object $params   Auth configuration & service configuration parameters
      */
-    public function __construct(ServiceProviderInterface $provider, array $params);
+    public function __construct(Provider $provider, array $params);
 
     /**
      * Execute sql query

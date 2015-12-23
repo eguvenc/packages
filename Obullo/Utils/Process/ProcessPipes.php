@@ -9,12 +9,8 @@ use RuntimeException;
  *
  * This file is borrowed from Symfony process package 
  * 
- * @category  Process
- * @package   ProcessPipes
- * @author    Obullo Framework <obulloframework@gmail.com>
- * @copyright 2009-2015 Obullo
+ * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
- * @link      http://obullo.com/package/process
  */
 
 class ProcessPipes
@@ -391,8 +387,3 @@ class ProcessPipes
         $this->files = array();
     }
 }
-
-// END Process class
-
-/* End of file Process.php */
-/* Location: .Obullo/Utils/Process/ProcessPipes.php */

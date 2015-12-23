@@ -13,12 +13,8 @@ use Obullo\Utils\Process\Exception\ProcessTimedOutException;
  *
  * This file is borrowed from Symfony process package 
  * 
- * @category  Process
- * @package   Process
- * @author    Obullo Framework <obulloframework@gmail.com>
- * @copyright 2009-2015 Obullo
+ * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
- * @link      http://obullo.com/package/process
  */
 
 class Process
@@ -1168,8 +1164,3 @@ class Process
         $this->incrementalErrorOutputOffset = 0;
     }
 }
-
-// END Process class
-
-/* End of file Process.php */
-/* Location: .Obullo/Utils/Process/Process.php */

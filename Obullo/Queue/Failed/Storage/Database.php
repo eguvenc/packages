@@ -6,15 +6,14 @@ use PDO;
 use Exception;
 use RuntimeException;
 use SimpleXMLElement;
-use Obullo\Config\ConfigInterface;
 use Obullo\Queue\Failed\StorageInterface;
-use Obullo\Container\ServiceProviderInterface;
+use Obullo\Config\ConfigInterface as Config;
+use Obullo\Container\ServiceProviderInterface as Provider;
 
 /**
  * FailedJob Database Handler
- * 
- * @author    Obullo Framework <obulloframework@gmail.com>
- * @copyright 2009-2015 Obullo
+ *
+ * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
 class Database implements StorageInterface
@@ -40,9 +39,9 @@ class Database implements StorageInterface
      * @param object $provider \Obullo\Service\ServiceProviderInterface
      * @param object $params   service parameters
      */
-    public function __construct(ConfigInterface $config, ServiceProviderInterface $provider, array $params)
+    public function __construct(Config $config, Provider $provider, array $params)
     {
-        $database = $config->load('database');
+        $database   = $config->load('database');
         $connection = $params['failedJob']['provider']['params']['connection'];
 
         if (! isset($database['connections'][$connection])) {
@@ -95,6 +94,7 @@ class Database implements StorageInterface
             $this->db->commit();
 
         } catch (Exception $e) {
+            
             $this->db->rollBack();
             $exception = new \Obullo\Error\Exception;
             $exception->show($e);
@@ -116,6 +116,7 @@ class Database implements StorageInterface
             ->bindParam(2, $line, PDO::PARAM_INT)
             ->execute()
             ->row();
+
         if ($row == false) {
             return false;
         }
@@ -134,10 +135,13 @@ class Database implements StorageInterface
     {
         $sql = "UPDATE $this->tablename SET job_attempts = %d, failure_last_date = %d, failure_repeat = failure_repeat + 1 WHERE id = %d";
         try {
+
             $this->db->beginTransaction();
             $this->db->exec(sprintf($sql, $event['job_attempts'], time(), $id));
             $this->db->commit();
+
         } catch (Exception $e) {
+
             $this->db->rollBack();
             $exception = new \Obullo\Error\Exception;
             $exception->show($e);

@@ -319,7 +319,7 @@ $getDebuggerURl = function ($method = 'index') {
  * @author    Rabih Abou Zaid
  * @author    Erkan Yeter
  * @author    Ersin Güvenç
- * @copyright 2009-2015 Obullo
+ * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
 var debuggerOff = <?php echo "'".$debuggerOff."'" ?>;

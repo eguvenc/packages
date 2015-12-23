@@ -8,13 +8,9 @@ use Obullo\Config\ConfigInterface;
 
 /**
  * File Caching Class
- *
- * @category  Cache
- * @package   File
- * @author    Obullo Framework <obulloframework@gmail.com>
- * @copyright 2009-2015 Obullo
- * @license   http://opensource.org/licenses/MIT MIT license
- * @link      http://obullo.com/package/cache
+ * 
+ * @license http://opensource.org/licenses/MIT MIT license
+ * @link    http://obullo.com/package/cache
  */
 class File implements CacheInterface
 {

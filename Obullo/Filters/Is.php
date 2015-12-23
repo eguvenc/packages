@@ -7,7 +7,7 @@ namespace Obullo\Filters;
  *
  * Also we use this class in request package like : $price = this->request->post('price', 'is')->int();
  * 
- * @copyright 2009-2015 Obullo
+ * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
 class Is extends AbstractFilter

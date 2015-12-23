@@ -6,9 +6,8 @@ use Obullo\Captcha\CaptchaResult;
 
 /**
  * Captcha Abstract Class
- * 
- * @author    Obullo Framework <obulloframework@gmail.com>
- * @copyright 2009-2015 Obullo
+ *
+ * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
 abstract class AbstractProvider

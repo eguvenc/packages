@@ -3,15 +3,14 @@
 namespace Obullo\Session;
 
 use Obullo\Log\LoggerInterface as Logger;
-use Obullo\Container\ServiceProviderInterface as ServiceProvider;
+use Obullo\Container\ServiceProviderInterface as Provider;
 
 use Psr\Http\Message\RequestInterface as Request;
 
 /**
  * Session Class
  * 
- * @author    Obullo Framework <obulloframework@gmail.com>
- * @copyright 2009-2015 Obullo
+ * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
 class Session implements SessionInterface
@@ -52,7 +51,7 @@ class Session implements SessionInterface
      * @param object $logger   \Obullo\Log\LoggerInterface
      * @param array  $params   service parameters
      */
-    public function __construct(ServiceProvider $provider, Request $request, Logger $logger, array $params) 
+    public function __construct(Provider $provider, Request $request, Logger $logger, array $params) 
     {
         $this->params = $params;
         $this->provider = $provider;

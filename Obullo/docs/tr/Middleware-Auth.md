@@ -23,7 +23,7 @@ Son olarak route grubu içerisinde <b>$this->attach()</b> metodunu kullanarak ye
 $c['router']->group(
     [
         'name' => 'AuthorizedUsers',
-        'domain' => $c['config']['domain']['mydomain.com'], 
+        'domain' => 'mydomain.com', 
         'middleware' => array('Auth','Guest')
     ],
     function () {

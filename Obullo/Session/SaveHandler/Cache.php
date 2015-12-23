@@ -2,13 +2,12 @@
 
 namespace Obullo\Session\SaveHandler;
 
-use Obullo\Container\ServiceProviderInterface;
+use Obullo\Container\ServiceProviderInterface as Provider;
 
 /**
  * Cache Save Handler
  * 
- * @author    Obullo Framework <obulloframework@gmail.com>
- * @copyright 2009-2015 Obullo
+ * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
 class Cache implements SaveHandlerInterface
@@ -54,7 +53,7 @@ class Cache implements SaveHandlerInterface
      * @param object $provider \Obullo\Service\ServiceProviderInterface
      * @param array  $params   service parameters
      */
-    public function __construct(ServiceProviderInterface $provider, array $params)
+    public function __construct(Provider $provider, array $params)
     {
         $this->params = $params;
         $this->provider = $provider;

@@ -3,13 +3,13 @@
 
 > Bu katman uygulamaya <b>http://example.com/welcome</b> olarak gelen istekleri mevcut yerel dili ekleyerek <b>http://example.com/en/welcome</b> adresine yönlendirir.
 
-### Kurulum
+#### Kurulum
 
 ```php
 php task middleware add rewriteLocale
 ```
 
-### Kaldırma
+#### Kaldırma
 
 ```php
 php task middleware remove rewriteLocale
@@ -17,7 +17,7 @@ php task middleware remove rewriteLocale
 
 Eğer route yapınızda bu katmanı kullandıysanız app/routes.php dosyasından ayrıca silin.
 
-### Çalıştırma
+#### Çalıştırma
 
 Aşağıdaki örnek genel ziyaretçiler route grubu için RewriteLocale katmanını çalıştırır.
 

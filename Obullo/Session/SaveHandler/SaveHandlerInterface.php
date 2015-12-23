@@ -2,13 +2,12 @@
 
 namespace Obullo\Session\SaveHandler;
 
-use Obullo\Container\ServiceProviderInterface;
+use Obullo\Container\ServiceProviderInterface as Provider;
 
 /**
  * Save Handler Interface
  * 
- * @author    Obullo Framework <obulloframework@gmail.com>
- * @copyright 2009-2015 Obullo
+ * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
 interface SaveHandlerInterface
@@ -19,7 +18,7 @@ interface SaveHandlerInterface
      * @param object $provider \Obullo\Service\ServiceProviderInterface
      * @param array  $params   service parameters
      */
-    public function __construct(ServiceProviderInterface $provider, array $params);
+    public function __construct(Provider $provider, array $params);
 
     /**
     * Php5 session handler interface open function

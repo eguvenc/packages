@@ -5,25 +5,17 @@
 
 <a name="maintenance-add"></a>
 
-### Kurulum
+#### Kurulum
+
+Aşağıdaki kaynaktan <b>Maintenance.php</b> dosyasını uygulamanızın <kbd>app/classes/Http/Middlewares/</kbd> klasörüne kopyalayın.
 
 ```php
-php task middleware add maintenance
+http://github.com/obullo/http-middlewares/
 ```
-
-<a name="maintenance-remove"></a>
-
-### Kaldırma
-
-```php
-php task middleware remove maintenance
-```
-
-Eğer app/routes.php içinde bu katmanı kullandıysanız middleware dizileri içinden silin.
 
 <a name="maintenance-run"></a>
 
-### Çalıştırma
+#### Çalıştırma
 
 Uygulamanızı bakıma almak için aşağıdaki komutu çalıştırın.
 
@@ -39,7 +31,7 @@ php task app up root
 
 <a name="maintenance-configuration"></a>
 
-### Konfigürasyon
+#### Gelişmiş Konfigürasyon
 
 Eğer tanımlı değilse <kbd>config/$env/maintenance.php</kbd> dosyası içerisinden uygulamanıza domainlere ait regex ( düzenli ) ifadeleri belirleyin.
 

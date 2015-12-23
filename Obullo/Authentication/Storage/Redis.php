@@ -2,14 +2,13 @@
 
 namespace Obullo\Authentication\Storage;
 
-use Obullo\Container\ServiceProviderInterface;
+use Obullo\Container\ServiceProviderInterface as Provider;
 use Obullo\Session\SessionInterface as Session;
 
 /**
  * Redis Storage
  * 
- * @author    Obullo Framework <obulloframework@gmail.com>
- * @copyright 2009-2015 Obullo
+ * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
 class Redis extends AbstractStorage implements StorageInterface
@@ -26,7 +25,7 @@ class Redis extends AbstractStorage implements StorageInterface
      * @param object $provider provider
      * @param array  $params   parameters
      */
-    public function __construct(Session $session, ServiceProviderInterface $provider, array $params)
+    public function __construct(Session $session, Provider $provider, array $params)
     {
         $this->params = $params;
         $this->cacheKey = (string)$params['cache.key'];

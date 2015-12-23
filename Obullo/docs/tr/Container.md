@@ -417,7 +417,7 @@ Eğer kendi oluşturduğunuz servis sağlayıcınızı çalıştırmak istiyorsa
 namespace Service\Providers;
 
 use Obullo\Container\ServiceInterface;
-use Obullo\Container\ContainerInterface;
+use Obullo\Container\ContainerInterface as Container;
 use Obullo\Container\ServiceProviderInterface;
 use Obullo\Service\Provider\AbstractProvider;
 
@@ -425,7 +425,7 @@ class Cache extends AbstractProvider implements ServiceProviderInterface
 {
     protected $c;
 
-    public function __construct(ContainerInterface $c)
+    public function __construct(Container $c)
     {
         $this->c = $c;
         $this->register();

@@ -15,8 +15,7 @@ use Obullo\Container\ContainerInterface as Container;
 /**
  * Application
  * 
- * @author    Obullo Framework <obulloframework@gmail.com>
- * @copyright 2009-2015 Obullo
+ * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
 class Application implements ApplicationInterface
@@ -117,7 +116,7 @@ class Application implements ApplicationInterface
         if ($this->c['app.env'] != 'production') {
             echo $exception->make($e);  // Print exceptions to see errors
         }
-        return $this->logException($e);
+        return $this->exceptionError($e);
     }
 
     /**
@@ -134,7 +133,7 @@ class Application implements ApplicationInterface
         if ($this->c['app.env'] != 'production') {
             echo $exception->make($e);  // Print exceptions to see errors
         }
-        return $this->logException($e);
+        return $this->exceptionError($e);
     }
 
     /**
@@ -144,7 +143,7 @@ class Application implements ApplicationInterface
      * 
      * @return boolean
      */
-    public function logException($e)
+    public function exceptionError($e)
     {
         $exception = new \Obullo\Error\Exception;
         $return = false;

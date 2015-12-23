@@ -10,9 +10,9 @@ use AMQPException;
 use AMQPConnection;
 use RuntimeException;
 use Obullo\Queue\QueueInterface;
-use Obullo\Config\ConfigInterface;
+use Obullo\Config\ConfigInterface as Config;
 use Obullo\Queue\JobHandler\AmqpJob;
-use Obullo\Container\ServiceProviderInterface;
+use Obullo\Container\ServiceProviderInterface as Provider;
 
 /**
  * Info
@@ -24,8 +24,7 @@ use Obullo\Container\ServiceProviderInterface;
 /**
  * AMQP Handler
  * 
- * @author    Obullo Framework <obulloframework@gmail.com>
- * @copyright 2009-2015 Obullo
+ * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
 class Amqp implements QueueInterface
@@ -58,7 +57,7 @@ class Amqp implements QueueInterface
      * @param object $provider \Obullo\Service\Provider\ServiceProviderInterface 
      * @param array  $params   provider parameters
      */
-    public function __construct(ConfigInterface $config, ServiceProviderInterface $provider, array $params)
+    public function __construct(Config $config, Provider $provider, array $params)
     {
         $this->config = $config->load('queue')['amqp'];
         $this->AMQPconnection = $provider->get($params);

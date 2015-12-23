@@ -1,5 +1,5 @@
 
-## Çıktır Görüntüleyici (Debugger)
+## Çıktı Görüntüleyici (Debugger)
 
 Debugger paketi uygulamanın geliştirilmesi esnasında uygulama isteklerinden sonra oluşan ortam bileşenleri ve arka plan log verilerini görselleştirir. Debugger modülü aktifken uygulama ziyaret edildir ve uygulama çalışırken bir başka yeni pencerede <kbd>http://yourproject/debugger</kbd> adresine girilerek bu sayfada http, konsol, ajax log verileri ve ortam bilgileri ( $_POST, $_SERVER, $_GET, $_SESSION, $_COOKIE, http başlıkları, http gövdesi ) websocket bağlantısı ile dinamik olarak görüntülenir.
 
@@ -43,7 +43,7 @@ Aşağıdaki kaynaktan <b>Debugger.php</b> dosyasını uygulamanızın <kbd>app/
 http://github.com/obullo/http-middlewares/
 ```
 
-### Linux
+### Linux / Mac
 
 ----
 

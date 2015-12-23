@@ -8,12 +8,8 @@ namespace Obullo\Utils;
  *
  * Borrowed from Zend Framework 
  * 
- * @category  Utilities
- * @package   ArrayUtils
- * @author    Obullo Framework <obulloframework@gmail.com>
- * @copyright 2009-2015 Obullo
+ * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
- * @link      http://obullo.com/package/utils
  */
 abstract class ArrayUtils
 {

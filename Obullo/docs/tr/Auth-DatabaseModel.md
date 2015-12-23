@@ -11,12 +11,12 @@ Aşağıda O2 yetki doğrulama paketi içerisindeki <kbd>\Obullo\Authentication\
 namespace Obullo\Authentication\Model;
 
 use Auth\Identities\GenericUser;
-use Obullo\Container\ContainerInterface;
-use Obullo\Container\ServiceProviderInterface;
+use Obullo\Container\ContainerInterface as Container;
+use Obullo\Container\ServiceProviderInterface as Provider;
 
 interface UserInterface
 {
-    public function __construct(ContainerInterface $c, ServiceProviderInterface $provider);
+    public function __construct(Container $c, Provider $provider);
     public function execQuery(GenericUser $user);
     public function execRecallerQuery($token);
     public function updateRememberToken($token, GenericUser $user);

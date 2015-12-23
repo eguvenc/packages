@@ -3,7 +3,7 @@
 namespace Obullo\Utils;
 
 use RuntimeException;
-use Obullo\Container\ContainerInterface;
+use Obullo\Container\ContainerInterface as Container;
 
 trait SingletonTrait
 {
@@ -16,7 +16,7 @@ trait SingletonTrait
      * 
      * @return singleton instance.
      */
-    public static function getInstance(ContainerInterface $c)
+    public static function getInstance(Container $c)
     {
         if (null === self::$instance) {
             self::$instance = new static($c);

@@ -5,12 +5,8 @@ namespace Obullo\Utils;
 /**
  * CaseInsentiveArray Class
  * 
- * @category  Utils
- * @package   CaseInsentiveArray
- * @author    Obullo Framework <obulloframework@gmail.com>
- * @copyright 2009-2015 Obullo
+ * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
- * @link      http://obullo.com/package/utils
  */
 class CaseInsensitiveArray implements \ArrayAccess, \Countable, \Iterator
 {
