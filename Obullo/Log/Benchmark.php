@@ -53,5 +53,4 @@ class Benchmark
         $logger->debug('Final output sent to browser', $extra, -9999);
     }
 
-
 }

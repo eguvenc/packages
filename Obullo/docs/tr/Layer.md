@@ -55,7 +55,7 @@ Her bir katman basit kontrolör sınıflarıdır. Layer sınıfı tarafından te
 
 ### Katmanlı Mimariyi Kullanmak
 
-Katmanlı mimari sunum ( presentation ) katmanınının yazılım geliştirme sürecini etkileyici bir şekilde yönetir. Bu mimariyi kullanmanın faydalarını aşağıdaki gibi sıralayabiliriz.
+Katmanlı mimari yazılım geliştirmenin arayüz sürecini etkileyici bir şekilde yönetir. Bu mimariyi kullanmanın faydalarını aşağıdaki gibi sıralayabiliriz.
 
 * Arayüz Tutarlılığı: Katmanlı programlama görünen varlıkları ( views ) kesin parçalara ayırır ve her bölüm kendisinden sorumlu olduğu fonksiyonu çalıştırır ( view controller ) böylece her katman bir layout yada widget hissi verir.
 * Bakımı Kolay Uygulamalar: Parçalara bölünen kullanıcı arayüzü bileşenleri MVC tasarım desenine bağlı kaldıkları için bakım kolaylığı sağlarlar.
