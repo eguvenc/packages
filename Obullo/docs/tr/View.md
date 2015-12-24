@@ -168,7 +168,7 @@ $this->view->assign(
 
 > Obullo çerçevesinde katman paketi sayesinde view dosyaları kontrolör dosyaları içerisinden zincirleme olarak içe içe çağırılabilir. Bu da her view dosyasına ait bir kontrolör dosyasının yaratılabileceği anlamına gelir. Bknz. [Layer.md](Layer.md)
 
-![Layers](/images/layer-ui-components?raw=true "")
+![Layers](images/layer-ui-components.png?raw=true "")
 
 Bu mimariyi kullanmanın faydalarını aşağıdaki gibi sıralayabiliriz.
 
