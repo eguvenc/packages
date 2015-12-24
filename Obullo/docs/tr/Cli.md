@@ -24,11 +24,11 @@ Cli paketi yani Command Line Interface komut satırından yürütülen işlemler
         <li><a href="#debugger-command">Debugger Komutu</a></li>
         <li><a href="#queue-command">Queue Komutu</a></li>
         <li><a href="#run-your-commands">Kendi Komutlarınızı Çalıştırmak</a></li>
-        <li><a href="#external-commands">Konsol Komutlarını Dışarıdan Çalıştırmak</a></li>
+        <li><a href="#external-run">Konsol Komutlarını Dışarıdan Çalıştırmak</a></li>
+        <li><a href="#internal-run">Konsol Komutlarını İçeriden Çalıştırmak</a></li>
         <li><a href="#shortcuts">Argümanlar İçin Kısayollar</a></li>
     </ul>
 </li>
-
 
 <li><a href="#method-reference">Fonksiyon Referansı</a></li>
 </ul>
@@ -234,23 +234,17 @@ Help:
 
 Available Commands
 
-    clear    : Clear log data ( also removes the queue logs ).
+    clear    : Clear log data
     help     : Help
-
-Available Arguments
-
-    --dir    : Sets log direction for reader. Directions : cli, ajax, http ( default )
-    --db     : Database name if mongo driver used.
-    --table  : Collection name if mongo driver used.
 
 Usage:
 
-php task log --dir=value
+php task log type
 
     php task log 
-    php task log --dir=cli
-    php task log --dir=ajax
-    php task log --dir=http --table=logs
+    php task log cli
+    php task log ajax
+    php task log http
 
 Description:
 
@@ -409,7 +403,7 @@ class Hello extends \Controller {
 php task hello
 ```
 
-<a name="external-commands"></a>
+<a name="external-run"></a>
 
 #### Konsol Komutlarını Dışarıdan Çalıştırmak
 
@@ -477,6 +471,21 @@ php /var/www/framework/task help
 </tbody>
 </table>
 
+<a name="internal-run"></a>
+
+#### Konsol Komutlarını İçeriden Çalıştırmak
+
+Komutları uygulama içerisinden çalıştırmak için task sınıfı kullanılır.
+
+```php
+$this->task->run('welcome/index/arg/arg');
+```
+
+Asenkron olmayan bir komutun çıktısını almak için ikinci parametreden <kbd>true</kbd> gönderilmelidir.
+
+```php
+echo $this->task->run('welcome/index/arg/arg', true);
+```
 
 <a name="method-reference"></a>
 

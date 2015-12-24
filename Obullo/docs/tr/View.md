@@ -233,7 +233,7 @@ http://myproject/views/navbar
 
 ### Template Sınıfı
 
-Template sınıfı view sınıfı ile benzer metotlar içerir ve <kbd>/resources/templates/</kbd> klasöründen genel view dosyalarını yüklemek için yardımcı bir sınıf olarak kullanılır.
+Template sınıfı <kbd>/resources/templates/</kbd> klasöründe oluşturulan genel view dosyalarını yüklemek için yardımcı bir sınıf olarak kullanılır.
 
 <a name="t_load"></a>
 
