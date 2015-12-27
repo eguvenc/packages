@@ -270,19 +270,19 @@ class Url implements UrlInterface
      *
      * Simply adds the http:// part if missing
      *
-     * @param string $str the URL
+     * @param string $url the URL
      * 
      * @return string
      */
-    public function prep($str = '')
+    public function prep($url = '')
     {
-        if ($str == 'http://' || $str == '') {
+        if ($url == 'http://' || $url == '') {
             return '';
         }
-        if (! parse_url($str, PHP_URL_SCHEME)) {
-            $str = 'http://' . $str;
+        if (! parse_url($url, PHP_URL_SCHEME)) {
+            $url = 'http://' . $url;
         }
-        return $str;
+        return $url;
     }
 
 }

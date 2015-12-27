@@ -76,9 +76,14 @@ interface UrlInterface
     public function currentUrl();
 
     /**
-     * Get webhost definition
+     * Prep URL
      *
+     * Simply adds the http:// part if missing
+     *
+     * @param string $uri the URL
+     * 
      * @return string
      */
-    public function webhost();    
+    public function prep($uri = '');
+  
 }
