@@ -46,6 +46,20 @@ class Url implements UrlInterface
     protected $params;
 
     /**
+     * Url protocol
+     * 
+     * @var string
+     */
+    protected $protocol = '';
+
+    /**
+     * Url
+     * 
+     * @var string
+     */
+    protected $url = '';
+
+    /**
      * Constructor
      * 
      * @param RequestInterface $request request
@@ -63,28 +77,94 @@ class Url implements UrlInterface
     }
 
     /**
+     * Create link with http protocol
+     * 
+     * @param string $protocol http protocol
+     * 
+     * @return object
+     */
+    public function withProtocol($protocol = null)
+    {
+        if ($protocol == null) {
+            $protocol = ($this->request->isSecure()) ? 'https://' : 'http://';
+        }
+        $this->protocol = $protocol;
+        return $this;
+    }
+
+    /**
+     * Create asset with an external url
+     * 
+     * @param string $url url
+     * 
+     * @return object
+     */
+    public function withUrl($url = null)
+    {
+        $this->url = $url;
+        return $this;
+    }
+
+    /**
      * Anchor Link
      *
      * Creates an anchor based on the local URL.
      *
      * @param string $uri        the URL
-     * @param string $title      the link title
+     * @param string $label      the link name
      * @param mixed  $attributes any attributes
      * 
      * @return string
      */
-    public function anchor($uri = '', $title = '', $attributes = '')
+    public function anchor($uri = '', $label = '', $attributes = '')
     {
         $siteUrl = $this->_getSiteUrl($uri);
         
-        if (empty($title)) {
-            $title = $siteUrl;
+        if (empty($label)) {
+            $label = $siteUrl;
         }
         $attributes = ($attributes != '') ? self::parseAttributes($attributes) : '';
+        $anchor = '<a href="' .$siteUrl . '"' . $attributes . '>' . (string)$label . '</a>';
+        $this->clear();
 
-        return '<a href="' . $siteUrl . '"' . $attributes . '>' . (string)$title . '</a>';
+        return $anchor;        
     }
     
+    /**
+     * Clear variables
+     * 
+     * @return void
+     */
+    protected function clear()
+    {
+        $this->protocol = '';
+        $this->url = '';
+    }
+
+    /**
+     * Create static assets urls
+     * 
+     * @param string $uri /images/example.png
+     * 
+     * @return string
+     */
+    public function asset($uri)
+    {
+        if (! empty($this->url)) {
+            $url = $this->prep($this->url);
+        } else {
+            $url = $this->prep($this->params['assets']['url']);
+        }
+        $url = rtrim($url, '/').'/';
+        $uri = $url.trim($this->params['assets']['folder'], '/').'/'.ltrim($uri, '/');
+
+        if (! empty($this->protocol)) {
+            $uri = $this->protocol.preg_replace('#^https?:\/\/#i', '', $uri);
+        }
+        $this->clear();
+        return $uri;
+    }
+
     /**
      * Get site url
      * 
@@ -99,21 +179,6 @@ class Url implements UrlInterface
         return ( ! preg_match('!^\w+://! i', $uri)) ? $siteUri : $uri;
     }
 
-
-    /**
-     * Get Assets URL
-     * 
-     * @param string $uri    asset uri
-     * @param string $folder whether to add asset folder
-     * 
-     * @return string
-     */
-    public function assetsUrl($uri = '', $folder = true)
-    {
-        $assetsFolder = ($folder) ? trim($this->params['assets']['folder'], '/').'/' : '';
-        return $this->params['assets']['url'] . $assetsFolder . ltrim($uri, '/');
-    }
-
     /**
      * Get Base URL
      * 
@@ -123,25 +188,42 @@ class Url implements UrlInterface
      */
     public function baseUrl($uri = '')
     {
-        return rtrim($this->params['baseurl'], '/') .'/'. ltrim($uri, '/');
+        $baseUrl = rtrim($this->params['baseurl'], '/') .'/'. ltrim($uri, '/');
+
+        if ($baseUrl != '' && $baseUrl != '/') {
+            $baseUrl = $this->prep($baseUrl);
+        }
+        return $baseUrl;
     }
 
     /**
      * Site URL
      *
-     * @param string $uriStr the URI string
+     * @param string $uri the URI string
      * 
      * @return string
      */
-    public function siteUrl($uriStr = '')
+    public function siteUrl($uri = '')
     {
-        if (is_array($uriStr)) {
-            $uriStr = implode('/', $uriStr);
+        $baseUrl = $this->baseUrl();
+
+        if (is_array($uri)) {
+            $uri = implode('/', $uri);
         }
-        if ($uriStr == '') {
-            return $this->baseUrl();
+        if ($this->protocol != '') {
+            if ($baseUrl == '/') {
+                $baseUrl = '';
+            } else {
+                $baseUrl = preg_replace('#^https?:\/\/#i', '', $baseUrl);
+            }
+        }
+        if ($uri == '') {
+            $this->clear();
+            return $baseUrl;
         } 
-        return $this->baseUrl(). trim($uriStr, '/');
+        $url = $this->protocol.$baseUrl. trim($uri, '/');
+        $this->clear();
+        return $url;
     }
 
     /**
@@ -152,43 +234,6 @@ class Url implements UrlInterface
     public function currentUrl()
     {
         return $this->siteUrl($this->uri->getRequestUri());
-    }
-
-    /**
-     * Get current url
-     *
-     * @return string
-     */
-    public function webhost()
-    {
-        return trim($this->params['webhost'], '/');
-    }
-
-    /**
-     * Create static assets urls
-     * 
-     * @param string $uri      /images/example.png
-     * @param mixed  $protocol http:// or https://
-     * @param mixed  $url      dynamic url ( overrides to asset url in config )
-     * 
-     * @return string
-     */
-    public function asset($uri, $protocol = '', $url = '')
-    {
-        $url = empty($url) ? $this->params['assets']['url'] : $url;
-        $uri = $url.trim($this->params['assets']['folder'], '/').'/'.ltrim($uri, '/');
-
-        if ($protocol == false) {
-            $uri = preg_replace('#^https?:\/\/#i', '', $uri);
-            $protocol = '';
-        }
-        if ($protocol == true) {  // Auto detect
-            $protocol = ($this->request->isSecure()) ? 'https://' : 'http://';
-        }
-        if (! empty($protocol) || is_bool($protocol)) {
-            $uri = preg_replace('#^https?:\/\/#i', '', $uri);
-        }
-        return $protocol.$uri;
     }
 
     /**

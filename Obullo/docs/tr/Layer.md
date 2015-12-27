@@ -14,7 +14,7 @@
     <li>
         <a href="#running">Çalıştırma</a>
         <ul>
-            <li><a href="#loading-class">Sınıfı Yüklemek</a></li>
+            <li><a href="#methods">Metotlara Erişim</a></li>
             <li><a href="#calling-layers">Bir Katmanı Çağırmak</a></li>
             <li><a href="#hello-layers">Merhaba Katmanlar</a></li>
             <li><a href="#caching-layers">Bir Katmanı Önbelleklemek</a></li>
@@ -81,9 +81,9 @@ Bu özelliğin yanında katman içerisinde bir kez yapılması gereken veritaban
 
 Katman sınıfı <kbd>app/components.php</kbd> dosyasında tanımlıdır bu yüzdan ayrıca konfigüre edilmeye gerek duymaz.
 
-<a name="loading-class"></a>
+<a name="methods"></a>
 
-#### Sınıfı Yüklemek
+#### Metotlara Erişim
 
 ```php
 $this->c['layer']->method();

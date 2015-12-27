@@ -58,16 +58,6 @@ interface SessionInterface
     public function destroy();
 
     /**
-     * Fetch a specific item from the session array
-     *
-     * @param string $item   session key
-     * @param string $prefix session key prefix
-     * 
-     * @return string
-     */
-    public function get($item, $prefix = '');
-
-    /**
      * Add or change data in the $_SESSION
      * 
      * @param mixed  $new    key or array
@@ -77,6 +67,16 @@ interface SessionInterface
      * @return void
      */
     public function set($new = array(), $newval = '', $prefix = '');
+
+    /**
+     * Fetch a specific item from the session array
+     *
+     * @param string $item   session key
+     * @param string $prefix session key prefix
+     * 
+     * @return string
+     */
+    public function get($item, $prefix = '');
 
     /**
      * Delete a session variable from the $_SESSION

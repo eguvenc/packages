@@ -11,7 +11,7 @@ Konfigürasyon sınıfı <kbd>app/config</kbd> klasöründeki uygulamanıza ait 
 <li>
     <a href="#running">Çalıştırma</a>
     <ul>
-        <li><a href="#loading-class">Sınıfı Yüklemek</a></li>
+        <li><a href="#methods">Metotlara Erişim</a></li>
         <li><a href="#loading-config-files">Konfigürasyon Dosyalarını Yüklemek</a></li>
         <li><a href="#accessing-config-variables">Konfigürasyon Dosyalarına Erişim</a></li>
         <li><a href="#writing-config-files">Konfigürasyon Dosyalarına Yazmak</a></li>
@@ -37,9 +37,9 @@ Konfigürasyon sınıfı <kbd>app/config</kbd> klasöründeki uygulamanıza ait 
 
 Konfigürasyon sınıfı uygulamaya çalışmaya başladığında yüklenir ve her zaman uygulama içerisinde yüklüdür.
 
-<a name="loading-class"></a>
+<a name="methods"></a>
 
-#### Sınıfı Yüklemek
+#### Metotlara Erişim
 
 ```php
 $this->c['config']->method();

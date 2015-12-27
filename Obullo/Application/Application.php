@@ -296,7 +296,9 @@ class Application implements ApplicationInterface
         if ($method == '__invoke') {
             return;
         }
-        return Controller::$instance->$method($arguments);
+        if (method_exists(Controller::$instance, $method)) {
+            return Controller::$instance->$method($arguments);
+        }
     }
 
     /**

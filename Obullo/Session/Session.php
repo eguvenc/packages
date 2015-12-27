@@ -247,10 +247,17 @@ class Session implements SessionInterface
      */
     public function get($item, $prefix = '')
     {
-        if ($item == 'session_id') {
-            return session_id();
-        }
         return ( ! isset($_SESSION[$prefix . $item])) ? false : $_SESSION[$prefix . $item];
+    }
+
+    /**
+     * Returns to session_id() value
+     * 
+     * @return string
+     */
+    public function id()
+    {
+        return session_id();
     }
 
     /**
@@ -335,4 +342,30 @@ class Session implements SessionInterface
     {
         session_write_close();
     }
+
+    /**
+     * Remember me
+     * 
+     * @param integer $lifetime         default 3600
+     * @param bool    $deleteOldSession whether to delete old session data after renenerate
+     * 
+     * @return void
+     */
+    public function rememberMe($lifetime = null, $deleteOldSession = true)
+    {
+        $reminder = new Remminder;
+        $reminder->rememberMe($lifetime, $deleteOldSession);
+    }
+
+    /**
+     * Forget me
+     * 
+     * @return void
+     */
+    public function forgetMe()
+    {
+        $reminder = new Remminder;
+        $reminder->forgetMe();
+    }
+
 }

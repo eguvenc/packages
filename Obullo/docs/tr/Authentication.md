@@ -112,7 +112,7 @@ Eğer kullanıcı kimliği database sorgusu yapılarak elde edilmişse elde edil
 
 ### Konfigürasyon
 
-Yetki doğrulama paketine ait konfigürasyon <kbd>config/auth.php</kbd> dosyasında tutulmaktadır. Bu konfigürasyona ait bölümlerin ne anlama geldiği aşağıda geniş bir çerçevede anlatılmıştır.
+Yetki doğrulama paketine ait konfigürasyon <kbd>app/$env/service/user.php</kbd> dosyasında tutulmaktadır. Bu konfigürasyona ait bölümlerin ne anlama geldiği aşağıda geniş bir çerçevede ele alınmıştır.
 
 <a name="config-table"></a>
 

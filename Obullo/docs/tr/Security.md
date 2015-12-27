@@ -1,5 +1,5 @@
 
 ## Csrf Form Güvenliği
 
-[Csrf Katmanına](Middleware-Csrf.md) gözatabilirsiniz.
+[Csrf Katmanına](Middleware-Csrf.md) dosyasından gözatabilirsiniz.
 

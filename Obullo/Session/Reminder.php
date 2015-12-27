@@ -2,8 +2,7 @@
 
 namespace Obullo\Session;
 
-use Obullo\Config\ConfigInterface;
-use Obullo\Container\ContainerInterface;
+use Obullo\Container\ContainerInterface as Container;
 
 /**
  * Session Reminder Class
@@ -30,13 +29,13 @@ class Reminder
     /**
      * Constructor 
      * 
-     * @param ContainerInterface $c       container
-     * @param SessionInterface   $session session
+     * @param ContainerInterface $container container
+     * @param SessionInterface   $session   session
      */
-    public function __construct(Container $c, SessionInterface $session)
+    public function __construct(Container $container, Session $session)
     {
         $this->session = $session;
-        $this->params = $c['session.params'];
+        $this->params = $container['session.params'];
     }
 
     /**
@@ -78,7 +77,10 @@ class Reminder
      * @return void
      */
     protected function setSessionCookieLifetime($lifetime, $deleteOldSession = true)
-    {
+    { 
+        if ($lifetime == null) {
+            $lifetime = $this->params['storage']['lifetime'];
+        }
         session_set_cookie_params(
             $lifetime,
             $this->params['cookie']['path'],
@@ -87,7 +89,11 @@ class Reminder
             $this->params['cookie']['httpOnly']
         );
         if ($this->session->exists()) {
-            $this->session->regenerateId($deleteOldSession, $lifetime); // There is a running session so we will regenerate id to send a new cookie.
+            
+            // If session exists
+            // we need regenerate id to send a new cookie.
+
+            $this->session->regenerateId($deleteOldSession, $lifetime);
         }
     }
 }
