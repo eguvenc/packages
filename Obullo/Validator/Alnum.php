@@ -3,22 +3,22 @@
 namespace Obullo\Validator;
 
 /**
- * IsNumeric
+ * Alfa numeric ( Only letters & numbers )
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class IsNumeric
+class Alnum
 {
     /**
-     * Minimum length
+     * Alpha numeric
      * 
      * @param string $value string
-     * 
+     *
      * @return bool
-     */    
+     */         
     public function isValid($value)
     {
-        return ( ! is_numeric($value)) ? false : true;
+        return (! ctype_alnum($value)) ? false : true;
     }
 }

@@ -11,14 +11,14 @@ namespace Obullo\Validator;
 class IsJson
 {
     /**
-     * is Json
+     * Is Json
      * 
-     * @param string $str string
+     * @param string $value string
      * 
      * @return bool
      */    
-    public function isValid($str)
+    public function isValid($value)
     {
-        return ( ! is_object(json_decode($str))) ? false : true;
+        return ( ! is_object(json_decode($value))) ? false : true;
     }
 }

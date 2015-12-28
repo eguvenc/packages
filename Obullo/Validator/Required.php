@@ -13,12 +13,12 @@ class Required
     /**
      * Empty or not
      * 
-     * @param string $val value
+     * @param string $value value
      * 
      * @return bool
      */    
-    public function isValid($val)
+    public function isValid($value)
     {
-        return (empty($val) &&  $val != 0) ? false : true;
+        return (empty($value) && $value != 0) ? false : true;
     }
 }

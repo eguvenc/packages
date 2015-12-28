@@ -2,6 +2,8 @@
 
 namespace Obullo\Validator;
 
+use Obullo\Validator\ValidatorInterface as Validator;
+
 /**
  * IsDecimal
  * 
@@ -11,22 +13,41 @@ namespace Obullo\Validator;
 class IsDecimal
 {
     /**
+     * Params
+     * 
+     * @var array
+     */
+    protected $params;
+
+    /**
+     * Constructor
+     * 
+     * @param Validator $validator object
+     * @param string    $field     name
+     * @param array     $params    rule parameters 
+     */
+    public function __construct(Validator $validator, $field, $params = array())
+    {
+        $validator = $field = null;
+        $this->params = $params;
+    }
+
+    /**
      * IsDecimal
      * 
-     * @param string $str string
-     * @param string $val value
+     * @param string $value string
      * 
      * @return bool
      */    
-    public function isValid($str, $val)
+    public function isValid($value)
     {
-        if ($params = explode(',', $val)) {
+        if ($params = explode(',', $this->params[0])) {
 
             if (isset($params[1])) {
                 
                 $params[0] = $params[0] - $params[1];
 
-                if (preg_match('/^\d{1,'.$params[0].'}(?:\.\d{1,'.$params[1].'})?$/', $str)) {
+                if (preg_match('/^\d{1,'.$params[0].'}(?:\.\d{1,'.$params[1].'})?$/', $value)) {
                     return true;
                 }
             }

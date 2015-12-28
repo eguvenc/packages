@@ -2,7 +2,7 @@
 
 namespace Obullo\Validator;
 
-use Obullo\Container\ContainerInterface as Container;
+use Obullo\Validator\ValidatorInterface as Validator;
 
 /**
  * Matches
@@ -13,37 +13,48 @@ use Obullo\Container\ContainerInterface as Container;
 class Matches
 {
     /**
-     * Container
+     * Request
      * 
      * @var object
      */
-    protected $c;
+    protected $request;
 
     /**
-     * Container
+     * Input element
      * 
-     * @param Container $container contaienr
+     * @var string
      */
-    public function __construct(Container $container)
+    protected $field;
+
+    /**
+     * Constructor
+     * 
+     * @param Validator $validator object
+     * @param string    $field     name
+     * @param array     $params    rule parameters 
+     */
+    public function __construct(Validator $validator, $field, $params = array())
     {
-        $this->c = $container;
+        $params = null;
+        $this->field = $field;
+        $container = $validator->getContainer();
+        $this->request = $container['request'];
     }
 
     /**
      * Match one field to another
      * 
-     * @param string $str   string
-     * @param string $field field
+     * @param string $value string
      * 
      * @return bool
      */    
-    public function isValid($str, $field)
+    public function isValid($value)
     {   
-        $request = $this->c['request']->all();
+        $request = $this->request->all();
 
-        if (! isset($request[$field])) {
+        if (! isset($request[$this->field])) {
             return false;                
         }
-        return ($str !== $request[$field]) ? false : true;
+        return ($value !== $request[$this->field]) ? false : true;
     }
 }

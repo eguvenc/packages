@@ -11,7 +11,7 @@ namespace Obullo\Validator;
 class Md5
 {
     /**
-     * Md5 str
+     * Md5
      * 
      * @param string $val value
      * 

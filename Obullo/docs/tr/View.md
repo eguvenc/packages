@@ -9,7 +9,6 @@ Bir view dosyası basitçe html başlık ve gövdesinden oluşan bütün bir web
         <ul>
             <li><a href="#load">$this->view->load()</a></li>
             <li><a href="#get">$this->view->get()</a></li>
-            <li><a href="#subfolder">Alt Dizinler</a></li>
             <li>
                 <a href="#variables">Değişkenler Atamak</a> 
                 <ul>
@@ -83,6 +82,13 @@ Welcome kontrolör dosyasında olduğu gibi kontrolör dosyası bir modül içer
 </body>
 </html>
 ```
+
+View klasörü içerisinde iç içe klasörler açılabilir. 
+
+```php
+echo $this->view->load('subfolder/filename');
+```
+
 <a name="layers"></a>
 
 #### $this->view->get();
@@ -106,16 +112,6 @@ class Footer extends Controller
         );
     }
 }
-```
-
-<a name="subfolder"></a>
-
-#### Alt Dizinler
-
-View klasörü içerisinde iç içe klasörler açılabilir. 
-
-```php
-echo $this->view->load('subfolder/filename');
 ```
 
 <a name="variables"></a>
@@ -176,6 +172,7 @@ Bu mimariyi kullanmanın faydalarını aşağıdaki gibi sıralayabiliriz.
 * <b>Bakımı Kolay Uygulamalar:</b> Parçalara bölünen kullanıcı arayüzü bileşenleri MVC tasarım desenine bağlı kaldıkları için bakım kolaylığı sağlarlar.
 * <b>Mantıksal Uygulamalar:</b> Katmanlar birbirleri ile etkişim içerisinde olabilecekleri gibi uygulama üzerinde hakimiyet ve önbelleklenebilme özellikleri ile genişleyebilir mantıksal uygulamalar yaratmayı sağlarlar. Bölümsel olarak birbirinden ayrılan katmanlar bir <kbd>web servis</kbd> gibi de çalışabilirler. Oluşturulan her katmana bir http yada ajax isteği ile ulaşılabilir.
 
+
 <a name="controllers"></a>
 
 #### View Controller
@@ -203,14 +200,47 @@ class Navbar extends Controller
 {
     public function index()
     {   
-        $header = $this->layer->get('views/navbar');
-        $footer = $this->layer->get('views/footer');
-
         $this->view->load(
             'navbar',
             [
-                'header' => $header,
-                'footer' => $footer,
+                'header' => $this->layer->get('views/navbar'),
+                'footer' => $this->layer->get('views/footer'),
+            ]
+        );
+    }
+}
+```
+
+Views klasöründen çağrılan navbar adlı kontrolör dosyasının içeriği.
+
+```php
+namespace Views;
+
+use Obullo\Http\Controller;
+
+class Navbar extends Controller
+{
+    public function index()
+    {
+        $link = ($this->app->request->get('link')) ? $this->app->request->get('link') : 'welcome';
+
+        $li = '';
+        $navbar = [
+            'welcome' => 'Welcome',
+            'about'   => 'About', 
+            'contact' => 'Contact',
+        ];
+        foreach ($navbar as $key => $value) {
+            $class = '';
+            if ($link == $key) {
+                $class = ' class="active" ';
+            }
+            $li.= "<li $class>".$this->url->anchor('examples/layers/navbar?link='.$key, $value)."</li>";
+        }
+        echo $this->view->get(
+            'navbar',
+            [
+                'li' => $li
             ]
         );
     }

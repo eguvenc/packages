@@ -2,8 +2,12 @@
 
 namespace Obullo\Validator;
 
+use Obullo\Validator\ValidatorInterface as Validator;
+
 /**
- * Date
+ * Date 
+ * 
+ * Borrowed from Zend
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
@@ -15,7 +19,7 @@ class Date
      * 
      * @var string
      */
-    public $value = ''; 
+    public $value = '';
 
     /**
      * Format
@@ -23,19 +27,30 @@ class Date
      * @var string
      */
     public $format = '';
-    
+     
+    /**
+     * Constructor
+     * 
+     * @param Validator $validator object
+     * @param string    $field     name
+     * @param array     $params    rule parameters 
+     */
+    public function __construct(Validator $validator, $field, $params = array())
+    {
+        $validator = $field = null;
+        $this->format = isset($params[0]) ? $params[0] : 'Y-m-d';
+    }
+
     /**
      * Date check
      * 
-     * @param string $str    string
-     * @param string $format field
+     * @param string $value string
      * 
      * @return bool
      */    
-    public function isValid($str, $format = 'Y-m-d')
+    public function isValid($value)
     {   
-        $this->value  = $str;
-        $this->format = $format;
+        $this->value = $value;
         return (! $this->convertToDateTime($this->value)) ? false : true ;
     }
 

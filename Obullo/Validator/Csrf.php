@@ -3,22 +3,22 @@
 namespace Obullo\Validator;
 
 /**
- * Trim
+ * Csrf form verify
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Trim
+class Csrf
 {
     /**
-     * Trim
+     * Csrf code check
      * 
-     * @param string $val value
-     * 
+     * @param string $value string
+     *
      * @return bool
-     */    
-    public function func($val)
+     */         
+    public function isValid($value)
     {
-        return trim($val);
+
     }
 }

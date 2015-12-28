@@ -2,6 +2,8 @@
 
 namespace Obullo\Validator;
 
+use Obullo\Validator\ValidatorInterface as Validator;
+
 /**
  * Exact
  * 
@@ -10,19 +12,33 @@ namespace Obullo\Validator;
  */
 class Exact
 {
+    protected $length;
+
+    /**
+     * Constructor
+     * 
+     * @param Validator $validator object
+     * @param string    $field     name
+     * @param array     $params    rule parameters 
+     */
+    public function __construct(Validator $validator, $field, $params = array())
+    {
+        $validator = $field = null;
+        $this->length = isset($params[0]) ? (string)$params[0] : '0';
+    }
+
     /**
      * Exact length
      * 
-     * @param string $str string
-     * @param string $val value
+     * @param string $value string
      * 
      * @return bool
      */    
-    public function isValid($str, $val)
+    public function isValid($value)
     {   
-        if (preg_match('/[^0-9]/', $val)) {
+        if (! ctype_digit($this->length)) {
             return false;
         }
-        return (mb_strlen($str) != $val) ? false : true;   
+        return (mb_strlen($value) != $this->length) ? false : true;   
     }
 }

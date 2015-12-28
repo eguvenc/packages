@@ -13,12 +13,12 @@ class IsBool
     /**
      * Is Boolean
      * 
-     * @param string $str string
+     * @param string $value string
      * 
      * @return bool
      */    
-    public function isValid($str)
+    public function isValid($value)
     {
-        return ( is_bool($str) || $str == 0 || $str == 1 ) ? true : false;
+        return ( is_bool($value) || $value == 0 || $value == 1 ) ? true : false;
     }
 }

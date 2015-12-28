@@ -18,7 +18,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Validator 
+class Validator implements ValidatorInterface
 {
     public $fieldData = array();
     
@@ -337,19 +337,21 @@ class Validator
             if (substr($rule, 0, 9) == 'callback_') {  // Is the rule has a callback? 
                 $callback = true;
             }
-            $param = false;                                             // Strip the parameter (if exists) from the rule
-            if (preg_match_all("/(.*?)\((.*?)\)/", $rule, $matches)) {  // Rules can contain parameters: minLen(5),                    
-                $rule    = $matches[1][0];
-                $param   = $matches[2][0];
+            $params = array();                                          // Strip the parameter (if exists) from the rule
+            if (preg_match_all("/(.*?)\((.*?)\)/", $rule, $matches)) {  // Rules can contain parameters: min(5),                    
+                $rule   = $matches[1][0];
+                $params = $matches[2];
             }
             if ($callback === true) {    // Call the function that corresponds to the rule
+
                 if (! array_key_exists($rule, $this->callbackFunctions)) {  // Check method exists in callback object.
                     continue;
                 }
                 $closure = Closure::bind($this->callbackFunctions[$rule], $this, get_class());
-                $result  = $closure($postdata, $param);  // Run the function and grab the result
+                $result  = $closure($postdata, $params);  // Run the function and grab the result
 
                 if ($inArray == true) { // Re-assign the result to the master data array
+
                     $this->fieldData[$row['field']]['postdata'][$cycles] = (is_bool($result)) ? $postdata : $result;
                 } else {
                     $this->fieldData[$row['field']]['postdata'] = (is_bool($result)) ? $postdata : $result;
@@ -360,7 +362,7 @@ class Validator
 
             } else {
 
-                $result = $this->callRuleClass($rule, $postdata, $param);
+                $result = $this->callRuleClass($rule, $postdata, $params, $row['field']);
 
                 if ($inArray == true) {
                     $this->fieldData[$row['field']]['postdata'][$cycles] = (is_bool($result)) ? $postdata : $result;
@@ -374,6 +376,7 @@ class Validator
 
                     $RULE = strtoupper($rule);
                     $line = $this->translator['OBULLO:VALIDATOR:'.$RULE];
+
                     if ($this->translator[$rule] == false) {
                         $line = 'Error message is not set correctly or unable to translation access an error message.';
                         $this->logger->error($line);
@@ -382,10 +385,13 @@ class Validator
                 } else {
                     $line = $this->errorMessages[$rule];
                 }
+                $param = (isset($params[0])) ? $params[0] : '';
+
                 if (isset($this->fieldData[$param]) && isset($this->fieldData[$param]['label'])) {
 
                     // Is the parameter we are inserting into the error message the name                                                                                  
                     // of another field?  If so we need to grab its "field label"
+                
                     $param = $this->translateFieldname($this->fieldData[$param]['label']);
                 }
                 $message = sprintf($line, $this->translateFieldname($row['label']), $param); // Build the error message
@@ -404,18 +410,23 @@ class Validator
      * 
      * @param string $rule     string
      * @param array  $postdata postdata
-     * @param mixed  $param    param
+     * @param array  $params   params
+     * @param mixed  $field    field
      * 
      * @return boolean
      */
-    protected function callRuleClass($rule, $postdata, $param)
+    protected function callRuleClass($rule, $postdata, $params, $field)
     {
         $ruleClass = ucfirst($rule);
         $classes = [
             'Alpha',
+            'AlphaDash',
+            'Csrf',
+            'CreditCard',
             'Date',
             'Email',
             'Exact',
+            'Iban',
             'IsBool',
             'IsDecimal',
             'IsJson',
@@ -443,7 +454,7 @@ class Validator
                 )
             );
         }
-        $object = new $className($this->c);
+        $object = new $className($this, $field, $params);
         $method = 'isValid';
 
         if (method_exists($object, 'func')) {
@@ -454,7 +465,7 @@ class Validator
                 $object,
                 $method
             ),
-            array($postdata, $param)
+            array($postdata)
         );
     }
 
@@ -513,6 +524,7 @@ class Validator
         if (is_array($key)) {
             $this->setErrors($key);
         } else {
+            $val = ($this->translator->exists($val)) ? $this->translator[$val] : $val;
             $this->fieldData[$key]['error'] = $val;
             $this->errorArray[$key] = $val;
         }
@@ -525,9 +537,10 @@ class Validator
      * 
      * @return void
      */
-    public function setErrors($errors)
+    public function setErrors(array $errors)
     {
         foreach ($errors as $k => $v) {
+            $v = ($this->translator->exists($v)) ? $this->translator[$v] : $v;
             $this->fieldData[$k]['error'] = $v;
             $this->errorArray[$k] = $v;
         }
@@ -572,35 +585,16 @@ class Validator
     }
 
     /**
-     * Set filtered value from validator data
-     *
-     * Permits you to repopulate a form field with the value it was submitted
-     * with, or, if that value doesn't exist, with the default
-     *
-     * @param string $field   the field name
-     * @param string $default value
+     * Set filtered value to field
+     * 
+     * @param string $field the field name
+     * @param string $value value
      * 
      * @return void
      */    
-    public function setValue($field = '', $default = '')
+    public function setValue($field = '', $value = '')
     {
-        return $this->getValue($field, $default);
-    }
-
-    /**
-     * Get filtered value from validator data
-     *
-     * Permits you to repopulate a form field with the value it was submitted
-     * with, or, if that value doesn't exist, with the default
-     *
-     * @param string $field   the field name
-     * @param string $default value
-     * 
-     * @return void
-     */    
-    public function value($field = '', $default = '')
-    {
-        return $this->getValue($field, $default);
+        $this->fieldData[$field]['postdata'] = $value;
     }
 
     /**
@@ -715,7 +709,7 @@ class Validator
      * 
      * @return string label
      */
-    public function createLabel($field)
+    protected function createLabel($field)
     {
         $label = ucfirst($field);
         if (strpos($field, '_') > 0) {
@@ -746,6 +740,16 @@ class Validator
             );
         }
         $object->$method();
+    }
+
+    /**
+     * Returns to container 
+     * 
+     * @return object
+     */
+    public function getContainer()
+    {
+        return $this->c;
     }
 
 }

@@ -2,6 +2,8 @@
 
 namespace Obullo\Validator;
 
+use Obullo\Validator\ValidatorInterface as Validator;
+
 /**
  * Valid Email
  * 
@@ -10,27 +12,42 @@ namespace Obullo\Validator;
  */
 class Email
 {
+    protected $dnsCheck = false;
+
+    /**
+     * Constructor
+     * 
+     * @param Validator $validator object
+     * @param string    $field     name
+     * @param array     $params    rule parameters 
+     */
+    public function __construct(Validator $validator, $field, $params = array())
+    {
+        $validator = $field = null;
+        $this->dnsCheck = isset($params[0]) ? (bool)$params[0] : false;
+    }
+
     /**
      * Valid Email
      *
-     * @param string  $str email
-     * @param boolean $dns dns check
+     * @param string $value email
      * 
      * @return bool
      */    
-    public function isValid($str, $dns = false)
+    public function isValid($value)
     {
-        $isValid = (filter_var($str, FILTER_VALIDATE_EMAIL)) === false ? false : true;
+        $isValid = (filter_var($value, FILTER_VALIDATE_EMAIL)) === false ? false : true;
 
-        if ($isValid && $dns) {
+        if ($isValid && $this->dnsCheck) {
             $username = null;
             $domain   = null;
-            list($username, $domain) = explode('@', $str);
+            list($username, $domain) = explode('@', $value);
             if (! checkdnsrr($domain, 'MX')) {
                 return false;
             }
             return true;
         }
+        
         return $isValid;
     }
 }

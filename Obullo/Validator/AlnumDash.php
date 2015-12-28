@@ -3,22 +3,22 @@
 namespace Obullo\Validator;
 
 /**
- * IsNumeric
+ * AlnumDash ( Only letters & numbers & underscore & dash )
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class IsNumeric
+class AlnumDash
 {
     /**
-     * Minimum length
+     * AlphaDash
      * 
      * @param string $value string
-     * 
+     *
      * @return bool
-     */    
+     */         
     public function isValid($value)
     {
-        return ( ! is_numeric($value)) ? false : true;
+        return ( ! preg_match("/^([-a-z0-9_\-])+$/i", $value)) ? false : true;
     }
 }
