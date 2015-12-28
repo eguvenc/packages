@@ -43,7 +43,7 @@ Obullo da filtreleme iki ayrı sınıf ile yapılır doğrulama filtresi için <
 
 Is sınıfı php filter_var() fonksiyonlarını kullanarak belirli data tipleri üzerinde doğrulama kontrolü sağlar. Filtreleme özellikleri gönderilen çeşitli parametreler ile değiştirilebilir.
 
-#### Sınıfı Yüklemek
+#### Metotlara Erişim
 
 -------
 
@@ -337,7 +337,7 @@ if ($this->request->post('url_adress', 'is')->url('host|query')) {
 Clean sınıfı php filter_var() fonksiyonlarını kullanarak belirli data tipleri yardımı ile girilen değeri <b>arındırır</b>. Filtreleme özellikleri gönderilen çeşitli parametreler ile değiştirilebilir.
 
 
-#### Sınıfı Yüklemek
+#### Metotlara Erişim
 
 -------
 

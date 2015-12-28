@@ -181,7 +181,7 @@ Form sınıfı <kbd>app/components.php</kbd> dosyası içerisinde tanımlıdır 
 
 <a name="loading-service"></a>
 
-#### Sınıfı Yüklemek
+#### Metotlara Erişim
 
 -------
 

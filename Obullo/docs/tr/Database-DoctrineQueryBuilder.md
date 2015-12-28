@@ -13,7 +13,7 @@ Doctrine 2.1 sürüm ile gelen query builder sınıfı eklentisi SQL dili için 
     <ul>
         <li><a href="#dependencies">Bağımlılıklar</a></li>
         <li><a href="#service-provider">Servis Sağlayıcısı</a></li>
-        <li><a href="#loading-class">Sınıfı Yüklemek</a></li>
+        <li><a href="#methods">Metotlara Erişim</a></li>
     </ul>
 </li>
 
@@ -138,9 +138,9 @@ $c['app']->provider(
 /* Location: .app/components.php */
 ```
 
-<a name="loading-class"></a>
+<a name="methods"></a>
 
-#### Sınıfı Yüklemek
+#### Metotlara Erişim 
 
 Servis sağlayıcısı yapılandırmasından sonra sorgu oluşturucuyu servis sağlayıcısı üzerinden bağlantı parametereleri göndererek oluşturabilirsiniz. Gönderilen bağlantı parametreleri <b>this->db</b> servis sağlayıcısı üzerinden <b>database</b> servis sağlayıcısına gönderilirler.
 

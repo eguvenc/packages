@@ -11,6 +11,24 @@ namespace Obullo\Url;
 interface UrlInterface
 {
     /**
+     * Create link with http protocol
+     * 
+     * @param string $protocol http protocol
+     * 
+     * @return void
+     */
+    public function withProtocol($protocol = null);
+
+    /**
+     * Create asset with an external url
+     * 
+     * @param string $url url
+     * 
+     * @return object
+     */
+    public function withUrl($url = null);
+
+    /**
      * Anchor Link
      *
      * Creates an anchor based on the local URL.
@@ -24,14 +42,13 @@ interface UrlInterface
     public function anchor($uri = '', $title = '', $attributes = '');
 
     /**
-     * Get Assets URL
+     * Create static assets urls
      * 
-     * @param string $uri    asset uri
-     * @param string $folder whether to add asset folder
+     * @param string $uri /images/example.png
      * 
      * @return string
      */
-    public function assetsUrl($uri = '', $folder = true);
+    public function asset($uri);
 
     /**
      * Get Base URL definition
@@ -45,11 +62,11 @@ interface UrlInterface
     /**
      * Site URL
      *
-     * @param string $uriStr the URI string
+     * @param string $uri the URI string
      * 
      * @return string
      */
-    public function siteUrl($uriStr = '');
+    public function siteUrl($uri = '');
 
     /**
      * Get current url
@@ -59,21 +76,14 @@ interface UrlInterface
     public function currentUrl();
 
     /**
-     * Get webhost definition
+     * Prep URL
      *
-     * @return string
-     */
-    public function webhost();
-
-    /**
-     * Create static assets urls
-     * 
-     * @param string $uri      /images/example.png
-     * @param mixed  $protocol http:// or https://
-     * @param mixed  $url      dynamic url ( overrides to asset url in config )
+     * Simply adds the http:// part if missing
+     *
+     * @param string $uri the URL
      * 
      * @return string
      */
-    public function asset($uri, $protocol = '', $url = '');
-    
+    public function prep($uri = '');
+  
 }

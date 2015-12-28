@@ -360,7 +360,7 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * Write to cookies
+     * Write to cookie
      *
      * @return void
      */

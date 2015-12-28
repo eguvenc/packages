@@ -34,8 +34,6 @@ It's a good practice to use ":" as key for all messages in a given file to avoid
 We define keys an array. An example 
 
 ```php
-<?php
-
 return array(
 
     /**
@@ -162,21 +160,18 @@ echo $this->translator['LANGUAGE:KEY']; // gives translated text of 'language_ke
 Checking none exist key.
 
 ```php
-<?php
 var_dump($this->translator->exists('asdasdas'));  // gives "true" or "false"
 ```
 
 Printing none exist key echo same string.
 
 ```php
-<?php
 echo $this->translator['asdasdas'];     // gives a notice to you 'asdasdas' if translate notice disabled from your config file.
 ```
 
 If translation notice enabled from your config printing none exist key echo same string with translate notice.
 
 ```php
-<?php
 echo $this->translator['asdasdas'];     // gives a notice to you 'translate:asdasdas'
 ```
 
@@ -185,7 +180,6 @@ echo $this->translator['asdasdas'];     // gives a notice to you 'translate:asda
 Translator class has a <b>sprintf</b> which has provide the same functionality of php sprintf.
 
 ```php
-<?php
 echo $this->translator->get('There are %d monkeys in the %s.', 5, 'tree');
 
 // Gives There are *5* monkeys in the *tree*.
@@ -208,7 +202,6 @@ $c['app']->middleware(new Http\Middlewares\Translation);
 Translator config should be like this
 
 ```php
-<?php
 // Uri Settings
 'uri' => array(
     'segment'       => true, // Uri segment number e.g. http://example.com/en/home
@@ -233,14 +226,12 @@ It sets cookie using <b>locale_accept_from_http($_SERVER['HTTP_ACCEPT_LANGUAGE']
 This route rewrite your url to http://example.com/en/welcomde/index First segment (0) gives language code
 
 ```php
-<?php
 $c['router']->route('get', '(en|es|de)/(.+)', '$2');        
 ```
 
 Below the route sets your default controller for http://example.com/en/.
 
 ```php
-<?php
 $c['router']->route('get', '(en|es|de)', 'home/index');
 ```
 

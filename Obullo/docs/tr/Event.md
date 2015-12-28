@@ -10,7 +10,7 @@ Olay sınıfı uygulamada olaylara abone olmak ve onları dinlemek için <a href
     <li>
         <a href="#running">Çalıştırma</a>
         <ul>
-            <li><a href="#loading-service">Sınıfı Yüklemek</a></li>
+            <li><a href="#methods">Metotlara Erişim</a></li>
             <li><a href="#firing-an-event">Bir Olayı Başlatmak</a></li>
             <li><a href="#sucscribing-an-event">Bir Olaya Abone Olup Dinlemek</a></li>
             <li><a href="#subscribe-priority">Olaylara Önemlilik Derecesi İle Abone Olmak</a></li>
@@ -54,9 +54,9 @@ Son olarak olay anını ne kadar çok dinleyicimiz  ( <b>listeners / subscribers
 
 Event sınıfı <kbd>app/components.php</kbd> dosyası içerisinde tanımlıdır ve konteyner içerisinden çağrılarak çalıştırılır.
 
-<a name="loading-service"></a>
+<a name="methods"></a>
 
-#### Sınıfı Yüklemek
+#### Metotlara Erişim
 
 ```php
 $this->c['event']->method();

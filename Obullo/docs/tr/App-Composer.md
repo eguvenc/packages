@@ -47,7 +47,6 @@ Composer dosyanızda kullandığınız obullo sürümüne göre ana dosya klasö
 {
     "autoload": {
         "psr-4": {
-            "Obullo\\": "o2/",
             "": "app/classes"
         }
     }
