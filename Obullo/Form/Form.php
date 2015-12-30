@@ -5,6 +5,7 @@ namespace Obullo\Form;
 use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Config\ConfigInterface as Config;
 use Obullo\Container\ContainerInterface as Container;
+use Obullo\Validator\ValidatorInterface as Validator;
 
 use Psr\Http\Message\RequestInterface as Request;
 
@@ -97,7 +98,7 @@ class Form
      */
     public function error($message)
     {
-        $this->messages['message'] = (string)$message;
+        $this->messages['messages'][] = (string)$message;
         $this->messages['success'] = static::ERROR;
         $this->messages['code'] = 0;
     }
@@ -111,7 +112,7 @@ class Form
      */
     public function success($message)
     {
-        $this->messages['message'] = (string)$message;
+        $this->messages['messages'][] = (string)$message;
         $this->messages['success'] = static::SUCCESS;
         $this->messages['code'] = 1;
     }
@@ -125,7 +126,7 @@ class Form
      */
     public function warning($message)
     {
-        $this->messages['message'] = (string)$message;
+        $this->messages['messages'][] = (string)$message;
         $this->messages['code'] = 2;
     }
 
@@ -138,7 +139,7 @@ class Form
      */
     public function info($message)
     {
-        $this->messages['message'] = (string)$message;
+        $this->messages['messages'][] = (string)$message;
         $this->messages['code'] = 3;
     }
 
@@ -216,19 +217,26 @@ class Form
     /**
      * Set validator errors array to form e.g. : array('field' => 'error', 'field2' => 'error' )
      * 
-     * @param mixed $errors error array or validator object 
+     * @param mixed $errors array or validator object 
      *
      * @return void
      */
     public function setErrors($errors)
     {
-        if (is_object($errors)) {
-            $errors = $errors->getErrors();  // Get "Validator" object errors
+        if (is_object($errors) && $errors instanceof Validator) {
+
+            $errorArray = $errors->getErrors();  // Get validator errors
+            $formMessages = $errors->getFormMessages();
+
+            if (count($formMessages) > 0) {
+                $this->messages['success'] = 0;
+                $this->messages['messages'] = $formMessages; // Replace messages with warning errors
+            }
         }
-        if (is_array($errors) && count($errors) > 0) {
+        if (is_array($errorArray) && count($errorArray) > 0) {
             $this->messages['success'] = 0;
         }
-        $this->messages['errors'] = $errors;
+        $this->messages['errors'] = $errorArray;
     }
 
     /**
@@ -242,7 +250,7 @@ class Form
     public function setMessage($message, $status = 0)
     {
         $this->status($status);
-        $this->messages['message'] = (string)$message;
+        $this->messages['messages'][] = (string)$message;
     }
 
     /**
@@ -252,18 +260,34 @@ class Form
      * 
      * @return string
      */
-    public function getMessage($msg = '')
+    public function getMessages($msg = '')
     {
         if (! empty($msg) && is_string($msg)) {
-            $this->messages['message'] = (string)$msg;
+            $this->messages['messages'][] = (string)$msg;
         }
-        if (empty($this->messages['message'])) {
+        if (empty($this->messages['messages'])) {
             return '';
         }
+        $messageStr = '';
+        foreach ($this->messages['messages'] as $message) {
+            $messageStr.= $this->addTemplate($message);
+        }
+        return $messageStr; 
+    }
+
+    /**
+     * Add message template
+     * 
+     * @param string $message message
+     *
+     * @return string
+     */
+    protected function addTemplate($message)
+    {
         $array = $this->getValidTemplate();
-        return $this->messages['message'] = str_replace(
+        return str_replace(
             array('{class}','{icon}','{message}'), 
-            array($array['class'], $array['icon'], $this->messages['message']),
+            array($array['class'], $array['icon'], $message),
             $this->notification['message']
         );
     }
@@ -437,11 +461,9 @@ class Form
                 $field = $this->request->post($field);
             }
         }
-
         if (isset($validator->fieldData[$field]['postdata'])) {
             $field = $validator->fieldData[$field]['postdata'];
         }
-
         if (is_array($field)) {
             if (! in_array($value, $field)) {
                 return '';

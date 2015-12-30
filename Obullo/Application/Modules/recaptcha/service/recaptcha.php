@@ -9,8 +9,8 @@ return array(
         ],
         'api' => [
             'key' => [
-                'site' => '',
-                'secret' => '',
+                'site' => '6LcWtwUTAAAAACzJjC2NVhHipNPzCtjKa5tiE6tM',
+                'secret' => '6LcWtwUTAAAAAEwwpWdoBMT7dJcAPlborJ-QyW6C',
             ]
         ],
         'user' => [
@@ -25,9 +25,6 @@ return array(
                     'value' => 1,
                     'style' => 'display:none;',
                 ]
-            ],
-            'validation' => [
-                'callback' => true,
             ]
         ]
     ],

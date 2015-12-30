@@ -50,7 +50,7 @@ abstract class AbstractProvider
      * 
      * @return boolean
      */
-    abstract public function result($code = null);
+    abstract public function result($code);
     
     /**
      * Create result.

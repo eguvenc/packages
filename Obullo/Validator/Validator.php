@@ -28,6 +28,7 @@ class Validator implements ValidatorInterface
     protected $translator;
     protected $requestParams;
     protected $errorArray = array();
+    protected $formErrors = array();
     protected $errorMessages = array();    
     protected $errorPrefix = '<div>';
     protected $errorSuffix = '</div>';
@@ -36,6 +37,7 @@ class Validator implements ValidatorInterface
     protected $validation = false;
     protected $callbackFunctions = array();
     protected $filters = array();
+    protected $ruleArray = array();
 
     /**
      * Constructor
@@ -56,6 +58,7 @@ class Validator implements ValidatorInterface
         $this->logger = $logger;
         $this->translator = $translator;
 
+        $this->ruleArray = $this->config->load('validator')['rules'];
         $this->translator->load('validator');
         $this->logger->debug('Validator Class Initialized');
     }
@@ -91,7 +94,7 @@ class Validator implements ValidatorInterface
      */
     public function setRules($field, $label = '', $rules = '')
     {        
-        if (count($this->requestParams) == 0) {  // No reason to set rules if we have no POST or GET data
+        if (count($this->requestParams) == 0) {  // No reason to set rules if we have no POST data
             return;
         }
                                  // If an array was passed via the first parameter instead of indidual string
@@ -105,35 +108,19 @@ class Validator implements ValidatorInterface
             }
             return;
         }
-        if (! is_string($field) || ! is_string($rules) || $field == '') { // No fields? Nothing to do...
+        if (! is_string($field) || ! is_string($rules) || $field == '') { // No fields ? Nothing to do...
             return;
         }
         $label = ($label == '') ? $this->createLabel($field) : $label;  // If the field label wasn't passed we use the field name
+
         // Is the field name an array?  We test for the existence of a bracket "(" in
         // the field name to determine this.  If it is an array, we break it apart
-        // into its components so that we can fetch the corresponding POST data later     
-
-        if (strpos($field, '(') !== false && preg_match_all('/\((.*?)\)/', $field, $matches)) {
-            $x = explode('(', $field);
-            // Note: Due to a bug in current() that affects some versions
-            // of PHP we can not pass function call directly into it.
-            $indexes[] = current($x);
-            for ($i = 0; $i < count($matches['0']); $i++) {
-                if ($matches['1'][$i] != '') {
-                    $indexes[] = $matches['1'][$i];
-                }
-            }
-            $isArray = true;
-        } else {
-            $indexes = array();
-            $isArray = false;        
-        }
+        // into its components so that we can fetch the corresponding POST data later
+        // 
         $this->fieldData[$field] = array(
                                             'field'    => $field, 
                                             'label'    => $label, 
                                             'rules'    => trim($rules, '|'),  // remove uneccessary pipes
-                                            'isArray' => $isArray,
-                                            'keys'     => $indexes,
                                             'postdata' => null,
                                             'error'    => '',
                                         );
@@ -150,28 +137,28 @@ class Validator implements ValidatorInterface
     {
         if (count($this->requestParams) == 0) { // Do we even have any data to process ?
             return false;
-        }                                     // Does the fieldDataarray containing the validation rules exist ?     
-        if (count($this->fieldData) == 0) {   // If not, we look to see if they were assigned via a config file              
-                                              // No validation rules ?  We're done...        
-            if (sizeof($this->fieldData) == 0) {    // We're we able to set the rules correctly ?
-                $this->errorMessages['message'] = 'Unable to find validation rules';
-                $this->logger->debug($this->errorMessages['message']);
-                return true;
-            }
         }
+        if (count($this->fieldData) == 0) {    // We're we able to set the rules correctly ?
+            $this->setFormMessage('Unable to find validation rules');
+            return true;
+        }
+        
         // Cycle through the rules for each field, match the 
         // corresponding $this->requestParams item && test for errors
-        foreach ($this->fieldData as $field => $row) {  // Fetch the data from the corresponding $this->requestParams array && cache it in the fieldDataarray.
+        // 
+        foreach ($this->fieldData as $field => $row) {  // Fetch the data from the corresponding $this->requestParams array && cache it in the fieldData array.
                                                         // Depending on whether the field name is an array or a string will determine where we get it from.
-            if (isset($row['isArray']) && $row['isArray'] == true) {
-                $this->fieldData[$field]['postdata'] = $this->reduceArray($this->requestParams, $row['keys']);
-            } else {
-                if (isset($this->requestParams[$field]) && $this->requestParams[$field] != '') {
-                    $this->fieldData[$field]['postdata'] = $this->requestParams[$field];
-                }
+
+            if (isset($this->requestParams[$field]) && $this->requestParams[$field] != '') {
+                $this->fieldData[$field]['postdata'] = $this->requestParams[$field];
             }
+        
             if (isset($row['rules'])) {  // If we have no rule don't run validation ( e.g. we can set errors using setError() function without validation set rules.)
-                $this->execute($row, explode('|', $row['rules']), $this->fieldData[$field]['postdata']);       
+                $this->execute(
+                    $row,
+                    explode('|', $row['rules']),
+                    $this->fieldData[$field]['postdata']
+                );
             } 
         }
         $totalErrors = sizeof($this->errorArray);         // Did we end up with any errors?
@@ -179,36 +166,12 @@ class Validator implements ValidatorInterface
             $this->safeFormData = true;
         }
         $this->resetPostArray();    // Now we need to re-set the POST data with the new, processed data
+
         if ($totalErrors == 0) {    // No errors, validation passes !
             $this->validation = true;
             return true;
         }
         return false;         // Validation fails
-    }
-
-    /**
-     * Traverse a multidimensional $this->requestParams array index until the data is found
-     *
-     * @param array   $array data
-     * @param array   $keys  keys
-     * @param integer $i     iterator
-     * 
-     * @return mixed
-     */        
-    protected function reduceArray($array, $keys, $i = 0)
-    {
-        if (is_array($array)) {
-            if (isset($keys[$i])) {
-                if (isset($array[$keys[$i]])) {
-                    $array = $this->reduceArray($array[$keys[$i]], $keys, ($i+1));
-                } else {
-                    return null;
-                }
-            } else {
-                return $array;
-            }
-        }
-        return $array;
     }
 
     /**
@@ -219,36 +182,17 @@ class Validator implements ValidatorInterface
     protected function resetPostArray()
     {
         foreach ($this->fieldData as $row) {
+
             if (isset($row['postdata']) && ! is_null($row['postdata'])) {
-                if (isset($row['isArray']) && $row['isArray'] == false) {
-                    if (isset($this->requestParams[$row['field']])) {
-                        $this->requestParams[$row['field']] = $this->prepForForm($row['postdata']);
-                    }
-                } else {
-                    $post_ref =& $this->requestParams;   // start with a reference
-                    if (isset($row['keys'])) {
-                        if (count($row['keys']) == 1) { // before we assign values, make a reference to the right POST key
-                            $post_ref =& $post_ref[current($row['keys'])];
-                        } else {
-                            foreach ($row['keys'] as $val) {
-                                $post_ref =& $post_ref[$val];
-                            }
-                        }
-                    }
-                    if (is_array($row['postdata'])) {
-                        $array = array();
-                        foreach ($row['postdata'] as $k => $v) {
-                            $array[$k] = $this->prepForForm($v);
-                        }
-                        $post_ref = $array;
-                    } else {
-                        $post_ref = $this->prepForForm($row['postdata']);
-                    }
+
+                $field = $row['field'];
+                if (isset($this->requestParams[$field])) {
+                    $this->requestParams[$field] = $this->prepForForm($row['postdata']);
                 }
             }
         }
     }
-    
+
     /**
      * Prep data for form
      *
@@ -273,36 +217,24 @@ class Validator implements ValidatorInterface
         return str_replace(array("'", '"', '<', '>'), array("&#39;", "&quot;", '&lt;', '&gt;'), stripslashes($data));
     }
 
+
     /**
      * Executes the Validation routines
      * 
-     * @param array   $row      field row    
-     * @param string  $rules    rules
-     * @param array   $postdata post data
-     * @param integer $cycles   cycles
+     * @param array  $row      field row    
+     * @param string $rules    rules
+     * @param array  $postdata post data
      * 
      * @return void
      */
-    protected function execute($row, $rules, $postdata = null, $cycles = 0)
+    protected function execute($row, $rules, $postdata = null)
     {                   
-        if (is_array($postdata)) {  // If the $this->requestParams data is an array we will run a recursive call
-            foreach ($postdata as $val) {
-                $this->execute($row, $rules, $val, $cycles);
-                $cycles++;
-            }
-            return;
-        }
-        $callback = false;         // If the field is blank, but NOT required, no further tests are necessary
-        if (! in_array('required', $rules) && is_null($postdata)) {
-            if (preg_match("/(callback_\w+)/", implode(' ', $rules), $match)) {  // Before we bail out, does the rule contain a callback?
-                $callback = true;
-                $rules = (array('1' => $match[1]));
-            } else {
-                return;
-            }
-        }
-        if (is_null($postdata) && $callback == false) {    // Isset Test. Typically this rule will only apply to checkboxes.
+        $field = $row['field'];
+
+        if (is_null($postdata)) {    // Isset Test. Typically this rule will only apply to checkboxes.
+
             if (in_array('required', $rules)) {
+
                 if (! isset($this->errorMessages['required'])) {
                     $line = $this->translator['OBULLO:VALIDATOR:REQUIRED'];
                     if ($line == false) {
@@ -312,161 +244,118 @@ class Validator implements ValidatorInterface
                     $line = $this->errorMessages['required'];
                 }
                 $message = sprintf($line, $this->translateFieldname($row['label'])); // Build the error message
-                $this->fieldData[$row['field']]['error'] = $message;                 // Save the error message
-                if (! isset($this->errorArray[$row['field']])) {
-                    $this->errorArray[$row['field']] = $message;
+                $this->fieldData[$field]['error'] = $message;                        // Save the error message
+
+                if (! isset($this->errorArray[$field])) {
+                    $this->errorArray[$field] = $message;
                 }
-            }
-            return;
-        }
-        foreach ($rules as $rule) {   // Cycle through each rule && run it
-
-            $inArray = false;         // We set the $postdata variable with the current data in our master array so that
-                                      // each cycle of the loop is dealing with the processed data from the last cycle
-            if ($row['isArray'] == true && is_array($this->fieldData[$row['field']]['postdata'])) {
-                if (! isset($this->fieldData[$row['field']]['postdata'][$cycles])) {   // We shouldn't need this safety,
-                                                                                        // but just in case there isn't an array index
-                    continue;                                                           // associated with this cycle we'll bail out
-                }
-                $postdata = $this->fieldData[$row['field']]['postdata'][$cycles];
-                $inArray = true;
-            } else {
-                $postdata = $this->fieldData[$row['field']]['postdata'];
-            }
-            $callback = false;
-            if (substr($rule, 0, 9) == 'callback_') {  // Is the rule has a callback? 
-                $callback = true;
-            }
-            $params = array();                                          // Strip the parameter (if exists) from the rule
-            if (preg_match_all("/(.*?)\((.*?)\)/", $rule, $matches)) {  // Rules can contain parameters: min(5),                    
-                $rule   = $matches[1][0];
-                $params = $matches[2];
-            }
-            if ($callback === true) {    // Call the function that corresponds to the rule
-
-                if (! array_key_exists($rule, $this->callbackFunctions)) {  // Check method exists in callback object.
-                    continue;
-                }
-                $closure = Closure::bind($this->callbackFunctions[$rule], $this, get_class());
-                $result  = $closure($postdata, $params);  // Run the function and grab the result
-
-                if ($inArray == true) { // Re-assign the result to the master data array
-
-                    $this->fieldData[$row['field']]['postdata'][$cycles] = (is_bool($result)) ? $postdata : $result;
-                } else {
-                    $this->fieldData[$row['field']]['postdata'] = (is_bool($result)) ? $postdata : $result;
-                }
-                if (! in_array('required', $rules, true) && $result !== false) {
-                    continue;
-                }
-
-            } else {
-
-                $result = $this->callRuleClass($rule, $postdata, $params, $row['field']);
-
-                if ($inArray == true) {
-                    $this->fieldData[$row['field']]['postdata'][$cycles] = (is_bool($result)) ? $postdata : $result;
-                } else {
-                    $this->fieldData[$row['field']]['postdata'] = (is_bool($result)) ? $postdata : $result;
-                }
-            }
-            if ($result === false) { // Did the rule test negatively?  If so, grab the error.
-                
-                if (! isset($this->errorMessages[$rule])) {
-
-                    $RULE = strtoupper($rule);
-                    $line = $this->translator['OBULLO:VALIDATOR:'.$RULE];
-
-                    if ($this->translator[$rule] == false) {
-                        $line = 'Error message is not set correctly or unable to translation access an error message.';
-                        $this->logger->error($line);
-                    }
-
-                } else {
-                    $line = $this->errorMessages[$rule];
-                }
-                $param = (isset($params[0])) ? $params[0] : '';
-
-                if (isset($this->fieldData[$param]) && isset($this->fieldData[$param]['label'])) {
-
-                    // Is the parameter we are inserting into the error message the name                                                                                  
-                    // of another field?  If so we need to grab its "field label"
-                
-                    $param = $this->translateFieldname($this->fieldData[$param]['label']);
-                }
-                $message = sprintf($line, $this->translateFieldname($row['label']), $param); // Build the error message
-                $this->fieldData[$row['field']]['error'] = $message;   // Save the error message
-                
-                if (! isset($this->errorArray[$row['field']])) {
-                    $this->errorArray[$row['field']] = $message;
-                }
-                return;
             }
         }
+        $field = new Field($row, $postdata, $rules, $this->ruleArray);
+        $field->setValidator($this);
+        $field();
+
+        // if (false == $result) {
+        //     $this->dispatchErrors($rule, $row, array());
+        //     return;
+        // }
+
+        // $result = false;
+        // foreach ($rules as $rule) {   // Cycle through each rule && run it
+
+        //     $postdata = $this->fieldData[$field]['postdata'];
+        
+        //     $callback = false;
+        //     if (substr($rule, 0, 9) == 'callback_') {  // Is the rule has a callback? 
+        //         $callback = true;
+        //     }
+        //     $params = array();                                          // Strip the parameter (if exists) from the rule
+        //     if (preg_match_all("/(.*?)\((.*?)\)/", $rule, $matches)) {  // Rules can contain parameters: min(5),                    
+        //         $rule   = $matches[1][0];
+        //         $params = $matches[2];
+        //     }
+        //     if ($callback === true) {    // Call the function that corresponds to the rule
+
+        //         if (! array_key_exists($rule, $this->callbackFunctions)) {  // Check method exists in callback object.
+        //             continue;
+        //         }
+        //         $closure = Closure::bind(
+        //             $this->callbackFunctions[$rule],
+        //             $this,
+        //             get_class()
+        //         );
+        //         $result = $closure($postdata, $params);  // Run the function and grab the result
+        //         $this->fieldData[$field]['postdata'] = (is_bool($result)) ? $postdata : $result;
+                
+        //         if (! in_array('required', $rules, true) && $result !== false) {
+        //             continue;
+        //         }
+
+        //     } else {
+
+
+        //         if ($rule == 'required') {
+        //             $result = $this->callRuleClass($rule, $postdata, $params, $field);
+        //             $this->fieldData[$field]['postdata'] = (is_bool($result)) ? $postdata : $result;
+        //         }
+        //         if ($rule != 'required' && $result == true) {
+        //             $result = $this->callRuleClass($rule, $postdata, $params, $field);
+        //             $this->fieldData[$field]['postdata'] = (is_bool($result)) ? $postdata : $result;
+        //         }
+        //     }
+        //     if (false == $result) {
+        //         $this->dispatchErrors($rule, $row, $params);
+        //         return;
+        //     }
+        // }
     }
 
     /**
-     * Call rules
+     * Dispatch errors
      * 
-     * @param string $rule     string
-     * @param array  $postdata postdata
-     * @param array  $params   params
-     * @param mixed  $field    field
+     * @param Field  $field object
+     * @param string $rule  name
      * 
-     * @return boolean
+     * @return void
      */
-    protected function callRuleClass($rule, $postdata, $params, $field)
-    {
-        $ruleClass = ucfirst($rule);
-        $classes = [
-            'Alpha',
-            'AlphaDash',
-            'Csrf',
-            'CreditCard',
-            'Date',
-            'Email',
-            'Exact',
-            'Iban',
-            'IsBool',
-            'IsDecimal',
-            'IsJson',
-            'IsNumeric',
-            'Matches',
-            'Max',
-            'Md5',
-            'Min',
-            'Required',
-            'Trim'
-        ];
-        if (in_array($ruleClass, $classes)) {  // Load validation rule from app/classes/Form/Validator/Rules
-            
-            $className = 'Obullo\Validator\\'.ucfirst($rule);
+    public function dispatchErrors(FieldInterface $field, $rule)
+    {        
+        $fieldName = $field->getName();
+        $label     = $field->getLabel();
+        $params    = $field->getParams();
 
-        } elseif (file_exists(CLASSES.'Form/Validator/'.$ruleClass.'.php')) {
+        if (! isset($this->errorMessages[$rule])) {
 
-            $className = '\Form\Validator\\'.ucfirst($rule);
+            $RULE = strtoupper($rule);
+            $line = $this->translator['OBULLO:VALIDATOR:'.$RULE];
+
+            if ($this->translator[$rule] == false) {
+                $line = 'Error message is not set correctly or unable to translation access an error message.';
+                $this->logger->error($line);
+            }
 
         } else {
-            throw new RuntimeException(
-                sprintf(
-                    "Validator rule class '%s' is not exists.",
-                    $ruleClass
-                )
-            );
+            $line = $this->errorMessages[$rule];
         }
-        $object = new $className($this, $field, $params);
-        $method = 'isValid';
+        $param = (isset($params[0])) ? $params[0] : '';
 
-        if (method_exists($object, 'func')) {
-            $method = 'func';
+        if (isset($this->fieldData[$param]) && isset($this->fieldData[$param]['label'])) {
+
+            // Is the parameter we are inserting into the error message the name                                                                                  
+            // of another field ?  If so we need to grab its "field label"
+        
+            $param = $this->translateFieldname($this->fieldData[$param]['label']);
         }
-        return call_user_func_array(
-            array(
-                $object,
-                $method
-            ),
-            array($postdata)
+        $message = sprintf(
+            $line,
+            $this->translateFieldname($label),
+            $param
         );
+        $this->fieldData[$fieldName]['error'] = $message;   // Save the error message
+        
+        if (! isset($this->errorArray[$fieldName])) {
+            $this->errorArray[$fieldName] = $message;
+        }
     }
 
     /**
@@ -493,7 +382,7 @@ class Validator implements ValidatorInterface
      * Lets users set their own error messages on the fly.  Note:  The key
      * name has to match the function name that it corresponds to.
      *
-     * @param string $key key
+     * @param string $key function name
      * @param string $val val
      * 
      * @return string
@@ -509,6 +398,31 @@ class Validator implements ValidatorInterface
             $key = array($key => $val);
         }
         $this->errorMessages = array_merge($this->errorMessages, $key);
+    }
+
+    /**
+     * Set warning errors
+     * 
+     * @param string $error errors
+     *
+     * @return void
+     */
+    public function setFormMessage($error)
+    {
+        $value = (string)$error;
+        $value = ($this->translator->exists($value)) ? $this->translator[$value] : $value;
+        $this->formErrors[] = $value;
+        $this->logger->debug($value);
+    }
+
+    /**
+     * Get warning messages
+     * 
+     * @return array
+     */
+    public function getFormMessages()
+    {
+        return $this->formErrors;
     }
 
     /**
@@ -721,28 +635,6 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Executes callbackFunction() method in given object.
-     * 
-     * @param object $object 
-     *
-     * @return void
-     */
-    public function bind($object)
-    {
-        $method = "callbackFunction";
-        if (! method_exists($object, $method)) {
-            throw new RuntimeException(
-                sprintf(
-                    "The callback object %s does not contain %s method.",
-                    get_class($object),
-                    $method
-                )
-            );
-        }
-        $object->$method();
-    }
-
-    /**
      * Returns to container 
      * 
      * @return object
@@ -751,5 +643,4 @@ class Validator implements ValidatorInterface
     {
         return $this->c;
     }
-
 }

@@ -47,6 +47,22 @@ interface ValidatorInterface
     public function setMessage($key, $val = '');
 
     /**
+     * Set warning errors
+     * 
+     * @param string $error errors
+     *
+     * @return void
+     */
+    public function setFormMessage($error);
+
+    /**
+     * Get warning messages
+     * 
+     * @return array
+     */
+    public function getFormMessages();
+
+    /**
      * Set error(s) to form validator
      * 
      * @param mixed  $key key
@@ -139,15 +155,6 @@ interface ValidatorInterface
      * @return string
      */    
     public function getErrorString($prefix = '', $suffix = '');
-
-    /**
-     * Executes callbackFunction() method in given object.
-     * 
-     * @param object $object 
-     *
-     * @return void
-     */
-    public function bind($object);
 
     /**
      * Returns to container 

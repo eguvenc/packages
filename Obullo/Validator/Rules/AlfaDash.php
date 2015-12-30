@@ -3,15 +3,15 @@
 namespace Obullo\Validator;
 
 /**
- * Csrf form verify
+ * AlfaDash ( Only letters & underscore & dash )
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Csrf
+class AlfaDash
 {
     /**
-     * Csrf code check
+     * AlphaDash
      * 
      * @param string $value string
      *
@@ -19,6 +19,6 @@ class Csrf
      */         
     public function isValid($value)
     {
-
+        return ( ! preg_match("/^([-a-z_\-])+$/i", $value)) ? false : true;
     }
 }

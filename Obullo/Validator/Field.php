@@ -1,0 +1,247 @@
+<?php
+
+namespace Obullo\Validator;
+
+use RuntimeException;
+use Obullo\Validator\ValidatorInterface;
+
+/**
+ * Form field
+ * 
+ * @copyright 2009-2016 Obullo
+ * @license   http://opensource.org/licenses/MIT MIT license
+ */
+class Field implements FieldInterface
+{
+    /**
+     * Field name
+     * 
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * Field label
+     * 
+     * @var string
+     */
+    protected $label;
+
+    /**
+     * Field value
+     * 
+     * @var mixed
+     */
+    protected $value;
+
+    /**
+     * Field error
+     * 
+     * @var string
+     */
+    protected $error;
+
+    /**
+     * Validator
+     * 
+     * @var object
+     */
+    protected $validator;
+
+    /**
+     * Rules
+     * 
+     * @var array
+     */
+    protected $rules = array();
+
+    /**
+     * Rule parameters
+     * 
+     * @var array
+     */
+    protected $params = array();
+
+    /**
+     * Field form messages
+     * 
+     * @var array
+     */
+    protected $messages = array();
+
+    /**
+     * Rule config
+     * 
+     * @var array
+     */
+    protected $ruleArray = array();
+
+    /**
+     * Constructor
+     * 
+     * @param array $row       field     data
+     * @param mixed $value     field     value
+     * @param array $rules     field     rules
+     * @param array $ruleArray ruleArray config
+     */
+    public function __construct($row, $value, $rules, $ruleArray = array())
+    {
+        $this->name  = $row['field'];
+        $this->label = $row['label'];
+        $this->value = $value;
+        $this->rules = $rules;
+        $this->ruleArray = $ruleArray;
+    }
+
+    /**
+     * Set validator object
+     * 
+     * @param object $validator validator
+     *
+     * @return void
+     */
+    public function setValidator(ValidatorInterface $validator)
+    {
+        $this->validator = $validator;
+    }
+
+    /**
+     * Call next rule
+     * 
+     * @return void
+     */
+    public function next()
+    {
+        $rule = array_shift($this->rules);
+
+        if (! empty($rule)) {
+                                                                                                  // Strip the parameter (if exists) from the rule
+            if (strpos($rule, '(') > 0 && preg_match_all("/(.*?)\((.*?)\)/", $rule, $matches)) {  // Rules can contain parameters: min(5),                    
+                $rule = $matches[1][0];
+                $this->params = $matches[2];
+            }
+            $key = strtolower($rule);
+            if (! array_key_exists($key, $this->ruleArray)) {
+                throw new RuntimeException(
+                    sprintf(
+                        "Validator rule '%s' is not defined in configuration file.",
+                        $key
+                    )
+                );
+            }
+            $Class = $this->ruleArray[$key];
+            $next = new $Class;
+            $result = $next($this);
+
+            if (false === $result) {
+                $this->validator->dispatchErrors($this, $rule);
+            }
+        }
+    }
+    
+    /**
+     * Invoke next rule
+     * 
+     * @return boolean
+     */
+    public function __invoke()
+    {
+        return $this->next();
+    }
+
+    /**
+     * Sets field value
+     * 
+     * @param mixed $value value
+     *
+     * @return void
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+    }
+
+    /**
+     * Returns to field value
+     * 
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * Returns to field name
+     * 
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Returns to field label
+     * 
+     * @return string
+     */
+    public function getLabel()
+    {
+        return $this->label;
+    }
+
+    /**
+     * Returns to field parameters
+     * 
+     * @return array
+     */
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+    /**
+     * Sets field error
+     * 
+     * @param string $value error
+     *
+     * @return void
+     */
+    public function setError($value)
+    {
+        $this->error = (string)$value;
+    }
+
+    /**
+     * Returns to field error
+     * 
+     * @return string
+     */
+    public function getError()
+    {
+        return $this->error;
+    }
+
+    /**
+     * Set field form message
+     * 
+     * @param string $message message
+     *
+     * @return void
+     */
+    public function setFormMessage($message)
+    {
+        $this->messages[] = $message;
+    }
+
+    /**
+     * Returns field form messages
+     * 
+     * @return array
+     */
+    public function getFormMessages()
+    {
+        return $this->messages;
+    }
+} 

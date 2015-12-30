@@ -46,7 +46,7 @@ $traceID = md5($e->getFile().$e->getLine().$e->getCode().$e->getMessage());
 exit; // Shutdown error exit.
 } else {
 
-    if ($e->getCode() != E_PARSE) {
+    if ($e->getCode() != E_PARSE && $e->getCode() != 1) {
 
         $config = include APP. 'local/config.php';
 

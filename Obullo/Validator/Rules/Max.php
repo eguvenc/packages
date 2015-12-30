@@ -1,8 +1,8 @@
 <?php
 
-namespace Obullo\Validator;
+namespace Obullo\Validator\Rules;
 
-use Obullo\Validator\ValidatorInterface as Validator;
+use Obullo\Validator\FieldInterface as Field;
 
 /**
  * Max
@@ -15,16 +15,25 @@ class Max
     protected $length;
 
     /**
-     * Constructor
+     * Call next
      * 
-     * @param Validator $validator object
-     * @param string    $field     name
-     * @param array     $params    rule parameters 
+     * @param Field $next object
+     * 
+     * @return object
      */
-    public function __construct(Validator $validator, $field, $params = array())
+    public function __invoke(Field $next)
     {
-        $validator = $field = null;
+        $field  = $next;
+        $value  = $field->getValue();
+        $params = $field->getParams();
+
         $this->length = isset($params[0]) ? (string)$params[0] : '0';
+
+        if ($this->isValid($value)) {
+
+            return $next();
+        }
+        return false;
     }
 
     /**

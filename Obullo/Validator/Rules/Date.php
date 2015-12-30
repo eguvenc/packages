@@ -2,8 +2,6 @@
 
 namespace Obullo\Validator;
 
-use Obullo\Validator\ValidatorInterface as Validator;
-
 /**
  * Date 
  * 
@@ -35,7 +33,7 @@ class Date
      * @param string    $field     name
      * @param array     $params    rule parameters 
      */
-    public function __construct(Validator $validator, $field, $params = array())
+    public function __construct(ValidatorInterface $validator, $field, $params = array())
     {
         $validator = $field = null;
         $this->format = isset($params[0]) ? $params[0] : 'Y-m-d';

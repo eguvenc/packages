@@ -4,7 +4,6 @@ namespace Obullo\Validator;
 
 use InvalidArgumentException;
 use Obullo\Utils\ArrayUtils;
-use Obullo\Validator\ValidatorInterface as Validator;
 
 /**
  * Validates IBAN Numbers (International Bank Account Numbers)
@@ -126,7 +125,7 @@ class Iban
      * @param string    $field     name
      * @param string    $params    params
      */
-    public function __construct(Validator $validator, $field, $params = array())
+    public function __construct(ValidatorInterface $validator, $field, $params = array())
     {
         $this->validator = $validator;
         $this->field = $field;

@@ -2,8 +2,6 @@
 
 namespace Obullo\Validator;
 
-use Obullo\Validator\ValidatorInterface as Validator;
-
 /**
  * Matches
  * 
@@ -33,7 +31,7 @@ class Matches
      * @param string    $field     name
      * @param array     $params    rule parameters 
      */
-    public function __construct(Validator $validator, $field, $params = array())
+    public function __construct(ValidatorInterface $validator, $field, $params = array())
     {
         $params = null;
         $this->field = $field;

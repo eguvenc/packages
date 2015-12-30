@@ -5,6 +5,7 @@ namespace Obullo\Security;
 use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Session\SessionInterface as Session;
 
+use Obullo\Utils\Random;
 use Psr\Http\Message\RequestInterface as Request;
 
 /**
@@ -42,6 +43,13 @@ class Csrf
       * @var object
       */
      protected $session;
+
+     /**
+      * Token salt
+      *
+      * @var string
+      */
+     protected $salt;
 
      /**
       * Token refresh seconds
@@ -83,6 +91,8 @@ class Csrf
         $this->tokenName = $this->params['token']['name'];
         $this->tokenData = $this->session->get($this->tokenName);
 
+        $this->setSalt();
+
         $this->logger->channel('security');
         $this->logger->debug('Csrf Class Initialized');
     }
@@ -96,17 +106,74 @@ class Csrf
      */
     public function verify(Request $request)
     {
+        if ($this->params['protection'] == false) {
+            return true;
+        }
         $post = $request->getParsedBody();
 
         if (! isset($post[$this->tokenName]) 
             || ! isset($this->tokenData['value'])
             || ($post[$this->tokenName] != $this->tokenData['value'])
         ) {
+            $this->logger->channel('security');
+            $this->logger->debug('Csrf validation is failed.');
             return false;
         }
         $this->logger->channel('security');
         $this->logger->debug('Csrf token verified');
         return true;
+    }
+
+    /**
+     * Get CSRF Hash
+     *
+     * Getter Method
+     *
+     * @return string
+     */
+    public function getToken()
+    {
+        $this->setToken();
+        $this->refreshToken();
+
+        return $this->tokenData['value'];
+    }
+
+    /**
+     * Get CSRF Token Name
+     *
+     * Getter Method
+     *
+     * @return string csrf token name
+     */
+    public function getTokenName()
+    {
+        return $this->tokenName;
+    }
+
+    /**
+     * Salt for CSRF token
+     *
+     * @param string $salt salt
+     * 
+     * @return void
+     */
+    public function setSalt($salt = '')
+    {
+        if (empty($salt)) {
+            $salt = $this->params['token']['salt'];
+        }
+        $this->salt = (string) $salt;
+    }
+
+    /**
+     * Retrieve salt for CSRF token
+     *
+     * @return string
+     */
+    public function getSalt()
+    {
+        return $this->salt;
     }
 
     /**
@@ -152,40 +219,13 @@ class Csrf
     }
 
     /**
-     * Get CSRF Hash
-     *
-     * Getter Method
-     *
-     * @return string
-     */
-    public function getToken()
-    {
-        $this->setToken();
-        $this->refreshToken();
-
-        return $this->tokenData['value'];
-    }
-
-    /**
-     * Get CSRF Token Name
-     *
-     * Getter Method
-     *
-     * @return string csrf token name
-     */
-    public function getTokenName()
-    {
-        return $this->tokenName;
-    }
-
-    /**
      * Set Cross Site Request Forgery Protection Cookie
      * 
      * @return string
      */
     protected function generateHash()
     {
-        return md5(uniqid(rand(), true));
+        return md5($this->getSalt() . Random::generate('alnum', 32) . uniqid(rand(), true));
     }
 
 }

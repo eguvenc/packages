@@ -1,11 +1,11 @@
 <?php
 
-namespace Obullo\Validator;
+namespace Obullo\Validator\Rules;
 
-use Obullo\Validator\ValidatorInterface as Validator;
+use Obullo\Validator\FieldInterface as Field;
 
 /**
- * Valid Email
+ * Validate Email
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
@@ -15,16 +15,38 @@ class Email
     protected $dnsCheck = false;
 
     /**
-     * Constructor
+     * Call next
      * 
-     * @param Validator $validator object
-     * @param string    $field     name
-     * @param array     $params    rule parameters 
+     * @param Field $next object
+     * 
+     * @return object
      */
-    public function __construct(Validator $validator, $field, $params = array())
+    public function __invoke(Field $next)
     {
-        $validator = $field = null;
-        $this->dnsCheck = isset($params[0]) ? (bool)$params[0] : false;
+        $field  = $next;
+        $value  = $field->getValue();
+        $params = $field->getParams();
+
+        $dns = isset($params[0]) ? (bool)$params[0] : false;
+        $this->setDnsCheck($dns);
+
+        if ($this->isValid($value)) {
+
+            return $next();
+        }
+        return false;
+    }
+
+    /**
+     * Enabled / disable dns option
+     * 
+     * @param boolean $enabled dns option
+     * 
+     * @return void
+     */
+    public function setDnsCheck($enabled = true)
+    {
+        $this->dnsCheck = $enabled;
     }
 
     /**

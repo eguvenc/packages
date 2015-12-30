@@ -80,7 +80,6 @@ class Image extends AbstractProvider implements ProviderInterface
         $this->logger = $logger;
         $this->session = $session;
         $this->translator = $translator;
-        $this->translator->load('captcha');
         $this->params['mod'] = 'cool';
         $this->init();
         
@@ -131,7 +130,7 @@ class Image extends AbstractProvider implements ProviderInterface
         if (! $this->isAllowedMod($mod)) {
             throw new RuntimeException(
                 sprintf(
-                    'Unsupported mod. You can choose from the following list "%s".',
+                    'Unsupported mod. Available mods are here "%s".',
                     implode(',', $this->mods)
                 )
             );
@@ -608,16 +607,15 @@ class Image extends AbstractProvider implements ProviderInterface
      * 
      * @return Captcha\CaptchaResult object
      */
-    public function result($code = null)
+    public function result($code)
     {
-        if ($code == null) {
-            $code = $this->request->post($this->params['form']['input']['attributes']['name']);
-        }
-        if ($data = $this->session->get($this->params['form']['input']['attributes']['name'])) {
+        $inputName = $this->params['form']['input']['attributes']['name'];
+        
+        if ($data = $this->session->get($inputName)) {
             return $this->validateCode($data, $code);
         }
         $this->result['code'] = CaptchaResult::FAILURE_CAPTCHA_NOT_FOUND;
-        $this->result['messages'][] = $this->translator['OBULLO:CAPTCHA:NOT_FOUND'];
+        $this->result['messages'][] = $this->translator['OBULLO:VALIDATOR:CAPTCHA:NOT_FOUND'];
         return $this->createResult();
     }
 
@@ -630,21 +628,21 @@ class Image extends AbstractProvider implements ProviderInterface
      * @return Captcha\CaptchaResult object
      */
     protected function validateCode($data, $code)
-    {
+    {           
         if ($data['expiration'] < time()) { // Expiration time of captcha ( second )
             $this->session->remove($this->params['form']['input']['attributes']['name']); // Remove captcha data from session.
             $this->result['code'] = CaptchaResult::FAILURE_EXPIRED;
-            $this->result['messages'][] = $this->translator['OBULLO:CAPTCHA:EXPIRED'];
+            $this->result['messages'][] = $this->translator['OBULLO:VALIDATOR:CAPTCHA:EXPIRED'];
             return $this->createResult();
         }
         if ($code == $data['code']) {  // Is code correct ?
             $this->session->remove($this->params['form']['input']['attributes']['name']); // Remove
             $this->result['code'] = CaptchaResult::SUCCESS;
-            $this->result['messages'][] = $this->translator['OBULLO:CAPTCHA:SUCCESS'];
+            $this->result['messages'][] = $this->translator['OBULLO:VALIDATOR:CAPTCHA:SUCCESS'];
             return $this->createResult();
         }
         $this->result['code'] = CaptchaResult::FAILURE_INVALID_CODE;
-        $this->result['messages'][] = $this->translator['OBULLO:CAPTCHA:INVALID'];
+        $this->result['messages'][] = $this->translator['OBULLO:VALIDATOR:CAPTCHA:INVALID'];
         return $this->createResult();
     }
 
@@ -655,8 +653,6 @@ class Image extends AbstractProvider implements ProviderInterface
      */
     protected function buildHtml()
     {
-        $this->validation = $this->params['form']['validation'];
-        unset($this->params['form']['validation']);
         foreach ($this->params['form'] as $key => $val) {
             if (isset($val['attributes'])) {
                 $this->html .= vsprintf(
@@ -703,7 +699,10 @@ class Image extends AbstractProvider implements ProviderInterface
      */
     public function printRefreshButton()
     {
-        return sprintf($this->params['form']['refresh']['button'], $this->translator['OBULLO:CAPTCHA:REFRESH_BUTTON_LABEL']);
+        return sprintf(
+            $this->params['form']['refresh']['button'],
+            $this->translator['OBULLO:VALIDATOR:CAPTCHA:REFRESH_BUTTON_LABEL']
+        );
     }
 
     /**
@@ -714,39 +713,5 @@ class Image extends AbstractProvider implements ProviderInterface
     public function printJs()
     {
         return;
-    }
-
-    /**
-     * We call this function using $this->validator->bind($this->captcha) method.
-     * 
-     * @return void
-     */
-    public function callbackFunction()
-    {
-        $post  = $this->request->isPost();
-        $label = $this->translator['OBULLO:CAPTCHA:LABEL'];
-        $rules = 'required|exact('.$this->params['characters']['length'].')|trim';
-
-        if ($this->validation && $post) {  // Add callback if we have http post
-            $rules.= '|callback_captcha';  // Add callback validation rule
-            $self = $this;
-            $this->c['validator']->func(
-                'callback_captcha',
-                function () use ($self, $label) {
-                    if ($self->result()->isValid() == false) {
-                        $this->setMessage($this->translator->get('OBULLO:CAPTCHA:VALIDATION', $label));
-                        return false;
-                    }
-                    return true;
-                }
-            );
-        }
-        if ($post) {
-            $this->c['validator']->setRules(
-                $this->params['form']['input']['attributes']['name'],
-                $label,
-                $rules
-            );
-        }
     }
 }

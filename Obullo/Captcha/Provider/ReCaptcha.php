@@ -105,14 +105,13 @@ class ReCaptcha extends AbstractProvider implements ProviderInterface
         $this->params = $params;
         $this->request = $request;
         $this->translator = $translator;
-        $this->translator->load('captcha');
         $this->logger = $logger;
 
         $this->errorCodes = array(
-            self::FAILURE_MISSING_INPUT_SECRET   => $this->translator['OBULLO:RECAPTCHA:MISSING_INPUT_SECRET'],
-            self::FAILURE_INVALID_INPUT_SECRET   => $this->translator['OBULLO:RECAPTCHA:INVALID_INPUT_SECRET'],
-            self::FAILURE_MISSING_INPUT_RESPONSE => $this->translator['OBULLO:RECAPTCHA:MISSING_INPUT_RESPONSE'],
-            self::FAILURE_INVALID_INPUT_RESPONSE => $this->translator['OBULLO:RECAPTCHA:INVALID_INPUT_RESPONSE']
+            self::FAILURE_MISSING_INPUT_SECRET   => $this->translator['OBULLO:VALIDATOR:RECAPTCHA:MISSING_INPUT_SECRET'],
+            self::FAILURE_INVALID_INPUT_SECRET   => $this->translator['OBULLO:VALIDATOR:RECAPTCHA:INVALID_INPUT_SECRET'],
+            self::FAILURE_MISSING_INPUT_RESPONSE => $this->translator['OBULLO:VALIDATOR:RECAPTCHA:MISSING_INPUT_RESPONSE'],
+            self::FAILURE_INVALID_INPUT_RESPONSE => $this->translator['OBULLO:VALIDATOR:RECAPTCHA:INVALID_INPUT_RESPONSE']
         );
         $this->init();
         $this->logger->debug('ReCaptcha Class Initialized');
@@ -288,19 +287,16 @@ class ReCaptcha extends AbstractProvider implements ProviderInterface
     /**
      * Validation captcha
      * 
-     * @param string $response response
+     * @param string $code result
      * 
      * @return bool
      */
-    public function result($response = null)
+    public function result($code)
     {
-        if ($response == null) {
-            $response = $this->request->post('g-recaptcha-response');
-        }
         $response = $this->sendVerifyRequest(
             array(
                 'secret'   => $this->getSecretKey(),
-                'response' => $response,
+                'response' => $code,
                 'remoteip' => $this->getUserIp() // optional
             )
         );
@@ -331,12 +327,12 @@ class ReCaptcha extends AbstractProvider implements ProviderInterface
             }
             if ($response['success'] === true) {
                 $this->result['code'] = CaptchaResult::SUCCESS;
-                $this->result['messages'][] = $this->translator['OBULLO:CAPTCHA:SUCCESS'];
+                $this->result['messages'][] = $this->translator['OBULLO:VALIDATOR:CAPTCHA:SUCCESS'];
                 return $this->createResult();
             }
         }
         $this->result['code'] = CaptchaResult::FAILURE_CAPTCHA_NOT_FOUND;
-        $this->result['messages'][] = $this->translator['OBULLO:CAPTCHA:NOT_FOUND'];
+        $this->result['messages'][] = $this->translator['OBULLO:VALIDATOR:CAPTCHA:NOT_FOUND'];
         return $this->createResult();
     }
 
@@ -361,8 +357,6 @@ class ReCaptcha extends AbstractProvider implements ProviderInterface
      */
     protected function buildHtml()
     {
-        $this->validation = $this->params['form']['validation'];
-        unset($this->params['form']['validation']);
         foreach ($this->params['form'] as $key => $val) {
             $this->html .= vsprintf(
                 '<%s %s/>',
@@ -394,38 +388,5 @@ class ReCaptcha extends AbstractProvider implements ProviderInterface
         }
         return count($html) ? implode(' ', $html) : '';
     }
-
-    /**
-     * We call this function using $this->validator->bind($this->captcha) method.
-     * 
-     * @return void
-     */
-    public function callbackFunction()
-    {
-        $post  = $this->request->isPost();
-        $label = $this->translator['OBULLO:CAPTCHA:LABEL'];
-        $rules = 'required';
-
-        if ($this->validation && $post) {  // Add callback if we have http post
-            $rules.= '|callback_captcha';  // Add callback validation rule
-            $self = $this;
-            $this->c['validator']->func(
-                'callback_captcha',
-                function () use ($self, $label) {
-                    if ($self->result()->isValid() == false) {
-                        $this->setMessage($this->translator->get('OBULLO:CAPTCHA:VALIDATION', $label));
-                        return false;
-                    }
-                    return true;
-                }
-            );
-        }
-        if ($post) {
-            $this->c['validator']->setRules(
-                $this->params['form']['input']['attributes']['name'],
-                $label,
-                $rules
-            );
-        }
-    }
+    
 }
