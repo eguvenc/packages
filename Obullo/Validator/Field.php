@@ -115,10 +115,12 @@ class Field implements FieldInterface
         $rule = array_shift($this->rules);
 
         if (! empty($rule)) {
-                                                                                                  // Strip the parameter (if exists) from the rule
-            if (strpos($rule, '(') > 0 && preg_match_all("/(.*?)\((.*?)\)/", $rule, $matches)) {  // Rules can contain parameters: min(5),                    
-                $rule = $matches[1][0];
-                $this->params = $matches[2];
+                                                                                                  
+            if (strpos($rule, '(') > 0) {
+                
+                $matches = RuleParameter::parse($rule);
+                $rule = $matches[0];
+                $this->params = $matches[1];
             }
             $key = strtolower($rule);
             if (! array_key_exists($key, $this->ruleArray)) {
