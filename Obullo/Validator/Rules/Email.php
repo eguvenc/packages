@@ -31,7 +31,6 @@ class Email
         $this->setDnsCheck($dns);
 
         if ($this->isValid($value)) {
-
             return $next();
         }
         return false;

@@ -253,6 +253,7 @@ class Validator implements ValidatorInterface
         }
         $field = new Field($row, $postdata, $rules, $this->ruleArray);
         $field->setValidator($this);
+        $field->setDependency($this->c['dependency']);
         $field();
 
         // if (false == $result) {

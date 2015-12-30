@@ -37,13 +37,13 @@ class Dependency
     /**
      * Set container
      * 
-     * @param ContainerInterface|null $c Container
+     * @param ContainerInterface|null $container Container
      *
      * @return object
      */
-    public function __construct(ContainerInterface $c)
+    public function __construct(ContainerInterface $container)
     {
-        $this->c = $c;
+        $this->c = $container;
     }
 
     /**

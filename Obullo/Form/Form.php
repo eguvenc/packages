@@ -230,7 +230,9 @@ class Form
 
             if (count($formMessages) > 0) {
                 $this->messages['success'] = 0;
-                $this->messages['messages'] = $formMessages; // Replace messages with warning errors
+                foreach ($formMessages as $value) {
+                    $this->messages['messages'][] = $value; // Add form messages
+                }
             }
         }
         if (is_array($errorArray) && count($errorArray) > 0) {

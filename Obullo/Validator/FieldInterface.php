@@ -81,14 +81,7 @@ interface FieldInterface
      * @return void
      */
     public function setError($value);
-
-    /**
-     * Returns to field error
-     * 
-     * @return string
-     */
-    public function getError();
-
+    
     /**
      * Set field form message
      * 
@@ -97,12 +90,5 @@ interface FieldInterface
      * @return void
      */
     public function setFormMessage($message);
-
-    /**
-     * Returns field form messages
-     * 
-     * @return array
-     */
-    public function getFormMessages();
 
 }

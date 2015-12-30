@@ -35,18 +35,18 @@ class Field implements FieldInterface
     protected $value;
 
     /**
-     * Field error
-     * 
-     * @var string
-     */
-    protected $error;
-
-    /**
      * Validator
      * 
      * @var object
      */
     protected $validator;
+
+    /**
+     * Dependency
+     * 
+     * @var object
+     */
+    protected $dependency;
 
     /**
      * Rules
@@ -61,13 +61,6 @@ class Field implements FieldInterface
      * @var array
      */
     protected $params = array();
-
-    /**
-     * Field form messages
-     * 
-     * @var array
-     */
-    protected $messages = array();
 
     /**
      * Rule config
@@ -106,6 +99,18 @@ class Field implements FieldInterface
     }
 
     /**
+     * Set dependency class
+     * 
+     * @param object $dependency container
+     *
+     * @return void
+     */
+    public function setDependency($dependency)
+    {
+        $this->dependency = $dependency;
+    }
+
+    /**
      * Call next rule
      * 
      * @return void
@@ -132,7 +137,7 @@ class Field implements FieldInterface
                 );
             }
             $Class = $this->ruleArray[$key];
-            $next = new $Class;
+            $next  = $this->dependency->resolveDependencies($Class);
             $result = $next($this);
 
             if (false === $result) {
@@ -149,28 +154,6 @@ class Field implements FieldInterface
     public function __invoke()
     {
         return $this->next();
-    }
-
-    /**
-     * Sets field value
-     * 
-     * @param mixed $value value
-     *
-     * @return void
-     */
-    public function setValue($value)
-    {
-        $this->value = $value;
-    }
-
-    /**
-     * Returns to field value
-     * 
-     * @return mixed
-     */
-    public function getValue()
-    {
-        return $this->value;
     }
 
     /**
@@ -194,6 +177,16 @@ class Field implements FieldInterface
     }
 
     /**
+     * Returns to field value
+     * 
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
      * Returns to field parameters
      * 
      * @return array
@@ -201,6 +194,18 @@ class Field implements FieldInterface
     public function getParams()
     {
         return $this->params;
+    }
+
+    /**
+     * Sets field value
+     * 
+     * @param mixed $value value
+     *
+     * @return void
+     */
+    public function setValue($value)
+    {
+        $this->validator->setValue($this->getName(), $value);
     }
 
     /**
@@ -212,17 +217,7 @@ class Field implements FieldInterface
      */
     public function setError($value)
     {
-        $this->error = (string)$value;
-    }
-
-    /**
-     * Returns to field error
-     * 
-     * @return string
-     */
-    public function getError()
-    {
-        return $this->error;
+        $this->validator->setError($this->getName(), $value);
     }
 
     /**
@@ -234,16 +229,7 @@ class Field implements FieldInterface
      */
     public function setFormMessage($message)
     {
-        $this->messages[] = $message;
+        $this->validator->setFormMessage($message);
     }
 
-    /**
-     * Returns field form messages
-     * 
-     * @return array
-     */
-    public function getFormMessages()
-    {
-        return $this->messages;
-    }
 } 

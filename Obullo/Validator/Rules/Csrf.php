@@ -3,6 +3,9 @@
 namespace Obullo\Validator\Rules;
 
 use Obullo\Validator\FieldInterface as Field;
+use Obullo\Security\Csrf as CsrfClass;
+
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
  * Csrf form verify
@@ -13,22 +16,19 @@ use Obullo\Validator\FieldInterface as Field;
 class Csrf
 {
     protected $csrf;
+    protected $field;
     protected $request;
-    protected $validator;
-    protected $translator;
 
     /**
      * Constructor
      * 
-     * @param Validator $validator object
-     * @param string    $field     name
-     * @param array     $params    rule parameters 
+     * @param Csrf    $csrf    csrf
+     * @param Request $request request
      */
-    public function __construct()
+    public function __construct(CsrfClass $csrf, Request $request)
     {
-        // $this->csrf = $container['csrf'];
-        // $this->request = $container['request'];
-        // $this->translator = $container['translator'];
+        $this->csrf = $csrf;
+        $this->request = $request;
     }
 
     /**
@@ -40,12 +40,10 @@ class Csrf
      */
     public function __invoke(Field $next)
     {
-        $field  = $next;
-        $value  = $field->getValue();
-        $params = $field->getParams();
+        $this->field = $next;
+        $value = $this->field->getValue();
 
         if ($this->isValid($value)) {
-
             return $next();
         }
         return false;
@@ -58,26 +56,22 @@ class Csrf
      */         
     public function isValid()
     {
-        return true;
-
         if ($this->request->getMethod() == 'POST') {
 
             $inputName = $this->csrf->getTokenName();
 
             if (false == $this->request->post($inputName)) {
 
-                $this->setErrorMessage(
-                    $this->translator->get(
-                        'OBULLO:VALIDATOR:CSRF:REQUIRED',
-                        $inputName
-                    )
-                );
+                $this->field->setFormMessage('OBULLO:VALIDATOR:CSRF:REQUIRED');
+
                 return false;
             }
             $verify = $this->csrf->verify($this->request);
 
             if ($verify == false) {
-                $this->setErrorMessage('OBULLO:VALIDATOR:CSRF:INVALID');
+
+                $this->field->setFormMessage('OBULLO:VALIDATOR:CSRF:INVALID');
+
                 return false;
             }
             return true;
