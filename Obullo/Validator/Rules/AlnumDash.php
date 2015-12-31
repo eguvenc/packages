@@ -1,6 +1,8 @@
 <?php
 
-namespace Obullo\Validator;
+namespace Obullo\Validator\Rules;
+
+use Obullo\Validator\FieldInterface as Field;
 
 /**
  * AlnumDash ( Only letters & numbers & underscore & dash )
@@ -10,6 +12,24 @@ namespace Obullo\Validator;
  */
 class AlnumDash
 {
+    /**
+     * Call next
+     * 
+     * @param Field $next object
+     * 
+     * @return object
+     */
+    public function __invoke(Field $next)
+    {
+        $field = $next;
+        $value = $field->getValue();
+
+        if ($this->isValid($value)) {
+            return $next();
+        }
+        return false;
+    }
+
     /**
      * AlphaDash
      * 

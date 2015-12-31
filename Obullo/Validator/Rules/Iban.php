@@ -1,9 +1,10 @@
 <?php
 
-namespace Obullo\Validator;
+namespace Obullo\Validator\Rules;
 
 use InvalidArgumentException;
 use Obullo\Utils\ArrayUtils;
+use Obullo\Validator\FieldInterface as Field;
 
 /**
  * Validates IBAN Numbers (International Bank Account Numbers)
@@ -16,11 +17,7 @@ class Iban
     const SEPANOTSUPPORTED = 'OBULLO:VALIDATOR:IBAN:SEPANOTSUPPORTED';
     const FALSEFORMAT      = 'OBULLO:VALIDATOR:IBAN:FALSEFORMAT';
     const CHECKFAILED      = 'OBULLO:VALIDATOR:IBAN:CHECKFAILED';
-
-    protected $validator;
-    protected $field;
-    protected $params = array();
-
+    
     /**
      * Optional country code by ISO 3166-1
      *
@@ -119,17 +116,19 @@ class Iban
     );
 
     /**
-     * Constructor
+     * Call next
      * 
-     * @param Validator $validator object
-     * @param string    $field     name
-     * @param string    $params    params
+     * @param Field $next object
+     * 
+     * @return object
      */
-    public function __construct(ValidatorInterface $validator, $field, $params = array())
+    public function __invoke(Field $next)
     {
-        $this->validator = $validator;
-        $this->field = $field;
-        $this->params = $params;
+        $field = $next;
+        if ($this->isValid($field)) {
+            return $next();
+        }
+        return false;
     }
 
     /**
@@ -189,30 +188,33 @@ class Iban
     }
 
     /**
-     * Returns true if $value is a valid IBAN
-     *
-     * @param string $value value
+     * Returns true if field $value is a valid IBAN
      * 
-     * @return bool
+     * @param Field $field object
+     * 
+     * @return boolean
      */
-    public function isValid($value)
+    public function isValid(Field $field)
     {
-        if (empty($this->params[0])) {
-            $this->validator->setError($this->field, self::NOTSUPPORTED);
+        $params = $field->getParams();
+        $countryCode = (isset($params[0])) ? $params[0] : '';
+        $allowNonSepa = (isset($params[1])) ? $params[1] : true;
+
+        if (empty($countryCode)) {
+            $field->setError(self::NOTSUPPORTED);
             return false;
         }
-        $param = strtoupper($this->params[0]);
-        if (! empty($this->params[1])) {
-            $this->setAllowNonSepa((bool)$this->params[1]);
-        }
-        $this->setCountryCode($param);
+        $countryCode = strtoupper($countryCode);
+
+        $this->setCountryCode($countryCode);
+        $this->setAllowNonSepa($allowNonSepa);
 
         if (! is_string($value)) {
-            $this->validator->setError($this->field, self::FALSEFORMAT);
+            $field->setError(self::FALSEFORMAT);
             return false;
         }
         $value = str_replace(' ', '', strtoupper($value));
-        $this->validator->setValue($this->field, $value);
+        $field->setValue($value);
 
         $countryCode = $this->getCountryCode();
 
@@ -220,19 +222,18 @@ class Iban
             $countryCode = substr($value, 0, 2);
         }
         if (! array_key_exists($countryCode, static::$ibanRegex)) {
-            $this->validator->setValue($this->field, $countryCode);
-            $this->validator->setError($this->field, self::NOTSUPPORTED);
+            $field->setValue($countryCode);
+            $field->setError(self::NOTSUPPORTED);
             return false;
         }
-
-        if (!$this->allowNonSepa && !in_array($countryCode, static::$sepaCountries)) {
-            $this->validator->setValue($this->field, $countryCode);
-            $this->validator->setError($this->field, self::SEPANOTSUPPORTED);
+        if (! $this->allowNonSepa && ! in_array($countryCode, static::$sepaCountries)) {
+            $field->setValue($countryCode);
+            $field->setError(self::SEPANOTSUPPORTED);
             return false;
         }
 
         if (! preg_match('/^' . static::$ibanRegex[$countryCode] . '$/', $value)) {
-            $this->validator->setError($this->field, self::FALSEFORMAT);
+            $field->setError(self::FALSEFORMAT);
             return false;
         }
 
@@ -255,7 +256,7 @@ class Iban
         }
 
         if ($temp != 1) {
-            $this->validator->setError($this->field, self::CHECKFAILED);
+            $field->setError(self::CHECKFAILED);
             return false;
         }
         return true;

@@ -1,6 +1,8 @@
 <?php
 
-namespace Obullo\Validator;
+namespace Obullo\Validator\Rules;
+
+use Obullo\Validator\FieldInterface as Field;
 
 /**
  * IsBool

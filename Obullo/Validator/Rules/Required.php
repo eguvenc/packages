@@ -22,7 +22,6 @@ class Required
     public function __invoke(Field $next)
     {
         $field = $next;
-
         if ($this->isValid($field->getValue())) {
             return $next();
         }

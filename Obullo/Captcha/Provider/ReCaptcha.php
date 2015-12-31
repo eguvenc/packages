@@ -4,12 +4,11 @@ namespace Obullo\Captcha\Provider;
 
 use Obullo\Captcha\CaptchaResult;
 use Obullo\Captcha\AbstractProvider;
-use Obullo\Captcha\ProviderInterface;
+use Obullo\Captcha\CaptchaInterface;
 
 use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Container\ContainerInterface as Container;
 use Obullo\Translation\TranslatorInterface as Translator;
-
 use Psr\Http\Message\RequestInterface as Request;
 
 /**
@@ -18,7 +17,7 @@ use Psr\Http\Message\RequestInterface as Request;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class ReCaptcha extends AbstractProvider implements ProviderInterface
+class ReCaptcha extends AbstractProvider implements CaptchaInterface
 {
     /**
      * Api data

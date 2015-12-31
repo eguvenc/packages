@@ -2,6 +2,7 @@
 
 namespace Obullo\Validator;
 
+use Closure;
 use RuntimeException;
 use Obullo\Validator\ValidatorInterface;
 
@@ -120,26 +121,37 @@ class Field implements FieldInterface
         $rule = array_shift($this->rules);
 
         if (! empty($rule)) {
-                                                                                                  
+                              
             if (strpos($rule, '(') > 0) {
                 
                 $matches = RuleParameter::parse($rule);
                 $rule = $matches[0];
                 $this->params = $matches[1];
             }
-            $key = strtolower($rule);
-            if (! array_key_exists($key, $this->ruleArray)) {
-                throw new RuntimeException(
-                    sprintf(
-                        "Validator rule '%s' is not defined in configuration file.",
-                        $key
-                    )
-                );
-            }
-            $Class = $this->ruleArray[$key];
-            $next  = $this->dependency->resolveDependencies($Class);
-            $result = $next($this);
+            $callbacks = $this->validator->getCallbacks(); // Is the rule has a callback?
 
+            if (substr($rule, 0, 9) == 'callback_' && array_key_exists($rule, $callbacks)) {                 
+                $next = Closure::bind(
+                    $callbacks[$rule],
+                    $this->validator,
+                    get_class($this->validator)
+                );
+                $result = $next($this);
+            } else {
+
+                $key = strtolower($rule);
+                if (! array_key_exists($key, $this->ruleArray)) {
+                    throw new RuntimeException(
+                        sprintf(
+                            "Validator rule '%s' is not defined in configuration file.",
+                            $key
+                        )
+                    );
+                }
+                $Class  = $this->ruleArray[$key];
+                $next   = $this->dependency->resolveDependencies($Class);
+                $result = $next($this);
+            }
             if (false === $result) {
                 $this->validator->dispatchErrors($this, $rule);
             }
@@ -227,9 +239,9 @@ class Field implements FieldInterface
      *
      * @return void
      */
-    public function setFormMessage($message)
+    public function setMessage($message)
     {
-        $this->validator->setFormMessage($message);
+        $this->validator->setMessage($message);
     }
 
 } 

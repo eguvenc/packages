@@ -89,6 +89,6 @@ interface FieldInterface
      *
      * @return void
      */
-    public function setFormMessage($message);
+    public function setMessage($message);
 
 }

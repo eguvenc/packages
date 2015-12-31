@@ -1,6 +1,8 @@
 <?php
 
-namespace Obullo\Validator;
+namespace Obullo\Validator\Rules;
+
+use Obullo\Validator\FieldInterface as Field;
 
 /**
  * Date 
@@ -13,30 +15,31 @@ namespace Obullo\Validator;
 class Date
 {
     /**
-     * Value
-     * 
-     * @var string
-     */
-    public $value = '';
-
-    /**
      * Format
      * 
      * @var string
      */
     public $format = '';
-     
+
     /**
-     * Constructor
+     * Call next
      * 
-     * @param Validator $validator object
-     * @param string    $field     name
-     * @param array     $params    rule parameters 
+     * @param Field $next object
+     * 
+     * @return object
      */
-    public function __construct(ValidatorInterface $validator, $field, $params = array())
+    public function __invoke(Field $next)
     {
-        $validator = $field = null;
+        $field = $next;
+        $value  = $field->getValue();
+        $params = $field->getParams();
+
         $this->format = isset($params[0]) ? $params[0] : 'Y-m-d';
+
+        if ($this->isValid($value)) {
+            return $next();
+        }
+        return false;
     }
 
     /**
@@ -48,8 +51,7 @@ class Date
      */    
     public function isValid($value)
     {   
-        $this->value = $value;
-        return (! $this->convertToDateTime($this->value)) ? false : true ;
+        return (! $this->convertToDateTime($value)) ? false : true ;
     }
 
      /**

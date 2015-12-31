@@ -9,20 +9,37 @@ use Obullo\Utils\Random;
 use Psr\Http\Message\RequestInterface as Request;
 
 /**
- * ABOUT CSRF
- * 
- * @see http://shiflett.org/articles/cross-site-request-forgeries
- * @see http://blog.beheist.com/csrf-protection-in-codeigniter-2-0-a-closer-look/
- */
-
-/**
  * Csrf Class
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
+ * 
+ * @see http://shiflett.org/articles/cross-site-request-forgeries
+ * @see http://blog.beheist.com/csrf-protection-in-codeigniter-2-0-a-closer-look/
  */
-class Csrf 
+class Csrf implements CsrfInterface
 {
+     /**
+      * Token salt
+      *
+      * @var string
+      */
+     protected $salt;
+
+     /**
+      * Error code
+      * 
+      * @var int
+      */
+     protected $code;
+
+     /**
+      * Error message
+      * 
+      * @var string
+      */
+     protected $error;
+    
      /**
       * Service parameters
       * 
@@ -43,13 +60,6 @@ class Csrf
       * @var object
       */
      protected $session;
-
-     /**
-      * Token salt
-      *
-      * @var string
-      */
-     protected $salt;
 
      /**
       * Token refresh seconds
@@ -111,17 +121,51 @@ class Csrf
         }
         $post = $request->getParsedBody();
 
-        if (! isset($post[$this->tokenName]) 
-            || ! isset($this->tokenData['value'])
-            || ($post[$this->tokenName] != $this->tokenData['value'])
-        ) {
-            $this->logger->channel('security');
-            $this->logger->debug('Csrf validation is failed.');
+        if (! isset($post[$this->tokenName])) {
+            $this->setError('The csrf token does not exist in post data.', 00);
             return false;
         }
-        $this->logger->channel('security');
-        $this->logger->debug('Csrf token verified');
+        if (! isset($this->tokenData['value'])
+            || ($post[$this->tokenName] != $this->tokenData['value'])
+        ) {
+            $this->setError('The csrf verfication is failed.', 01);
+            return false;
+        }
         return true;
+    }
+
+    /**
+     * Set csrf error
+     * 
+     * @param string $error message
+     * @param string $code  error code
+     *
+     * @return void
+     */
+    public function setError($error, $code = 00)
+    {
+        $this->error = (string)$error;
+        $this->code  = $code;
+    }
+
+    /**
+     * Returns to csrf error
+     * 
+     * @return string
+     */
+    public function getError()
+    {
+        return $this->error;
+    }
+
+    /**
+     * Returns to last error code
+     * 
+     * @return int
+     */
+    public function getErrorCode()
+    {
+        return $this->code;
     }
 
     /**
@@ -197,9 +241,12 @@ class Csrf
      */
     protected function refreshToken()
     {
-        $tokenRefresh = strtotime('- '.$this->refresh.' seconds'); // Create a old time belonging to refresh seconds.
+        /**
+         * Create a refresh time
+         */
+        $tokenRefresh = strtotime('- '.$this->refresh.' seconds');
 
-        if (isset($this->tokenData['time']) && $tokenRefresh > $this->tokenData['time']) {  // Refresh token
+        if (isset($this->tokenData['time']) && $tokenRefresh > $this->tokenData['time']) {
             $this->createToken();
         }
     }

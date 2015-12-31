@@ -1,6 +1,9 @@
 <?php
 
-namespace Obullo\Validator;
+namespace Obullo\Validator\Rules;
+
+use Obullo\Validator\FieldInterface as Field;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
  * Matches
@@ -18,41 +21,51 @@ class Matches
     protected $request;
 
     /**
-     * Input element
-     * 
-     * @var string
-     */
-    protected $field;
-
-    /**
      * Constructor
      * 
-     * @param Validator $validator object
-     * @param string    $field     name
-     * @param array     $params    rule parameters 
+     * @param Request $request request
      */
-    public function __construct(ValidatorInterface $validator, $field, $params = array())
+    public function __construct(Request $request)
     {
-        $params = null;
-        $this->field = $field;
-        $container = $validator->getContainer();
-        $this->request = $container['request'];
+        $this->request = $request;
+    }
+
+    /**
+     * Call next
+     * 
+     * @param Field $next object
+     * 
+     * @return object
+     */
+    public function __invoke(Field $next)
+    {
+        $field = $next;
+        $value = $field->getValue();
+        $params = $field->getParams();
+
+        $matchField = isset($params[0]) ? $params[0] : '';
+
+        if ($this->isValid($value, $matchField)) {
+            return $next();
+        }
+        return false;
     }
 
     /**
      * Match one field to another
      * 
-     * @param string $value string
+     * @param string $value      field value
+     * @param string $matchField matched field name
      * 
      * @return bool
      */    
-    public function isValid($value)
+    public function isValid($value, $matchField)
     {   
-        $request = $this->request->all();
+        $matchField = $this->request->post($matchField);
 
-        if (! isset($request[$this->field])) {
+        if (! $matchField) {
             return false;                
         }
-        return ($value !== $request[$this->field]) ? false : true;
+        return ($value !== $matchField) ? false : true;
     }
 }

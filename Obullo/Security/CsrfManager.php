@@ -2,8 +2,8 @@
 
 namespace Obullo\Security;
 
-use Obullo\Container\ContainerInterface as Container;
 use Obullo\Container\ServiceInterface;
+use Obullo\Container\ContainerInterface as Container;
 
 /**
  * Csrf Manager

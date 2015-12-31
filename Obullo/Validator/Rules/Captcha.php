@@ -1,6 +1,10 @@
 <?php
 
-namespace Obullo\Validator;
+namespace Obullo\Validator\Rules;
+
+use Obullo\Captcha\CaptchaInterface;
+use Obullo\Validator\FieldInterface as Field;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
  * Captcha
@@ -10,51 +14,53 @@ namespace Obullo\Validator;
  */
 class Captcha
 {
-    protected $field;
     protected $request;
     protected $captcha;
-    protected $validator;
-    protected $translator;
 
     /**
      * Constructor
      * 
-     * @param Validator $validator object
-     * @param string    $field     name
-     * @param array     $params    rule parameters 
+     * @param Request $request request
+     * @param Captcha $captcha captcha
      */
-    public function __construct(ValidatorInterface $validator, $field, $params = array())
-    {
-        $params = null;
-        $container = $validator->getContainer();
+    public function __construct(Request $request, Captcha $captcha)
+    { 
+        $this->request = $request;
+        $this->captcha = $captcha;
+    }
 
-        $this->field = $field;
-        $this->validator = $validator;
-        $this->request = $container['request'];
-        $this->captcha = $container['captcha'];
-        $this->translator = $container['translator'];
+    /**
+     * Call next
+     * 
+     * @param Field $next object
+     * 
+     * @return object
+     */
+    public function __invoke(Field $next)
+    {
+        $field = $next;
+        $value = $field->getValue();
+
+        if ($this->isValid($value, $field)) {
+            return $next();
+        }
+        return false;
     }
 
     /**
      * Check captcha
      * 
      * @param string $value string
+     * @param object $field field
      * 
      * @return bool
      */    
-    public function isValid($value)
+    public function isValid($value, $field)
     {   
         if ($this->request->isPost()) {
 
             if (false == $this->captcha->result($value)->isValid()) {
-
-                $this->validator->setError(
-                    $this->field,
-                    $this->translator->get(
-                        'OBULLO:VALIDATOR:CAPTCHA:VALIDATION',
-                        $this->translator['OBULLO:VALIDATOR:CAPTCHA:LABEL']
-                    )
-                );
+                $field->setError('OBULLO:VALIDATOR:CAPTCHA:VALIDATION');
                 return false;
             }
             return true;

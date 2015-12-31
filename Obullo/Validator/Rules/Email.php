@@ -12,8 +12,6 @@ use Obullo\Validator\FieldInterface as Field;
  */
 class Email
 {
-    protected $dnsCheck = false;
-
     /**
      * Call next
      * 
@@ -27,39 +25,27 @@ class Email
         $value  = $field->getValue();
         $params = $field->getParams();
 
-        $dns = isset($params[0]) ? (bool)$params[0] : false;
-        $this->setDnsCheck($dns);
+        $dnsCheck = isset($params[0]) ? (bool)$params[0] : false;
 
-        if ($this->isValid($value)) {
+        if ($this->isValid($value, $dnsCheck)) {
             return $next();
         }
         return false;
     }
 
     /**
-     * Enabled / disable dns option
-     * 
-     * @param boolean $enabled dns option
-     * 
-     * @return void
-     */
-    public function setDnsCheck($enabled = true)
-    {
-        $this->dnsCheck = $enabled;
-    }
-
-    /**
      * Valid Email
      *
-     * @param string $value email
+     * @param string  $value    email
+     * @param boolean $dnsCheck check dns
      * 
      * @return bool
      */    
-    public function isValid($value)
+    public function isValid($value, $dnsCheck = false)
     {
         $isValid = (filter_var($value, FILTER_VALIDATE_EMAIL)) === false ? false : true;
 
-        if ($isValid && $this->dnsCheck) {
+        if ($isValid && $dnsCheck) {
             $username = null;
             $domain   = null;
             list($username, $domain) = explode('@', $value);

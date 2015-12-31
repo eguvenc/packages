@@ -33,34 +33,21 @@ interface ValidatorInterface
      */        
     public function isValid();
 
-     /**
-     * Set Error Message
-     *
-     * Lets users set their own error messages on the fly.  Note:  The key
-     * name has to match the function name that it corresponds to.
-     *
-     * @param string $key key
-     * @param string $val val
-     * 
-     * @return string
-     */
-    public function setMessage($key, $val = '');
-
     /**
-     * Set warning errors
+     * Set form message
      * 
      * @param string $error errors
      *
      * @return void
      */
-    public function setFormMessage($error);
+    public function setMessage($error);
 
     /**
-     * Get warning messages
+     * Get form messages
      * 
      * @return array
      */
-    public function getFormMessages();
+    public function getMessages();
 
     /**
      * Set error(s) to form validator
@@ -91,6 +78,20 @@ interface ValidatorInterface
      * @return void
      */
     public function func($func, $closure);
+
+    /**
+     * Get form field data
+     *
+     * @return boolean
+     */
+    public function getFieldData();
+
+    /**
+     * Returns to callback functions
+     * 
+     * @return array
+     */
+    public function getCallbacks();
 
      /**
      * Get filtered value from validator data

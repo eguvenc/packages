@@ -108,7 +108,8 @@ return array(
 Yukarıdaki form şablonuna ait bir mesaj form sınıfı ile aşağıdaki gibi üretilebilir.
 
 ```php
-$this->form->success("Welcome to form class");
+$this->form->success("Welcome to form class.");
+$this->form->success("Form validation success.");
 ```
 View çıktısı
 
@@ -116,25 +117,11 @@ View çıktısı
 echo $this->form->getMessage();
 ```
 
-```php
-// Çıktı <span class="glyphicon glyphicon-ok-sign">Welcome to form class</span>
-```
-ya da
+Çıktı
 
 ```php
-$this->form->status(1);
-$this->form->code(3);
-$this->form->setKey('message', 'Example warning');
-```
-
-View çıktısı
-
-```php
-echo $this->form->getMessage();
-```
-
-```php
-// Çıktı <span class="glyphicon glyphicon-exclamation-sign">Example warning</span> 
+<span class="glyphicon glyphicon-ok-sign">Welcome to form class</span>
+<span class="glyphicon glyphicon-ok-sign">Form validation success.</span>
 ```
 
 <a name="status-table"></a>

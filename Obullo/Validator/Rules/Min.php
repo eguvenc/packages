@@ -12,8 +12,6 @@ use Obullo\Validator\FieldInterface as Field;
  */
 class Min
 {
-    protected $length;
-
     /**
      * Call next
      * 
@@ -27,27 +25,28 @@ class Min
         $value  = $field->getValue();
         $params = $field->getParams();
 
-        $this->length = isset($params[0]) ? (string)$params[0] : '0';
+        $length = isset($params[0]) ? (string)$params[0] : '0';
 
-        if ($this->isValid($value)) {
-
+        if ($this->isValid($value, $length)) {
             return $next();
         }
         return false;
     }
 
+
     /**
      * Minimum length
      * 
-     * @param string $value string
+     * @param string $value  value
+     * @param int    $length length
      * 
      * @return bool
      */    
-    public function isValid($value)
+    public function isValid($value, $length = '0')
     {   
-        if (! ctype_digit($this->length)) {
+        if (! ctype_digit($length)) {
             return false;
         }
-        return (mb_strlen($value) < $this->length) ? false : true;   
+        return (mb_strlen($value) < $length) ? false : true;   
     }
 }

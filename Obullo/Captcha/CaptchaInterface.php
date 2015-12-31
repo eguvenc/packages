@@ -3,12 +3,12 @@
 namespace Obullo\Captcha;
 
 /**
- * Captcha Provider Interface
+ * Captcha Interface
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-interface ProviderInterface
+interface CaptchaInterface
 {
     /**
      * Initialize

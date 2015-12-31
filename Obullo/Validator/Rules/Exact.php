@@ -1,6 +1,8 @@
 <?php
 
-namespace Obullo\Validator;
+namespace Obullo\Validator\Rules;
+
+use Obullo\Validator\FieldInterface as Field;
 
 /**
  * Exact
@@ -10,33 +12,40 @@ namespace Obullo\Validator;
  */
 class Exact
 {
-    protected $length;
-
     /**
-     * Constructor
+     * Call next
      * 
-     * @param Validator $validator object
-     * @param string    $field     name
-     * @param array     $params    rule parameters 
+     * @param Field $next object
+     * 
+     * @return object
      */
-    public function __construct(ValidatorInterface $validator, $field, $params = array())
+    public function __invoke(Field $next)
     {
-        $validator = $field = null;
-        $this->length = isset($params[0]) ? (string)$params[0] : '0';
+        $field  = $next;
+        $value  = $field->getValue();
+        $params = $field->getParams();
+
+        $length = isset($params[0]) ? (string)$params[0] : '0';
+
+        if ($this->isValid($value, $length)) {
+            return $next();
+        }
+        return false;
     }
 
     /**
      * Exact length
      * 
-     * @param string $value string
+     * @param string $value  value
+     * @param int    $length length
      * 
      * @return bool
      */    
-    public function isValid($value)
+    public function isValid($value, $length = '0')
     {   
-        if (! ctype_digit($this->length)) {
+        if (! ctype_digit($length)) {
             return false;
         }
-        return (mb_strlen($value) != $this->length) ? false : true;   
+        return (mb_strlen($value) != $length) ? false : true;   
     }
 }

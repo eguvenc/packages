@@ -226,7 +226,7 @@ class Form
         if (is_object($errors) && $errors instanceof Validator) {
 
             $errorArray = $errors->getErrors();  // Get validator errors
-            $formMessages = $errors->getFormMessages();
+            $formMessages = $errors->getMessages();
 
             if (count($formMessages) > 0) {
                 $this->messages['success'] = 0;
@@ -413,10 +413,13 @@ class Form
      */    
     public function getValue($field = '', $default = '')
     {
-        if ($this->c->active('validator') && isset($this->c['validator']->fieldData[$field])) { // If we have validator object
+        if ($this->c->active('validator')) { // If we have validator object
 
-            return $this->c['validator']->getValue($field, $default);
+            $fieldData = $this->c['validator']->getFieldData();
 
+            if (isset($fieldData[$field])) {
+                return $this->c['validator']->getValue($field, $default);
+            }
         } elseif ($value = $this->request->post($field)) {
 
             return $value;
@@ -452,19 +455,19 @@ class Form
      */
     public function setSelect($field = '', $value = '', $default = false, $selectedString = ' selected="selected"')
     {
-        $validator = $this->c['validator'];
+        $fieldData = $this->c['validator']->getFieldData();
 
-        if (! isset($validator->fieldData[$field]) || ! isset($validator->fieldData[$field]['postdata'])) {
+        if (! isset($fieldData[$field]) || ! isset($fieldData[$field]['postdata'])) {
 
-            if ($default === true && count($validator->fieldData) === 0) {
+            if ($default === true && count($fieldData) === 0) {
                 return $selectedString;
             }
             if ($default === false) {
                 $field = $this->request->post($field);
             }
         }
-        if (isset($validator->fieldData[$field]['postdata'])) {
-            $field = $validator->fieldData[$field]['postdata'];
+        if (isset($fieldData[$field]['postdata'])) {
+            $field = $fieldData[$field]['postdata'];
         }
         if (is_array($field)) {
             if (! in_array($value, $field)) {

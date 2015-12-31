@@ -20,23 +20,20 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  */
 class Validator implements ValidatorInterface
 {
-    public $fieldData = array();
-    
     protected $c;
     protected $config;
     protected $logger;
     protected $translator;
     protected $requestParams;
+    protected $fieldData  = array();
     protected $errorArray = array();
-    protected $formErrors = array();
-    protected $errorMessages = array();    
+    protected $formErrors = array(); 
     protected $errorPrefix = '<div>';
     protected $errorSuffix = '</div>';
     protected $errorString = '';
     protected $safeFormData = false;
     protected $validation = false;
     protected $callbackFunctions = array();
-    protected $filters = array();
     protected $ruleArray = array();
 
     /**
@@ -72,7 +69,6 @@ class Validator implements ValidatorInterface
     {
         $this->fieldData     = array();
         $this->errorArray    = array();
-        $this->errorMessages = array();
         $this->errorPrefix   = '';
         $this->errorSuffix   = '';
         $this->errorString   = '';
@@ -139,7 +135,7 @@ class Validator implements ValidatorInterface
             return false;
         }
         if (count($this->fieldData) == 0) {    // We're we able to set the rules correctly ?
-            $this->setFormMessage('Unable to find validation rules');
+            $this->setMessage('Unable to find validation rules');
             return true;
         }
         
@@ -214,9 +210,12 @@ class Validator implements ValidatorInterface
         if ($this->safeFormData == false || $data === '') {
             return $data;
         }
-        return str_replace(array("'", '"', '<', '>'), array("&#39;", "&quot;", '&lt;', '&gt;'), stripslashes($data));
+        return str_replace(
+            array("'", '"', '<', '>'),
+            array("&#39;", "&quot;", '&lt;', '&gt;'),
+            stripslashes($data)
+        );
     }
-
 
     /**
      * Executes the Validation routines
@@ -235,14 +234,15 @@ class Validator implements ValidatorInterface
 
             if (in_array('required', $rules)) {
 
-                if (! isset($this->errorMessages['required'])) {
+                if (! isset($this->errorArray['required'])) {
                     $line = $this->translator['OBULLO:VALIDATOR:REQUIRED'];
                     if ($line == false) {
                         $line = 'The field was not set';
                     }
                 } else {
-                    $line = $this->errorMessages['required'];
+                    $line = $this->errorArray['required'];
                 }
+
                 $message = sprintf($line, $this->translateFieldname($row['label'])); // Build the error message
                 $this->fieldData[$field]['error'] = $message;                        // Save the error message
 
@@ -255,60 +255,16 @@ class Validator implements ValidatorInterface
         $field->setValidator($this);
         $field->setDependency($this->c['dependency']);
         $field();
+    }
 
-        // if (false == $result) {
-        //     $this->dispatchErrors($rule, $row, array());
-        //     return;
-        // }
-
-        // $result = false;
-        // foreach ($rules as $rule) {   // Cycle through each rule && run it
-
-        //     $postdata = $this->fieldData[$field]['postdata'];
-        
-        //     $callback = false;
-        //     if (substr($rule, 0, 9) == 'callback_') {  // Is the rule has a callback? 
-        //         $callback = true;
-        //     }
-        //     $params = array();                                          // Strip the parameter (if exists) from the rule
-        //     if (preg_match_all("/(.*?)\((.*?)\)/", $rule, $matches)) {  // Rules can contain parameters: min(5),                    
-        //         $rule   = $matches[1][0];
-        //         $params = $matches[2];
-        //     }
-        //     if ($callback === true) {    // Call the function that corresponds to the rule
-
-        //         if (! array_key_exists($rule, $this->callbackFunctions)) {  // Check method exists in callback object.
-        //             continue;
-        //         }
-        //         $closure = Closure::bind(
-        //             $this->callbackFunctions[$rule],
-        //             $this,
-        //             get_class()
-        //         );
-        //         $result = $closure($postdata, $params);  // Run the function and grab the result
-        //         $this->fieldData[$field]['postdata'] = (is_bool($result)) ? $postdata : $result;
-                
-        //         if (! in_array('required', $rules, true) && $result !== false) {
-        //             continue;
-        //         }
-
-        //     } else {
-
-
-        //         if ($rule == 'required') {
-        //             $result = $this->callRuleClass($rule, $postdata, $params, $field);
-        //             $this->fieldData[$field]['postdata'] = (is_bool($result)) ? $postdata : $result;
-        //         }
-        //         if ($rule != 'required' && $result == true) {
-        //             $result = $this->callRuleClass($rule, $postdata, $params, $field);
-        //             $this->fieldData[$field]['postdata'] = (is_bool($result)) ? $postdata : $result;
-        //         }
-        //     }
-        //     if (false == $result) {
-        //         $this->dispatchErrors($rule, $row, $params);
-        //         return;
-        //     }
-        // }
+    /**
+     * Returns to callback functions
+     * 
+     * @return array
+     */
+    public function getCallbacks()
+    {
+        return $this->callbackFunctions;
     }
 
     /**
@@ -325,19 +281,20 @@ class Validator implements ValidatorInterface
         $label     = $field->getLabel();
         $params    = $field->getParams();
 
-        if (! isset($this->errorMessages[$rule])) {
+        if (! isset($this->errorArray[$rule])) {
 
             $RULE = strtoupper($rule);
             $line = $this->translator['OBULLO:VALIDATOR:'.$RULE];
 
             if ($this->translator[$rule] == false) {
                 $line = 'Error message is not set correctly or unable to translation access an error message.';
-                $this->logger->error($line);
+                $this->logger->error($line, array('rule' => $rule));
             }
 
         } else {
-            $line = $this->errorMessages[$rule];
+            $line = $this->errorArray[$rule];
         }
+
         $param = (isset($params[0])) ? $params[0] : '';
 
         if (isset($this->fieldData[$param]) && isset($this->fieldData[$param]['label'])) {
@@ -347,6 +304,7 @@ class Validator implements ValidatorInterface
         
             $param = $this->translateFieldname($this->fieldData[$param]['label']);
         }
+
         $message = sprintf(
             $line,
             $this->translateFieldname($label),
@@ -378,37 +336,13 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Set Error Message
-     *
-     * Lets users set their own error messages on the fly.  Note:  The key
-     * name has to match the function name that it corresponds to.
-     *
-     * @param string $key function name
-     * @param string $val val
-     * 
-     * @return string
-     */
-    public function setMessage($key, $val = '')
-    {
-        if (! is_array($key)) {
-            if ($val == '' && count($this->callbackFunctions) > 0) {
-                $callbackKeys = array_keys($this->callbackFunctions);
-                $val = $key;
-                $key = end($callbackKeys);
-            }
-            $key = array($key => $val);
-        }
-        $this->errorMessages = array_merge($this->errorMessages, $key);
-    }
-
-    /**
-     * Set warning errors
+     * Set form message
      * 
      * @param string $error errors
      *
      * @return void
      */
-    public function setFormMessage($error)
+    public function setMessage($error)
     {
         $value = (string)$error;
         $value = ($this->translator->exists($value)) ? $this->translator[$value] : $value;
@@ -417,11 +351,11 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Get warning messages
+     * Get form messages
      * 
      * @return array
      */
-    public function getFormMessages()
+    public function getMessages()
     {
         return $this->formErrors;
     }
@@ -473,6 +407,16 @@ class Validator implements ValidatorInterface
     public function func($func, $closure)
     {
         $this->callbackFunctions[$func] = $closure;
+    }
+
+    /**
+     * Returns true if field name exists in validator
+     * 
+     * @return array
+     */
+    public function getFieldData()
+    {
+        return $this->fieldData;
     }
 
     /**
