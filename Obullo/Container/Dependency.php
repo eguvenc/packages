@@ -143,9 +143,8 @@ class Dependency
                     if ($isService || $isComponent) {  // Detect missing dependecy
                         throw new RuntimeException(
                             sprintf(
-                                'Dependency "%s" is missing for "%s" component.',
-                                $parameter->getClass()->name,
-                                $d
+                                '%s dependency is not defined in components.php.',
+                                ucfirst($d)
                             )
                         );
                     }

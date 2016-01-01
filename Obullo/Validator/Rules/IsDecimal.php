@@ -13,35 +13,37 @@ use Obullo\Validator\FieldInterface as Field;
 class IsDecimal
 {
     /**
-     * Params
+     * Call next
      * 
-     * @var array
-     */
-    protected $params;
-
-    /**
-     * Constructor
+     * @param Field $next object
      * 
-     * @param Validator $validator object
-     * @param string    $field     name
-     * @param array     $params    rule parameters 
+     * @return object
      */
-    public function __construct(ValidatorInterface $validator, $field, $params = array())
+    public function __invoke(Field $next)
     {
-        $validator = $field = null;
-        $this->params = $params;
+        $field = $next;
+        $value = $field->getValue();
+        $params = $field->getParams();
+
+        if ($this->isValid($value, $params)) {
+            return $next();
+        }
+        return false;
     }
 
     /**
      * IsDecimal
+     *
+     * http://stackoverflow.com/questions/6772603/php-check-if-number-is-decimal
      * 
-     * @param string $value string
+     * @param string $value  string
+     * @param array  $params array
      * 
      * @return bool
      */    
-    public function isValid($value)
+    public function isValid($value, $params = array())
     {
-        if ($params = explode(',', $this->params[0])) {
+        if ($params = explode(',', $params[0])) {
 
             if (isset($params[1])) {
                 

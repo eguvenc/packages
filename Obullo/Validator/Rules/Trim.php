@@ -13,14 +13,17 @@ use Obullo\Validator\FieldInterface as Field;
 class Trim
 {
     /**
-     * Trim
+     * Call next
      * 
-     * @param string $val value
+     * @param Field $next object
      * 
-     * @return bool
-     */    
-    public function func($val)
+     * @return object
+     */
+    public function __invoke(Field $next)
     {
-        return trim($val);
+        $field = $next;
+        $value = trim($field->getValue());
+        $field->setValue($value);
+        return $next();
     }
 }

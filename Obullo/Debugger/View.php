@@ -309,7 +309,7 @@ pre span.string {color: #cc0000;}
 
 <?php 
 $getDebuggerURl = function ($method = 'index') {
-    return $this->c['url']->baseUrl('/debugger/debugger/'.$method);
+    return '/debugger/debugger/'.$method;
 };
 ?>
 <script type="text/javascript">

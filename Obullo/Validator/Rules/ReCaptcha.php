@@ -2,7 +2,9 @@
 
 namespace Obullo\Validator\Rules;
 
+use Obullo\Captcha\CaptchaInterface;
 use Obullo\Validator\FieldInterface as Field;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
  * ReCaptcha
@@ -12,51 +14,52 @@ use Obullo\Validator\FieldInterface as Field;
  */
 class ReCaptcha
 {
-    protected $field;
     protected $request;
     protected $recaptcha;
-    protected $validator;
-    protected $translator;
 
     /**
      * Constructor
      * 
-     * @param Validator $validator object
-     * @param string    $field     name
-     * @param array     $params    rule parameters 
+     * @param Request $request   request
+     * @param Captcha $recaptcha recaptcha
      */
-    public function __construct(ValidatorInterface $validator, $field, $params = array())
-    {
-        $params = null;
-        $container = $validator->getContainer();
-
-        $this->field = $field;
-        $this->validator = $validator;
-        $this->request = $container['request'];
-        $this->recaptcha = $container['recaptcha'];
-        $this->translator = $container['translator'];
+    public function __construct(Request $request, CaptchaInterface $recaptcha)
+    { 
+        $this->request = $request;
+        $this->recaptcha = $recaptcha;
     }
 
     /**
-     * Check reCaptcha
+     * Call next
+     * 
+     * @param Field $next object
+     * 
+     * @return object
+     */
+    public function __invoke(Field $next)
+    {
+        $field = $next;
+        if ($this->isValid($field)) {
+            return $next();
+        }
+        return false;
+    }
+
+    /**
+     * Check recaptcha
+     * 
+     * @param object $field field
      * 
      * @return bool
      */    
-    public function isValid()
-    {   
+    public function isValid(Field $field)
+    {  
         if ($this->request->isPost()) {
 
-            $code = $this->request->post('g-recaptcha-response');
+            $value = $this->request->post('g-recaptcha-response');
 
-            if (false == $this->recaptcha->result($code)->isValid()) {
-
-                $this->validator->setError(
-                    $this->field,
-                    $this->translator->get(
-                        'OBULLO:VALIDATOR:CAPTCHA:VALIDATION',
-                        $this->translator['OBULLO:VALIDATOR:CAPTCHA:LABEL']
-                    )
-                );
+            if (false == $this->recaptcha->result($value)->isValid()) {
+                $field->setError('OBULLO:VALIDATOR:CAPTCHA:VALIDATION');
                 return false;
             }
             return true;

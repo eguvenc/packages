@@ -196,6 +196,7 @@ class Iban
      */
     public function isValid(Field $field)
     {
+        $value = $field->getValue();
         $params = $field->getParams();
         $countryCode = (isset($params[0])) ? $params[0] : '';
         $allowNonSepa = (isset($params[1])) ? $params[1] : true;
@@ -236,7 +237,6 @@ class Iban
             $field->setError(self::FALSEFORMAT);
             return false;
         }
-
         $format = substr($value, 4) . substr($value, 0, 4);
         $format = str_replace(
             array('A',  'B',  'C',  'D',  'E',  'F',  'G',  'H',  'I',  'J',  'K',  'L',  'M',

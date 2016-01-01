@@ -52,6 +52,14 @@ class Debugger extends Controller
         if (false == preg_match('#(ws:\/\/(?<host>(.*)))(:(?<port>\d+))(?<url>.*?)$#i', $this->c['config']['http']['debugger']['socket'], $matches)) {
             throw new RuntimeException("Debugger socket connection error, example web socket configuration: ws://127.0.0.1:9000");
         }
+        /**
+         * Enable websocket
+         */
+        $newArray = $this->config->load('config');
+        $newArray['http']['debugger']['enabled'] = true;
+
+        $this->config->write('config.php', $newArray);
+
         $this->connection = $matches;
         $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);   // Create TCP/IP sream socket
         socket_set_option($this->socket, SOL_SOCKET, SO_REUSEADDR, 1);  // Reuseable port

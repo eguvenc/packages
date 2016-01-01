@@ -35,6 +35,13 @@ class Config implements ConfigInterface
     protected $path;
 
     /**
+     * Main config file
+     * 
+     * @var array
+     */
+    protected $base = array();
+
+    /**
      * Constructor
      *
      * Sets the $config data from the primary config.php file as a class variable
@@ -46,8 +53,7 @@ class Config implements ConfigInterface
         $this->c = $c;
         $this->path  = CONFIG .$c['app.env'].'/';
         $this->local = CONFIG .'local/';
-
-        $this->array = include $this->local .'config.php';  // Load current environment config variables 
+        $this->base = $this->array = include $this->local .'config.php';  // Load current environment config variables 
         
         if ($c['app.env'] != 'local') {
             $envConfig   = include $this->path .'config.php';
@@ -71,7 +77,7 @@ class Config implements ConfigInterface
             return $this->array[$filename];
         }
         if ($filename == 'config') {  //  Config already loaded but someone may want to load it again.
-            return $this->array;
+            return $this->base;
         }
         $envFile = $this->path . $filename.'.php';
         $file = $this->local . $filename.'.php';  // Default config path
@@ -99,7 +105,7 @@ class Config implements ConfigInterface
      */
     public function base()
     {
-        return $this->array;
+        return $this->base;
     }
 
     /**

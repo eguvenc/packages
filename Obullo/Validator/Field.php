@@ -74,16 +74,14 @@ class Field implements FieldInterface
      * Constructor
      * 
      * @param array $row       field     data
-     * @param mixed $value     field     value
-     * @param array $rules     field     rules
      * @param array $ruleArray ruleArray config
      */
-    public function __construct($row, $value, $rules, $ruleArray = array())
+    public function __construct($row, $ruleArray = array())
     {
         $this->name  = $row['field'];
         $this->label = $row['label'];
-        $this->value = $value;
-        $this->rules = $rules;
+        $this->value = $row['postdata'];
+        $this->rules = $row['rules'];
         $this->ruleArray = $ruleArray;
     }
 
@@ -130,27 +128,30 @@ class Field implements FieldInterface
             }
             $callbacks = $this->validator->getCallbacks(); // Is the rule has a callback?
 
-            if (substr($rule, 0, 9) == 'callback_' && array_key_exists($rule, $callbacks)) {                 
+            if (substr($rule, 0, 9) == 'callback_' && array_key_exists($rule, $callbacks)) {
+
                 $next = Closure::bind(
                     $callbacks[$rule],
                     $this->validator,
                     get_class($this->validator)
                 );
                 $result = $next($this);
+
             } else {
 
                 $key = strtolower($rule);
-                if (! array_key_exists($key, $this->ruleArray)) {
-                    throw new RuntimeException(
-                        sprintf(
-                            "Validator rule '%s' is not defined in configuration file.",
-                            $key
-                        )
+                if (! array_key_exists($key, $this->ruleArray)) {  // If rule does not exist.
+                    $error = sprintf(
+                        "%s rule is not defined in configuration file.",
+                        ucfirst($key)
                     );
+                    $this->setError($error);
+                    $result = false;
+                } else {
+                    $Class  = $this->ruleArray[$key];
+                    $next   = $this->dependency->resolveDependencies($Class);
+                    $result = $next($this);
                 }
-                $Class  = $this->ruleArray[$key];
-                $next   = $this->dependency->resolveDependencies($Class);
-                $result = $next($this);
             }
             if (false === $result) {
                 $this->validator->dispatchErrors($this, $rule);
@@ -206,6 +207,18 @@ class Field implements FieldInterface
     public function getParams()
     {
         return $this->params;
+    }
+
+    /**
+     * Set rule params
+     * 
+     * @param array $params rule params
+     *
+     * @return void
+     */
+    public function setParams(array $params)
+    {
+        $this->params = $params;
     }
 
     /**

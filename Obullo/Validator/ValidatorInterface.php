@@ -2,6 +2,8 @@
 
 namespace Obullo\Validator;
 
+use Closure;
+
 /**
  * Interface
  * 
@@ -69,22 +71,14 @@ interface ValidatorInterface
     public function setErrors(array $errors);
 
     /**
-     * Create a callback function
-     * for validator
+     * Creates a callback function
      * 
      * @param string  $func    name
      * @param closure $closure anonymous function
      * 
      * @return void
-     */
-    public function func($func, $closure);
-
-    /**
-     * Get form field data
-     *
-     * @return boolean
-     */
-    public function getFieldData();
+     */ 
+    public function callback($func, Closure $closure);
 
     /**
      * Returns to callback functions
@@ -92,6 +86,13 @@ interface ValidatorInterface
      * @return array
      */
     public function getCallbacks();
+
+    /**
+     * Get form field data
+     *
+     * @return boolean
+     */
+    public function getFieldData();
 
      /**
      * Get filtered value from validator data

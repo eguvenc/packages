@@ -23,7 +23,7 @@ class Captcha
      * @param Request $request request
      * @param Captcha $captcha captcha
      */
-    public function __construct(Request $request, Captcha $captcha)
+    public function __construct(Request $request, CaptchaInterface $captcha)
     { 
         $this->request = $request;
         $this->captcha = $captcha;
@@ -55,7 +55,7 @@ class Captcha
      * 
      * @return bool
      */    
-    public function isValid($value, $field)
+    public function isValid($value, Field $field)
     {   
         if ($this->request->isPost()) {
 

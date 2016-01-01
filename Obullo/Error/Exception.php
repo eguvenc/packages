@@ -16,14 +16,13 @@ class Exception
     /**
      * Get exception view with http stream body
      * 
-     * @param object  $e          exception object
-     * @param boolean $fatalError whether to fatal error
+     * @param object $e exception
      * 
      * @return string view
      */
-    public function withBody(\Exception $e, $fatalError = false)
+    public function withBody(\Exception $e)
     {
-        $html = $this->make($e, $fatalError);
+        $html = $this->make($e);
 
         $body = new Stream(fopen('php://temp', 'r+'));
         $body->write($html);
@@ -33,25 +32,24 @@ class Exception
     /**
      * Display the exception view
      * 
-     * @param object  $e          exception object
-     * @param boolean $fatalError whether to fatal error
+     * @param object $e exception
      * 
      * @return string view
      */
-    public function make(\Exception $e, $fatalError = false)
+    public function make(\Exception $e)
     {
         if (! $this->isDisplayable($e)) {
             return;
         }
 
-        return $this->display($e, $fatalError);
+        return $this->display($e);
     }
 
     /**
      * Check whether to exception is development error if 
      * not we display it to developer
      *
-     * @param object $e exception object
+     * @param object $e exception
      * 
      * @return boolean
      */
@@ -87,19 +85,15 @@ class Exception
     /**
      * Display exception view
      * 
-     * @param ErrorException $e          error exception object
-     * @param boolean        $fatalError bool
+     * @param ErrorException $e error exception object
      * 
      * @return string
      */
-    protected function display($e, $fatalError = false)
+    protected function display($e)
     {
         global $c;
         $request = $c['request'];
 
-        if ($fatalError == false) { 
-            unset($fatalError);  // Fatal error variable used in view file
-        }
         if (defined('STDIN')) {
             return $this->view('console', $e);
         }

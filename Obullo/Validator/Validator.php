@@ -45,8 +45,13 @@ class Validator implements ValidatorInterface
      * @param Translator $translator TranslatorInterface
      * @param Logger     $logger     LoggerInterface
      */
-    public function __construct(Container $container, Config $config, Request $request, Translator $translator, Logger $logger)
-    {    
+    public function __construct(
+        Container $container, 
+        Config $config, 
+        Request $request, 
+        Translator $translator, 
+        Logger $logger
+    ) {    
         mb_internal_encoding($config['locale']['charset']);
         
         $this->c = $container;
@@ -100,7 +105,7 @@ class Validator implements ValidatorInterface
                     continue;
                 }
                 $label = ( ! isset($row['label'])) ? $this->createLabel($row['field']) : $row['label']; // If the field label wasn't passed we use the field's name
-                $this->setRules($row['field'], $label, trim($row['rules'], '|'));  // Here we go!
+                $this->setRules($row['field'], $label, $row['rules']);  // Here we go!
             }
             return;
         }
@@ -138,23 +143,13 @@ class Validator implements ValidatorInterface
             $this->setMessage('Unable to find validation rules');
             return true;
         }
-        
         // Cycle through the rules for each field, match the 
         // corresponding $this->requestParams item && test for errors
         // 
-        foreach ($this->fieldData as $field => $row) {  // Fetch the data from the corresponding $this->requestParams array && cache it in the fieldData array.
-                                                        // Depending on whether the field name is an array or a string will determine where we get it from.
-
-            if (isset($this->requestParams[$field]) && $this->requestParams[$field] != '') {
-                $this->fieldData[$field]['postdata'] = $this->requestParams[$field];
-            }
-        
-            if (isset($row['rules'])) {  // If we have no rule don't run validation ( e.g. we can set errors using setError() function without validation set rules.)
-                $this->execute(
-                    $row,
-                    explode('|', $row['rules']),
-                    $this->fieldData[$field]['postdata']
-                );
+        foreach ($this->fieldData as $row) {
+            if (isset($row['rules'])) {
+                $row['rules'] = explode('|', $row['rules']);
+                $this->execute($row);
             } 
         }
         $totalErrors = sizeof($this->errorArray);         // Did we end up with any errors?
@@ -182,6 +177,7 @@ class Validator implements ValidatorInterface
             if (isset($row['postdata']) && ! is_null($row['postdata'])) {
 
                 $field = $row['field'];
+
                 if (isset($this->requestParams[$field])) {
                     $this->requestParams[$field] = $this->prepForForm($row['postdata']);
                 }
@@ -220,38 +216,17 @@ class Validator implements ValidatorInterface
     /**
      * Executes the Validation routines
      * 
-     * @param array  $row      field row    
-     * @param string $rules    rules
-     * @param array  $postdata post data
+     * @param array $row field row 
      * 
      * @return void
      */
-    protected function execute($row, $rules, $postdata = null)
+    protected function execute($row)
     {                   
         $field = $row['field'];
-
-        if (is_null($postdata)) {    // Isset Test. Typically this rule will only apply to checkboxes.
-
-            if (in_array('required', $rules)) {
-
-                if (! isset($this->errorArray['required'])) {
-                    $line = $this->translator['OBULLO:VALIDATOR:REQUIRED'];
-                    if ($line == false) {
-                        $line = 'The field was not set';
-                    }
-                } else {
-                    $line = $this->errorArray['required'];
-                }
-
-                $message = sprintf($line, $this->translateFieldname($row['label'])); // Build the error message
-                $this->fieldData[$field]['error'] = $message;                        // Save the error message
-
-                if (! isset($this->errorArray[$field])) {
-                    $this->errorArray[$field] = $message;
-                }
-            }
+        if (isset($this->requestParams[$field]) && $this->requestParams[$field] != '') {
+            $row['postdata'] = $this->fieldData[$field]['postdata'] = $this->requestParams[$field];
         }
-        $field = new Field($row, $postdata, $rules, $this->ruleArray);
+        $field = new Field($row, $this->ruleArray);
         $field->setValidator($this);
         $field->setDependency($this->c['dependency']);
         $field();
@@ -282,29 +257,19 @@ class Validator implements ValidatorInterface
         $params    = $field->getParams();
 
         if (! isset($this->errorArray[$rule])) {
-
             $RULE = strtoupper($rule);
             $line = $this->translator['OBULLO:VALIDATOR:'.$RULE];
-
-            if ($this->translator[$rule] == false) {
-                $line = 'Error message is not set correctly or unable to translation access an error message.';
-                $this->logger->error($line, array('rule' => $rule));
-            }
-
         } else {
             $line = $this->errorArray[$rule];
         }
-
         $param = (isset($params[0])) ? $params[0] : '';
 
-        if (isset($this->fieldData[$param]) && isset($this->fieldData[$param]['label'])) {
+        // Is the parameter we are inserting into the error message the name                                                                                  
+        // of another field ?  If so we need to grab its "field label"
 
-            // Is the parameter we are inserting into the error message the name                                                                                  
-            // of another field ?  If so we need to grab its "field label"
-        
+        if (isset($this->fieldData[$param]) && isset($this->fieldData[$param]['label'])) {        
             $param = $this->translateFieldname($this->fieldData[$param]['label']);
         }
-
         $message = sprintf(
             $line,
             $this->translateFieldname($label),
@@ -404,7 +369,7 @@ class Validator implements ValidatorInterface
      * 
      * @return void
      */
-    public function func($func, $closure)
+    public function callback($func, Closure $closure)
     {
         $this->callbackFunctions[$func] = $closure;
     }

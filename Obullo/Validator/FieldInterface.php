@@ -72,6 +72,15 @@ interface FieldInterface
      * @return array
      */
     public function getParams();
+    
+    /**
+     * Set rule params
+     * 
+     * @param array $params rule params
+     *
+     * @return void
+     */
+    public function setParams(array $params);
 
     /**
      * Sets field error

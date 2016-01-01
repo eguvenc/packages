@@ -13,14 +13,17 @@ use Obullo\Validator\FieldInterface as Field;
 class Md5
 {
     /**
-     * Md5
+     * Call next
      * 
-     * @param string $val value
+     * @param Field $next object
      * 
-     * @return bool
-     */    
-    public function func($val)
+     * @return object
+     */
+    public function __invoke(Field $next)
     {
-        return md5($val);
+        $field = $next;
+        $value = md5($field->getValue());
+        $field->setValue($value);
+        return $next();
     }
 }

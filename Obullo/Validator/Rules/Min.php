@@ -33,7 +33,6 @@ class Min
         return false;
     }
 
-
     /**
      * Minimum length
      * 
