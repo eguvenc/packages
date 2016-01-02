@@ -223,8 +223,15 @@ class Validator implements ValidatorInterface
     protected function execute($row)
     {                   
         $field = $row['field'];
-        if (isset($this->requestParams[$field]) && $this->requestParams[$field] != '') {
-            $row['postdata'] = $this->fieldData[$field]['postdata'] = $this->requestParams[$field];
+        if (strpos($field, '[') > 0) {
+            $newField = str_replace('[]', '', $field);
+            if (isset($this->requestParams[$newField]) && $this->requestParams[$newField] != '') {
+                $row['postdata'] = $this->fieldData[$field]['postdata'] = $this->requestParams[$newField];
+            }
+        } else {
+            if (isset($this->requestParams[$field]) && $this->requestParams[$field] != '') {
+                $row['postdata'] = $this->fieldData[$field]['postdata'] = $this->requestParams[$field];
+            }
         }
         $field = new Field($row, $this->ruleArray);
         $field->setValidator($this);
