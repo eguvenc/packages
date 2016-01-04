@@ -6,22 +6,18 @@ Doğrulama sınıfı yazdığınız kodu minimize ederek form girdilerini kapsam
 <ul>
     <li><a href="#how-it-works">Nasıl Çalışır ?</a>
         <ul>
+            <li><a href="#field">Field Nesnesi</a></li>
+            <li><a href="#next">Next Komutu</a></li>
             <li><a href="#rules-config">Kural Konfigürasyonu</a></li>
         </ul>
     </li>
 
-    <li><a href="#validation">Doğrulama</a>
+    <li><a href="#run">Çalıştırma</a>
         <ul>
             <li><a href="#setRules">$this->validator->setRules()</a></li>
             <li><a href="#isValid">$this->validator->isValid()</a></li>
             <li><a href="#ruleReference">Kural Referansı</a></li>
-        </ul>
-    </li>
-
-    <li>
-        <a href="#callback">Geri Çağırım</a>
-        <ul>
-            <li><a href="#func">$this->validator->callback()</a></li>
+            <li><a href="#funcReference">Fonksiyon Referansı</a></li>
         </ul>
     </li>
 
@@ -45,6 +41,13 @@ Doğrulama sınıfı yazdığınız kodu minimize ederek form girdilerini kapsam
         <ul>
             <li><a href="#getValue">$this->validator->getValue()</a></li>
             <li><a href="#setValue">$this->validator->setValue()</a></li>
+        </ul>
+    </li>
+
+    <li>
+        <a href="#callback">Geri Çağırım</a>
+        <ul>
+            <li><a href="#func">$this->validator->callback()</a></li>
         </ul>
     </li>
 
@@ -84,22 +87,6 @@ $this->validator->setRules('username', 'Username', 'required|min(5)|email');
 ```
 
 Örneğin min doğrulama kuralı <kbd>Obullo\Validator\Rules\Min</kbd> adlı sınıfı çağırır.
-
-```php
-class Min
-{
-    public function __invoke(Field $next)
-    {
-        $field = $next;
-        $value = $field->getValue();
-
-        if ($this->isValid($value)) {
-            return $next();
-        }
-        return false;
-    }
-}
-```
 
 <a name="field"></a>
 
@@ -162,21 +149,16 @@ class Required
         }
         return false;
     }
-
-    public function isValid($value)
-    {        
-        if (empty($value)) {
-            return false;
-        }
-        return true;
-    }
 }
 ```
 
-Eğer ilk kural <kbd>required</kbd> kuralı doğrulanırsa next komutu ile sonraki kural olan <kbd>email</kbd> kuralı çağırılmış olur.
+Daha iyi anlaşılması için aşağıdaki şemaya gözatabiliriz.
 
 ![Validation Rules](images/validation-rules.png?raw=true "Validation Rules")
 
+Şemaya göre ilk kural olan <kbd>required</kbd> kuralı, doğrulandığında $next() komutu ile sonraki kural olan <kbd>email</kbd> kuralını çağırır. Eğer email kuralı <b>true</b> değerine dönerse doğrulayıcı aynı elemente ait bir sonraki kuralı çağırır. Eğer metot <b>false</b> değerine dönerse bu durumda $next() komutu çalıştırılmaz, doğrulama hataları değişkenlere atanır. Bu durum herbir element için zincirleme bir şekilde devam eder.
+
+> **Not:** Doğrulama aşamasında bütün elementlerin sadece ilk kuralları çalışır (örn. required), birinci kuraldan sonraki diğer tüm elementlere ait kurallar isValid() metodunun cevabı true alındığında çalışırlar.
 
 <a name="rules-config"></a>
 
@@ -188,10 +170,8 @@ Her bir kurala ait sınıf <kbd>app/$env/validator.php</kbd> dosyası içerisind
 return array(
 
     'rules' => [
-
         'alpha' => 'Obullo\Validator\Rules\Alpha',
         'alphadash' => 'Obullo\Validator\Rules\AlphaDash',
-        .
         .
     ]
 );
@@ -199,10 +179,9 @@ return array(
 
 > **Not:** Bu dosya içerisinde değişiklik yaparak kendi doğrulama kurallarınızı oluşturabilirsiniz.
 
+<a name="run"></a>
 
-<a name="validation"></a>
-
-### Doğrulama
+### Çalıştırma
 
 Form doğrulama kuralları kontroller sınıfı içerisinde <kbd>setRules()</kbd> metodu ile oluşturulur ve <kbd>isValid</kbd> metodu ile tetiklenir.
 
@@ -210,17 +189,224 @@ Form doğrulama kuralları kontroller sınıfı içerisinde <kbd>setRules()</kbd
 
 #### $this->validator->setRules()
 
+Doğrulama kuralları nesne yöntemi ile aşağıdaki gibi tek tek,
+
 ```php
 if ($this->request->isPost()) {
 
-    $this->validator->setRules('email', 'Email', 'required|email');
+    $this->validator->setRules('username', 'Username', 'required|email');
     $this->validator->setRules('password', 'Password', 'required|min(6)');
+}
+```
+
+yada aşağıdaki gibi bir dizi aracılığı ile atanabilirler.
+
+```php
+if ($this->request->isPost()) {
+
+    $rules = array(
+       array(
+             'field'   => 'username',
+             'label'   => 'Username',
+             'rules'   => 'required'
+          ),
+       array(
+             'field'   => 'password',
+             'label'   => 'Password',
+             'rules'   => 'required|min(6)'
+          ),
+    );
+    $this->validator->setRules($rules);
 }
 ```
 
 <a name="isValid"></a>
 
 #### $this->validator->isValid()
+
+Doğrulama sınıfına tanımlanan kurallar $this->validator->isValid() metodu ile çalıştırılır.
+
+```php
+if ($this->request->isPost()) {
+
+    if ($this->validator->isValid()) {          
+        // success
+    } else {
+        // fail
+    }
+}
+```
+
+<a name="ruleReference"></a>
+
+#### Kural Referansı
+
+Aşağıdaki tabloda şu anki sürümde mevcut olan doğrulama kuralları gösteriliyor.
+
+<table>
+<thead>
+<tr>
+<th>Kural</th>
+<th>Açıklama</th>
+<th>Parametre</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td>alphaDash</td>
+    <td>Eğer form element değeri ( a-z A-Z_- ) karakterleri haricinde bir karakter içeriyorsa false değerine döner.</td>
+    <td>-</td>
+</tr>
+<tr>
+    <td>alnum</td>
+    <td>Eğer form element değeri ( a-z A-Z 0-9 ) karakterleri haricinde bir karakter içeriyorsa false değerine döner.</td>
+    <td>-</td>
+</tr>
+<tr>
+    <td>alnumDash</td>
+    <td>Eğer form element değeri ( a-z A-Z 0-9_- ) karakterleri haricinde bir karakter içeriyorsa false değerine döner.</td>
+    <td>-</td>
+</tr>
+<tr>
+    <td>alpha</td>
+    <td>Eğer form element değeri ( a-z A-Z ) karakterleri haricinde bir karakter içeriyorsa false değerine döner.</td>
+    <td>-</td>
+</tr>
+<tr>
+    <td>captcha</td>
+    <td>Eğer form element değeri geçerli captcha yanıtını içerimiyorsa false değerine geri döner.</td>
+    <td>-</td>
+</tr>
+<tr>
+    <td>csrf</td>
+    <td>Eğer form element değeri geçerli csrf değerini içerimiyorsa false değerine geri döner.</td>
+    <td>-</td>
+</tr>
+<tr>
+    <td>date</td>
+    <td>Eğer form element değeri girilen tarih formatı ile uyuşmuyorsa false değerine döner.</td>
+    <td>date(Y-m-d)</td>
+</tr>
+<tr>
+    <td>email</td>
+    <td>Eğer form elementi geçerli bir email adresi içermiyorsa false değerine döner. Kural parametresine true gönderilirse dns kontrolü de yapılabilir.
+    <td>email(true)</td>
+</td>
+</tr>
+<tr>
+    <td>exact</td>
+    <td>Eğer form element değerinin genişliği girilen değere tam olarak eşit değilse false değerine geri döner.</td>
+    <td>exact(n)</td>
+</tr>
+<tr>
+    <td>iban</td>
+    <td>Uluslarası banka esap numarası yani IBAN değeri geçerli değilse false değerine geri döner.</td>
+    <td>iban(COUNTRY_CODE) yada iban(COUNTRY_CODE)(false). Eğer ayrıca SEPA (Single Euro Payments Area) dışındaki ülkeler için doğrulama istenmiyorsa 2. parametre false girilir.</td>
+</tr>
+<tr>
+    <td>isBool</td>
+    <td>Eğer form element değeri boolean ( true / false or 0 / 1 ) değerlerini içermiyorsa false değerine geri döner.</td>
+    <td>-</td>
+</tr>
+<tr>
+    <td>isDecimal</td>
+    <td>Eğer form element değeri ondalık bir sayı değilse false değerine döner.</td>
+    <td>-</td>
+</tr>
+<tr>
+    <td>isJson</td>
+    <td>Eğer form element json değeri decode edilemiyorsa false değerine geri döner.</td>
+    <td>-</td>
+</tr>
+<tr>
+    <td>isNumeric</td>
+    <td>Eğer form element değeri sayısal karakterler içermiyorsa false değerine geri döner.</td>
+    <td>-</td>
+</tr>
+<tr>
+    <td>matches</td>
+    <td>Eğer form element girilen form element değeri ile eşleşmiyorsa false değerine döner.</td>
+    <td>matches(field_name)</td>
+</tr>
+<tr>
+    <td>max</td>
+    <td>Eğer form element değerinin genişliği girilen değerden büyük ise false değerine geri döner.</td>
+    <td>max(n)</td>
+</tr>
+<tr>
+    <td>min</td>
+    <td>Eğer form element değerinin genişliği girilen değerden küçük ise false değerine geri döner.</td>
+    <td>min(n)</td>
+</tr>
+<tr>
+    <td>recaptcha</td>
+    <td>Eğer form element değeri google recaptcha servisinden gelen yanıt ile eşleşmiyorsa false değerine geri döner.</td>
+    <td>-</td>
+</tr>
+<tr>
+    <td>required</td>
+    <td>Eğer form elementi boş ise false değerine döner.</td>
+    <td>-</td>
+</tr>
+</tbody>
+</table>
+
+<a name="funcReference"></a>
+
+#### Fonksiyon Referansı
+
+Aşağıdaki yardımcı fonksiyonlar ile doğrulama değerleri filtreden geçirilebilir yada değiştirilebilir.
+
+<table>
+<thead>
+<tr>
+<th>Fonksiyon</th>
+<th>Açıklama</th>
+<th>Parametre</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td>md5</td>
+    <td>Form element değerini php md5() fonksiyonu sonucuna dönüştürür.</td>
+    <td>-</td>
+</tr>
+<tr>
+    <td>trim</td>
+    <td>Form element değerini php trim() fonksiyonundan geçirir.</td>
+    <td>-</td>
+</tr>
+</tbody>
+</table>
+
+> **Not:** Kendi sınıflarınızı yaratarak özel kurallar ve fonksiyonlar oluşturabilirsiniz bunun için kendi kurallarınızı oluşturmak bölümüne bakınız.
+
+
+<a name="errors"></a>
+
+### Hatalar
+
+
+
+
+
+
+<a name="callback"></a>
+
+### Geri Çağırım
+
+
+
+
+
+
+
+
+
+
+
+#### $this->form->setErrors()
+
 
 ```php
 if ($this->request->isPost()) {
@@ -238,7 +424,7 @@ if ($this->request->isPost()) {
 }
 ```
 
-Form <kbd>setErrors()</kbd> metodu ile validator nesnesi form sınıfına referans olarak gönderilir. Böylece view kısmında form nesnesi üzerinden validator değerlerine ulaşılmış olur.
+Eğer doğrulama  başarısız olursa, form sınıfı <kbd>setErrors()</kbd> metodu ile validator nesnesi form sınıfına referans olarak gönderilir. Böylece view kısmında form nesnesi üzerinden validator değerlerine ulaşılmış olur.
 
 ```php
 <?php echo $this->form->getMessage() ?>
@@ -252,139 +438,6 @@ Form <kbd>setErrors()</kbd> metodu ile validator nesnesi form sınıfına refera
   <button type="submit" class="btn btn-default">Submit</button>
 </form>
 ```
-
-<a name="ruleReference"></a>
-
-#### Kural Referansı
-
-Aşağıda mevcut olan kurallar listesi gösteriliyor.
-
-<table>
-<thead>
-<tr>
-<th>Kural</th>
-<th>Parametre</th>
-<th>Açıklama</th>
-</tr>
-</thead>
-<tbody>
-
-<tr>
-    <td>alpha</td>
-    <td>-</td>
-    <td>Eğer form element değeri ( a-z A-Z 0-9 ) karakterleri haricinde bir karakter içeriyorsa false değerine döner.</td>
-</tr>
-<tr>
-    <td>alphaDash</td>
-    <td>-</td>
-    <td>Eğer form element değeri ( a-z A-Z 0-9_- ) karakterleri haricinde bir karakter içeriyorsa false değerine döner.</td>
-</tr>
-<tr>
-    <td>creditCard</td>
-    <td></td>
-    <td>Eğer form element değeri </td>
-</tr>
-<tr>
-    <td>date</td>
-    <td>date(Y-m-d)</td>
-    <td>Eğer form element değeri girilen tarih formatı ile uyuşmuyorsa false değerine döner.</td>
-</tr>
-<tr>
-    <td>email</td>
-    <td>email(true)</td>
-    <td>Eğer form elementi geçerli bir email adresi içermiyorsa false değerine döner. Kural parametresine true gönderilirse dns kontrolü de yapılır.
-</td>
-</tr>
-<tr>
-    <td>exact</td>
-    <td>exact(8)</td>
-    <td>Eğer form element değerinin genişliği girilen değere tam olarak eşit değilse false değerine geri döner.</td>
-</tr>
-<tr>
-    <td>iban</td>
-    <td>iban(COUNTRY_CODE) eğer SEPA ülkeleri istenmiyorsa ikinci parametre false girilir. iban(FR)(false)</td>
-    <td>Eğer form element değeri girilen ülke koduna ait geçerli IBAN kodu içermiyorsa false değerine geri döner.</td>
-</tr>
-<tr>
-    <td>isBool</td>
-    <td>-</td>
-    <td>Eğer form element değeri boolean ( true / false or 0 / 1 ) değerlerini içermiyorsa false değerine geri döner.</td>
-</tr>
-<tr>
-    <td>isDecimal</td>
-    <td>-</td>
-    <td>Eğer form element değeri decimal (0,2, 0,10) karakterler içermiyorsa false değerine döner.</td>
-</tr>
-<tr>
-    <td>isJson</td>
-    <td>-</td>
-    <td>Eğer form element json değeri decode edilemiyorsa false değerine geri döner.</td>
-</tr>
-<tr>
-    <td>isNumeric</td>
-    <td>No</td>
-    <td>Eğer form element değeri sayısal karakterler içermiyorsa false değerine geri döner.</td>
-    <td></td>
-</tr>
-<tr>
-    <td>matches</td>
-    <td>matches(field_name)</td>
-    <td>Eğer form element girilen form element değeri ile eşleşmiyorsa false değerine döner.</td>
-</tr>
-<tr>
-    <td>min</td>
-    <td>min(n)</td>
-    <td>Eğer form element değerinin genişliği girilen değerden küçük ise false değerine geri döner.</td>
-</tr>
-<tr>
-    <td>max</td>
-    <td>max(n)</td>
-    <td>Eğer form element değerinin genişliği girilen değerden büyük ise false değerine geri döner.</td>
-</tr>
-
-<tr>
-    <td>alphaNumeric</td>
-    <td>-</td>
-    <td>Returns false if the form element contains anything other than alpha-numeric characters.</td>
-</tr>
-<tr>
-    <td>alphaDash</td>
-    <td>-</td>
-    <td>Returns false if the form element contains anything other than alpha-numeric characters, underscores or dashes.</td>
-</tr>
-<tr>
-    <td>emails</td>
-    <td>emails(true)</td>
-    <td>Returns false if any value provided in a comma separated list is not a valid email. (If parameter true or 1 function also will do a dns query foreach emails)</td>
-</tr>
-<tr>
-    <td>required</td>
-    <td>-</td>
-    <td>Eğer form elementi boş ise false değerine döner.</td>
-    <td></td>
-</tr>
-<tr>
-    <td>validIp</td>
-    <td>-</td>
-    <td>Returns false if the supplied IP is not valid.</td>
-</tr>
-<tr>
-    <td>validBase64</td>
-    <td>-</td>
-    <td>Returns false if the supplied string contains anything other than valid Base64 characters.</td>
-</tr>
-<tr>
-    <td>noSpace</td>
-    <td>-</td>
-    <td>Returns false if the supplied string contains space characters.</td>
-</tr>
-<tr>
-    <td>callback_function(param)</td>
-    <td>callback_functionname(param)</td>
-    <td>You can define a custom callback function which is a class method located in your current model or just a function.</td>
-</tr>
-</tbody>
-</table>
 
 
 

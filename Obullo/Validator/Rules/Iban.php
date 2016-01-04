@@ -199,7 +199,7 @@ class Iban
         $value = $field->getValue();
         $params = $field->getParams();
         $countryCode = (isset($params[0])) ? $params[0] : '';
-        $allowNonSepa = (isset($params[1])) ? $params[1] : true;
+        $allowNonSepa = (isset($params[1])) ? (bool)$params[1] : true;
 
         if (empty($countryCode)) {
             $field->setError(self::NOTSUPPORTED);
