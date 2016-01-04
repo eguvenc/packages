@@ -150,8 +150,26 @@ $this->validator->setRules('username', 'Username', 'required|email');
 Eğer doğrulama başarılı ise field sınıfının $next metodu ile bir sonraki kuralı çağırması sağlanır.
 
 ```php
-if ($this->isValid($value)) {
-    return $next();
+class Required
+{
+    public function __invoke(Field $next)
+    {
+        $field = $next;
+        $value = $field->getValue();
+
+        if ($this->isValid($value)) {
+            return $next();
+        }
+        return false;
+    }
+
+    public function isValid($value)
+    {        
+        if (empty($value)) {
+            return false;
+        }
+        return true;
+    }
 }
 ```
 
