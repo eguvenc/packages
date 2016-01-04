@@ -22,7 +22,9 @@ class Required
     public function __invoke(Field $next)
     {
         $field = $next;
-        if ($this->isValid($field->getValue())) {
+        $value = $field->getValue();
+
+        if ($this->isValid($value)) {
             return $next();
         }
         return false;

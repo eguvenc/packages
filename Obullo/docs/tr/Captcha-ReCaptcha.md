@@ -40,8 +40,6 @@ ReCAPTCHA google şirketi tarafından geliştirilen popüler bir captcha servisi
 <li><a href="#method-reference">Fonksiyon Referansı</a></li>
 </ul>
 
-
-
 <a name="setup"></a>
 
 ### Kurulum

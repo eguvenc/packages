@@ -1,10 +1,16 @@
 
 ## Doğrulama Sınıfı
 
-Doğrulama sınıfı form girdilerini kapsamlı bir şekilde doğrulamayı ve yazdığınız kodu minimize etmeyi sağlar.
+Doğrulama sınıfı yazdığınız kodu minimize ederek form girdilerini kapsamlı bir şekilde doğrulamayı sağlar. Buna ek olarak doğrulama sınıfına ait konfigürasyon dosyasından kendi kurallarınızı tanımlayabilir yada geri çağırım fonksiyonu ile geçici kurallar oluşturabilirsiniz.
 
 <ul>
-    <li><a href="#form-validation">Form Doğrulama</a>
+    <li><a href="#how-it-works">Nasıl Çalışır ?</a>
+        <ul>
+            <li><a href="#rules-config">Kural Konfigürasyonu</a></li>
+        </ul>
+    </li>
+
+    <li><a href="#validation">Doğrulama</a>
         <ul>
             <li><a href="#setRules">$this->validator->setRules()</a></li>
             <li><a href="#isValid">$this->validator->isValid()</a></li>
@@ -15,8 +21,7 @@ Doğrulama sınıfı form girdilerini kapsamlı bir şekilde doğrulamayı ve ya
     <li>
         <a href="#callback">Geri Çağırım</a>
         <ul>
-            <li><a href="#func">$this->validator->func()</a></li>
-            <li><a href="#setMessage">$this->setMessage()</a></li>
+            <li><a href="#func">$this->validator->callback()</a></li>
         </ul>
     </li>
 
@@ -27,6 +32,8 @@ Doğrulama sınıfı form girdilerini kapsamlı bir şekilde doğrulamayı ve ya
             <li><a href="#setErrors">$this->validator->setErrors()</a></li>
             <li><a href="#getError">$this->validator->getError()</a></li>
             <li><a href="#getErrors">$this->validator->getErrors()</a></li>
+            <li><a href="#setMessage">$this->validator->setMessage()</a></li>
+            <li><a href="#setMessage">$this->validator->getMessages()</a></li>
             <li><a href="#getErrorString">$this->validator->getErrorString()</a></li>
             <li><a href="#setErrorDelimiters">$this->validator->setErrorDelimiters()</a></li>
             <li><a href="#isError">$this->validator->isError()</a></li>
@@ -42,7 +49,7 @@ Doğrulama sınıfı form girdilerini kapsamlı bir şekilde doğrulamayı ve ya
     </li>
 
     <li>
-        <a href="#values">Form Metotları</a>
+        <a href="#values">Form Sınıfı</a>
         <ul>
             <li><a href="#formSetError">$this->form->setError()</a></li>
             <li><a href="#formSetErrors">$this->form->setErrors()</a></li>
@@ -58,7 +65,6 @@ Doğrulama sınıfı form girdilerini kapsamlı bir şekilde doğrulamayı ve ya
 
     <li><a href="#validation-tutorial">Ek Bilgiler</a>
         <ul>
-            <li><a href="#bind">Nesne Tutturma ( bind )</a></li>
             <li><a href="#prepping-data">Veri Filtreleme</a></li>
             <li><a href="#translating-field-names">Çoklu Diller Kullanmak</a></li>
             <li><a href="#using-arrays-as-field-name">Girdi Alanlarında Array Kullanmak</a></li>
@@ -67,9 +73,106 @@ Doğrulama sınıfı form girdilerini kapsamlı bir şekilde doğrulamayı ve ya
     </li>
 </ul>
 
-<a name="form-validation"></a>
+<a name="how-it-works"></a>
 
-### Form Doğrulama
+### Nasıl Çalışır
+
+Doğrulama sınıfı <kbd>setRules</kbd> metodu içerisine girilen ilk parametre form elementine ait isim, ikinci parametre etiket ve üçüncü parametre ise doğrulama kurallarıdır. Her doğrulama kuralı bir nesnedir.
+
+```php
+$this->validator->setRules('username', 'Username', 'required|min(5)|email');
+```
+
+Örneğin min doğrulama kuralı <kbd>Obullo\Validator\Rules\Min</kbd> adlı sınıfı çağırır.
+
+```php
+class Min
+{
+    public function __invoke(Field $next)
+    {
+        $field = $next;
+        $value = $field->getValue();
+
+        if ($this->isValid($value)) {
+            return $next();
+        }
+        return false;
+    }
+}
+```
+
+<a name="field"></a>
+
+#### Field Nesnesi
+
+Her bir kural sınıfı içerisindeki <kbd>invoke</kbd> metodu içerisinden <kbd>Field $field</kbd> nesnesi gönderilir ve __invoke metodu ile kurallar çalıştırılmış olur. Field nesnesi get metotları form elementine ait özellikleri verir. Aşağıdaki örnekte <kbd>min(5)</kbd> kuralından elde edilen değerler gözüküyor.
+
+
+```php
+echo $field->getValue();  // username@example.com
+echo $field->getName();   // username
+echo $field->getLabel();  // Username
+print_r($field->getParams());  // 5
+```
+
+Set metotları ile element değerleri yenilenebilir yada forma bir mesaj gönderilebilir.
+
+```php
+$field->setValue("Field post value");
+$field->setError("Field error");
+$field->setMessage("Field form message");
+```
+
+<a name="next"></a>
+
+#### $next() Komutu
+
+Eğer doğrulama başarılı ise field sınıfının $next metodu ile bir sonraki kuralı çağırması sağlanır.
+
+```php
+if ($this->isValid($value)) {
+    return $next();
+}
+```
+
+Örneğin eğer <kbd>min(5)</kbd> kuralı doğrulanırsa next komutu ile sonraki <kbd>email</kbd> kuralı çağırılmış olur.
+
+
+```php
+$this->validator->setRules('username', 'Username', 'required|min(5)|email');
+```
+
+![Validation Rules](images/validation-rules.png?raw=true "Validation Rules")
+
+
+
+<a name="rules-config"></a>
+
+#### Kural Konfigürasyonu
+
+Her bir kurala ait sınıf <kbd>app/$env/validator.php</kbd> dosyası içerisinde aşağıdaki gibi tanımlıdır.
+
+```php
+return array(
+
+    'rules' => [
+
+        'alpha' => 'Obullo\Validator\Rules\Alpha',
+        'alphadash' => 'Obullo\Validator\Rules\AlphaDash',
+        'alnum' => 'Obullo\Validator\Rules\Alnum',
+        'alnumdash' => 'Obullo\Validator\Rules\AlnumDash',
+        .
+        .
+    ]
+);
+```
+
+> **Not:** Bu dosya içerisinde değişiklik yaparak kendi doğrulama kurallarınızı oluşturabilirsiniz.
+
+
+<a name="validation"></a>
+
+### Doğrulama
 
 Form doğrulama kuralları kontroller sınıfı içerisinde <kbd>setRules()</kbd> metodu ile oluşturulur ve <kbd>isValid</kbd> metodu ile tetiklenir.
 
@@ -91,9 +194,6 @@ if ($this->request->isPost()) {
 
 ```php
 if ($this->request->isPost()) {
-
-    $this->validator->setRules('email', 'Email', 'required|email');
-    $this->validator->setRules('password', 'Password', 'required|min(6)');
 
     if ($this->validator->isValid()) {          
 

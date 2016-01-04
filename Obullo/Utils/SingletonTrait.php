@@ -12,14 +12,14 @@ trait SingletonTrait
     /**
      * Returns the singleton instance of this class.
      *
-     * @param object $c Container
+     * @param object $container Container
      * 
      * @return singleton instance.
      */
-    public static function getInstance(Container $c)
+    public static function getInstance(Container $container)
     {
         if (null === self::$instance) {
-            self::$instance = new static($c);
+            self::$instance = new static($container);
         }
         return self::$instance;
     }
@@ -31,7 +31,9 @@ trait SingletonTrait
      */
     public function __clone()
     {
-        throw new RuntimeException(sprintf('Cloning %s is not allowed.', __CLASS__));
+        throw new RuntimeException(
+            sprintf('Cloning %s is not allowed.', __CLASS__)
+        );
     }
     
     /**
@@ -41,6 +43,8 @@ trait SingletonTrait
      */
     public function __wakeup()
     {
-        throw new RuntimeException(sprintf('Unserializing %s is not allowed.', __CLASS__));
+        throw new RuntimeException(
+            sprintf('Unserializing %s is not allowed.', __CLASS__)
+        );
     }
 }
