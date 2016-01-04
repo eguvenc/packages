@@ -75,7 +75,7 @@ Doğrulama sınıfı yazdığınız kodu minimize ederek form girdilerini kapsam
 
 <a name="how-it-works"></a>
 
-### Nasıl Çalışır
+### Nasıl Çalışır ?
 
 Doğrulama sınıfı <kbd>setRules</kbd> metodu içerisine girilen ilk parametre form elementine ait isim, ikinci parametre etiket ve üçüncü parametre ise doğrulama kurallarıdır. Her doğrulama kuralı bir nesnedir.
 
@@ -135,11 +135,11 @@ if ($this->isValid($value)) {
 }
 ```
 
-Örneğin eğer <kbd>min(5)</kbd> kuralı doğrulanırsa next komutu ile sonraki <kbd>email</kbd> kuralı çağırılmış olur.
+Örneğin eğer <kbd>required</kbd> kuralı doğrulanırsa next komutu ile sonraki <kbd>email</kbd> kuralı çağırılmış olur.
 
 
 ```php
-$this->validator->setRules('username', 'Username', 'required|min(5)|email');
+$this->validator->setRules('username', 'Username', 'required|email');
 ```
 
 ![Validation Rules](images/validation-rules.png?raw=true "Validation Rules")
