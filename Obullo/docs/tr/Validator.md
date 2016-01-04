@@ -105,14 +105,28 @@ class Min
 
 #### Field Nesnesi
 
-Her bir kural sınıfı içerisindeki <kbd>invoke</kbd> metodu içerisinden <kbd>Field $field</kbd> nesnesi gönderilir ve __invoke metodu ile kurallar çalıştırılmış olur. Field nesnesi get metotları form elementine ait özellikleri verir. Aşağıdaki örnekte <kbd>min(5)</kbd> kuralından elde edilen değerler gözüküyor.
+Her bir kural sınıfı içerisinden <kbd>invoke</kbd> metodu içerisine <kbd>Field $field</kbd> nesnesi gönderilir ve __invoke metodu ile kurallar çalıştırılmış olur. Field nesnesi get metotları, form elementine ait özellikleri verir. Aşağıdaki örnekte <kbd>min(5)</kbd> kuralından elde edilen değerler gözüküyor.
 
 
 ```php
-echo $field->getValue();  // username@example.com
-echo $field->getName();   // username
-echo $field->getLabel();  // Username
-print_r($field->getParams());  // 5
+class Min
+{
+    public function __invoke(Field $next)
+    {
+        echo $field->getValue();  // username@example.com
+        echo $field->getName();   // username
+        echo $field->getLabel();  // Username
+        print_r($field->getParams());  // 5
+
+        $field = $next;
+        $value = $field->getValue();
+
+        if ($this->isValid($value)) {
+            return $next();
+        }
+        return false;
+    }
+}
 ```
 
 Set metotları ile element değerleri yenilenebilir yada forma bir mesaj gönderilebilir.
@@ -127,6 +141,12 @@ $field->setMessage("Field form message");
 
 #### $next() Komutu
 
+Aşağıdaki örneği göz önüne alırsak,
+
+```php
+$this->validator->setRules('username', 'Username', 'required|email');
+```
+
 Eğer doğrulama başarılı ise field sınıfının $next metodu ile bir sonraki kuralı çağırması sağlanır.
 
 ```php
@@ -135,15 +155,9 @@ if ($this->isValid($value)) {
 }
 ```
 
-Örneğin eğer <kbd>required</kbd> kuralı doğrulanırsa next komutu ile sonraki <kbd>email</kbd> kuralı çağırılmış olur.
-
-
-```php
-$this->validator->setRules('username', 'Username', 'required|email');
-```
+Eğer ilk kural <kbd>required</kbd> kuralı doğrulanırsa next komutu ile sonraki kural olan <kbd>email</kbd> kuralı çağırılmış olur.
 
 ![Validation Rules](images/validation-rules.png?raw=true "Validation Rules")
-
 
 
 <a name="rules-config"></a>
@@ -159,8 +173,6 @@ return array(
 
         'alpha' => 'Obullo\Validator\Rules\Alpha',
         'alphadash' => 'Obullo\Validator\Rules\AlphaDash',
-        'alnum' => 'Obullo\Validator\Rules\Alnum',
-        'alnumdash' => 'Obullo\Validator\Rules\AlnumDash',
         .
         .
     ]
