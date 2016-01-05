@@ -350,7 +350,6 @@ class Form
     public function getValidationErrors($prefix = '', $suffix = '')
     {
         if ($this->c->active('validator')) {
-            
             return $this->c['validator']->getErrorString($prefix, $suffix);
         }
     }
@@ -366,10 +365,21 @@ class Form
      */
     public function getError($field, $prefix = '', $suffix = '')
     {
-        if ($this->c->active('validator')) {  // If we have validator object
-
+        if ($this->c->active('validator') && $this->isError($field)) {  // If we have validator object
             return $this->c['validator']->getError($field, $prefix, $suffix);
         }
+    }
+
+    /**
+     * Check field has error
+     * 
+     * @param string $field name
+     * 
+     * @return boolean
+     */
+    public function isError($field)
+    {
+        return $this->c['validator']->isError($field);
     }
 
     /**
@@ -470,7 +480,7 @@ class Form
             $field = $fieldData[$field]['postdata'];
         }
         if (is_array($field)) {
-            if (! in_array($value, $field)) {
+            if (! $this->inArray($value, $field)) {
                 return '';
             }
         } else {
@@ -479,6 +489,29 @@ class Form
             }
         }
         return $selectedString;  // ' selected="selected"'
+    }
+
+    /**
+     * Search multi dimensional array
+     * 
+     * @param mixed $search value
+     * @param array $array  array
+     * 
+     * @return boolean
+     */
+    protected function inArray($search, $array = array())
+    {
+        $inArray = false;
+        foreach ($array as $val) {
+            if (is_array($val)) {
+                return $this->inArray($search, $val);
+            } else {
+                if ($search == $val) {
+                    $inArray = true;
+                }
+            }
+        }
+        return $inArray;
     }
 
     /**

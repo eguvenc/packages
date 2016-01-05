@@ -227,7 +227,8 @@ class Validator implements ValidatorInterface
             $newField = str_replace('[]', '', $field);
             if (isset($this->requestParams[$newField]) && $this->requestParams[$newField] != '') {
                 $row['postdata'] = $this->fieldData[$field]['postdata'] = $this->requestParams[$newField];
-            }
+            } 
+            
         } else {
             if (isset($this->requestParams[$field]) && $this->requestParams[$field] != '') {
                 $row['postdata'] = $this->fieldData[$field]['postdata'] = $this->requestParams[$field];
