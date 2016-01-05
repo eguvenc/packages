@@ -48,6 +48,7 @@ Doğrulama sınıfı yazdığınız kodu minimize ederek form girdilerini kapsam
     <li>
         <a href="#formClass">Form Sınıfı</a>
         <ul>
+            <li><a href="#formSetMessage">$this->form->setMessage()</a></li>
             <li><a href="#formSetErrors">$this->form->setErrors()</a></li>
             <li><a href="#formGetError">$this->form->getError()</a></li>
             <li><a href="#formIsError">$this->form->isError()</a></li>
@@ -81,13 +82,13 @@ Doğrulama sınıfı yazdığınız kodu minimize ederek form girdilerini kapsam
 
 ### Nasıl Çalışır ?
 
-Doğrulama sınıfı <kbd>setRules</kbd> metodu içerisine girilen ilk parametre form elementine ait isim, ikinci parametre etiket ve üçüncü parametre ise doğrulama kurallarıdır. Her doğrulama kuralı bir nesnedir.
+Doğrulama kuralları doğrulama sınıfı <kbd>setRules</kbd> metodu ile oluşturulur. Bu metot içerisine girilen ilk parametre form elementine ait isim, ikinci parametre etiket ve üçüncü parametre ise kurallardır. Her doğrulama kuralı bir nesnedir. Örneğin min doğrulama kuralı <kbd>Obullo\Validator\Rules\Min</kbd> adlı sınıfı çağırır. Aşağıda  örnek bir form doğrulama kuralının oluşturuluşu gösteriliyor.
 
 ```php
 $this->validator->setRules('username', 'Username', 'required|min(5)|email');
 ```
 
-Örneğin min doğrulama kuralı <kbd>Obullo\Validator\Rules\Min</kbd> adlı sınıfı çağırır.
+
 
 <a name="field"></a>
 
@@ -129,13 +130,13 @@ $field->setMessage("Field form message");
 
 #### $next() Komutu
 
-Aşağıdaki örneği göz önüne alırsak,
+Next komutu ile doğrulama kuralının kendinden bir sonraki doğrulama kuralını çağırması sağlanır. Aşağıdaki örneği göz önüne alırsak,
 
 ```php
 $this->validator->setRules('username', 'Username', 'required|email');
 ```
 
-Eğer doğrulama başarılı ise field sınıfının $next metodu ile bir sonraki kuralı çağırması sağlanır.
+Aşağıdaki örnekte görüldüğü gibi required kuralı eğer doğrulamayı geçerse bu kural içerisindeki $next() fonksiyonu bir sonraki kuralı çağırır.
 
 ```php
 class Required
@@ -159,7 +160,7 @@ Daha iyi anlaşılması için aşağıdaki şemaya gözatabiliriz.
 
 Şemaya göre ilk kural olan <kbd>required</kbd> kuralı, doğrulandığında $next() komutu ile sonraki kural olan <kbd>email</kbd> kuralını çağırır. Eğer email kuralı <b>true</b> değerine dönerse doğrulayıcı aynı elemente ait bir sonraki kuralı çağırır. Eğer metot <b>false</b> değerine dönerse bu durumda $next() komutu çalıştırılmaz, doğrulama hataları değişkenlere atanır. Bu durum herbir element için zincirleme bir şekilde devam eder.
 
-> **Not:** Doğrulama aşamasında bütün elementlerin sadece ilk kuralları çalışır (örn. required), birinci kuraldan sonraki diğer tüm elementlere ait kurallar isValid() metodunun cevabı true alındığında çalışırlar.
+> **Not:** Doğrulama aşamasında bütün elementlerin sadece ilk kuralları çalışır (örn. required), birinci kuraldan sonraki diğer tüm elementlere ait kurallar isValid() metodunun cevabı true alındığında çağrılırlar.
 
 <a name="rules-config"></a>
 
@@ -455,12 +456,12 @@ $this->validator->setMessage("Please choose an option.");
 Form mesajı olarak kaydedilen hatalara bir dizi içerisinde geri döner.
 
 ```php
-[messages] => Array
-    (
-        [0] => Form validation failed.
-        [1] => Please choose a color.
-        [2] => Please choose a hobby.
-    )
+Array
+(
+    [0] => Form validation failed.
+    [1] => Please choose a color.
+    [2] => Please choose a hobby.
+)
 ```
 <a name="getErrorString"></a>
 
@@ -565,6 +566,12 @@ print_r($fields);
 
 Form sınıfı get fonksiyonları doğrulama sınıfı içerisideki verileri view dosyalarında göstermek, set fonksiyonları ise form nesnesine veri göndermek için kullanılır.
 
+<a name="formSetMessage"></a>
+
+#### $this->form->setMessage($message)
+
+Form messages anahtarı bir form mesajı ekler.
+
 <a name="formSetErrors"></a>
 
 #### $this->form->setErrors(object $validator | array $errors)
@@ -575,14 +582,10 @@ Form sınıfına doğrulama nesnesinden dönen hata ve değerleri göndermek iç
 if ($this->request->isPost()) {
 
     if ($this->validator->isValid()) {          
-
         $this->form->success('Success');
-
     } else {
-
         $this->form->error('Fail');
     }
-
     $this->form->setErrors($this->validator);
 }
 ```
@@ -670,12 +673,17 @@ echo $this->form->getError('options[]');
 
 #### $this->form->getErrorLabel($field)
 
-
 <a name="formGetErrors"></a>
 
 #### $this->form->getErrors()
 
 Shows an individual error message associated with the field name supplied to the function.
+
+<a name="formGetValidationErrors"></a>
+
+#### $this->form->getValidationErrors();
+
+<kbd>$validator->getErrorString()</kbd> metoduna geri döner.
 
 <a name="formGetValue"></a>
 
