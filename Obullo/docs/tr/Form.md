@@ -1,8 +1,6 @@
 
 ## Form Sınıfı
 
-------
-
 Form sınıfı özel form mesajlarını, validator sınıfı çıktılarını, işlem sonuçlarını, ve form hatalarını yönetir.
 
 <ul>

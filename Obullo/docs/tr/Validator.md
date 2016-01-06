@@ -54,7 +54,6 @@ Doğrulama sınıfı yazdığınız kodu minimize ederek form girdilerini kapsam
             <li><a href="#formIsError">$this->form->isError()</a></li>
             <li><a href="#formGetErrorClass">$this->form->getErrorClass()</a></li>
             <li><a href="#formGetErrorLabel">$this->form->getErrorLabel()</a></li>
-            <li><a href="#formGetErrors">$this->form->getErrors()</a></li>
             <li><a href="#formGetValue">$this->form->getValue()</a></li>
             <li><a href="#formSetValue">$this->form->setValue()</a></li>
             <li><a href="#formsetSelect">$this->form->setSelect()</a></li>
@@ -72,7 +71,7 @@ Doğrulama sınıfı yazdığınız kodu minimize ederek form girdilerini kapsam
 
     <li><a href="#validation-tutorial">Ek Bilgiler</a>
         <ul>
-            <li><a href="#translating-field-names">Çoklu Diller Kullanmak</a></li>
+            <li><a href="#translating-field-names">Farklı Dillere Çeviri</a></li>
             <li><a href="#create-your-own-rules">Kendi Kurallarınızı Oluşturun</a></li>
         </ul>    
     </li>
@@ -87,8 +86,6 @@ Doğrulama kuralları doğrulama sınıfı <kbd>setRules</kbd> metodu ile oluşt
 ```php
 $this->validator->setRules('username', 'Username', 'required|min(5)|email');
 ```
-
-
 
 <a name="field"></a>
 
@@ -592,9 +589,15 @@ if ($this->request->isPost()) {
 
 Form post işleminde sonra <kbd>validator</kbd> nesnesi form sınıfına referans olarak gönderilir. Böylece view kısmında form nesnesi üzerinden validator değerlerine ulaşılmış olur.
 
-```php
-<?php echo $this->form->getMessage() ?>
+Form mesajları
 
+```php
+echo $this->form->getMessage()
+```
+
+Form hataları
+
+```php
  <form name="example" action="/examples/forms/form" method="POST">
     <?php echo $this->form->getError('email') ?>
     <input type="email" name="email" value="<?php echo $this->form->getValue('email') ?>">
@@ -621,7 +624,7 @@ echo $this->form->getError('email', $prefix = '<p>', $suffix = '</p>')
 The Email field is required.
 ```
 
-Validator sınıfı array türündeki alanları da destekler.
+Doğrulama sınıfı array türündeki alanları da destekler.
 
 ```php
 <input type="text" name="options[]" value="" size="50" />
@@ -633,7 +636,7 @@ Bu türden bir element isminin doğrulaması için form kuralına da aynı isiml
 $this->validator->setRules('options[]', 'Options', 'required');
 ```
 
-Eğer checkbox türünde birden fazla alan isteniyorsa,
+Eğer checkbox element türünde birden fazla alan isteniyorsa,
 
 ```php
 <input type="checkbox" name="options[]" value="red" />
@@ -665,19 +668,55 @@ echo $this->form->getError('options[]');
 
 #### $this->form->isError($field)
 
+Eğer girilen alana ait bir hata varsa true aksi durumda false değerine döner.
+
 <a name="formGetErrorClass"></a>
 
 #### $this->form->getErrorClass($field)
+
+Eğer girilen alana ait hata dönerse <kbd>app/$env/form.php</kbd> dosyasından
+
+```php
+'error' => [
+    'class' => 'has-error has-feedback',
+]
+```
+<kbd>error > class</kbd> konfigürasyonu
+
+```php
+echo $this->form->getErrorClass('email')
+```
+
+aşağıdaki gibi çıktılanır.
+
+
+```php
+has-error has-feedback    
+```
 
 <a name="formGetErrorLabel"></a>
 
 #### $this->form->getErrorLabel($field)
 
-<a name="formGetErrors"></a>
+Eğer girilen alana ait hata dönerse <kbd>app/$env/form.php</kbd> dosyasından
 
-#### $this->form->getErrors()
+```php
+'error' => [
+    'label' => '<label class="control-label" for="%s">%s</label>
+]
+```
 
-Shows an individual error message associated with the field name supplied to the function.
+<kbd>error > label</kbd> konfigürasyonu
+
+```php
+echo $this->form->getErrorLabel('email')
+```
+
+aşağıdaki gibi çıktılanır.
+
+```php
+<label class="control-label" for="field">Label</label>
+```
 
 <a name="formGetValidationErrors"></a>
 
@@ -689,27 +728,26 @@ Shows an individual error message associated with the field name supplied to the
 
 #### $this->form->getValue()
 
-Returns to validated field value.
+Doğrulanmış bir form elementinin son değerine geri döner.
 
 <a name="formSetValue"></a>
 
-#### $this->form->setValue()
+#### $this->form->setValue($field, $value = '')
 
-Permits you to set the value of an input form or textarea. You must supply the field name via the first parameter of the function. The second (optional) parameter allows you to set a default value for the form. Example:
+Input yada textarea türündeki bir form elementine değer girmeyi sağlar. İlk parametreye input ismi girilmek zorundadır. İkinci parametre opsiyoneldir ve input alanı için varsayılan değeri tanımlar.
 
 ```php
-<input type="text" name="quantity" value="<?php echo $this->form->setValue('quantity', '0'); ?>" size="50" />
+<input type="text" name="quantity" 
+value="<?php echo $this->form->setValue('quantity', '0'); ?>" size="50" />
 ```
-The above form will show "0" when loaded for the first time.
 
+Yukarıdaki örnekte form elementi sayfa ilk yüklendiğinde 0 değerini gösterir.
 
 <a name="formSetSelect"></a>
 
 #### $this->form->setSelect()
 
-If you use a <kbd>(select)</kbd> menu, this function permits you to display the menu item that was selected. The first parameter must contain the name of the select menu, the second parameter must contain the value of each item, and the third (optional) parameter lets you set an item as the default (use boolean true/false).
-
-Example:
+Eğer bir <kbd>select</kbd> menü kullanıyorsanız, bu fonksiyon menüye ait seçilen opsiyonları göstermeyi sağlar. İlk parametre select menü ismini belirler, ikinci parametre ise her bir opsiyon değerini içermek zorundadır. Üçüncü parametre ise opsiyoneldir, opsiyon değerinin varsayılan olarak gösterilip gösterilmeyeceğini belirler ve boolean tipinde olmalıdır.
 
 ```php
 <select name="myselect">
@@ -754,7 +792,6 @@ Green
 </label>
 ```
 
-
 <a name="formSetRadio"></a>
 
 #### $this->form->setRadio()
@@ -762,16 +799,59 @@ Green
 Form post işleminden sonra seçilen radio element değerini seçili hale getirmek için aşağıdaki yöntem kullanılır, $this->form->setCheckbox() metodu ile aynı işlevselliğe sahiptir.
 
 ```php
-<input type="radio" name="myradio" value="1" <?php echo $this->form->setRadio('myradio', '1', true); ?> />
-<input type="radio" name="myradio" value="2" <?php echo $this->form->setRadio('myradio', '2'); ?> />
+<input type="radio" name="myradio" value="1" <?php echo $this->form->setRadio('myradio', '1', true) ?> />
+<input type="radio" name="myradio" value="2" <?php echo $this->form->setRadio('myradio', '2') ?> />
 ```
+
+> **Not:** Form sınıfı ile ilgili daha ayrıntılı bilgi için [Form.md](Form.md) dökümentasyonuna göz atın.
+
 
 <a name="callbackFunc"></a>
 
 ### Geri Çağırım
 
+Geri çağırım metotları özel doğrulama fonksiyonları oluşturmak yada opsiyonel olarak array türündeki alanları doğrulamak için kullanılabilir.
+
 <a name="callback"></a>
 
-#### $this->validator->callback()
+#### $this->validator->callback(Closure $function($field))
 
-<a name="values"></a>
+Aşağıdaki örnekte olduğu gibi <kbd>$field</kbd> nesnesi tanımlı olan bütün callback fonksiyonlarına gönderilir ve böylece gönderilen alana ait özellikler isimsiz fonksiyon içerisinde elde edilmiş olur. 
+
+```php
+$this->validator->setRules('email', 'Email', 'required|email');
+$this->validator->setRules('options[]', 'Options', 'callback_options');
+$this->validator->callback(
+    'callback_options',
+    function ($field) {
+        $value = $field->getValue();
+        if (empty($value)) {
+            $field->setMessage('Please choose a color.');
+            $field->setError('Please choose a color.');
+            return false;
+        }
+        return $field();
+    }
+);
+```
+
+Özel fonksiyonun çalışabilmesi için fonksiyon adının doğrulama kuralları içerisine de eklenmesi gerekir.
+
+```php
+$this->validator->setRules('options[]', 'Options', 'callback_options');
+```
+
+Yukarıdaki örneği dikkate alırsak isValid() metodunu çalıştırdığımızda
+
+```php
+if ($this->validator->isValid()) {          
+    $this->form->success('Form validation success.');
+} else {
+    $this->form->error('Form validation failed.');
+}
+```
+
+eğer <kbd>options</kbd> elementinin değeri boş gelirse <kbd>Please choose a color.</kbd> hataları ile karşılaşmamız gerekir.
+
+
+> **Not:** Eğer birden fazla özel fonksiyon oluşturulmak isteniyorsa callback() metodu tekrar kullanılmalıdır.
