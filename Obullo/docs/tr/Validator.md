@@ -81,7 +81,7 @@ Doğrulama sınıfı yazdığınız kodu minimize ederek form girdilerini kapsam
 
 ### Nasıl Çalışır ?
 
-Doğrulama kuralları doğrulama sınıfı <kbd>setRules</kbd> metodu ile oluşturulur. Bu metot içerisine girilen ilk parametre form elementine ait isim, ikinci parametre etiket ve üçüncü parametre ise kurallardır. Her doğrulama kuralı bir nesnedir. Örneğin min doğrulama kuralı <kbd>Obullo\Validator\Rules\Min</kbd> adlı sınıfı çağırır. Aşağıda  örnek bir form doğrulama kuralının oluşturuluşu gösteriliyor.
+Doğrulama kuralları doğrulama sınıfı <kbd>setRules</kbd> metodu ile oluşturulur. Bu metot içerisine girilen ilk parametre form elementine ait isim, ikinci parametre etiket ve üçüncü parametre ise kurallardır. Her doğrulama kuralı bir nesnedir. Örneğin min doğrulama kuralı <kbd>Obullo\Validator\Rules\Min</kbd> adlı sınıfı çağırır. Aşağıda  örnekte bir form doğrulama kuralının oluşturuluşu gösteriliyor.
 
 ```php
 $this->validator->setRules('username', 'Username', 'required|min(5)|email');
@@ -127,13 +127,13 @@ $field->setMessage("Field form message");
 
 #### $next() Komutu
 
-Next komutu ile doğrulama kuralının kendinden bir sonraki doğrulama kuralını çağırması sağlanır. Aşağıdaki örneği göz önüne alırsak,
+Next komutu ile doğrulama kuralının kendinden bir sonraki doğrulama kuralını çağırması sağlanır.
 
 ```php
 $this->validator->setRules('username', 'Username', 'required|email');
 ```
 
-Aşağıdaki örnekte görüldüğü gibi required kuralı eğer doğrulamayı geçerse bu kural içerisindeki $next() fonksiyonu bir sonraki kuralı çağırır.
+Aşağıdaki örneği göz önüne alırsak, required kuralı eğer doğrulamayı geçerse bu kural içerisindeki $next() fonksiyonu bir sonraki kuralı çağırır.
 
 ```php
 class Required
@@ -151,13 +151,13 @@ class Required
 }
 ```
 
-Daha iyi anlaşılması için aşağıdaki şemaya gözatabiliriz.
+Daha iyi anlaşılması için akış şemasına gözatalım.
 
 ![Validation Rules](images/validation-rules.png?raw=true "Validation Rules")
 
 Şemaya göre ilk kural olan <kbd>required</kbd> kuralı, doğrulandığında $next() komutu ile sonraki kural olan <kbd>email</kbd> kuralını çağırır. Eğer email kuralı <b>true</b> değerine dönerse doğrulayıcı aynı elemente ait bir sonraki kuralı çağırır. Eğer metot <b>false</b> değerine dönerse bu durumda $next() komutu çalıştırılmaz, doğrulama hataları değişkenlere atanır. Bu durum herbir element için zincirleme bir şekilde devam eder.
 
-> **Not:** Doğrulama aşamasında bütün elementlerin sadece ilk kuralları çalışır (örn. required), birinci kuraldan sonraki diğer tüm elementlere ait kurallar isValid() metodunun cevabı true alındığında çağrılırlar.
+> **Not:** Doğrulama aşamasında bütün elementlerin sadece ilk kuralları çalışır (örn. required), birinci kuraldan sonraki diğer tüm elementlere ait kurallar isValid() metodunun cevabı true alındığında çağrılırlar. Böylece form doğrulama aşamasında tüm kuralların çağrılması önlenerek performanstan kazanılmış olur.
 
 <a name="rules-config"></a>
 
