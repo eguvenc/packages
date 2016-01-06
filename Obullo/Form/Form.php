@@ -331,7 +331,7 @@ class Form
      * 
      * @return object|array|false
      */
-    public function results($assoc = false)
+    public function getResults($assoc = false)
     {
         if (isset($this->messages['results'])) {
             return ($assoc) ? $this->messages['results'] : (object)$this->messages['results'];

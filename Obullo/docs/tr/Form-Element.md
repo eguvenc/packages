@@ -48,7 +48,7 @@ Form element sınıfı html formları, html form elementleri ve form etiketi ile
                 <li><a href="#getError">$this->form->getError()</a></li>
                 <li><a href="#getValue">$this->form->getValue()</a></li>
                 <li><a href="#outputArray">$this->form->outputArray()</a></li>
-                <li><a href="#results">$this->form->results()</a></li>
+                <li><a href="#getResults">$this->form->getResults()</a></li>
             </ul>
         </li>
         <li>
@@ -538,9 +538,9 @@ Eğer validator sınıfı mevcutsa form post işleminden sonra filtrelenen input
 
 Bir form doğrulamasından sonra oluşan çıktıları array formatında getirir.
 
-<a name="results"></a>
+<a name="getResults"></a>
 
-##### $this->form->results();
+##### $this->form->getResults();
 
 Bir form doğrulamasından sonra eğer bir servis yada uygulama sonucu için <kbd>$this->form->setResults()</kbd> metodu ile girilen hata değerlerine array formatında geri döner.
 
@@ -628,7 +628,7 @@ $this->form->setResults($result->getArray());
 Örnek Çıktı
 
 ```php
-print_r($this->form->results());
+print_r($this->form->getRresults());
 ```
 
 ```php
@@ -658,7 +658,6 @@ if ($results = $this->form->results()) {
         echo $this->form->getMessage($message);  // Mesajlar form sınıfı html şablonuna aktarılıyor.
     }
 }
-
 ```
 
 <a name="security"></a>

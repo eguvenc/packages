@@ -69,9 +69,9 @@ Doğrulama sınıfı yazdığınız kodu minimize ederek form girdilerini kapsam
         </ul>
     </li>
 
-    <li><a href="#validation-tutorial">Ek Bilgiler</a>
+    <li><a href="#additional-info">Ek Bilgiler</a>
         <ul>
-            <li><a href="#translating-field-names">Farklı Dillere Çeviri</a></li>
+            <li><a href="#translations">Farklı Dillere Çeviri</a></li>
             <li><a href="#create-your-own-rules">Kendi Kurallarınızı Oluşturun</a></li>
         </ul>    
     </li>
@@ -561,13 +561,13 @@ print_r($fields);
 
 ### Form Sınfı
 
-Form sınıfı get fonksiyonları doğrulama sınıfı içerisideki verileri view dosyalarında göstermek, set fonksiyonları ise form nesnesine veri göndermek için kullanılır.
+Doğrulama işlemi içerisinde form sınıfı <b>get</b> metotları, verileri view dosyalarına bağlamak yada <b>set</b> metotları ile form nesnesine veri göndermek için kullanılır.
 
 <a name="formSetMessage"></a>
 
 #### $this->form->setMessage($message)
 
-Form messages anahtarı bir form mesajı ekler.
+Form çıktı dizisi içerisinde oluşturulan <b>messages</b> anahtarına bir form mesajı ekler. Detaylı bilgi için [Form.md](Form.md) dökümentasyonunu inceleyebilirsiniz.
 
 <a name="formSetErrors"></a>
 
@@ -855,3 +855,75 @@ eğer <kbd>options</kbd> elementinin değeri boş gelirse <kbd>Please choose a c
 
 
 > **Not:** Eğer birden fazla özel fonksiyon oluşturulmak isteniyorsa callback() metodu tekrar kullanılmalıdır.
+
+
+<a name="additional-info"></a>
+
+### Ek Bilgiler
+
+<a name="translations"></a>
+
+#### Farklı Dillere Çeviri
+
+Doğrulama sınıfına ait geçerli çeviri verisi <kbd>resources/translations/en/validator.php</kbd> dosyası içerisindedir. Eğer yeni bir dil eklenmek isteniyorsa aşağıdaki adımları izleyin. 
+
+Yeni dil dosyamızın ispanyolca (es) olduğunu varsayalım bunun için,
+
+* İlk önce <b>translations/en/validator.php</b> dosyasının bir kopyasını alın ve <b>resources/translations/es/</b> dizinine kopyalayın.
+* Ve bu dosya içerisindeki değerleri aşağıdaki gibi değiştirin.
+
+```php
+return array(
+    
+    'OBULLO:VALIDATOR:REQUIRED' => "El campo %s es obligatorio.",
+    'OBULLO:VALIDATOR:EMAIL'    => "El campo %s debe contener una dirección de correo válida.",
+);
+```
+
+Eğer varsayılan dil tarayıcınızdan ispanyolca (es) olarak girilirse doğrulama verileri artık bu dilde okunur. Çeviriler hakkında daha ayrıntılı bilgi için [Translation.md](Translation.md) dökümentasyonuna göz atın.
+
+##### Girdi Etiketlerinin Çevirisi
+
+Girdi alanlarına ait etiketlerin başlarında <kbd>translate:</kbd> öneki kullanırsanız bu anahtarlara ait çeviriler varsa çevirilirler.
+
+```php
+$this->validator->setRules('email', 'translate:Email', 'required|email');
+```
+
+Ayrıca dil dosyanıza bu çevirileri aşağıdaki gibi eklemeniz gerekir.
+
+```php
+return array(
+    
+    'Email' => 'Correo Electrónico',
+    'OBULLO:VALIDATOR:REQUIRED' => "El campo %s es obligatorio.",
+);
+```
+
+<a name="create-your-own-rules"></a>
+
+#### Kendi Kurallarınızı Oluşturun
+
+Kendi doğrulama kurallarınızı oluşturmak için kurala ait klasör yolunu <kbd>app/$env/validator.php</kbd> dosyası içerisinde tanımlamanız gerekir. Örneğin doğum tarihi alanını doğrulamak için <kbd>birthdate</kbd> adlı bir kuralımız olsun. Bunun için <kbd>Form\Validator\BirthDate</kbd> dosya yolunu aşağıdaki gibi tanımlamanız gerekir.
+
+```php
+return array(
+
+    'rules' => [
+
+        'birthdate' => 'Form\Validator\BirthDate'
+        'alpha' => 'Obullo\Validator\Rules\Alpha',
+        'alphadash' => 'Obullo\Validator\Rules\AlphaDash',
+        .
+        .
+        .
+        'trim' => 'Obullo\Validator\Rules\Trim'
+    ]
+);
+```
+
+Sonraki aşamada <kbd>app/classes/Fom/Validator/BirthDate</kbd> isimli bir sınıf oluşturun. Artık doğrulama kurallarında bu kuralı aşağıdaki gibi kullanabilirsiniz.
+
+```php
+$this->validator->setRules('email', 'Birth Date', 'required|birthdate');
+```
