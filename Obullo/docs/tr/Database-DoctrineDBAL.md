@@ -1,8 +1,6 @@
 
 ## Doctrine Veritabanı Katmanı ( DBAL )
 
-------
-
 Doctrine veritabanı katmanı daha çok PDO sınıfı saran ve PDO sınıfına benzer nitelikte metotlar içerir. Ek olarak bir programlama arayüzü ( API ) içerisinden nesne merkezli veritabanı şeması işletimi sağlar. Doctrine mevcut standart PDO programlama arayüzü üzerinden benzer arabirimler kullanmak yoluyla gerçek PDO API sürücüleri gibi yerli veya el yapımı API'leri veya özel sürücüleri çalıştırmayı mümkün kılar.
 
 <ul>

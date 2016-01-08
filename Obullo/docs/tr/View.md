@@ -46,7 +46,7 @@ Bir view dosyası basitçe html başlık ve gövdesinden oluşan bütün bir web
 
 ### View Sınıfı
 
-Bir view dosyası bir modüle ait ise modül dizini içerisindeki <kbd>/modules/$moduleName/view</kbd> klasörü içerisinden,  bir kontrolöre bağlı bir view dosyası ise <kbd>/modules/views/</kbd> klasöründen çağrılır.
+Bir view dosyası bir modüle ait ise modül dizini içerisindeki <kbd>/modules/$moduleName/view</kbd> klasörü içerisinden, bir kontrolöre bağlı bir view dosyası ise <kbd>/modules/views/</kbd> klasöründen çağrılır.
 
 <a name="load"></a>
 

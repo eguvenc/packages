@@ -1,8 +1,6 @@
 
 ## Veritabanı Sınıfı ( Database )
 
-------
-
 Veritabanı sınıfı veritabanı bağlantılarını sağlar ve temel veritabanı işlevlerini ( okuma, yazma, silme, kaydetme ) yürütür. Veritabanı operasyonları için <b><a href="http://php.net/manual/tr/book.pdo.php" target="_blank">PDO</a></b> ( Php Data Objects ) arayüzünü kullarak sadece ilişkili veritabanı türlerini ( <a href="http://tr.wikipedia.org/wiki/%C4%B0li%C5%9Fkisel_veri_taban%C4%B1_y%C3%B6netim_sistemi">RDBMS</a> ) türündeki veritabanlarını destekler.
 
 <ul>

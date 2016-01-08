@@ -37,13 +37,13 @@ class InputFilter implements ContainerAwareInterface
     /**
      * Container
      * 
-     * @param Contaner $c object
+     * @param Contaner $container object
      * 
      * @return void
      */
-    public function setContainer(Container $c = null)
+    public function setContainer(Container $container = null)
     {
-        $this->c = $c;
+        $this->c = $container;
     }
 
     /**
@@ -107,6 +107,9 @@ class InputFilter implements ContainerAwareInterface
         } else {
             $arguments = array($this->getValue());
         }
-        return call_user_func_array(array($this->getFilter(), $method), $arguments);
+        return call_user_func_array(
+            array($this->getFilter(), $method),
+            $arguments
+        );
     }
 }

@@ -1,268 +1,273 @@
 
-## URI Class
+## Http Uri Sınıfı
 
-The URI Class provides functions that help you retrieve information from your URI strings. If you use URI routing, you can also retrieve information about the re-routed segments.
+Uri sınıfı url adresinden gelen string türündeki verileri almayı sağlar. Eğer URI route yapısı kullanıldıysa yeniden route edilmiş segmentleri de almaya yardımcı olur. Http paketi içinde yer alan uri sınıfı <a href="http://www.php-fig.org/psr/psr-7/" target="_blank">Psr7</a> Standartlarını destekler ve <a href="https://github.com/zendframework/zend-diactoros" target="_blank">Zend-Diactoros</a> ailesinin üyelerinden biridir.
+
+<ul>
+    <li><a href="#url-and-uri">Url ve Uri Nedir ?</a></li>
+    <li>
+        <a href="#how-it-works">Nasıl Çalışıyor ?</a>
+        <ul>
+            <li><a href="#grabbing-uri">Sınıfı Çağırmak</a></li>
+            <li><a href="#resolving-url">Url Çözümleme</a></li>
+        </ul>
+    </li>
+    <li><a href="#special-methods">Özel Metotlar</a></li>
+    <li><a href="#with-methods">With Metotları</a></li>
+    <li>
+        <a href="#get-methods">Get metotları</a>
+        <ul>
+            <li><a href="#getScheme">$uri->getScheme()</a></li>
+            <li><a href="#getAuthority">$uri->getAuthority()</a></li>
+            <li><a href="#getUserInfo">$uri->getUserInfo()</a></li>
+            <li><a href="#getHost">$uri->getHost()</a></li>
+            <li><a href="#getPort">$uri->getPort()</a></li>
+            <li><a href="#getPath">$uri->getPath()</a></li>
+            <li><a href="#getQuery">$uri->getQuery()</a></li>
+            <li><a href="#getFragment">$uri->getFragment()</a></li>
+            <li><a href="#getRequestUri">$uri->getRequestUri()</a></li>
+            <li><a href="#getSegments">$uri->getSegments()</a></li>
+            <li><a href="#getRoutedSegments">$uri->getRoutedSegments()</a></li>
+            <li><a href="#segment">$uri->segment()</a></li>
+            <li><a href="#rsegment">$uri->rsegment()</a></li>
+        </ul>
+    </li>
+</ul>
 
 
-### Initializing a Uri Class
+<a name="url-and-uri"></a>
 
-------
+### Url ve Uri Nedir ? 
+
+URL (Uniform Resource Locator) web üzerindeki bir kaynağın konumu gösterir, URI (Uniform Resource Identifier) ise diğer kaynaklardan ayıran tanımlayıcı ismini belirtir. 
+Her URL , URI'dir ancak her URI , URL değildir. Bazı URI'ler bir adres olmasına rağmen gerçek bir kaynağı göstermeyebilir, sadece tanımlayıcıdır. Url bu nedenle daha genel bir terimdir.
+
+<a name="how-it-works"></a>
+
+### Nasıl Çalışıyor ?
+
+Dışarıdan gelen bir http isteği ServerRequestFactory sınıfı tarafından dinlenerek çözümlenir ve elde edilen değişkenler ile Uri sınıfı yaratılır.
+
+<a name="grabbing-uri"></a>
+
+#### Sınıfı Çağırmak
+
+Uri sınıfı request sınıfı içerisinden çağırılır.
 
 ```php
-<?php
-$this->uri->method();
+$uri = $request->getUri() 
 ```
 
-#### $this->uri->segment(n)
+<a name="resolving-url"></a>
 
-Permits you to retrieve a specific segment. Where n is the segment number you wish to retrieve. Segments are numbered from left to right. For example, if your full URL is this:
+#### Url Çözümleme
+
+Uri sınıfı dışarıdan gelen bir http isteğini,
 
 ```php
-http://example.com/index.php/news/local/metro/crime_is_up
+http://example.com/welcome/index?a=1&y=2
 ```
 
-The segment numbers would be this:
-
-* (0) news
-* (1) local
-* (2) metro
-* (3) crime_is_up
-
-By default the function returns false (boolean) if the segment does not exist. There is an optional second parameter that permits you to set your own default value if the segment is missing. For example, this would tell the function to return the number zero in the event of failure:
+aşağıdaki gibi çözümler.
 
 ```php
-$product_id = $this->uri->segment(3, 0);
+echo $uri : http://example.com/welcome/index?a=1&y=2
+echo $uri->getScheme() : http
+echo $uri->getAuthority() : example.com
+echo $uri->getHost() : example.com
+echo $uri->getPort() : 
+echo $uri->getPath() : /welcome/index
+echo $uri->getQuery() : a=1&y=2
+echo $uri->getFragment() : 
 ```
 
-It helps avoid having to write code like this:
+<a name="special-methods"></a>
+
+### Özel Metotlar
+
+Çerçeveye özgü metotlar size yardımcı olarak url adresinin tümünü yada belirli parçalarını alabilmenize olanak sağlar. Psr7 standartı <kbd>$uri->getPath()</kbd> metodu protokol,host,port ve sorgu değişkenleri olmadan bir url adresinin bütününü verir.
 
 ```php
-if ($this->uri->segment(3) === false)
-{
-    $product_id = 0;
-}
-else
-{
-    $product_id = $this->uri->segment(3);
-}
+echo $uri->getPath() : /welcome/index
 ```
 
-#### $this->uri->getSegments()
-
-Returns an array containing the URI segments. For example:
+Fakat url adresi ile birlikte varsa sorgu değişkenlerinin tümünü alabilmek <kbd>$uri->getRequestUri()</kbd> adlı psr7 standartı olmayan özel bir metot ile mümkün olur.
 
 ```php
-$segs = $this->uri->getSegments();
+echo $uri->getRequestUri() : /welcome/index?a=1&y=2
+```
 
-foreach ($segs as $segment)
+Parçalanan url bir dizi içerisinde toplanır çerçeveye özgü <kbd>$uri->getSegments()</kbd> metodu ile numaranlandırılmış parçaların tümüne ulaşılabilir.
+
+```php
+print_r($uri->getSegments()) : Array
+(
+    [0] => welcome
+    [1] => index
+)
+```
+
+Parçalara tek tek ulaşmak için <kbd>$uri->segment(n)</kbd> metodu kullanılır.
+
+```php
+echo $uri->segment(0) : welcome
+```
+
+<a name="with-methods"></a>
+
+### With Metotları
+
+Uri sınıfında with öneki ile başlayan metotları kullanarak uri nesnesine etki etmek mümkündür. Aşağıdaki gibi bir web url adresimizin olduğunu varsayarsak.
+
+```php
+echo $uri : http://example.com/welcome/index
+```
+
+Aşağıdaki metotlar ile istediğimiz türde uri'ler elde edebiliriz.
+
+```php
+$uri->withScheme("https") : https://example.com/welcome/index
+$uri->withUserInfo("test", "123456") : http://test:123456@example.com/welcome/index
+$uri->withHost("example") : http://example.com/welcome/index
+$uri->withPort("9898") : http://example.com:9898/welcome/index
+$uri->withPath("/example.php") : http://example.com/example.php
+$uri->withQuery("a=1&b=2") : http://example.com/welcome/index?a=1&b=2
+$uri->withFragment("anchor") : http://example.com/welcome/index#anchor
+```
+
+<a name="get-methods"></a>
+
+### Get Metotları
+
+<a name="getScheme"></a> 
+
+#### $uri->getScheme()
+
+Uri protokolüne geri döner. Örneğin <kbd>https, ftp, http</kbd>.
+
+<a name="getAuthority"></a> 
+
+#### $uri->getAuthority()
+
+Yetki alanına geri döner. Örneğin <kbd>example.com</kbd>.
+
+<a name="getUserInfo"></a> 
+
+#### $uri->getUserInfo()
+
+Eğer uri <kbd>test:123456@yetkiAlanı</kbd> gibi bir kullanıcı bilgisi içerisiyorsa "username[:password]" biçimini içeren string türüne döner. Eğer bir kullanıcı verisi yoksa metot boş string türüne döner.
+
+<a name="getHost"></a> 
+
+#### $uri->getHost()
+
+Host adresine geri döner. Örneğin <kbd>example.com</kbd>.
+
+<a name="getPort"></a> 
+
+#### $uri->getPort()
+
+Eğer url sayısal bir port değeri içerisiyorsa bu değere aksi durumda <b>null</b> değerine geri döner.
+
+<a name="getPath"></a> 
+
+#### $uri->getPath()
+
+Uri path bileşeni varsa <kbd>/welcome/index</kbd> gibi örnek bir değer aksi durumda <kbd>/</kbd> karakteri elde edilir.
+
+<a name="getQuery"></a> 
+
+#### $uri->getQuery()
+
+Uri içerisinde sorgu değişkenlerine geri döner. Örneğin <kbd>x=1&y=2</kbd>
+
+<a name="getFragment"></a> 
+
+#### $uri->getFragment()
+
+Uri içerisinde <kbd>#</kbd> karakteri önüne gelen değeri verir.
+
+<a name="getRequestUri"></a> 
+
+#### $uri->getRequestUri()
+
+Url <kbd>$uri->getPath()</kbd> ve <kbd>$uri->getQuery()</kbd> metotlarının birleşimini verir. Örneğin <kbd>/welcome/index?a=1&y=2</kbd>
+
+<a name="getSegments"></a> 
+
+#### $uri->getSegments()
+
+Tüm uri segmentlerine geri döner. Örnek:
+
+```php
+$segments = $uri->getSegments();
+
+foreach ($segments as $segment)
 {
     echo $segment;
     echo '<br />';
 }
 ```
 
-#### $this->uri->getRoutedSegments()
-
-
-
-#### $this->uri->routedSegment(n)
-
-This function is identical to the previous one, except that it lets you retrieve a specific segment from your re-routed URI in the event you are using Obullo's URI Routing <kbd>/docs/advanced/uri-routing</kbd> feature.
-
-
-#### $this->uri->getBaseUrl();
-
-This function retrieves the URL to your site without "index" value you've specified in the config file.
+Çıktı
 
 ```php
-echo $this->uri->getBaseUrl();  // output "/" ( forward slash )
+welcome
+index
 ```
 
-#### $this->uri->getAssetsUrl();
+<a name="getRoutedSegments"></a> 
 
-This function retrieves the URL to your assets folder ( css, image .. files ).
+#### $uri->getRoutedSegments()
+
+Bu method işlev olarak bir önceki metodun aynısıdır, tek farkı route işlemlerine duyarlı segmentlerin elde edilmesidir.
+
+<a name="segment"></a> 
+
+#### $uri->segment(n, $noResult = null)
+
+Spesifik bir segment değerine geri döner. Metod içerisine elde edilmek istenen segmentin numarası (n) girilir. Segmentler soldan sağa doğru numaralandırılır. Örneğin aşağıdaki gibi bir URL adresimiz varsa:
 
 ```php
-echo $this->uri->getAssetsUrl();  // output "/" ( forward slash )
+http://example.com/sports/basketball/nba/score_history
 ```
 
-#### $this->uri->getSiteUrl($uri = '', $suffix = true);
+Segment numaralandırılması aşağıdaki gibi olur.
 
-This function retrieves the URL to your site, along with the "index" value you've specified in the config file.If you set before url suffix (like .html) in config.php using second parameter <b>$suffix = false</b> you can switch off suffix for current site url.
+* (0) sports
+* (1) basketball
+* (2) nba
+* (3) score_history
 
-The index.php file (or whatever you have set as your site index_page in your config file) will be added to the URL, as will any URI segments you pass to the function. You are encouraged to use this function any time you need to generate a local URL so that your pages become more portable in the event your URL changes. Segments can be optionally passed to the function as a string or an array. Here is a string example:
+Eğer olmayan bir numara girilirse method <kbd>null</kbd> değerine geri döner. İkinci parametre ise opsiyoneldir. Eğer girilen segment numarası mevcut değilse method bu durumda ikinci parametrede belirtilen değere döner.
 
 ```php
-echo $this->uri->getSiteUrl("news/local/start/123");
+http://example.com/sports/basketball/team/
 ```
 
-The above example would return something like: /index.php/news/local/123.
-
-Here is an example of segments passed as an array:
-
 ```php
-$segments = array('news', 'local',  'start', '123');
-
-echo $this->uri->getSiteUrl($segments);
+$id = $uri->segment(3, 0); // 0
 ```
 
-#### $this->uri->getCurrentUrl();
-
-Returns the full URL (including segments) of the page being currently viewed.
-
-#### $this->uri->getProtocol()
-
-Gets the current protocol, function returns any protocol listed below.
-
-* REQUEST_URI
-* QUERY_STRING
-* PATH_INFO
-
-#### $this->uri->getRequestUri($urlencode = false)
-
-Returns the request uri like native $_SERVER['REQUEST_URI'] variable.
+Yukarıdaki kod aşağıdaki yazımdan kaçmak için kullanılır.
 
 ```php
-echo $this->uri->getRequestUri();      //  /search/index?var=val1&query=val2 
-echo $this->uri->getRequestUri(true);  //  %2Fsearch%2Findex%3Fvar%3Dval1%26query%3Dval2 
+http://example.com/sports/basketball/team/5
 ```
 
-
-#### $this->uri->extension()
-
-You can use uri extensions when you use ajax, xml, rss, json.. requests, you can dynamically change the application behaviours using uri extensions. Also this functionality will help you to create friendly urls.
-
 ```php
-example.com/directory/class/post.json 
-```
-
-You can define allowed extensions from your <kbd>config/config.php</kbd> file, default allowed URI extensions listed below.
-
-* json
-* xml
-
-Using URI Class $this->uri->getExtension(); function you can grab the called URI extension. 
-
-```php
-switch($this->uri->getExtension())
+if ($uri->segment(3) === null)
 {
-    case 'json':
-        echo json_encode($data);
-    break;
-    
-    case 'html':
-        echo $data;
-    break;
+    $id = 0;
+}
+else
+{
+    $id = $uri->segment(3);  // 5
 }
 ```
 
-#### $this->uri->getPath()
+<a name="rsegment"></a> 
 
-Returns a string with the complete URI. For example, if this is your full URL:
+#### $uri->rsegment(n)
 
-```php
-http://example.com/index.php/news/local/345
-```
-
-The function would return this:
-
-```php
-/news/local/345
-```
-
-## Loading Utilities Of Uri Class
-
-------
-
-### Initializing a Utilities Class
-
-------
-
-```php
-$this->uriHelper = new Utils($this->c['uri']);
-```
-
-#### $this->uriHelper->getSlashSegment(n)
-
-This function is almost identical to <kbd>$this->uri->segment()</kbd>, except it adds a trailing and/or leading slash based on the second parameter. If the parameter is not used, a trailing slash added. Examples:
-
-```php
-$this->uriHelper->getSlashSegment(3);
-$this->uriHelper->getSlashSegment(3, 'leading');
-$this->uriHelper->getSlashSegment(3, 'both');
-```
-
-Returns:
-
-* segment/
-* /segment
-* /segment/
-
-#### $this->uriHelper->getSlashRoutedSegment(n)
-
-This function is identical to the previous one, except that it lets you add slashes to a specific segment from your re-routed URI in the event you are using Obullo's URI Routing <kbd>/docs/advanced/uri-routing</kbd> feature.
-
-#### $this->uriHelper->getUriToAssoc(n)
-
-This function lets you turn URI segments into an associative array of key/value pairs. Consider this URI:
-
-```php
-index.php/user/search/name/joe/location/DE/gender/male
-```
-
-Using this function you can turn the URI into an associative array with this prototype:
-
-```php
-[array]
-(
-    'name'     => 'joe'
-    'location' => 'DE'
-    'gender'   => 'male'
-)
-```
-
-The first parameter of the function lets you set an offset. By default it is set to <kbd>3</kbd> since your URI will normally contain a controller/function in the first and second segments. Example:
-
-```php
-$array = $this->uriHelper->getUriToAssoc(3);
-echo $array['name']; 
-```
-
-The second parameter lets you set default key names, so that the array returned by the function will always contain expected indexes, even if missing from the URI. Example:
-
-```php
-$default = array('name', 'gender', 'location', 'type', 'sort');
-
-$array = $this->uriHelper->getUriToAssoc(3, $default);
-```
-
-If the URI does not contain a value in your default, an array index will be set to that name, with the value of false.
-
-Lastly, if a corresponding value is not found for a given key (if there is an odd number of URI segments) the value will be set to false (boolean).
-
-#### $this->uriHelper->getRoutedUriToAssoc(n)
-
-This function is identical to the previous one, except that it creates an associative array using the re-routed URI in the event you are using Obullo's URI Routing <kbd>/docs/advanced/uri-routing</kbd> feature.
-
-#### $this->uriHelper->getAssocToUri()
-
-Takes an associative array as input and generates a URI string from it. The array keys will be included in the string. Example:
-
-```php
-$array = array('product' => 'shoes', 'size' => 'large', 'color' => 'red');
-
-$str = $this->uriHelper->getAssocToUri($array);
-
-// Produces: product/shoes/size/large/color/red
-```
-#### $this->uriHelper->getRoutedUriString(n)
-
-This function is identical to the previous one, except that it returns the re-routed URI in the event you are using Obullo's URI Routing <kbd>/docs/advanced/uri-routing</kbd> feature.
-
-#### $this->uriHelper->getTotalSegments()
-
-Returns the total number of segments.
-
-#### $this->uriHelper->getTotalRoutedSegments()
-
-This function is identical to the previous one, except that it returns the total number of segments in your re-routed URI in the event you are using URI Routing <kbd>/docs/advanced/uri-routing</kbd> feature.
+Bu method işlev olarak bir önceki metodun aynısıdır, tek farkı route işlemlerine duyarlı segmentlerin elde edilmesidir.

@@ -707,14 +707,29 @@ class Uri implements UriInterface
      *
      * This function returns the URI segment based on the number provided.
      * 
-     * @param integer $number    number
-     * @param boolean $no_result custom no result output
+     * @param integer $n        number
+     * @param mixed   $noResult mixed
      * 
      * @return string
      */
-    public function segment($number, $no_result = false)
+    public function segment($n, $noResult = null)
     {
-        return ( ! isset($this->segments[$number])) ? $no_result : $this->segments[$number];
+        return isset($this->segments[$n]) ? $this->segments[$n] : $noResult;
+    }
+
+    /**
+     * Fetch a routed URI Segment
+     *
+     * This function returns the URI segment based on the number provided.
+     * 
+     * @param integer $n        number
+     * @param mixed   $noResult mixed
+     * 
+     * @return string
+     */
+    public function rsegment($n, $noResult = null)
+    {
+        return isset($this->rsegments[$n]) ? $this->rsegments[$n] : $noResult;
     }
 
     /**

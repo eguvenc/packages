@@ -1,7 +1,7 @@
 
-## O2 Yetki Doğrulama ( Authentication )
+## Yetki Doğrulama ( Authentication )
 
-Yetki doğrulama paketi yetki adaptörleri ile birlikte çeşitli ortak senaryolar için size bir API sağlar. O2 paketi tümleşik bellek yönetimi ile birlikte gelir; yetkisi doğrulanmış kullanıcıları hafızada bellekler ve veritabanı sorgularının önüne geçer. Çoklu oturumları sonlandırma, yeki doğrulamayı onaylama ,tarayıcı türü doğrulama ve beni hatırla gibi gelişmiş özellikleri de destekler.
+Yetki doğrulama paketi yetki adaptörleri ile birlikte çeşitli ortak senaryolar için size bir API sağlar. Paket tümleşik bellek yönetimi ile birlikte gelir; yetkisi doğrulanmış kullanıcıları hafızada bellekler ve veritabanı sorgularının önüne geçer. Çoklu oturumları sonlandırma, yeki doğrulamayı onaylama, tarayıcı türü doğrulama ve beni hatırla gibi gelişmiş özellikleri de destekler.
 
 <ul>
     <li><a href="#features">Özellikler</a></li>

@@ -23,11 +23,11 @@ class SessionManager implements ServiceInterface
     /**
      * Constructor
      * 
-     * @param ContainerInterface $c container
+     * @param ContainerInterface $container container
      */
-    public function __construct(Container $c)
+    public function __construct(Container $container)
     {
-        $this->c = $c;
+        $this->c = $container;
     }
 
     /**
@@ -40,7 +40,6 @@ class SessionManager implements ServiceInterface
     public function setParams(array $params)
     {
         $params['locale']['timezone'] = $this->c['config']['locale']['timezone'];
-
         $this->c['session.params'] = $params;
     }
 

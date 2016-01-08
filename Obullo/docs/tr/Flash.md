@@ -1,15 +1,11 @@
 
 ## Flaş Sınıfı
 
-------
-
 Flash sınıfı uygulama içerisinde son kullanıcıya gösterilen onay, hata veya bilgi mesajlarını yönetir. Bir işlemden sonra flaş sınıfı aracılığı ile <b>session</b> nesnesine kaydedilen mesaj veya mesajlar bir sonraki http isteğinde mevcut olurlar ve bir kez görüntülendikten sonra mevcut session verisinden silinirler.
 
 **Note:** Flaş sınıfına ait mesajlar olası bir karışıklığı önlemek için session anahtarına <b>"flash_"</b> öneki ile kaydedilirler.
 
 ### Sınıfı Yüklemek
-
--------
 
 ```php
 $this->c['flash']->method();

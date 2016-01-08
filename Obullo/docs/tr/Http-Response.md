@@ -1,5 +1,5 @@
 
-## Response Class
+## Http Response Sınıfı
 
 Http response sınıfının ana fonksiyonu finalize edilmiş web çıktısını tarayıcıya göndermektir. Tarayıcı başlıklarını, json yanıtı, http durum kodunu, 404 page not found yada özel bir hata mesajı göndermek response sınıfının diğer fonksiyonlarındandır. Ayrıca response sınıfı tarayıcıya gönderilen çıktıyı gzip yöntemi ile sıkıştırabilir fakat bu özellik opsiyoneldir ve bütün tarayıcılar desteklemeyebilir.
 

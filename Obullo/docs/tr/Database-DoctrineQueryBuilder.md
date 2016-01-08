@@ -1,8 +1,5 @@
 
-
 ## Doctrine DBAL Sorgu Oluşturucu ( Query Builder )
-
-------
 
 Doctrine 2.1 sürüm ile gelen query builder sınıfı eklentisi SQL dili için sorgu oluşturmanızı kolaylaştırır. Sorgu oluşturucu bir SQL ifadesine sql bölümleri ekleyen metotlardan ibarettir. Sorgu oluşturucu ile oluşturulan bir SQL ifadesi bir çıktı olarak alınabilir yada <b>execute</b> metodu ile varolan bağlantı içerisinden sorgu olarak çalıştırılabilir.
 

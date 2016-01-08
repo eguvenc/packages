@@ -1,10 +1,7 @@
 
 ## Hata Yönetimi ve Uygulama Hataları
 
-------
-
 Hata kontrolü ( hata raporlama ) uygulama ile tümleşik gelir ve <kbd>config/env.$env/config.php</kbd> dosyasından kontrol edilir.
-
 
 <ul>
 <li>

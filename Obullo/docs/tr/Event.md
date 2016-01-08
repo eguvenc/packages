@@ -1,8 +1,6 @@
 
 ## Olay Sınıfı ( Events )
 
-------
-
 Olay sınıfı uygulamada olaylara abone olmak ve onları dinlemek için <a href="http://www.sitepoint.com/understanding-the-observer-pattern/" target="_blank">observer</a> tasarım kalıbı ile oluşturulmuş basit bir sınıftır.
 
 <ul>

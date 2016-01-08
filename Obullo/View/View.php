@@ -42,12 +42,12 @@ class View implements ViewInterface
     /**
      * Constructor
      * 
-     * @param object $c      \Obullo\Container\ContainerInterface
-     * @param object $logger \Obullo\Log\LoggerInterface
+     * @param object $container container
+     * @param object $logger    logger
      */
-    public function __construct(Container $c, Logger $logger)
+    public function __construct(Container $container, Logger $logger)
     {
-        $this->c = $c;
+        $this->c = $container;
         $this->logger = $logger;
         $this->logger->debug('View Class Initialized');
     }
