@@ -89,7 +89,7 @@ View klasörü içerisinde iç içe klasörler açılabilir.
 echo $this->view->load('subfolder/filename');
 ```
 
-<a name="layers"></a>
+<a name="get"></a>
 
 #### $this->view->get();
 

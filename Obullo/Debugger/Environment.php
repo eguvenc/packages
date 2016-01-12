@@ -3,9 +3,9 @@
 namespace Obullo\Debugger;
 
 use RuntimeException;
+use Obullo\Session\SessionInterface as Session;
 use Psr\Http\Message\RequestInterface as Request;
 
-use Obullo\Session\SessionInterface as Session;
 
 /**
  * Debugger environment tab

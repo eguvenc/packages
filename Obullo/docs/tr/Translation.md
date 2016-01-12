@@ -216,8 +216,8 @@ $this->translator->setLocale('en', false);
 Eğer uygulamanızın <kbd>http://example.com/en/welcome/index</kbd> gibi bir dil desteği ile çalışmasını istiyorsanız aşağıdaki route kurallarını <kbd>app/routes.php</kbd> dosyası içerisine tanımlamanız gerekir.
 
 ```php
-$c['router']->get('(en|es|de)/(.+)', '$2');
-$c['router']->get('(en|es|de)', 'welcome/index');    
+$c['router']->get('(?:en|es|de)/(.*)', '$1');
+$c['router']->get('(?:en|es|de)', 'welcome');
 ```
 
 * İlk kural dil segmentinden sonra kontrolör, metot ve parametre çalıştırmayı sağlar. ( örn. http://example.com/en/examples )
