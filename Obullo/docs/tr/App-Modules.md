@@ -24,3 +24,7 @@ Ayrıntılı kurulum için Debugger paketi [Debbuger.md](Debugger.md) belgesine 
 ### Captcha Modülü
 
 Ayrıntılı kurulum için Captcha paketi [Captcha.md](Captcha.md) belgesine bakınız.
+
+### ReCaptcha Modülü
+
+Ayrıntılı kurulum için Captcha paketi [ReCaptcha.md](ReCaptcha.md) belgesine bakınız.

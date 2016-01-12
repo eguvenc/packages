@@ -1,37 +1,33 @@
 
-## Translator Class
+## Çeviri Sınıfı
 
-The Translator Class provides functions to retrieve language files and lines of text for purposes of internationalization.
+Çeviri sınıfı uygulamanızı birden fazla farklı dilde yayına hazırlamak için dil dosyalarından dil metinlerini içeren satırları elde etmeyi sağlarlar. Dil dosyaları uygulamanızın <kbd>resources/translations</kbd> klasöründe tutulurlar. Hata mesajları ve diğer mesajları göstermek için kendi dil dosyalarınızı bu klasörde oluşturabilirsiniz.
 
-In your app folder you'll find one called translator containing sets of language files. You can create your own language files as needed in order to display error and other messages in other languages.
+> **Note:** Her bir dil dosyası kendine ait klasör içerisinde kayıtlı olmalıdır. Mesela ispanyolca dosyaları <kbd>app/translations/es</kbd> klasörüne kaydedilmelidir.
 
-**Note:** Each language file must be stored in its own folder. For example, the English files are located at: <kbd>app/translations/en</kbd>
+<ul>
+    <li><a href="#creating-files">Dil Dosyaları Oluşturmak</a></li>
+    <li><a href="#loading-files">Dil Dosyalarını Yüklemek</a></li>
+    <li><a href="#fetching-lines">Dil Satırlarını Almak</a></li>
+    <li><a href="#checking-lines">Dil Satırı Kontrolü</a></li>
+    <li>
+        <a href="#translation-middleware">Http Dil Katmanı</a>
+        <ul>
+            <li><a href="#config">Konfigürasyon</a></li>
+            <li><a href="#how-it-works">Nasıl Çalışıyor</a></li>
+        </ul>
+    </li>
+    <li><a href="#getLocale">Mevcut Dili Almak ve Değiştirmek</a></li>
+    <li><a href="#routes">Routes.php için Dil Ayarları</a></li>
+    <li><a href="#fallback">Bulunamayan Dil</a></li>
+    <li><a href="#fallback-lines">Bulunamayan Dil Çevirisi</a></li>
+</ul>
 
-### Initializing the Translator Class ( Array Access )
+<a name="creating-files"></a> 
 
-------
+### Dil Dosyaları Oluşturmak
 
-```php
-$this->c['translator'];
-
-$this->translator['item'];
-$this->translator->method();
-```
-
-Controller sınıfının mevcut olmadığı bir yükleme seviyesinde iseniz translator sınfına konteyner içerisinden aşağıdaki gibi erişebilirsiniz.
-
-```php
-$this->c['translator']['item'];
-$this->c['translator']->method();
-```
-
-### Create Your Translation File
-
-------
-
-It's a good practice to use ":" as key for all messages in a given file to avoid collisions with similarly named items in other files. 
-
-We define keys an array. An example 
+Dil dosyaları <kbd>resources/translations</kbd> klasörü altında oluşturulur. Her bir dil dosyası kendine ait klasör içerisinde kayıtlıdır. Uygulamanızdaki dil dosyalarına ait satırların birbirleriyle karışmaması için en iyi yöntemlerden biri satırları kategorilere göre <kbd>:</kbd> karakteri ile ayırmaktır. Örneğin "Games" adında bir modülümüz olduğunu varsayarsak bu modüle ait dil satırlarının aşağıdaki gibi olması önerilir.
 
 ```php
 return array(
@@ -42,7 +38,6 @@ return array(
     'GAMES:MANAGEMENT:LABEL:ID'              => 'Id',
     'GAMES:MANAGEMENT:LABEL:NAME'            => 'Game Name',
     'GAMES:MANAGEMENT:LABEL:CATEGORIES'      => 'Categories',
-    'GAMES:MANAGEMENT:LABEL:PROVIDERS'       => 'Providers',
     'GAMES:MANAGEMENT:LABEL:STATUS'          => 'Status',
     'GAMES:MANAGEMENT:LABEL:ORDER'           => 'Order',
     'GAMES:MANAGEMENT:LABEL:GAME_URL'        => 'Game URL',
@@ -64,7 +59,7 @@ return array(
     /**
      * Error
      */
-    'GAMES:MANAGEMENT:ERROR:NOTVALIDRESOLUTION' => 'Games Resolution is not valid. Ex: 800x600',
+    'GAMES:MANAGEMENT:ERROR:NOTVALIDRESOLUTION' => 'Game resolution is not valid. Ex: 800x600',
 
     /**
      * Button
@@ -80,211 +75,190 @@ return array(
 );
 ```
 
-### Loading a Translate File
+<a name="loading-files"></a> 
 
-------
+### Dil Dosyalarını Yüklemek
 
-If you want load language files from your <b>app</b> folder create your language files to there ..
+Bir dil dosyası oluşturduktan sonra dosyayı kullanabilmek için ilk önce load() metodu kullanılır.
 
 ```php
--  app
-    + config
+- resources
     - translations
         - en
             games.php
 ```
 
-This function loads a language file from your <kbd>app/translator</kbd> folder.
-
-
 ```php
-$this->translator->load('filename');  // load translator file
+$this->translator->load('games');
 ```
 
-Where <samp>filename</samp> is the name of the file you wish to load (without the file extension), and language is the language set containing it (ie, en_US).
+<a name="fetching-lines"></a> 
+
+### Dil Satırlarını Almak
+
+Bir dil metnine ait değere basitçe ulaşmak için aşağıdaki yöntem kullanılır.
 
 ```php
-$c->load('translator');
-
-$this->translator->load('welcome');
-$this->translator['SITE:TITLE:WELCOME_TO_OUR_SITE'];
+echo $this->translator['GAMES:MANAGEMENT:LABEL:NAME'];  // Game Name
 ```
 
-### Loading the Framework Files
-
-Some of the packages use framework language file which is located in your <kbd>app/translations</kbd> folder. You can change the default language. ( look at <kbd>config/debug/config.php</kbd> ) 
-
-Core packages will load framework language files which are located in <kbd>app/translations/$language</kbd> folder.
-
-------
+Eğer metin içerisinde <kbd>%s</kbd> yada <kbd>%d</kbd> gibi formatlar kullanılmışsa aşağıdaki gibi get() metodu kullanılır. Get metodu php <b>sprintf()</b> fonksiyonu gibi çalışır.
 
 ```php
--  app
-    + config
-    - translations
-        - en
-             date.php
-             validator.php
-            ...
-        - es
-             date.php
-             validator.php
-            ...
+echo $this->translator->get('OBULLO:VALIDATOR:MIN', 'Email', 6);  // The Email field must be at least 6 ch..
 ```
 
-This function loads the <b>date</b> language file from your <kbd>app/translator/es_ES</kbd> folder.
+Eğer girilen metine ait dil satırı ilgili dil dosyasında bulunamazsa girilen metin çıktılanır.
 
 ```php
-$this->translator->load('date'); 
+echo $this->translator['GAMES:MANAGEMENT:LABEL:NAME'];  // GAMES:MANAGEMENT:LABEL:NAME
 ```
 
-### Fetching a Line of Text
+<a name="checking-lines"></a>
 
-------
+### Dil Satırı Kontrolü
 
-Once your desired language file is loaded you can access any line of text using this function:
+Bir dile ait satırın var olup olmadığını kontröl etmek için <kbd>has()</kbd> metodu kullanılır.
 
 ```php
-$this->translator['LANGUAGE:KEY'];
-```
-$this->translator class array access function returns the translated line if language line exists in your file, otherwise it returns to default text that you are provide.
-
-### Checking a Translate Key of Text
-
-Tramslate class allow to you array access and it returns to default key if translate key not exists.
-
-```php
-echo $this->translator['LANGUAGE:KEY']; // gives translated text of 'language_key'
+var_dump($this->translator->has('EXAMPLE:UNDEFINED_TEXT'));  // false
 ```
 
-Checking none exist key.
+<a name="translation-middleware"></a>
 
-```php
-var_dump($this->translator->exists('asdasdas'));  // gives "true" or "false"
-```
+### Http Dil Katmanı
 
-Printing none exist key echo same string.
-
-```php
-echo $this->translator['asdasdas'];     // gives a notice to you 'asdasdas' if translate notice disabled from your config file.
-```
-
-If translation notice enabled from your config printing none exist key echo same string with translate notice.
-
-```php
-echo $this->translator['asdasdas'];     // gives a notice to you 'translate:asdasdas'
-```
-
-### Using $this->translator->get($key, $arguments , , , ... );
-
-Translator class has a <b>sprintf</b> which has provide the same functionality of php sprintf.
-
-```php
-echo $this->translator->get('There are %d monkeys in the %s.', 5, 'tree');
-
-// Gives There are *5* monkeys in the *tree*.
-```
-
-### Translation Middleware
-
-Translator middleware setLocale method sets locale cookie value like below.
+Dil katmanı aşağıdaki gibi bir istek geldiğinde eğer ziyaretçi tarayıcısında <kbd>locale</kbd> adlı çerez mevcut değilse varsayılan dili çereze kaydeder.
 
 ```php
 http://example.com/en/home
 ```
 
-But it should be loaded in middleware.php
+<a name="config"></a>
+
+#### Konfigürasyon
+
+Dil katmanının çalıştırılmadan önce konfigüre edilmesi gerekir.
 
 ```php
-$c['app']->middleware(new Http\Middlewares\Translation);
+$c['middleware']->add(
+    [
+        // 'Maintenance',
+        // 'TrustedIp',
+        // 'ParsedBody',
+        'Translation',
+        'View', 
+        'Router',
+        // 'Csrf'
+    ]
+);
 ```
 
-Translator config should be like this
+Dil konfigürasyonu <kbd>app/$env/translator.php</kbd> dosyasında varsayılan olarak aşağıdaki gibi tanımlıdır.
+
 
 ```php
-// Uri Settings
-'uri' => array(
-    'segment'       => true, // Uri segment number e.g. http://example.com/en/home
-    'segmentNumber' => 0       
-),
-// Cookies
-'cookie' => array(
-    'name'   =>'locale',
-    'expire' => (365 * 24 * 60 * 60),  // 365 day; //  @see  Cookie expire time.   http://us.php.net/strtotime
-    'secure' => false,    // Cookies will only be set if a secure HTTPS connection exists.
-),
+'uri' => [
+    'segment' => true,
+    'segmentNumber' => 0   // Uri segment number e.g. http://example.com/en/home    
+],
+'cookie' => [
+    'name'   =>'locale', 
+    'domain' => null,
+    'expire' => (365 * 24 * 60 * 60), // 365 day
+    'secure' => false,
+    'httpOnly' => false,
+    'path' => '/',
+],
 ```
 
-if URI Segment and Http GET not provided  It sets locale code reading http COOKIE['name'].
+<a name="how-it-works"></a>
 
-It sets cookie using <b>locale_accept_from_http($_SERVER['HTTP_ACCEPT_LANGUAGE'])</b> function if language code not provided with any of above the methods : 
+#### Nasıl Çalışıyor ?
 
-**Note:** locale_accept_from_http() function requires php <b>intl</b> extension.
+Kullanıcı siteyi ziyaret ettiğinde dil katmanı çalışır ve aşağıdaki adımlardan sonra dil $çerezler[locale] değeri içerisinden okunur yada çerezlere $çerezler[locale] = 'dil' olarak kaydedilir.
 
-### Updating your routes
+Kullanıcının varsayılan dili <b>sırasıyla</b> aşağıdaki adımlara göre belirlenir.
 
-This route rewrite your url to http://example.com/en/welcomde/index First segment (0) gives language code
+* Eğer ziyaretçi <kbd>http://example.com/en/welcome</kbd> gibi bir URI get isteği ile geldiyse dil <kbd>en</kbd> olarak kaydedilir.
+* Eğer ziyaretçi tarayıcısında <kbd>$_COOKIES['locale']</kbd> değeri mevcut ise varsayılan dil bu kabul edilir.
+* Eğer ziyaretçinin tarayıcısı <kbd>locale_accept_from_http()</kbd> fonksiyonu ile incelenir ve tarayıcının geçerli dili bulunursa varsayılan dil bu kabul edilir.
+* Eğer yukarıdaki tüm seçenekler ile mevcut dil bulunamazsa <kbd>$this->translator->getDefault()</kbd> metodu ile translator.php konfigürasyonunuzdaki <kbd>config['default']['locale']</kbd> değeri ile varsayılan dil belirlenir.
+
+> **Not:** locale_accept_from_http() fonksiyonu <b>intl</b> genişlemesi gerektirir. Bu yüzden bu genişlemenin php konfigürasyonunuzda kurulu olması tavsiye edilir.
+
+<a name="getLocale"></a>
+
+### Mevcut Dili Almak ve Değiştirmek
+
+Bir http isteği ile dil katmanı sayesinde çerezler içerisine kaydedilen varsayılan dili almak için aşağıdaki metot kullanılır.
 
 ```php
-$c['router']->route('get', '(en|es|de)/(.+)', '$2');        
+$this->translator->getLocale();  // en
 ```
 
-Below the route sets your default controller for http://example.com/en/.
+Eğer çerezde kayıtlı varsayılan dili değiştirmek istiyorsanız set metodunu kullanmanız gerekir.
 
 ```php
-$c['router']->route('get', '(en|es|de)', 'home/index');
+$this->translator->setLocale('en');
 ```
 
-### Fallback Translations
+Eğer çereze yazmak istemiyorsanız ikinci parametreyi <kbd>false</kbd> olarak girmeniz gerekir.
+
+```php
+$this->translator->setLocale('en', false);
+```
+
+<a name="routes"></a>
+
+### Routes.php için Dil Ayarları
+
+Eğer uygulamanızın <kbd>http://example.com/en/welcome/index</kbd> gibi bir dil desteği ile çalışmasını istiyorsanız aşağıdaki route kurallarını <kbd>app/routes.php</kbd> dosyası içerisine tanımlamanız gerekir.
+
+```php
+$c['router']->get('(en|es|de)/(.+)', '$2');
+$c['router']->get('(en|es|de)', 'welcome/index');    
+```
+
+* İlk kural dil segmentinden sonra kontrolör, metot ve parametre çalıştırmayı sağlar. ( örn. http://example.com/en/examples )
+* İkinci kural ise varsayılan açılış sayfası içindir. ( örn. http://example.com/en/ )
+
+> **Not:** Uygulamanızın desteklediği dilleri düzenli ifadelerdeki parentez içlerine girmeniz gerekir. Yukarıda en,es ve de dilleri örnek gösterilmiştir.
+
+<a name="fallback"></a>
+
+### Bulunamayan Dil
+
+Eğer kullanıcının seçtiği dile ait klasör uygulamanızda mevcut değilse bunun yerine başka bir dil yüklenir. Bu yönteme fallback denilir ve fallback dilini almak için aşağıdaki metot kullanılır.
+
+```php
+$this->translator->getFallback();  // en
+```
+
+Fallback değeri <kbd>translator.php</kbd> konfigürasyon dosyanızda tanımlıdır. Fallback dili Translation katmanı içerisindeki setFallback() fonksiyonu ile kontrol edilir.
+
+```php
+protected function setFallback()
+{
+    $fallback = $this->translator->getFallback();
+
+    if (! $this->translator->hasFolder($this->getLocale())) {
+        $this->translator->setLocale($fallback);
+    }
+}
+```
+
+Yukarıdaki satırlarda eğer seçilen dile ait klasör mevcut değilse translator sınıfı dil değeri fallback değeri ile güncelleniyor.
+
+<a name="fallback-lines"></a>
+
+### Bulunamayan Dil Çevirisi
 
 Mevcut yüklü dil dosyanızda bir çeviri metni bulunamazsa fallback dil dosyanız devreye girer ve fallback dosyası yüklenerek mevcut olmayan çeviri bu dosya içerisinden çağrılır.
-Bu özelliği kullanabilmek translator.php config dosyasınızdaki fallback değerinin <b>true</b> olması gereklidir.
+Bu özelliği kullanabilmek için <kbd>translator.php</kbd> konfigürasyon dosyanızdaki fallback değerinin <b>true</b> olması gerekir.
 
 ```php
 'fallback' => array(
-    'enabled' => false,
-    'locale' => 'es',
+    'enabled' => true,
 ),
 ```
-
-
-### Function Reference
-
-------
-
-#### $this->translator->load(string $filename);
-
-Loads translate file from app/translations folder.
-
-#### $this->translator['key'];
-
-Print translation value.
-
-#### $this->translator->exists(string $line);
-
-Checks a translation key of text.
-
-#### $this->translator->get(string $line, args ... );
-
-Offers same functionality of php sprintf.
-
-#### $this->translator->setDefault(string $locale);
-
-
-#### $this->translator->getDefault(string $locale);
-
-#### $this->translator->setLocale(string $locale);
-
-Set default locale value. ( en, es, de .. )
-
-#### $this->translator->getLocale();
-
-Get current locale value. ( en, es, de .. )
-
-#### $this->translator->setFallback(string $locale);
-
-Set a fallback value if locale value not found you can use fallback value.
-
-#### $this->translator->getFallback(string $locale);
-
-Get a fallback value if locale value not found you can use fallback value.

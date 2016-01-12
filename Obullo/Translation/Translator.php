@@ -18,11 +18,6 @@ use Obullo\Container\ContainerInterface as Container;
 class Translator implements TranslatorInterface
 {
     /**
-     * System debug translate notice
-     */
-    const NOTICE = 'translate:';
-
-    /**
      * Container
      * 
      * @var object
@@ -48,42 +43,42 @@ class Translator implements TranslatorInterface
      *
      * @var string
      */
-    public $locale = null;
+    protected $locale = null;
 
     /**
      * Default locale
      *
      * @var string
      */
-    public $default = 'en';
+    protected $default = 'en';
 
     /**
      * Translation file is loaded
      *
      * @var array
      */
-    public $loaded = array();
+    protected $loaded = array();
 
     /**
      * Current locale code ( en, de, es )
      *
      * @var string
      */
-    public $fallback = 'en';
+    protected $fallback = 'en';
 
     /**
      * Translate files stack
      *
      * @var array
      */
-    public $translateArray = array();
+    protected $translateArray = array();
 
     /**
      * Fallback translate files
      *
      * @var array
      */
-    public $fallbackArray = array();
+    protected $fallbackArray = array();
 
     /**
      * Constructor
@@ -111,9 +106,24 @@ class Translator implements TranslatorInterface
      *
      * @return boolean returns to false if key not exists
      */
-    public function exists($key)
+    public function has($key)
     {
         return $this->offsetExists($key);
+    }
+
+    /**
+     * Check language directory exists
+     *
+     * @param string $locale folder
+     *
+     * @return boolean
+     */
+    public function hasFolder($locale)
+    {
+        if (is_dir(TRANSLATIONS . $locale)) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -143,12 +153,10 @@ class Translator implements TranslatorInterface
             return $key;
         }
         if (! isset($this->translateArray[$key])) {
-            $notice = ($this->config['debug']) ? static::NOTICE : '';
-
-            if ($this->config['fallback']['enabled'] && isset($this->fallbackArray[$key])) {    // Fallback translation is exist ?
+            if ($this->config['fallback']['enabled'] && isset($this->fallbackArray[$key])) {  // Fallback translation is exist ?
                 return $this->fallbackArray[$key];      // Get it.
             }
-            return $notice.$key;
+            return $key;
         }
         return $this->translateArray[$key];
     }
@@ -202,8 +210,6 @@ class Translator implements TranslatorInterface
         if (in_array($fileKey, $this->loaded, true)) {
             return $this->translateArray;
         }
-        static::isDir($locale);
-
         $translateArray = include $fileUrl;
 
         if (! isset($translateArray)) {
@@ -242,25 +248,6 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * Check language directory exists
-     *
-     * @param string $locale folder
-     *
-     * @return boolean
-     */
-    protected static function isDir($locale)
-    {
-        if (! is_dir(TRANSLATIONS . $locale)) {
-            throw new RuntimeException(
-                sprintf(
-                    'The translator %s path is not a folder.',
-                    TRANSLATIONS . $locale
-                )
-            );
-        }
-    }
-
-    /**
      * Gets a parameter or an object.
      *
      * @return mixed The value of the parameter or an object
@@ -281,8 +268,7 @@ class Translator implements TranslatorInterface
             }
             return $this->translateArray[$item];
         }
-        $translateNotice = ($this->config['debug']) ? static::NOTICE : '';
-        return $translateNotice . $item;  // Let's notice the developers this line has no translate text
+        return $item;
     }
 
     /**
@@ -295,9 +281,6 @@ class Translator implements TranslatorInterface
      */
     public function setLocale($locale = null, $write = true)
     {
-        if (! isset($this->config['languages'][$locale])) {    // If its not in defined languages.
-            return false;
-        }
         $this->locale = $locale;
         if ($write) {
             $this->defaultSet();  // Write to cookie

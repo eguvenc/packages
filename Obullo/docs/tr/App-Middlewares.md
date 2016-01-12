@@ -1,7 +1,7 @@
 
 ## Http Katmanları ( Middlewares )
 
-Http katmanı Rack protokolünün php ye uyarlanmış bir versiyonudur. Bknz. <a href="http://en.wikipedia.org/wiki/Rack_%28web_server_interface%29">http://en.wikipedia.org/wiki/Rack_%28web_server_interface%29</a>. Http katmanları eski adıyla http filtreleridir. Uygulama içerisindeki katmanlar uygulamayı etkilemek, analiz etmek, uygulama ortamını yada request ve response nesnelerini uygulama çalışmasından sonra veya önce araya girerek etkilemek için kullanılırlar. Katmanlar <b>application</b> paketi içerisinde <b>middleware</b> sınıfına genişleyen basit php sınıflarıdır. Bir katman route yapısında tutturulabilir yada bağımsız olarak uygulamanın her yerinde çalışabilir.
+Http katmanı Rack protokolünün php ye uyarlanmış bir versiyonudur. Bknz. <a href="http://en.wikipedia.org/wiki/Rack_%28web_server_interface%29">http://en.wikipedia.org/wiki/Rack_%28web_server_interface%29</a>. Http katmanları eski adıyla http filtreleridir. Uygulama içerisindeki katmanlar uygulamayı etkilemek, analiz etmek, uygulama ortamını yada request ve response nesnelerini uygulama çalışmasından sonra veya önce araya girerek etkilemek için kullanılırlar. Katmanlar <kbd>app/classes/Http</kbd> klasörü içerisinde yeralırlar <b>middleware</b> sınıfına genişleyen basit php sınıflarıdır. Bir katman route yapısında tutturulabilir yada bağımsız olarak uygulamanın her yerinde çalışabilir.
 
 <ul>
     <li>
@@ -166,58 +166,61 @@ class Maintenance extends Middleware
 Yukarıda maintenance katmanında görüldüğü gibi <b>use</b> komutu ile UnderMaintenanceTrait özelliği çağırılarak <b>$this->domainIsDown();</b> metoduna genişledik. Sizde uygulamanıza özgü özellikleri katmanlar içerisinden bu yöntemle çağırabilirsiniz.
 
 
-Mevcut sürümde bulunan http katmanları aşağıdaki gibidir. Http katmanları konsol komutları ile istenildiği zaman kaldırılıp kurulabilir.
+Mevcut sürümde bulunan http katmanlarının listesi aşağıdaki gibidir. Katmanlar hakkında detaylı bilgi için [http-middlewares](https://github.com/obullo/http-middlewares) proje dökümentasyonunu inceleyebilirsiniz.
 
 <a name="maintenance"></a>
 
 #### Maintenance Katmanı
 
-> Maintenance katmanı uygulamanızda tanımlı olan domain adreslerine göre uygulamanızı konsoldan bakıma alma işlevlerini kontrol eder. Detaylı bilgi için [Middleware-Maintenance.md](Middleware-Maintenance.md) dosyasını inceleyiniz.
+> Maintenance katmanı uygulamanızda tanımlı olan domain adreslerine göre uygulamanızı konsoldan bakıma alma işlevlerini kontrol eder. 
 
 <a name="auth"></a>
 
 #### Auth Katmanı
 
-> Başarılı oturum açmış ( yetkinlendirilmiş ) kullanıcılara ait katmandır. Detaylı bilgi için [Middleware-Auth.md](Middleware-Auth.md) dosyasını inceleyiniz.
+> Başarılı oturum açmış ( yetkinlendirilmiş ) kullanıcılara ait katmandır.
 
 <a name="guest"></a>
 
 #### Guest Katmanı
 
-> Oturum açmamış ( yetkinlendirilmemiş ) kullanıcılara ait bir katman oluşturur. Bu katman auth paketini çağırarak kullanıcının sisteme yetkisi olup olmadığını kontrol eder ve yetkisi olmayan kullanıcıları sistem dışına yönlendirir. Genellikle route yapısında Auth katmanı ile birlikte kullanılır. Detaylı bilgi için [Middleware-Auth.md](Middleware-Auth.md) dosyasını inceleyiniz.
+> Oturum açmamış ( yetkinlendirilmemiş ) kullanıcılara ait bir katman oluşturur. Bu katman auth paketini çağırarak kullanıcının sisteme yetkisi olup olmadığını kontrol eder ve yetkisi olmayan kullanıcıları sistem dışına yönlendirir. Genellikle route yapısında Auth katmanı ile birlikte kullanılır.
 
 <a name="methodNotAllowed"></a>
 
 #### MethodNotAllowed Katmanı
 
-> Uygulamaya gelen Http isteklerine göre metot türlerini filtrelemeyi sağlar. Belirlenen http metotları ( get, post, put, delete ) dışında bir istek gelirse isteği <kbd>HTTP Error 405 Method Not Allowed</kbd>  sayfası ile engeller. Detaylı bilgi için [Middleware-MethodNotAllowed.md](Middleware-MethodNotAllowed.md) dosyasını inceleyiniz.
+> Uygulamaya gelen Http isteklerine göre metot türlerini filtrelemeyi sağlar. Belirlenen http metotları ( get, post, put, delete ) dışında bir istek gelirse isteği <kbd>HTTP Error 405 Method Not Allowed</kbd>  sayfası ile engeller.
 
 <a name="request"></a>
 
 #### Request Katmanı
 
-> Uygulamaya gelen Http isteklerinin tümünü evrensel olarak filtrelemeyi sağlayan çekirdek katmandır. Detaylı bilgi için [Middleware-Request.md](Middleware-Request.md) dosyasını inceleyiniz.
+> Uygulamaya gelen Http isteklerinin tümünü evrensel olarak filtrelemeyi sağlayan çekirdek katmandır.
 
 <a name="https"></a>
 
 #### Https Katmanı
 
-> Uygulamada belirli adreslere gelen <kbd>http://</kbd> isteklerini <kbd>https://</kbd> protokolüne yönlendirir. Detaylı bilgi için [Middleware-Https.md](Middleware-Https.md) dosyasını inceleyiniz.
+> Uygulamada belirli adreslere gelen <kbd>http://</kbd> isteklerini <kbd>https://</kbd> protokolüne yönlendirir.
 
 <a name="translation"></a>
 
 #### Translation Katmanı
 
-> Uygulamaya gelen http isteklerinin tümü için <kbd>locale</kbd> anahtarlı çereze varsayılan yerel dili yada url den gönderilen dili kaydeder. Detaylı bilgi için [Middleware-Translation.md](Middleware-Translation.md) dosyasını inceleyiniz.
+> Uygulamaya gelen http isteklerinin tümü için <kbd>locale</kbd> anahtarlı çereze varsayılan yerel dili yada url den gönderilen dili kaydeder.
 
 <a name="rewriteLocale"></a>
 
 #### RewriteLocale Katmanı
 
-> Bu katman uygulamaya <kbd>http://example.com/welcome</kbd> olarak gelen istekleri mevcut yerel dili ekleyerek <kbd>http://example.com/en/welcome</kbd> adresine yönlendirir. Detaylı bilgi için [Middleware-RewriteLocale.md](Middleware-RewriteLocale.md) dosyasını inceleyiniz.
+> Bu katman uygulamaya <kbd>http://example.com/welcome</kbd> olarak gelen istekleri mevcut yerel dili ekleyerek <kbd>http://example.com/en/welcome</kbd> adresine yönlendirir.
 
 <a name="csrf"></a>
 
 #### Csrf Katmanı
 
-> Csrf katmanı Cross Request Forgery güvenlik tehdidine karşı uygulamanızdaki formlarda oluşturduğunuz güvenlik algoritmasını http <kbd>POST</kbd> istekleri geldiğinde sunucu tarafında doğrular, doğrulama başarılı olmazsa katman içerisinden kullanıcı hata sayfasına yönlendirilir. Detaylı bilgi için [Middleware-Csrf.md](Middleware-Csrf.md) dosyasını inceleyiniz.
+> Csrf katmanı Cross Request Forgery güvenlik tehdidine karşı uygulamanızdaki formlarda oluşturduğunuz güvenlik algoritmasını http <kbd>POST</kbd> istekleri geldiğinde sunucu tarafında doğrular, doğrulama başarılı olmazsa katman içerisinden kullanıcı hata sayfasına yönlendirilir.
+
+
+Katmanlar hakkında detaylı bilgi için [http-middlewares](https://github.com/obullo/http-middlewares) proje dökümentasyonunu inceleyebilirsiniz.

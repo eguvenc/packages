@@ -53,15 +53,15 @@ class Recaller
     /**
      * Constructor
      * 
-     * @param object $c        \Obullo\Container\Container
-     * @param object $storage  \Obullo\Authentication\Storage\Storage
-     * @param object $model    \Obullo\Authetication\Model\User
-     * @param array  $identity \Obullo\Authentication\Identity\Identity
-     * @param array  $params   auth
+     * @param object $container \Obullo\Container\Container
+     * @param object $storage   \Obullo\Authentication\Storage\Storage
+     * @param object $model     \Obullo\Authetication\Model\User
+     * @param array  $identity  \Obullo\Authentication\Identity\Identity
+     * @param array  $params    auth parameters
      */
-    public function __construct(Container $c, Storage $storage, UserModel $model, Identity $identity, array $params)
+    public function __construct(Container $container, Storage $storage, UserModel $model, Identity $identity, array $params)
     {
-        $this->c = $c;
+        $this->c = $container;
         $this->model = $model;
         $this->params = $params;
         $this->storage = $storage;

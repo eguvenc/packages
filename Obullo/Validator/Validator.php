@@ -318,7 +318,7 @@ class Validator implements ValidatorInterface
     public function setMessage($error)
     {
         $value = (string)$error;
-        $value = ($this->translator->exists($value)) ? $this->translator[$value] : $value;
+        $value = ($this->translator->has($value)) ? $this->translator[$value] : $value;
         $this->formErrors[] = $value;
         $this->logger->debug($value);
     }
@@ -346,7 +346,7 @@ class Validator implements ValidatorInterface
         if (is_array($key)) {
             $this->setErrors($key);
         } else {
-            $val = ($this->translator->exists($val)) ? $this->translator[$val] : $val;
+            $val = ($this->translator->has($val)) ? $this->translator[$val] : $val;
             $this->fieldData[$key]['error'] = $val;
             $this->errorArray[$key] = $val;
         }
@@ -362,7 +362,7 @@ class Validator implements ValidatorInterface
     public function setErrors(array $errors)
     {
         foreach ($errors as $k => $v) {
-            $v = ($this->translator->exists($v)) ? $this->translator[$v] : $v;
+            $v = ($this->translator->has($v)) ? $this->translator[$v] : $v;
             $this->fieldData[$k]['error'] = $v;
             $this->errorArray[$k] = $v;
         }

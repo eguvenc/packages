@@ -2,8 +2,8 @@
 
 namespace Obullo\Authentication\Storage;
 
-use Obullo\Container\ServiceProviderInterface as Provider;
 use Obullo\Session\SessionInterface as Session;
+use Obullo\Container\ServiceProviderInterface as Provider;
 
 /**
  * Null Storage
