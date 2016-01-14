@@ -349,7 +349,7 @@ class Translator implements TranslatorInterface
      */
     public function defaultSet()
     {
-        if (defined('STDIN') || $this->config['default']['set']['enabled'] == false) {
+        if (defined('STDIN') || $this->config['default']['set'] == false) {
             return;
         }            
         $this->c['cookie']

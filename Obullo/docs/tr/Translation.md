@@ -18,7 +18,7 @@
         </ul>
     </li>
     <li><a href="#getLocale">Mevcut Dili Almak ve Değiştirmek</a></li>
-    <li><a href="#routes">Routes.php için Dil Ayarları</a></li>
+    <li><a href="#rewrite">Url Adresi Dil Desteği</a></li>
     <li><a href="#fallback">Bulunamayan Dil</a></li>
     <li><a href="#fallback-lines">Bulunamayan Dil Çevirisi</a></li>
 </ul>
@@ -209,9 +209,9 @@ Eğer çereze yazmak istemiyorsanız ikinci parametreyi <kbd>false</kbd> olarak 
 $this->translator->setLocale('en', false);
 ```
 
-<a name="routes"></a>
+<a name="rewrite"></a>
 
-### Routes.php için Dil Ayarları
+### Url Adresi Dil Desteği
 
 Eğer uygulamanızın <kbd>http://example.com/en/welcome/index</kbd> gibi bir dil desteği ile çalışmasını istiyorsanız aşağıdaki route kurallarını <kbd>app/routes.php</kbd> dosyası içerisine tanımlamanız gerekir.
 
@@ -224,6 +224,9 @@ $c['router']->get('(?:en|es|de)', 'welcome');
 * İkinci kural ise varsayılan açılış sayfası içindir. ( örn. http://example.com/en/ )
 
 > **Not:** Uygulamanızın desteklediği dilleri düzenli ifadelerdeki parentez içlerine girmeniz gerekir. Yukarıda en,es ve de dilleri örnek gösterilmiştir.
+
+Eğer uygulamanızın bütününe değilde sadece belirli url adreslerinize dil desteği eklemek istiyorsanız <a href="https://github.com/obullo/http-middlewares" target="_blank">http-middlewares</a> bağlantısındaki <kbd>RewriteLocale</kbd> katmanını ve bu katmana ait dökümentasyonu inceleyin.
+
 
 <a name="fallback"></a>
 

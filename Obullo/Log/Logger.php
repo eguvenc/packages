@@ -48,14 +48,14 @@ class Logger extends AbstractLogger implements LoggerInterface
     /**
      * Constructor
      *
-     * @param object $c      container
-     * @param array  $params parameters
+     * @param object $container container
+     * @param array  $params    parameters
      */
-    public function __construct(Container $c, $params = array())
+    public function __construct(Container $container, $params = array())
     {
-        $this->c = $c;
+        $this->c = $container;
         $this->params  = $params;
-        $this->enabled = $c['config']['log']['enabled'];
+        $this->enabled = $container['config']['log']['enabled'];
         
         $this->initialize();
     }
@@ -510,7 +510,7 @@ class Logger extends AbstractLogger implements LoggerInterface
 
             if ($this->params['queue']['enabled']) { // Queue Logger
 
-                $this->c->get('queue')
+                $this->c['queue']
                     ->push(
                         'Workers@Logger',
                         $this->params['queue']['job'],

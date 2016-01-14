@@ -23,14 +23,14 @@ class Controller implements ControllerInterface
     /**
      * Set container
      * 
-     * @param Container $c container object
+     * @param Container $container container object
      * 
      * @return void
      */
-    public function __setContainer(Container $c = null)
+    public function __setContainer(Container $container = null)
     {
         if ($this->c == null) {
-            $this->c = &$c;
+            $this->c = &$container;
         }
     }
 
@@ -49,7 +49,7 @@ class Controller implements ControllerInterface
     /**
      * We prevent to set none object variables
      *
-     * Forexample in controller this is not allowed $this->user_variable = 'hello'.
+     * Forexample this is not allowed $this->user_variable = 'example'.
      * 
      * @param string $key string
      * @param string $val mixed

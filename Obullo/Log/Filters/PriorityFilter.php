@@ -1,6 +1,6 @@
 <?php
 
-namespace Obullo\Log\Filter;
+namespace Obullo\Log\Filters;
 
 use Obullo\Log\LoggerInterface as Logger;
 
@@ -29,13 +29,23 @@ class PriorityFilter
     /**
      * Constructor
      * 
-     * @param array  $params filter parameters
      * @param object $logger Logger
      */
-    public function __construct(array $params, Logger $logger)
+    public function __construct(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * Set filter params
+     * 
+     * @param array $params array
+     *
+     * @return void
+     */
+    public function setParams(array $params)
     {
         $this->params = $params;
-        $this->logger = $logger;
     }
 
     /**

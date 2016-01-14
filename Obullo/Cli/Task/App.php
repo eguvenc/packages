@@ -7,16 +7,6 @@ use Obullo\Cli\Console;
 
 class App extends Controller
 {
-    protected $uri;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->uri = $this->request->getUri();
-    }
-
     /**
      * Execute command
      * 
@@ -47,7 +37,8 @@ class App extends Controller
      */
     public function down($name = null)
     {
-        $name = (empty($name)) ? $this->uri->argument('name', null) : $name;
+        $uri = $this->request->getUri();
+        $name = (empty($name)) ? $uri->argument('name', 'root') : $name;
         $this->isEmpty($name);
 
         $newArray = $this->config['maintenance'];
@@ -67,7 +58,8 @@ class App extends Controller
      */
     public function up($name = null)
     {
-        $name = (empty($name)) ? $this->uri->argument('name', null) : $name;
+        $uri = $this->request->getUri();
+        $name = (empty($name)) ? $uri->argument('name', 'root') : $name;
         $this->isEmpty($name);
 
         $newArray = $this->config['maintenance'];

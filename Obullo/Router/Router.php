@@ -165,7 +165,7 @@ class Router implements RouterInterface
     {
         $this->uri->parseSegments();   // Compile the segments into an array 
 
-        if ($this->route->isEmpty()) {
+        if (! is_null($this->route) && $this->route->isEmpty()) {
             $this->setRequest($this->uri->getSegments());
             return;
         }
@@ -270,7 +270,7 @@ class Router implements RouterInterface
     {
         $uri = ltrim($this->uri->getPath(), '/'); // fix route errors with trim()
 
-        if ($routes = $this->route->getArray()) {
+        if (is_object($this->route) && $routes = $this->route->getArray()) {
             foreach ($routes as $val) {   // Loop through the route array looking for wild-cards
                 
                 $parameters = Parameters::parse($uri, $val);

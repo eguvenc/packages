@@ -5,15 +5,13 @@ Bir anotasyon aslında bir metadata yı (örneğin yorum,  açıklama, tanıtım
 
 > **Not:** Anotasyonlar herhangi bir kurulum yapmayı gerektirmez ve uygulamanıza performans açısından ek bir yük getirmez. Php ReflectionClass sınıfı ile okunan anotasyonlar çekirdekte herhangi bir düzenli ifade işlemi kullanılmadan kolayca çözümlenir.
 
-Şu anki sürümde biz anotasyonları sadece <kbd>Http Katmanlarını</kbd> atamak ve mevcut katmanları kaldırmak için kullanıyoruz.
-
 <ul>
     <li>
         <a href="#running">Çalıştırma</a>
         <ul>
             <li><a href="#enabling-annotations">Anotasyonları aktif etmek</a></li>
             <li><a href="#available-annotations">Mevcut Anotasyonlar</a></li>
-            <li><a href="#middleware">Middleware</a></li>
+            <li><a href="#middleware">Middleware Komutları</a></li>
             <li><a href="#loader-annotations">Yükleyici Anotasyonları</a></li>
         </ul>
     </li>
@@ -27,7 +25,7 @@ Bir anotasyon aslında bir metadata yı (örneğin yorum,  açıklama, tanıtım
 
 #### Anotasyonları aktif etmek
 
-Config.php konfigürasyon dosyasını açın ve <b>annotations > enabled</b> anahtarının değerini <b>true</b> olarak güncelleyin.
+Config.php konfigürasyon dosyasını açın ve <kbd>annotations > enabled</kbd> anahtarının değerini <kbd>true</kbd> olarak güncelleyin.
 
 ```php
 'controller' => [
@@ -49,8 +47,6 @@ public function index()
 {
     // ..
 }
-
-/* Location: .modules/welcome/welcome.php */
 ```
 
 <a name="available-annotations"></a>
@@ -86,7 +82,7 @@ public function index()
 
 <a name="middleware"></a>
 
-#### Middleware
+#### Middleware Komutları
 
 @middleware komutu ile bir kontrolör sınıfı içerisinden uygulamaya bir katman eklenebilir yada bir katman uygulamadan kaldırılabilir.
 
@@ -101,7 +97,7 @@ public function index()
  */
 ```
 
-Yukarıdaki örnek Controller sınıfı index ( middleware call ) metodundan önce uygulamaya <b>Example</b> katmanını ekler ve sadece <b>get</b> ve <b>post</b> isteklerinde erişime izin verir.
+Yukarıdaki örnekte anotasyon kontrolör sınıfı index metodundan önce uygulamaya <kbd>Example</kbd> katmanını ekler ve sadece <kbd>get</kbd> ve <kbd>post</kbd> isteklerinde erişime izin verir.
 
 ```php
 /**
@@ -113,26 +109,14 @@ Yukarıdaki örnek Controller sınıfı index ( middleware call ) metodundan ön
  */
 ```
 
-Yukarıdaki örnek sadece http <b>post</b> isteklerinde ve index() metodunun çalışmasından önce tanımlamış olduğunuz <b>XssFilter</b> gibi örnek bir katman çalıştırır.
+Yukarıdaki örnek sadece http <kbd>post</kbd> isteklerinde ve index() metodunun çalışmasından önce tanımlamış olduğunuz <kbd>XssFilter</kbd> gibi örnek bir katman çalıştırır.
 
-
-```php
-/**
- * Index
- *
- * @middleware->when("post")->remove("Csrf");
- *
- * @return void
- */
-```
-
-Yukarıdaki örnek sadece http <b>post</b> ve <b>get</b> isteklerinde index() metodunun çalışmasından önce varolan <b>Csrf</b> katmanını uygulamadan siler.
 
 <a name="loader-annotations"></a>
 
 #### Yükleyici Anotasyonları
 
-Bazı durumlarda yüklenen kontrolör sınıfının tüm metodlarında geçerli olabilecek bir filtreye ihtiyaç duyulabilir. Bu durumda filtreleri <b>__construct</b> metodu üzerine yazmanız yeterli olacaktır.
+Bazı durumlarda yüklenen kontrolör sınıfının tüm metodlarında geçerli olabilecek bir filtreye ihtiyaç duyulabilir. Bu durumda filtreleri <kbd>__construct</kbd> metodu üzerine yazmanız yeterli olacaktır.
 
 ```php
 /**

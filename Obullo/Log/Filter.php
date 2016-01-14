@@ -1,6 +1,6 @@
 <?php
 
-namespace Obullo\Log\Filter;
+namespace Obullo\Log;
 
 use Obullo\Log\LoggerInterface as Logger;
 
@@ -10,23 +10,27 @@ use Obullo\Log\LoggerInterface as Logger;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class LogFilters
+class Filter
 {
     /**
      * Handle log filters
      * 
-     * @param array $event  current handler log event
-     * @param array $logger logger
+     * @param array $event current handler log event
      * 
      * @return array single event data of writer
      */
-    public static function handle(array $event, Logger $logger)
+    public static function handle(array $event)
     {
+        global $c;
         foreach ($event['filters'] as $value) {
             $Class = '\\'.$value['class'];
             $method = $value['method'];
 
-            $filter = new $Class($value['params'], $logger); // Inject filter parameters
+            $filter = $c['dependency']->resolveDependencies($Class);  // Resolve components
+
+            if (method_exists($filter, 'setParams')) {
+                $filter->setParams($value['params']); // Inject filter parameters
+            }
             if (count($event['record']) > 0) {
                 $event['record'] = self::doFilter($event['record'], $filter, $method);
             }

@@ -51,7 +51,7 @@ class Http extends Application
         $router = $this->c['router'];
         $router->init();
 
-        include MODULES .$router->getModule('/').$router->getDirectory('/').$router->getClass().'.php';;
+        include MODULES .$router->getModule('/').$router->getDirectory('/').$router->getClass().'.php';
         $className = '\\'.$router->getNamespace().$router->getClass();
 
         $method = $router->getMethod();
@@ -107,7 +107,6 @@ class Http extends Application
                 }
             }
         }
-
         if ($this->c['config']['http']['debugger']['enabled']) {  // Boot debugger
             $middleware->add('Debugger');
         }
