@@ -13,7 +13,7 @@ Http katmanı <a href="http://en.wikipedia.org/wiki/Rack_%28web_server_interface
     </li>
 
     <li>
-        <a href="#assign">Katman Atama Yöntemleri</a>
+        <a href="#assign">Katman Atama</a>
         <ul>
             <li><a href="#globally">Evrensel Yöntem</a></li>
             <li><a href="#by-routes">Route Yöntemi</a></li>
@@ -22,7 +22,7 @@ Http katmanı <a href="http://en.wikipedia.org/wiki/Rack_%28web_server_interface
     </li>
 
     <li>
-        <a href="#features">Katman Sınıfı Özellikleri</a>
+        <a href="#features">Özellikler</a>
         <ul>
             <li><a href="#inject-components">Komponent Enjeksiyonu</a></li>
             <li><a href="#inject-container">Konteyner Enjeksiyonu</a></li>
@@ -179,7 +179,7 @@ Anotasyonlar hakkında daha fazla bilgi için [Annotations.md](Annotations.md) d
 
 <a name="features"></a>
 
-### Katman Sınıfı Özellikleri
+### Özellikler
 
 Katman sınıfı içerisindeki bazı metotlar uygulamaya özgü özel işlevleri yerine getirir. Bu metotlar aşağıda örneklendirilmiştir.
 
@@ -271,7 +271,7 @@ Eğer bir katman içerisinde <kbd>terminate()</kbd> metodu kullanılırsa bu met
 class Debugger implements MiddlewareInterface, ContainerAwareInterface, TerminableInterface()
 ```
 
-Katmanın sonlandırılabilir olarak tanımlanabilmesi için <kbd>TerminableInterface</kbd> arayüzüne genişlemesi ve katman içinde <kbd>terminate()</kbd> metodudunun ilan edilmesi gerekir.
+Katmanın sonlandırılabilir olarak tanımlanabilmesi için <kbd>TerminableInterface</kbd> arayüzüne genişlemesi ve katman içinde <kbd>terminate()</kbd> metodunun ilan edilmesi gerekir.
 
 ```php
 public function terminate()
@@ -280,4 +280,4 @@ public function terminate()
 }
 ```
 
-Kapatma işlevi <kbd>app/classes/Http/FinalHanlder/Zend</kbd> dosyası içerisindeki <kbd>register_shutdown_function()</kbd> fonksiyonu ile yürütülür.
+Kapatma işlevi <kbd>app/classes/Http/Middlewares/FinalHandler/Zend</kbd> dosyası içerisindeki <kbd>register_shutdown_function()</kbd> fonksiyonu ile yürütülür.
