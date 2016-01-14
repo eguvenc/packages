@@ -40,9 +40,7 @@ Uygulamayı gezegenimizin çekirdeği gibi düşünürsek çekirdeğe doğru git
 
 ![Middlewares](images/middlewares.png?raw=true "Middlewares")
 
-Yukarıdaki şemayı gözönüne alırsak uygulama çalıştığında en dışdaki katman ilk olarak çağrılır. Eğer bu katmandan bir <kbd>next</kbd> komutu cevabı elde edilirse bir sonraki katman çağrılır. Böylece bu aşamalar en içteki uygulama katmanı çalıştırılana kadar bir döngü içerisinde kademeli olarak devam eder. Uygulamaya eklenecek yeni bir katmanın hangi sıralamada çalışacağı <kbd>app/middlewares.php</kbd> dosyasından belirlenir.
-
-Her katmanda bir <kbd>invoke()</kbd> metodu olmak zorundadır. Opsiyonel olarak ayrıca her bir katmanda <kbd>construct()</kbd> metodu kullanılabilir ve bu metot bağımlılık enjeksiyonunu destekler. Böylece <kbd>app/components.php</kbd> dosyasında tanımladığınız bileşenler <kbd>construct()</kbd> metodu içerisine enjekte edilir.
+Yukarıdaki şemayı gözönüne alırsak uygulama çalıştığında en dıştaki katman ilk olarak çağrılır. Eğer bu katmandan bir <kbd>next</kbd> komutu cevabı elde edilirse bir sonraki katman çağrılır. Böylece bu aşamalar en içteki uygulama katmanı çalıştırılana kadar bir döngü içerisinde kademeli olarak devam eder. Uygulamaya eklenecek yeni bir katmanın hangi sıralamada çalışacağı <kbd>app/middlewares.php</kbd> dosyasından belirlenir. Her katmanda bir <kbd>invoke()</kbd> metodu olmak zorundadır.
 
 <a name="hello-middlewares"></a>
 
@@ -177,7 +175,7 @@ Yada <kbd>when</kbd> komutu ile sadece post işlemlerinde katmanlar ekleyebiliri
  */
 ```
 
-Anotasyonlar hakkında daha fazla bilgi için [Annotations](docs/tr/Annotations.md) dökümentasyonuna göz atın.
+Anotasyonlar hakkında daha fazla bilgi için [Annotations.md](Annotations.md) dökümentasyonuna göz atın.
 
 <a name="features"></a>
 
