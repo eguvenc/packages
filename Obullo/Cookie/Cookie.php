@@ -25,6 +25,13 @@ class Cookie implements CookieInterface
     protected $id;
 
     /**
+     * Config
+     * 
+     * @var object
+     */
+    protected $config;
+
+    /**
      * Logger
      * 
      * @var object

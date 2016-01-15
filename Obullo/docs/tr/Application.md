@@ -1,7 +1,7 @@
 
 ## Uygulama Sınıfı
 
-Uygulama sınıfı, ortam değişkenine ulaşmak, servis sağlayıcı, bileşenleri veya katmanları eklemek, uygulama versiyonu almak gibi uygulama ile ilgili ana fonksiyonlarını barındıran sınıftır.
+Uygulama sınıfı, ortam değişkenine ulaşmak, servis sağlayıcı, bileşenleri veya katmanları eklemek, uygulama versiyonunu almak gibi uygulama ile ilgili ana fonksiyonlarını barındıran sınıftır.
 
 <ul>
 <li>
@@ -132,7 +132,7 @@ return array(
 );
 ```
 
-Local ortamda çalışırken her geliştiricinin kendine ait bilgisayar ismini <kdb>app/environments.php</kbd> dosyası <b>local</b> dizisi içerisine bir defalığına eklemesi gereklidir. Linux benzeri işletim sistemlerinde bilgisayarınızın adını hostname komutuyla kolayca öğrenebilirsiniz.
+Local ortamda çalışırken her geliştiricinin kendine ait bilgisayar ismini <kbd>app/environments.php</kbd> dosyası <kbd>local</kbd> dizisi içerisine bir defalığına eklemesi gereklidir. Linux benzeri işletim sistemlerinde bilgisayarınızın adını hostname komutuyla kolayca öğrenebilirsiniz.
 
 ```
 root@localhost: hostname   // localhost.ubuntu
@@ -148,7 +148,7 @@ We could not detect your application environment, please correct your app/enviro
 
 #### Ortam Değişkeni
 
-* <b>Local</b> : Yerel sunucu ortamıdır, geliştiriciler tarafından uygulama bu ortam altında geliştirilir, her bir geliştiricinin bir defalığına <kbd>app/environments.php</kbd> dosyası içerisine kendi bilgisayarına ait ismi (hostname) tanımlaması gereklidir.
+* <b>Local</b> : Yerel sunucu ortamıdır, geliştiriciler tarafından uygulama bu ortam altında geliştirilir, her bir geliştiricinin bir defalığına <kbd>app/environments.php</kbd> dosyası içerisine kendi bilgisayarına ait ismi tanımlaması gereklidir.
 
 * <b>Test</b> : Test sunucu ortamıdır, geliştiriciler tarafından uygulama bu ortamda test edilir sonuçlar başarılı ise prodüksiyon ortamında uygulama yayına alınır, test sunucu isimlerinin bir defalığına <kbd>app/environments.php</kbd> dosyası içerisine tanımlaması gereklidir.
 
@@ -164,7 +164,7 @@ echo $c['app']->env();  // Çıktı  local
 
 #### Yeni Bir Ortam Değişkeni Yaratmak
 
-Yeni bir ortam yaratmak için <kbd>app/environments.php</kbd> dosyasına ortam adını küçük harflerle girin. Aşağıdaki örnekte sunucu isimleri ile birlikte <kbd>qa</kbd> adında bir ortam yaratılıyor
+Yeni bir ortam yaratmak için <kbd>app/environments.php</kbd> dosyasına ortam adını küçük harflerle girin. Aşağıdaki örnekte sunucu isimleri ile birlikte <kbd>qa</kbd> adında bir ortam yaratılıyor.
 
 ```php
 return array(
@@ -227,10 +227,10 @@ Bileşenler uygulamada yüklendiğinde önceden tanımlanmış çekirdek sınıf
 
 #### Bileşenleri Tanımlamak
 
-Bir bileşenin uygulama içerisinde çalışabilmesi için <kbd>app/components.php</kbd> dosyasına tanımlı olması gerekir. Bileşenler uygulamanın her yerinde kullanılan yada kullanılma ihtimalleri yüksek olan sınıflardır. Bir bileşeni onun uygulama içerisindeki görevini bilmeden kaldırdıysanız uygulamanız düzgün çalışmayabilir. Bir bileşen tanımlandıktan sonra konteyner sınıfı içerisinde kayıt edilir ve çağrılmadığı sürece uygulamaya yüklenmez. Bileşenin yüklenmesi için aşağıdaki gibi en az bir defa çağrılması gerekir.
+Bir bileşenin uygulama içerisinde çalışabilmesi için <kbd>app/components.php</kbd> dosyasına tanımlı olması gerekir. Bileşenler uygulamanın her yerinde kullanılma ihtimalleri yüksek olan sınıflardır. Bir bileşeni onun uygulama içerisindeki görevini bilmeden kaldırdıysanız uygulamanız düzgün çalışmayabilir. Bir bileşen tanımlandıktan sonra konteyner sınıfı içerisinde kayıt edilir ve çağrılmadığı sürece uygulamaya yüklenmez. Bileşenin yüklenmesi için aşağıdaki gibi en az bir defa çağrılması gerekir.
 
 ```php
-$this->c['class'];
+$this->c['view'];
 ```
 
 Bileşenler <kbd>app/components.php</kbd> dosyasında aşağıdaki gibi tanımlanırlar.
@@ -262,7 +262,7 @@ Eğer mevcut bir bileşeni değiştirmek istiyorsanız isimlere karşılık gele
 
 ### Get Metotları
 
-Get türündeki metotları uygulama sınıfında varolan verilere ulaşmanızı sağlar.
+Get türündeki metotlar uygulama sınıfı değerlerine ulaşmanızı sağlar.
 
 <a name="get-methods-env"></a>
 
@@ -284,7 +284,7 @@ echo $c['app']->env();  // local
 
 ##### $this->app->version();
 
-Mevctur Obullo sürümüne geri döner.
+Mevcut Obullo sürümüne geri döner.
 
 ```php
 $c['app']->version(); // Çıktı 1.0
@@ -300,7 +300,11 @@ Yada
 
 ##### $this->app->x();
 
-Uygulama sınıfında eğer metod ( x ) tanımlı değilse Controller sınıfından çağırır.
+Uygulama sınıfında içerisinde çağırılan metot tanımlı değilse Controller sınıfından çağırır.
+
+```php
+$this->app->test();  // Contoller sınıfı içerisindeki test metodunu çalıştırır.
+```
 
 ```php
 $this->c['app']->test();  // Contoller sınıfı içerisindeki test metodunu çalıştırır.
@@ -308,7 +312,7 @@ $this->c['app']->test();  // Contoller sınıfı içerisindeki test metodunu ça
 
 ##### $this->app->uri->x();
 
-Layer paketi isteği gönderildiğinde uri nesnesi istek gönderilen url değerinin yerel değişkenlerinden yeniden oluşturulur ve bu yüzden evrensel uri değişime uğrar. Böyle bir durumda bu method sizin ilk durumdaki http isteği yapılan evrensel uri nesnesine ulaşmanıza imkan tanır.
+Bir Layer ( Bknz. [Layer](Layer.md) paketi  ) isteği gönderildiğinde uri nesnesi istek gönderilen uri değeri ile yeniden oluşturulur ve bu nedenle evrensel uri nesnesi değişime uğrar. Böyle bir durumda bu metot ilk durumdaki http isteğinin uri nesnesine ulaşabilmeyi sağlar.
 
 ```php
 $this->c['app']->uri->getPath();
@@ -316,7 +320,7 @@ $this->c['app']->uri->getPath();
 
 ##### $this->app->router->x();
 
-Uygulamada kullanılan evrensel <b>router</b> nesnesine geri dönerek bu nesnenin metotlarına ulaşmanızı sağlar. Uygulama içerisinde bir hiyerarşik katman ( Bknz. [Layer](Layer.md) paketi  ) isteği gönderildiğinde router nesnesi istek gönderilen url değerinin yerel değişkenlerinden yeniden oluşturulur ve bu yüzden evrensel router değişime uğrar. Böyle bir durumda bu method ( x ) sizin ilk durumdaki http isteği yapılan evrensel router nesnesine ulaşmanıza imkan tanır.
+Uygulamada kullanılan evrensel <b>router</b> nesnesine geri dönerek bu nesnenin metotlarına ulaşmanızı sağlar. Bir Layer isteği ( Bknz. [Layer](Layer.md) paketi  ) gönderildiğinde router nesnesi istek gönderilen uri değeri ile yeniden oluşturulur ve bu nedenle evrensel router nesnesi değişime uğrar. Böyle bir durumda bu metot ilk durumdaki http isteğinin router nesnesine ulaşabilmeyi sağlar.
 
 ```php
 $this->c['app']->router->getMethod();
