@@ -1,5 +1,5 @@
 
-## Yetki Doğrulama ( Authentication )
+## Yetki Doğrulama ( User )
 
 Yetki doğrulama paketi yetki adaptörleri ile birlikte çeşitli ortak senaryolar için size bir API sağlar. Paket tümleşik bellek yönetimi ile birlikte gelir; yetkisi doğrulanmış kullanıcıları hafızada bellekler ve veritabanı sorgularının önüne geçer. Çoklu oturumları sonlandırma, yeki doğrulamayı onaylama, tarayıcı türü doğrulama ve beni hatırla gibi gelişmiş özellikleri de destekler.
 
@@ -30,12 +30,7 @@ Yetki doğrulama paketi yetki adaptörleri ile birlikte çeşitli ortak senaryol
                     <li><a href="#loading-service">Servisi Yüklemek</a></li>
                     <li><a href="#making-service">Servisi Yeniden Yaratmak</a></li>
                     <li><a href="#calling-classes">Sınıfları Çağırmak</a></li>
-                    <li>
-                        <a href="#accessing-config-variables">Konfigürasyon Değerlerine Erişmek</a>
-                        <ul>
-                            <li><a href="#authconfig">AuthConfig::get()</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="#accessing-config-variables">Konfigürasyon Değerlerine Erişmek</a></li>
                 </ul>
             </li>
         </ul>
@@ -79,7 +74,7 @@ Yetki doğrulama paketi yetki adaptörleri ile birlikte çeşitli ortak senaryol
 
 ### Özellikler
 
-O2 yetki doğrulama; 
+Obullo yetki doğrulama; 
 
 * Hafıza depoları, ( Storages ) 
 * Adaptörler,
@@ -90,7 +85,7 @@ O2 yetki doğrulama;
 * Yetki doğrulama onaylandırma ( Verification )
 * Oturum id sini yeniden yaratma, ( Session regenerate )
 * Tarayıcı türünü doğrulama ( User agent validation )
-* Hatırlatma çerezi ve beni hatırla ( Remember me token )
+* Hatırlatma çerezi ve beni hatırla ( Remember me )
 
 gibi özellikleri barındırır.
 
@@ -102,11 +97,9 @@ Aşağıdaki akış şeması bir kullanıcının yetki doğrulama aşamalarında
 
 ![Authentication](images/auth-flowchart.png?raw=true "Authentication")
 
-Şemada görüldüğü üzere <b>GenericUser</b> ve <b>AuthorizedUser</b> olarak iki farklı durumu olan bir kullanıcı sözkonusudur. GenericUser <b>yetkilendirilmemiş</b> AuhtorizedUser ise servis tarafından <b>yetkilendirilmiş</b> kullanıcıdır.
+Şemada görüldüğü üzere <kbd>GenericUser</kbd> ve <kbd>AuthorizedUser</kbd> olarak iki farklı durumu olan bir kullanıcı sözkonusudur. GenericUser <kbd>yetkilendirilmemiş</kbd> AuhtorizedUser ise servis tarafından <kbd>yetkilendirilmiş</kbd> kullanıcıdır.
 
-Akış şemasına göre GenericUser login butonuna bastığı anda ilk önce hafıza bloğuna bir sorgu yapılır ve daha önceden kullanıcının önbellekte yetkilendirilmiş kalıcı kimliği olup olmadığında bakılır eğer hafıza bloğunda kalıcı yetki doğrulama kaydı var ise kullanıcı kimliği buradan yok ise database adaptörüne sorgu yapılarak elde edilir.
-
-Eğer kullanıcı kimliği database sorgusu yapılarak elde edilmişse elde edilen kimlik kartı performans için tekrar hafıza bloğuna yazılır.
+Akış şemasına göre GenericUser login butonuna bastığı anda ilk önce önbelleğe bir sorgu yapılır ve daha önceden kullanıcının önbellekte kalıcı bir kimliği olup olmadığında bakılır. Eğer hafıza bloğunda kalıcı yetki var ise kullanıcı kimliği buradan okunur yok ise veritabanına sorgu gönderilir ve elde edilen kimlik kartı performans için tekrar önbelleğe yazılır.
 
 <a name="configuration"></a>
 
@@ -128,7 +121,7 @@ Yetki doğrulama paketine ait konfigürasyon <kbd>app/$env/service/user.php</kbd
     <tbody>
         <tr>
             <td>cache[key]</td>
-            <td>Bu değer auth paketinin kayıt olacağı anahtarın önekidir. Bu değeri her proje için farklı girmeniz projelerinizin karışmaması için tavsiye edilir. Örneğin bu değer "Auth:ProjectName" olarak girilebilir.</td>
+            <td>Bu değer auth paketinin kayıt olacağı anahtarın önekidir. Bu değeri her proje için farklı girmeniz tavsiye edilir. Örneğin bu değer <kbd>Auth:ProjectName</kbd> olarak girilebilir.</td>
         </tr>
         <tr>
             <td>cache[storage]</td>
@@ -136,33 +129,33 @@ Yetki doğrulama paketine ait konfigürasyon <kbd>app/$env/service/user.php</kbd
         </tr>
         <tr>
             <td>cache[provider][driver]</td>
-            <td>Hazıfa deposu içerisinde kullanılan servis sağlayıcısının hangi servis sağlayıcısına bağlanacağını belirler. Varsayılan değer "redis" değeridir. Bu konfigürasyon servis sağlayıcısı çağrıldığında <b>$c['x']->get(["connection" => "y"])</b> örneğinde <b>"x"</b> yerine gelen değerdir.</td>
+            <td>Hazıfa deposu içerisinde kullanılan servis sağlayıcısının hangi servis sağlayıcısına bağlanacağını belirler. Varsayılan değer <kbd>redis</kbd> değeridir.</td>
         </tr>
 
         <tr>
             <td>cache[provider][connection]</td>
-            <td>Hazıfa deposu içerisinde kullanılan servis sağlayıcısının hangi bağlantıyı kullanacağını belirler. Varsayılan değer "second" değeridir. Bu konfigürasyon servis sağlayıcısı çağrıldığında <b>$c['x']->get(["connection" => "y"])</b> örneğinde <b>"y"</b> yerine gelen değerdir.</td>
+            <td>Hazıfa deposu içerisinde kullanılan servis sağlayıcısının hangi bağlantıyı kullanacağını belirler.</td>
         </tr>
         <tr>
             <td>cache[block][permanent][lifetime]</td>
-            <td>Oturum açıldıktan sonra kullanıcı kalıcı olarak onaylandı ise kullanıcı kimliği verileri <b>permanent</b> hafıza bloğuna kaydedilir. Kalıcı blokta ön belleğe alınan veriler kullanıcının web sitesi üzerinde <b>hareketsiz</b> kaldığı andan itibaren varsayılan olarak <b>3600</b> saniye sonra yok olur.</td>
+            <td>Oturum açıldıktan sonra kullanıcı kalıcı olarak onaylandı ise kullanıcı kimliği verileri <kbd>permanent</kbd> hafıza bloğuna kaydedilir. Kalıcı blokta ön belleğe alınan veriler kullanıcının web sitesi üzerinde <kbd>hareketsiz</kbd> kaldığı andan itibaren varsayılan olarak <kbd>3600</kbd> saniye sonra yok olur.</td>
         </tr>
         <tr>
             <td>cache[block][temporary][lifetime]</td>
-            <td>Oturum açıldıktan sonra kullanıcı kimliği verileri <b>$this->user->identity->makeTemporary()</b> komutu ile <b>temporary</b> hafıza bloğuna taşınır. Geçici bloğa kaydedilmiş veriler <b>300</b> saniye sonrasında varsayılan olarak yok olur. Geçici blok yetki doğrulama onaylandırma durumları için tasarlanmıştır. Kimlik onayladı ise <b>$this->user->identity->makePermanent()</b> komutu ile kalıcı hale getirilmelidir.
+            <td>Opsiyonel olarak gümrükten pasaport ile geçiş gibi kimlik onaylama sistemi isteniyorsa,  oturum açıldıktan sonra kullanıcı kimliği verileri <kbd>$this->user->identity->makeTemporary()</kbd> komutu ile <kbd>temporary</kbd> hafıza bloğuna taşınabilirr. Geçici bloğa taşınmış veriler <kbd>300</kbd> saniye sonrasında yok olur. Geçici blok kimlik onayı durumları için tasarlanmıştır. Kimlik onayladı ise <kbd>$this->user->identity->makePermanent()</kbd> komutu ile kimlik kalıcı hale getirilir ve kullanıcı sisteme tam giriş yapmış olur.
             </td>
         </tr>
         <tr>
             <td>security[passwordNeedsRehash][cost]</td>
-            <td>Bu değer Crypt/Password kütüphanesi tarafından şifre hash işlemi için kullanılır. Varsayılan değer 6 dır fakat maximum 8 ila 12 arasında olmalıdır aksi takdirde uygulamanız yetki doğrulama aşamasında performans sorunları yaşayabilir. 8 veya 10 değerleri orta donanımlı bilgisayarlar için 12 ise güçlü donanımlı ( çekirdek sayısı fazla ) bilgisayarlar için tavsiye edilir.</td>
-        </tr>
-        <tr>
-            <td>login[rememberMe]</td>
-            <td>Eğer kullanıcı beni hatırla özelliğini kullanarak giriş bilgilerini kalıcı olarak tarayıcısına kaydetmek istiyorsa  <b>__rm</b> isimli bir çerez ilk oturum açmadan sonra tarayıcısına kaydedilir. Bu çerezin sona erme süresi varsayılan olarak 6 aydır. Kullanıcı farklı zamanlarda uygulamanızı ziyaret ettiğinde eğer bu çerez ( remember token ) tarayıcısında kayıtlı ise Identity sınıfı içerisinde <b>Authentication\Recaller->recallUser($token)</b> metodu çalışmaya başlar ve beni hatırla çerezi veritabanında kayıtlı olan değer ile karşılaştırılır değerler birbiri ile aynı ise kullanıcı sisteme giriş yapmış olur. Güvenlik amacıyla her oturum açma (login) ve kapatma (logout) işlemlerinden sonra bu değer çereze ve veritabanına yeniden kaydedilir.</td>
+            <td>Bu değer <kbd>password</kbd> kütüphanesi tarafından şifre hash işlemi için kullanılır. Varsayılan değer 6 dır fakat maximum 8 ila 12 arasında olmalıdır aksi takdirde uygulamanız yetki doğrulama aşamasında performans sorunları yaşayabilir. 8 veya 10 değerleri orta donanımlı bilgisayarlar için 12 ise güçlü donanımlı ( çekirdek sayısı fazla ) bilgisayarlar için tavsiye edilir.</td>
         </tr>
         <tr>
             <td>session[regenerateSessionId]</td>
             <td>Session id nin önceden çalınabilme ihtimaline karşı uygulanan bir güvenlik yöntemlerinden bir tanesidir. Bu opsiyon aktif durumdaysa oturum açma işleminden önce session id yeniden yaratılır ve tarayıcıda kalan eski oturum id si artık işe yaramaz hale gelir.</td>
+        </tr>
+        <tr>
+            <td>login[rememberMe]</td>
+            <td>Eğer kullanıcı beni hatırla özelliğini kullanarak giriş bilgilerini kalıcı olarak tarayıcısına kaydetmek istiyorsa  <b>__rm</b> isimli bir çerez ilk oturum açmadan sonra tarayıcısına kaydedilir. Bu çerezin sona erme süresi varsayılan olarak 6 aydır. Kullanıcı farklı zamanlarda uygulamanızı ziyaret ettiğinde eğer bu çerez ( remember token ) tarayıcısında kayıtlı ise Identity sınıfı içerisinde <b>Authentication\Recaller->recallUser($token)</b> metodu çalışmaya başlar ve beni hatırla çerezi veritabanında kayıtlı olan değer ile karşılaştırılır değerler birbiri ile aynı ise kullanıcı sisteme giriş yapmış olur. Güvenlik amacıyla her oturum açma (login) ve kapatma (logout) işlemlerinden sonra bu değer çereze ve veritabanına yeniden kaydedilir.</td>
         </tr>
         <tr>
             <td>middleware[unique.session]</td>

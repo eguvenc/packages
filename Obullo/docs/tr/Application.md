@@ -306,6 +306,8 @@ Uygulama sınıfında içerisinde çağırılan metot tanımlı değilse Control
 $this->app->test();  // Contoller sınıfı içerisindeki test metodunu çalıştırır.
 ```
 
+
+
 ```php
 $this->c['app']->test();  // Contoller sınıfı içerisindeki test metodunu çalıştırır.
 ```
@@ -417,7 +419,7 @@ yerine
 $c['dependency']->resolve('Namespace\ClassName');
 ```
 
-<kbd>resolve()</kbd> metodu ile çağırın. Eğer construct() metodu içerisinde girilen değişken isimleri yukarıdaki bağımlılık listenizle uyuşuyorsa aşağıdaki gibi $request, $config ve $logger bileşenlerini sınıfınıza enjekte edebilirsiniz.
+<kbd>resolve()</kbd> metodu ile çağırın. Eğer <kbd>construct()</kbd> metodu içerisinde girilen değişken isimleri yukarıdaki bağımlılık listenizle uyuşuyorsa aşağıdaki gibi $request,  $logger ve diğer tanımlı olan bileşenleri sınıfınıza enjekte edebilirsiniz.
 
 
 ```php
@@ -430,9 +432,8 @@ use Obullo\Config\ConfigInterface as Config;
 
 class MyClass
 {
-    protected $request;
-    protected $config;
     protected $cookies;
+    protected $config;
     protected $logger;
 
     public function __construct(Request $request, Config $config, Logger $logger)
