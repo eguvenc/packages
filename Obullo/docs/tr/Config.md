@@ -188,7 +188,7 @@ echo $this->c['app']->env();  // local
 Konfigürasyon yapılmadığında yada sunucu isimleri geçerli sunucu ismi ile eşleşmediğinde uygulama size aşağıdaki gibi bir hata dönecektir.
 
 ```
-We could not detect your application environment, please correct your app/environments.php hostnames.
+We could not detect your application environment, please correct your app/environments.php file.
 ```
 
 <a name="environment-variable"></a>

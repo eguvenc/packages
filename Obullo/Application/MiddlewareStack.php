@@ -165,7 +165,7 @@ class MiddlewareStack implements MiddlewareStackInterface
         $Class = $this->registered[$name];
         $this->names[$name] = $this->count;
 
-        return $this->queue[$this->count] = $this->dependency->resolveDependencies($Class);  // Store middlewares
+        return $this->queue[$this->count] = $this->dependency->resolve($Class);  // Store middlewares
     }
 
     /**

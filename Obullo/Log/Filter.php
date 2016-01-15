@@ -26,7 +26,7 @@ class Filter
             $Class = '\\'.$value['class'];
             $method = $value['method'];
 
-            $filter = $c['dependency']->resolveDependencies($Class);  // Resolve components
+            $filter = $c['dependency']->resolve($Class);  // Resolve components
 
             if (method_exists($filter, 'setParams')) {
                 $filter->setParams($value['params']); // Inject filter parameters

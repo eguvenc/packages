@@ -149,7 +149,7 @@ class Field implements FieldInterface
                     $result = false;
                 } else {
                     $Class  = $this->ruleArray[$key];
-                    $next   = $this->dependency->resolveDependencies($Class);
+                    $next   = $this->dependency->resolve($Class);
                     $result = $next($this);
                 }
             }

@@ -61,7 +61,7 @@ class Dependency
         }
         $this->components[$key] = $class;
         $this->c[$key] = function () use ($class) {
-            return $this->resolveDependencies($class);
+            return $this->resolve($class);
         };
     }
 
@@ -99,7 +99,7 @@ class Dependency
      * 
      * @return object class instance
      */
-    public function resolveDependencies($class)
+    public function resolve($class)
     {
         $Class = '\\'.ltrim($class, '\\');
         $reflector = new ReflectionClass($Class);

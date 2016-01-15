@@ -27,7 +27,7 @@ $detectEnvironment = function () {
         }
     }
     if ($env == null) {
-        die('We could not detect your application environment, please correct your app/environments.php hostnames.');
+        die('We could not detect your application environment, please correct your app/environments.php file.');
     }
     return $env;
 };
