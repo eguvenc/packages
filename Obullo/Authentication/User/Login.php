@@ -84,7 +84,7 @@ class Login
     {
         $name = $this->params['login']['rememberMe']['cookie']['name'];
 
-        $cookies = $this->c['request']->getCookieParams();
+        $cookies = $this->getContainer()->get('request')->getCookieParams();
 
         return isset($cookies[$name]) ? $cookies[$name] : false;
     }
@@ -98,7 +98,7 @@ class Login
     public function ignoreRecaller()
     {
         if ($this->hasRememberMe()) {
-            $this->c['session']->set('Auth/IgnoreRecaller', 1);
+            $this->getContainer()->get('session')->set('Auth/IgnoreRecaller', 1);
         }
     }
 
@@ -111,8 +111,8 @@ class Login
      */
     public function formatCredentials(array $credentials)
     {   
-        $i = $this->c['auth.params']['db.identifier'];
-        $p = $this->c['auth.params']['db.password'];
+        $i = $this->getContainer()->get('auth.params')['db.identifier'];
+        $p = $this->getContainer()->get('auth.params')['db.password'];
 
         if (isset($credentials[$i]) && isset($credentials[$p])) {
             
@@ -136,22 +136,24 @@ class Login
      */
     protected function createResults(array $credentials)
     {
+        $container = $this->getContainer();
+
         /**
          * Login Query
          * 
          * @var object
          */
-        $authResult = $this->c['auth.adapter']->login($credentials);
+        $authResult = $container->get('auth.adapter')->login($credentials);
 
         /**
          * Generate User Identity
          */
-        $this->c['auth.identity']->initialize();
+        $this->containet->get('auth.identity')->initialize();
 
         /**
          * Create event
          */
-        $event = new LoginEvent;
+        $event = new LoginEvent($container);
 
         /**
          * Event variables
@@ -167,7 +169,7 @@ class Login
         /**
          * Emit data
          */
-        $emitter->emit($name, $this->c, $authResult);
+        $emitter->emit($name, $authResult);
 
         /**
          * Event result returns multiple array response but we use one.

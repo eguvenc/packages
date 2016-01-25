@@ -120,9 +120,12 @@ abstract class Job
      */
     protected function resolveAndFire(array $payload)
     {
-        global $c;
+        global $container;
         $Class = str_replace('@', '\\', ucfirst($payload['job']));
-        $this->instance = new $Class($c, array('env' => $this->getEnv()));
+        $this->instance = new $Class(
+            $container, 
+            array('env' => $this->getEnv())
+        );
         $this->instance->fire($this, $payload['data']);
     }
 

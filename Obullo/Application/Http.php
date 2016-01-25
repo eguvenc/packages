@@ -5,9 +5,12 @@ namespace Obullo\Application;
 use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
-use Obullo\Container\ContainerAwareInterface;
-use Obullo\Http\Middleware\ParamsAwareInterface;
-use Obullo\Http\Middleware\ControllerAwareInterface;
+use Obullo\Container\ParamsAwareInterface;
+use Obullo\Container\ControllerAwareInterface;
+use League\Container\ImmutableContainerAwareInterface;
+
+use Obullo\Router\RouterInterface as Router;
+use Obullo\Application\MiddlewareStackInterface as MiddlewareStack;
 
 use ReflectionClass;
 
@@ -29,26 +32,32 @@ class Http extends Application
      */
     public function init()
     {
-        $c = $this->c;  // make global
+        $container = $this->getContainer();  // make global
+        $app = $container->get('app');
 
         include APP .'errors.php';
         
         $this->registerErrorHandlers();
+            
+        $router = $container->get('router');
+        $middleware = $container->get('middleware');
 
         include APP .'middlewares.php';
         include APP .'routes.php';
 
-        $this->boot();
+        $this->boot($router, $middleware);
     }
 
     /**
      * Register assigned middlewares
+     *
+     * @param object $router     router
+     * @param object $middleware middleware
      * 
      * @return void
      */
-    protected function boot()
+    protected function boot(Router $router, MiddlewareStack $middleware)
     {
-        $router = $this->c['router'];
         $router->init();
 
         include MODULES .$router->getModule('/').$router->getDirectory('/').$router->getClass().'.php';
@@ -64,9 +73,11 @@ class Http extends Application
         } else {
 
             $this->controller = new $className;
-            $this->controller->__setContainer($this->c);
+            $this->controller->setContainer($this->container);
 
-            if (! method_exists($this->controller, $method)
+            if ($method == 'setContainer' 
+                || $method == 'getContainer' 
+                || ! method_exists($this->controller, $method)
                 || substr($method, 0, 1) == '_'
             ) {
                 $router->clear();  // Fix layer errors.
@@ -74,23 +85,24 @@ class Http extends Application
             }
         }
         $this->bootAnnotations($method);
-        $this->bootMiddlewares();
+        $this->bootMiddlewares($router, $middleware);
     }
 
     /**
      * Boot middlewares
      * 
+     * @param object $router     router
+     * @param object $middleware middleware
+     * 
      * @return void
      */
-    protected function bootMiddlewares()
+    protected function bootMiddlewares(Router $router, MiddlewareStack $middleware)
     {
-        $router     = $this->c['router'];
-        $request    = $this->c['request'];
-        $middleware = $this->c['middleware'];
+        $request = $this->container->get('request');
 
         $object = null;
         $uriString = $request->getUri()->getPath();
-        
+
         if ($attach = $router->getAttach()) {
 
             foreach ($attach->getArray() as $value) {
@@ -107,7 +119,7 @@ class Http extends Application
                 }
             }
         }
-        if ($this->c['config']['http']['debugger']['enabled']) {  // Boot debugger
+        if ($this->container->get('config')['http']['debugger']['enabled']) {  // Boot debugger
             $middleware->add('Debugger');
         }
         $this->inject($middleware);
@@ -120,12 +132,13 @@ class Http extends Application
      * 
      * @return void
      */
-    protected function inject($middleware)
+    protected function inject(MiddlewareStack $middleware)
     {
         foreach ($middleware->getNames() as $name) {
+
             $object = $middleware->get($name);
-            if ($object instanceof ContainerAwareInterface) {
-                $object->setContainer($this->c);
+            if ($object instanceof ImmutableContainerAwareInterface) {
+                $object->setContainer($this->getContainer());
             }
             if ($this->controller != null && $object instanceof ControllerAwareInterface) {
                 $object->setController($this->controller);
@@ -142,13 +155,14 @@ class Http extends Application
      */
     protected function bootAnnotations($method)
     {
-        if ($this->c['config']['extra']['annotations'] && $this->controller != null) {
+        if ($this->container->get('config')['extra']['annotations'] && $this->controller != null) {
 
             $reflector = new ReflectionClass($this->controller);
 
             if ($reflector->hasMethod($method)) {
+
                 $docs = new \Obullo\Application\Annotations\Controller;
-                $docs->setContainer($this->c);
+                $docs->setContainer($this->getContainer());
                 $docs->setReflectionClass($reflector);
                 $docs->setMethod($method);
                 $docs->parse();
@@ -169,18 +183,13 @@ class Http extends Application
         if ($this->error) {
             return false;
         }
-        unset($this->c['response']);
-        $this->c['response'] = function () use ($response) {
-            return $response;
-        };
-        unset($this->c['request']);
-        $this->c['request'] = function () use ($request) {
-            return $request;
-        };
+        $this->container->share('response', $response);  // Refresh objects
+        $this->container->share('request', $request);
+
         $result = call_user_func_array(
             array(
                 $this->controller,
-                $this->c['router']->getMethod()
+                $this->container->get('router')->getMethod()
             ),
             array_slice($this->controller->request->getUri()->getRoutedSegments(), 3)
         );

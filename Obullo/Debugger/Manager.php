@@ -19,7 +19,7 @@ class Manager
      * 
      * @var object
      */
-    protected $c;
+    protected $container;
 
     /**
      * Logger class
@@ -40,10 +40,10 @@ class Manager
      */
     public function __construct()
     {
-        global $c;
-        $this->c = $c;
-        $this->logger = $c['logger'];
-        $this->config = $c['config']->load('service/logger');
+        global $container;
+        $this->container = $container;
+        $this->logger = $container->get('logger');
+        $this->config = $container->get('config')->load('providers/logger');
     }
 
     /**
@@ -58,16 +58,16 @@ class Manager
          * 
          * @var string
          */
-        $websocketUrl = $this->c['config']['http']['debugger']['socket'];
-        $debuggerOff  = (int)$this->c['config']['http']['debugger']['enabled'];
-        $debuggerUrl  = $this->c['url']->baseUrl(INDEX_PHP.'/debugger/body');
+        $websocketUrl = $this->container->get('config')['http']['debugger']['socket'];
+        $debuggerOff  = (int)$this->container->get('config')['http']['debugger']['enabled'];
+        $debuggerUrl  = $this->container->get('url')->baseUrl(INDEX_PHP.'/debugger/body');
 
         $env = new Environment(
-            $this->c['request'],
-            $this->c['session']
+            $this->container->get('request'),
+            $this->container->get('session')
         );
         $envHtml = $env->printHtml();
-        $cookies = $this->c['request']->getCookieParams();
+        $cookies = $this->container->get('request')->getCookieParams();
 
         ob_start();
         include_once 'View.php';
@@ -86,7 +86,7 @@ class Manager
     {
         if (false == preg_match(
             '#(ws:\/\/(?<host>(.*)))(:(?<port>\d+))(?<url>.*?)$#i', 
-            $this->c['config']['http']['debugger']['socket'], 
+            $this->container->get('config')['http']['debugger']['socket'], 
             $matches
         )) {
             throw new RuntimeException("Debugger socket connection error, example web socket configuration: ws://127.0.0.1:9000");

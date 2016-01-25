@@ -3,8 +3,10 @@
 namespace Obullo\Validator\Rules;
 
 use Obullo\Security\CsrfInterface;
-use Obullo\Validator\FieldInterface as Field;
 use Psr\Http\Message\ServerRequestInterface as Request;
+
+use League\Container\ImmutableContainerAwareTrait;
+use League\Container\ImmutableContainerAwareInterface;
 
 /**
  * Csrf form verify
@@ -12,22 +14,9 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Csrf
+class Csrf implements ImmutableContainerAwareInterface
 {
-    protected $csrf;
-    protected $request;
-
-    /**
-     * Constructor
-     * 
-     * @param Csrf    $csrf    csrf
-     * @param Request $request request
-     */
-    public function __construct(CsrfInterface $csrf, Request $request)
-    {
-        $this->csrf = $csrf;
-        $this->request = $request;
-    }
+    use ImmutableContainerAwareTrait;
 
     /**
      * Call next
@@ -54,11 +43,14 @@ class Csrf
      */
     public function isValid(Field $field)
     {
-        if ($this->request->getMethod() == 'POST') {
+        $container = $this->getContainer();
+        $request = $container->get('request');
 
-            if (! $this->csrf->verify($this->request)) {
+        if ($request->getMethod() == 'POST') {
 
-                $code = $this->csrf->getErrorCode();
+            if (! $container->get('csrf')->verify($request)) {
+
+                $code = $container->get('csrf')->getErrorCode();
                 
                 switch ($code) {
                 case 00:

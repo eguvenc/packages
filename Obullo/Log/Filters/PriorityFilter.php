@@ -2,7 +2,10 @@
 
 namespace Obullo\Log\Filters;
 
-use Obullo\Log\LoggerInterface as Logger;
+use Obullo\Container\ParamsAwareTrait;
+use Obullo\Container\ParamsAwareInterface;
+use League\Container\ImmutableContainerAwareTrait;
+use League\Container\ImmutableContainerAwareInterface;
 
 /**
  * Priority filter
@@ -10,43 +13,9 @@ use Obullo\Log\LoggerInterface as Logger;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class PriorityFilter
+class PriorityFilter implements ImmutableContainerAwareInterface, ParamsAwareInterface
 {
-    /**
-     * Logger class
-     * 
-     * @var object
-     */
-    protected $logger;
-
-    /**
-     * Parameters
-     * 
-     * @var array
-     */
-    protected $params;
-
-    /**
-     * Constructor
-     * 
-     * @param object $logger Logger
-     */
-    public function __construct(Logger $logger)
-    {
-        $this->logger = $logger;
-    }
-
-    /**
-     * Set filter params
-     * 
-     * @param array $params array
-     *
-     * @return void
-     */
-    public function setParams(array $params)
-    {
-        $this->params = $params;
-    }
+    use ImmutableContainerAwareTrait, ParamsAwareTrait;
 
     /**
      * Filter in array
@@ -60,9 +29,11 @@ class PriorityFilter
         if (empty($record)) {
             return array();
         }
-        $priority = $this->logger->getPriority($record['level']);
+        $priority = $this->getContainer()
+            ->get('logger')
+            ->getPriority($record['level']);
 
-        if (in_array($priority, $this->params)) {
+        if (in_array($priority, $this->getParams())) {
             return $record;
         }
         return;
@@ -80,9 +51,11 @@ class PriorityFilter
         if (empty($record)) {
             return array();
         }
-        $priority = $this->logger->getPriority($record['level']);
+        $priority = $this->getContainer()
+            ->get('logger')
+            ->getPriority($record['level']);
 
-        if (! in_array($priority, $this->params)) {
+        if (! in_array($priority, $this->getParams())) {
             return $record;
         }
         return;

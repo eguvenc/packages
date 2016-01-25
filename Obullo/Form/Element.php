@@ -17,13 +17,6 @@ use Obullo\Container\ContainerInterface as Container;
 class Element
 {
     /**
-     * Container
-     * 
-     * @var object
-     */
-    protected $c;
-
-    /**
      * Config
      * 
      * @var object
@@ -38,6 +31,13 @@ class Element
     protected $request;
 
     /**
+     * Container
+     * 
+     * @var object
+     */
+    protected $container;
+
+    /**
      * Constructor
      *
      * @param object $container \Obullo\Container\ContainerInterface
@@ -47,9 +47,9 @@ class Element
      */
     public function __construct(Container $container, Request $request, Config $config, Logger $logger)
     {
-        $this->c = $container;
         $this->config = $config;
         $this->request = $request;
+        $this->container = $container;
 
         $logger->debug('Form Element Class Initialized');
     }
@@ -69,18 +69,18 @@ class Element
         if ($attributes == '') {
             $attributes = 'method="post"';
         }
-        $action = ( strpos($action, '://') === false) ? $this->c['url']->siteUrl($action) : $action;
+        $action = ( strpos($action, '://') === false) ? $this->container['url']->siteUrl($action) : $action;
         $form  = '<form action="'.$action.'"';
         $form .= $this->attributesToString($attributes, true);
         $form .= '>';
 
-        $csrf = $this->config->load('service/csrf')['params'];
+        $csrf = $this->config->load('providers/csrf')['params'];
         $form = str_replace(array('"method=\'get\'"', "method=\'GET\'"), 'method="get"', $form);
 
         // Add CSRF field if enabled, but leave it out for GET requests and requests to external websites
 
         if ($csrf['protection'] && ! stripos($form, 'method="get"')) {
-            $hidden[$this->c['csrf']->getTokenName()] = $this->c['csrf']->getToken();
+            $hidden[$this->container['csrf']->getTokenName()] = $this->container['csrf']->getToken();
         }
         if (is_array($hidden) && count($hidden) > 0) {
             $form .= $this->hidden($hidden, '');
@@ -137,7 +137,7 @@ class Element
             $content = $data['content'];
             unset($data['content']); // content is not an attribute
         }
-        return "<button ".$this->parseFormAttributes($data, $defaults).$extra.">".$this->c['translator'][$content]."</button>";
+        return "<button ".$this->parseFormAttributes($data, $defaults).$extra.">".$this->container['translator'][$content]."</button>";
     }
     
     /**
@@ -338,7 +338,7 @@ class Element
     public function label($label_text = '', $id = '', $attributes = "")
     {
         $label = '<label';
-        $label_text = $this->c['translator'][$label_text];
+        $label_text = $this->container['translator'][$label_text];
         if (empty($id)) {
             $id = mb_strtolower($label_text);
         }
@@ -453,7 +453,7 @@ class Element
      */
     public function submit($data = '', $value = '', $extra = '')
     {
-        $defaults = array('type' => 'submit', 'name' => (( ! is_array($data)) ? $data : ''), 'value' => $this->c['translator'][$value]);
+        $defaults = array('type' => 'submit', 'name' => (( ! is_array($data)) ? $data : ''), 'value' => $this->container['translator'][$value]);
 
         return '<input ' . $this->parseFormAttributes($data, $defaults) . $extra . ' />';
     }
@@ -595,7 +595,7 @@ class Element
             $field = $field['name'];
         }
         $request = $this->request->getParameters();
-        $value   = (isset($request[$field])) ? $this->c['form']->getValue($field) : '';
+        $value   = (isset($request[$field])) ? $this->container['form']->getValue($field) : '';
 
         if (! isset($request[$field])) { // If POST data not available use Database $row
 

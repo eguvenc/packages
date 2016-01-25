@@ -3,6 +3,7 @@
 namespace Obullo\Application\Annotations;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Obullo\Application\MiddlewareStackInterface as Middleware;
 
 /**
  * Annotations Methods
@@ -51,13 +52,11 @@ class Methods
      * Constructor
      * 
      * @param ServerRequestInterface         $request    request
-     * @param \Obullo\Container\Dependency   $dependency manager
      * @param \Obullo\Application\Middleware $middleware stack object
      */
-    public function __construct(Request $request, $dependency, $middleware)
+    public function __construct(Request $request, Middleware $middleware)
     {
         $this->request = $request;
-        $this->dependency = $dependency;
         $this->middlewareStack = $middleware;
     }
 

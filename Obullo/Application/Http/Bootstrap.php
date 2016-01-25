@@ -1,13 +1,5 @@
 <?php
 
-use Obullo\Container\Loader;
-use Obullo\Container\Container;
-use Obullo\Container\Dependency;
-use Obullo\Container\ContainerInterface;
-
-use Obullo\Config\Config;
-use Obullo\Application\Http;
-
 /**
  * Detect environment
  * 
@@ -33,13 +25,8 @@ $detectEnvironment = function () {
 };
 $env = $detectEnvironment();
 
-/**
- * Container
- * 
- * @var object
- */
-$c = new Container(new Loader(ROOT ."app/".$env."/service", LOADER)); // Bind services to container
-$c['app.env'] = $env;
+$container = new League\Container\Container;
+$container->add('env', new League\Container\Argument\RawArgument($env));
 
 /**
  * Include application
@@ -47,30 +34,11 @@ $c['app.env'] = $env;
 require OBULLO .'Application/Http.php';
 
 /**
- * Dependency
+ * Register core components
  */
-$c['dependency'] = function () use ($c) {
-    return new Dependency($c);
-};
-
-/**
- * Config
- */
-$c['config'] = function () use ($c) {
-    return new Config($c);
-};
-
-/**
- * Application
- */
-$c['app'] = function () use ($c) {
-    return new Http($c);
-};
-
-/**
- * Components
- */
-include APP .'components.php';
+$container->share('config', 'Obullo\Config\Config')->withArgument($container);
+$container->share('app', 'Obullo\Application\Http')->withArgument($container);
+$container->share('middleware', 'Obullo\Application\MiddlewareStack')->withArgument($container);
 
 /**
  * Create Server Request
@@ -82,12 +50,31 @@ $request = \Obullo\Http\ServerRequestFactory::fromGlobals(
     $_COOKIE,
     $_FILES
 );
-$c['request'] = function () use ($request, $c) {
-    $request->setContainer($c);
-    return $request;
-};
+$request->setContainer($container);
+
+/**
+ * Share Server Request
+ */
+$container->share(
+    'request',
+    $request
+);
+
+/**
+ * Register app components
+ */
+require APP .'components.php';
+
+/**
+ * Register router
+ */
+$container->share('router', 'Obullo\Router\Router')
+    ->withArgument($container)
+    ->withArgument($container->get('request'))
+    ->withArgument($container->get('logger'));
+
 
 /**
  * Initialize to application
  */
-$c['app']->init();
+$container->get('app')->init();

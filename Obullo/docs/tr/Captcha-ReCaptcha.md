@@ -127,11 +127,6 @@ class Recaptcha implements ServiceInterface
         };
     }
 }
-
-// END Recaptcha service
-
-/* End of file Recaptcha.php */
-/* Location: .app/classes/Service/Recaptcha.php */
 ```
 
 <a name="running"></a>

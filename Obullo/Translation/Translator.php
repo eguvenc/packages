@@ -5,9 +5,8 @@ namespace Obullo\Translation;
 use ArrayAccess;
 use RuntimeException;
 use Obullo\Log\LoggerInterface as Logger;
-use Obullo\Config\ConfigInterface as Config;
 use Psr\Http\Message\RequestInterface as Request;
-use Obullo\Container\ContainerInterface as Container;
+use Interop\Container\ContainerInterface as Container;
 
 /**
  * Translator Class
@@ -22,14 +21,14 @@ class Translator implements TranslatorInterface
      * 
      * @var object
      */
-    protected $c;
+    protected $container;
 
     /**
      * Config
      * 
      * @var array
      */
-    protected $config;
+    protected $params;
 
     /**
      * Logger
@@ -84,17 +83,17 @@ class Translator implements TranslatorInterface
      * Constructor
      *
      * @param object $container Container
-     * @param object $config    ConfigInterface
      * @param object $logger    LoggerInterface
+     * @param array  $params    service parameters
      */
-    public function __construct(Container $container, Config $config, Logger $logger)
+    public function __construct(Container $container, Logger $logger, array $params)
     {
-        $this->c = $container;
+        $this->container = $container;
         $this->logger = $logger;
-        $this->config = $config->load('translator');   // Load package config file
+        $this->params = $params;   // Load package config file
 
-        $this->setDefault($this->config['default']['locale']);    // Sets default langugage from translator config file.
-        $this->setFallback($this->config['fallback']['locale']);  // Default lang code
+        $this->setDefault($this->params['default']['locale']);    // Sets default langugage from translator config file.
+        $this->setFallback($this->params['fallback']['locale']);  // Default lang code
 
         $this->logger->debug('Translator Class Initialized');
     }
@@ -153,7 +152,7 @@ class Translator implements TranslatorInterface
             return $key;
         }
         if (! isset($this->translateArray[$key])) {
-            if ($this->config['fallback']['enabled'] && isset($this->fallbackArray[$key])) {  // Fallback translation is exist ?
+            if ($this->params['fallback']['enabled'] && isset($this->fallbackArray[$key])) {  // Fallback translation is exist ?
                 return $this->fallbackArray[$key];      // Get it.
             }
             return $key;
@@ -235,7 +234,7 @@ class Translator implements TranslatorInterface
      */
     protected function loadFallback($fileKey)
     {
-        if ($this->config['fallback']['enabled']) {
+        if ($this->params['fallback']['enabled']) {
 
             $locale   = $this->getFallback();
             $filename = ltrim(strstr($fileKey, '/'), '/');
@@ -349,15 +348,15 @@ class Translator implements TranslatorInterface
      */
     public function defaultSet()
     {
-        if (defined('STDIN') || $this->config['default']['set'] == false) {
+        if (defined('STDIN') || $this->params['default']['set'] == false) {
             return;
         }            
-        $this->c['cookie']
-            ->name($this->config['cookie']['name'])
+        $this->container->get('cookie')
+            ->name($this->params['cookie']['name'])
             ->value($this->getLocale())
-            ->expire($this->config['cookie']['expire'])
-            ->path($this->config['cookie']['path'])
-            ->domain($this->config['cookie']['domain'])
+            ->expire($this->params['cookie']['expire'])
+            ->path($this->params['cookie']['path'])
+            ->domain($this->params['cookie']['domain'])
             ->secure(false)
             ->httpOnly(false)
             ->set();

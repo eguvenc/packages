@@ -2,7 +2,7 @@
 
 namespace Obullo\Cli\LogReader;
 
-use Obullo\Container\ContainerInterface as Container;
+use League\Container\ImmutableContainerAwareTrait;
 
 /**
  * File reader
@@ -12,6 +12,8 @@ use Obullo\Container\ContainerInterface as Container;
  */
 class File
 {
+    use ImmutableContainerAwareTrait;
+
     /**
      * File paths
      * 
@@ -48,15 +50,14 @@ class File
     /**
      * Follow logs
      * 
-     * @param string $c     container
      * @param string $dir   sections ( http, ajax, cli )
      * @param string $table tablename
      * 
      * @return void
      */
-    public function follow(Container $c, $dir = 'http', $table = null)
+    public function follow($dir = 'http', $table = null)
     {
-        $c = $table = null;  // Unused variables
+        $table = null;  // Unused variables
         $directions = static::getPathArray();
 
         if (! isset($directions[$dir])) {

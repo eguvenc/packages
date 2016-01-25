@@ -7,7 +7,8 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 
-use Obullo\Container\ContainerInterface as Container;
+use League\Container\ContainerAwareTrait;
+use Interop\Container\ContainerInterface as Container;
 
 /**
  * Borrowed from Zend Diactoros
@@ -29,7 +30,7 @@ use Obullo\Container\ContainerInterface as Container;
  */
 class ServerRequest implements ServerRequestInterface
 {
-    use MessageTrait, RequestTrait;
+    use MessageTrait, RequestTrait, ContainerAwareTrait;
 
     /**
      * @var array
@@ -339,19 +340,6 @@ class ServerRequest implements ServerRequestInterface
     }
 
     //----------------- OBULLO METHODS -------------------//
-
-    /**
-     * Set container
-     * 
-     * @param ContainerInterface $c container
-     *
-     * @return object
-     */
-    public function setContainer(Container $c)
-    {
-        $this->c = $c;
-        return $this;
-    }
 
     /**
      * GET wrapper

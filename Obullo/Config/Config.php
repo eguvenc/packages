@@ -3,7 +3,7 @@
 namespace Obullo\Config;
 
 use Obullo\Config\Writer\PhpArray;
-use Obullo\Container\ContainerInterface as Container;
+use Interop\Container\ContainerInterface as Container;
 
 /**
  * Config Class
@@ -14,25 +14,18 @@ use Obullo\Container\ContainerInterface as Container;
 class Config implements ConfigInterface
 {
     /**
-     * Array stack
+     * Current config folder
      * 
-     * @var array
+     * @var string
      */
-    public $array = array();
+    protected $path;
 
     /**
      * Container
      * 
      * @var object
      */
-    protected $c;
-
-    /**
-     * Current config folder
-     * 
-     * @var string
-     */
-    protected $path;
+    protected $container;
 
     /**
      * Main config file
@@ -42,20 +35,37 @@ class Config implements ConfigInterface
     protected $base = array();
 
     /**
+     * Array stack
+     * 
+     * @var array
+     */
+    protected $array = array();
+
+    /**
+     * Enviromemt
+     * 
+     * @var string
+     */
+    protected static $env;
+
+    /**
      * Constructor
      *
      * Sets the $config data from the primary config.php file as a class variable
      * 
-     * @param object $c container
+     * @param object $container container
      */
-    public function __construct(Container $c)
+    public function __construct(Container $container)
     {
-        $this->c = $c;
-        $this->path  = CONFIG .$c['app.env'].'/';
+        $this->container = $container;
+        self::$env = $container->get('env')->getValue();
+        
+        $this->path  = CONFIG .self::$env.'/';
         $this->local = CONFIG .'local/';
         $this->base = $this->array = include $this->local .'config.php';  // Load current environment config variables 
-        
-        if ($c['app.env'] != 'local') {
+
+        if (self::$env != 'local') {
+            
             $envConfig   = include $this->path .'config.php';
             $this->array = array_replace_recursive($this->array, $envConfig);  // Merge config variables if env not local.
         }
@@ -71,7 +81,7 @@ class Config implements ConfigInterface
      */
     public function load($filename)
     {
-        $c = $this->c; //  Make available $c variable in config files.
+        $container = $this->container; //  Make available $container variable in config files.
 
         if (isset($this->array[$filename])) {   // Is file loaded before ?
             return $this->array[$filename];
@@ -84,14 +94,17 @@ class Config implements ConfigInterface
 
         $isEnvFile = false;
         if (is_file($envFile)) {   // Do we able to locate environment file ?
+            
             $isEnvFile = true;
             $file = $envFile;
         }
         $config = include $file;
 
-        if ($c['app.env'] != 'local' && $isEnvFile) { // Merge config variables if env not local.
+        if (self::$env != 'local' && $isEnvFile) { // Merge config variables if env not local.
+
             $localConfig = include $this->local . $filename .'.php';
             return $this->array[$filename] = array_replace_recursive($localConfig, $config);
+
         } else {
             $this->array[$filename] = $config;
         }
@@ -118,12 +131,8 @@ class Config implements ConfigInterface
      */
     public function write($filename, array $data)
     {
-        $fullpath = CONFIG .$this->c['app.env']. '/';
+        $fullpath = CONFIG .self::$env. '/';
 
-        if (strpos($filename, '../') === 0) {  // If we have shared config request
-            $fullpath = CONFIG;
-            $filename = substr($filename, 3);
-        }
         $writer = new PhpArray;
         $writer->toFile($fullpath . $filename, $data);
     }

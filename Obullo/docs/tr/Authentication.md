@@ -28,8 +28,6 @@ Yetki doğrulama paketi yetki adaptörleri ile birlikte çeşitli ortak senaryol
                 <a href="#service">Servis Konfigürasyonu</a>
                 <ul>
                     <li><a href="#loading-service">Servisi Yüklemek</a></li>
-                    <li><a href="#making-service">Servisi Yeniden Yaratmak</a></li>
-                    <li><a href="#calling-classes">Sınıfları Çağırmak</a></li>
                     <li><a href="#accessing-config-variables">Konfigürasyon Değerlerine Erişmek</a></li>
                 </ul>
             </li>
@@ -93,7 +91,7 @@ gibi özellikleri barındırır.
 
 ### Akış Şeması
 
-Aşağıdaki akış şeması bir kullanıcının yetki doğrulama aşamalarından nasıl geçtiği ve yetki doğrulama servisinin gelişmiş özellikleri ile kullanıldığında nasıl çalıştığı hakkında size bir ön bilgi verecektir:
+Aşağıdaki akış şeması bir kullanıcının yetki doğrulama aşamalarından nasıl geçtiği ve servisin nasıl çalıştığı hakkında size bir ön bilgi verecektir:
 
 ![Authentication](images/auth-flowchart.png?raw=true "Authentication")
 
@@ -105,7 +103,7 @@ Akış şemasına göre GenericUser login butonuna bastığı anda ilk önce ön
 
 ### Konfigürasyon
 
-Yetki doğrulama paketine ait konfigürasyon <kbd>app/$env/service/user.php</kbd> dosyasında tutulmaktadır. Bu konfigürasyona ait bölümlerin ne anlama geldiği aşağıda geniş bir çerçevede ele alınmıştır.
+Yetki doğrulama paketine ait konfigürasyon <kbd>app/$env/providers/user.php</kbd> dosyasında tutulmaktadır. Bu konfigürasyona ait bölümlerin ne anlama geldiği aşağıda geniş bir çerçevede ele alınmıştır.
 
 <a name="config-table"></a>
 
@@ -138,11 +136,11 @@ Yetki doğrulama paketine ait konfigürasyon <kbd>app/$env/service/user.php</kbd
         </tr>
         <tr>
             <td>cache[block][permanent][lifetime]</td>
-            <td>Oturum açıldıktan sonra kullanıcı kalıcı olarak onaylandı ise kullanıcı kimliği verileri <kbd>permanent</kbd> hafıza bloğuna kaydedilir. Kalıcı blokta ön belleğe alınan veriler kullanıcının web sitesi üzerinde <kbd>hareketsiz</kbd> kaldığı andan itibaren varsayılan olarak <kbd>3600</kbd> saniye sonra yok olur.</td>
+            <td>Oturum açıldıktan sonra kullanıcı kimliği verileri <kbd>permanent</kbd> yani kalıcı hafıza bloğuna kaydedilir. Kalıcı blokta ön belleğe alınan veriler kullanıcının web sitesi üzerinde <kbd>hareketsiz</kbd> kaldığı andan itibaren varsayılan olarak <kbd>3600</kbd> saniye sonra yok olur.</td>
         </tr>
         <tr>
             <td>cache[block][temporary][lifetime]</td>
-            <td>Opsiyonel olarak gümrükten pasaport ile geçiş gibi kimlik onaylama sistemi isteniyorsa,  oturum açıldıktan sonra kullanıcı kimliği verileri <kbd>$this->user->identity->makeTemporary()</kbd> komutu ile <kbd>temporary</kbd> hafıza bloğuna taşınabilirr. Geçici bloğa taşınmış veriler <kbd>300</kbd> saniye sonrasında yok olur. Geçici blok kimlik onayı durumları için tasarlanmıştır. Kimlik onayladı ise <kbd>$this->user->identity->makePermanent()</kbd> komutu ile kimlik kalıcı hale getirilir ve kullanıcı sisteme tam giriş yapmış olur.
+            <td>Opsiyonel olarak gümrükten pasaport ile geçiş gibi kimlik onaylama sistemi isteniyorsa,  oturum açıldıktan sonra kullanıcı kimliği verileri <kbd>$this->user->identity->makeTemporary()</kbd> komutu ile <kbd>temporary</kbd> hafıza bloğuna taşınabilirr. Geçici bloğa taşınmış veriler <kbd>300</kbd> saniye sonrasında yok olur. Kimlik onayladı ise <kbd>$this->user->identity->makePermanent()</kbd> komutu ile kimlik kalıcı hale getirilir ve kullanıcı sisteme tam giriş yapmış olur.
             </td>
         </tr>
         <tr>
@@ -159,7 +157,7 @@ Yetki doğrulama paketine ait konfigürasyon <kbd>app/$env/service/user.php</kbd
         </tr>
         <tr>
             <td>middleware[unique.session]</td>
-            <td>Tekil oturum açma opsiyonu aktif olduğunda aynı kimlik bilgileri ile farklı aygıtlardan yalnızca bir kullanıcı oturum açabilir. Auth katmanı içerisinde kullandığınız trait sınıfının davranışına göre en son açılan oturum her zaman aktif kalırken eski oturumlar otomatik olarak sonlandırılır. Fakat bu fonksiyon <kbd>app/classes/Http/Middlewares</kbd> dizinindeki auth katmanı çalıştırıldığı zaman devreye girer. Katmanı çalıştırmak için onu <kbd>route</kbd> yapısına tutturmanız gerekmektedir. Katman içerisindeki unique login özelliği <kbd>Authentication/Middleware</kbd> klasöründen çağrılarak bu sınıf içerisinden tetiklenir. Http katmanları hakkında daha geniş bilgiye <kbd>application</kbd> ve <kbd>router</kbd> paketi dökümentasyonlarını inceleyerek ulaşabilirsiniz.</td> 
+            <td>Tekil oturum açma opsiyonu aktif olduğunda aynı kimlik bilgileri ile farklı aygıtlardan yalnızca bir kullanıcı oturum açabilir. Auth katmanı içerisinde kullandığınız trait sınıfının davranışına göre en son açılan oturum her zaman aktif kalırken eski oturumlar otomatik olarak sonlandırılır. Fakat bu fonksiyon <kbd>app/classes/Http/Middlewares</kbd> dizinindeki auth katmanı çalıştırıldığı zaman devreye girer. Daha fazla bilgi için auth katmanı dökümentasyonunu inceleyebilirsiniz.</td> 
         </tr>
     </tbody>
 </table>
@@ -168,7 +166,7 @@ Yetki doğrulama paketine ait konfigürasyon <kbd>app/$env/service/user.php</kbd
 
 #### Adaptörler
 
-Yetki doğrulama adaptörleri uygulamaya esneklik kazandıran sorgulama arabirimleridir, yetki doğrulamanın bir veritabanı ile mi yoksa farklı bir protokol üzerinden mi yapılacağını belirleyen sınıflardır. Varsayılan arabirim türü <kbd>Database</kbd> (RDBMS or NoSQL) dir, farklı türde kimlik doğrulama arabirimleri bu sürümde henüz mevcut değildir.
+Yetki doğrulama adaptörleri uygulamaya esneklik kazandıran sorgulama arabirimleridir, yetki doğrulamanın bir veritabanı ile mi yoksa farklı bir protokol üzerinden mi yapılacağını belirleyen sınıflardır. Varsayılan arabirim türü <kbd>Database</kbd> (RDBMS or NoSQL) dir.
 
 Farklı adaptörlerin çok farklı seçenekler ve davranışları olması muhtemeldir , ama bazı temel şeyler kimlik doğrulama adaptörleri arasında ortaktır. Örneğin, kimlik doğrulama hizmeti sorgularını gerçekleştirmek ve sorgulardan dönen sonuçlar yetki doğrulama adaptörleri için ortak kullanılır.
 
@@ -176,11 +174,9 @@ Farklı adaptörlerin çok farklı seçenekler ve davranışları olması muhtem
 
 #### Hafıza Depoları ( Storages )
 
-Hazıfa deposu yetki doğrulama esnasında kullanıcı kimliğini ön belleğe alır ve tekrar tekrar oturum açıldığında database ile bağlantı kurmayarak uygulamanın performans kaybetmesini önler. Ayrıca yetki doğrulama onayı açıksa onaylama işlemi için geçici bir kimlik oluşturulur ve bu kimliğe ait bilgiler yine hafıza deposu aracılığıyla önbellekte tutulur.
+Hazıfa deposu yetki doğrulama esnasında kullanıcı kimliğini ön belleğe alır ve tekrar tekrar oturum açıldığında database ile bağlantı kurmayarak uygulamanın performans kaybetmesini önler.
 
-**Not:** Yetki doğrulama şu anda depolama için sadece <kbd>Redis</kbd> veritabanı ve <kbd>Cache</kbd> sürücüsünü desteklemektedir. Cache sürücüsü seçtiğinizde File, Memcache, Memcached, Apc gibi sürücüleri cache.php konfigurasyon dosyanızdan ayarlamanız gerekmektedir.
-
-Redis veritabanını tercih ediyorsanız, Ubuntu altında redis kurulumu için <kbd>warmup</kbd> adı verilen dökümentasyon topluluğumuzun hazırladığı belgeden yararlanabilirsiniz. <a href="https://github.com/obullo/warmup/tree/master/Redis" target="_blank">Redis Kurulumu</a>.
+Yetki doğrulama şu anda depolama için sadece <kbd>Redis</kbd> veritabanı ve <kbd>Cache</kbd> sürücüsünü desteklemektedir. Cache sürücüsü seçtiğinizde <kbd>File, Memcache, Memcached, Apc</kbd> gibi sürücüleri cache konfigurasyon dosyanızdan ayarlamanız gerekmektedir.
 
 <a name="null-storage"></a>
 
@@ -199,7 +195,7 @@ Null sınıfı varsayılan depodur ve depo olarak <kbd>cache</kbd> sınıfı yer
 )
 ```
 
-> **Not** Null hafıza deposunda geçici kimlik oluşturma ve sadece bir aygıttan tekil oturum açtırma gibi gelişmiş işlevler çalışmaz.
+Null hafıza deposunda geçici kimlik oluşturma ve sadece bir aygıttan tekil oturum açtırma gibi gelişmiş işlevler çalışmaz.
 
 <a name="redis-storage"></a>
 
@@ -209,12 +205,12 @@ Yetki doğrulama sınıfı hafıza deposu için varsayılan olarak redis kullan�
 
 ![PhpRedisAdmin](images/auth-redis.png?raw=true "PhpRedisAdmin")
 
-Varsayılan hafıza sınıfı auth konfigürasyonundan değiştirilebilir.
+Varsayılan hafıza deposu <kbd>providers/user.php</kbd> konfigürasyonundan değiştirilebilir.
 
 ```php
 'cache' => array(
 
-    'storage' => '\Obullo\Authentication\Storage\Redis',   // Storage driver uses cache package
+    'storage' => '\Obullo\Authentication\Storage\Redis',
     'provider' => array(
         'driver' => 'redis',
         'connection' => 'second'
@@ -225,7 +221,7 @@ Varsayılan hafıza sınıfı auth konfigürasyonundan değiştirilebilir.
 
 ##### Cache ( File, Apc, Memcache, Memcached, Redis )
 
-Eğer cache sürücülerini kullanmak istiyorsanız config dosyasından ayarları aşağıdaki gibi değiştirmeniz yeterli olacaktır.
+Eğer cache sürücülerini kullanmak istiyorsanız <kbd>providers/user.php</kbd> konfigürasyon dosyasından ayarları aşağıdaki gibi değiştirmeniz yeterli olacaktır.
 
 ```php
 'cache' => array(
@@ -238,22 +234,17 @@ Eğer cache sürücülerini kullanmak istiyorsanız config dosyasından ayarlar�
 )
 ```
 
-> **Not**:  Yukarıda görüldüğü gibi provider ayarlarından driver sekmesini sürücü ismi ile değiştirmeyi unutmamalısınız.
-
-
-Redis dışında bir çözüm kullanıyorsanız yazmış olduğunuz kendi hafıza depolama sınfınızı provider driver anahtarını değiştererek kullanabilirsiniz.
+Yukarıda görüldüğü gibi provider ayarlarından driver sekmesini sürücü ismi ile değiştirmeyi unutmamalısınız. Redis dışında bir çözüm kullanıyorsanız yazmış olduğunuz kendi hafıza depolama sınfınızı provider driver anahtarına girerek kullanabilirsiniz.
 
 <a name="running"></a>
 
 ### Çalıştırma
 
-Auth paketi ile çalışmaya başlamadan önce servis dosyasının ve <kbd>config/auth.php</kbd> dosyasının konfigure edilmesi gerekir.
-
 <a name="service"></a>
 
 #### Servis Konfigürasyonu
 
-Yetki doğrulama servisini kullanmadan önce servis dosyasını konfigüre etmeniz gerekir. Bu dosya database tablo ayarları yetki adaptörleri ve model gibi konfigürasyonları içerir. Bunu yapmadan önce eğer mysql benzeri ilişkili bir database kullanıyorsanız aşağıdaki sql kodunu çalıştırarak demo için bir tablo yaratın.
+Mysql benzeri ilişkili bir database kullanıyorsanız aşağıdaki sql kodunu çalıştırarak demo için bir tablo yaratın.
 
 ```sql
 --
@@ -276,89 +267,64 @@ INSERT INTO `users` (`id`, `username`, `password`, `remember_token`) VALUES
 (1, 'user@example.com', '$2y$06$6k9aYbbOiVnqgvksFR4zXO.kNBTXFt3cl8xhvZLWj4Qi/IpkYXeP.', '');
 ```
 
-Yukarıdaki sql kodu için kullanıcı adı <kbd>user@example.com</kbd> ve şifre <kbd>123456</kbd> dır. Aşağıda görüldüğü gibi yetki doğrulama <kbd>User</kbd> servisi üzerinden yönetilir <kbd>app/classes/Service/User.php</kbd> dosyasını açarak servisi konfigüre edebilirsiniz.
+Yukarıdaki sql kodu için kullanıcı adı <kbd>user@example.com</kbd> ve şifre <kbd>123456</kbd> dır. Yetki doğrulama <kbd>User</kbd> servisi üzerinden yönetilir <kbd>providers/user.php</kbd> konfigürasyon dosyasını açarak servisi konfigüre edebilirsiniz.
 
 ```php
-Class User implements ServiceInterface
-{
-    public function register(ContainerInterface $c)
-    {
-        $c['user'] = function () use ($c) {
+return array(
+    
+    'params' => [
 
-            $parameters = [
-                'cache.key' => 'Auth',
-                'db.adapter'=> '\Obullo\Authentication\Adapter\Database',
-                'db.model'  => '\Obullo\Authentication\Model\Pdo\User',       // User model, you can replace it with your own.
-                'db.provider' => [
-                    'name' => 'database',
-                    'params' => [
-                        'connection' => 'default'
-                    ]
-                ],
-                'db.tablename' => 'users',
-                'db.id' => 'id',
-                'db.identifier' => 'username',
-                'db.password' => 'password',
-                'db.rememberToken' => 'remember_token',
-                'db.select' => [
-                    'date',
-                ]
-            ];
-            $manager = new AuthManager($c);
-            $manager->setParameters($parameters);
-            return $manager;
-        };
-    }
-}
-
-/* Location: .app/classes/Service/User.php */
+        'cache.key' => 'Auth',
+        'db.adapter'=> '\Obullo\Authentication\Adapter\Database',
+        'db.model'  => '\Obullo\Authentication\Model\Pdo\User',
+        'db.provider' => [
+            'name' => 'database',
+            'params' => [
+                'connection' => 'default'
+            ]
+        ],
+        'db.tablename' => 'users',
+        'db.id' => 'id',
+        'db.identifier' => 'username',
+        'db.password' => 'password',
+        'db.rememberToken' => 'remember_token',
+        'db.select' => [
+            'date',
+        ],
+        .
+)
 ```
 
-**Adapter:** Yetki doğrulama adaptörleri yetki doğrulama servisinde <kbd>Database</kbd> (RDBMS or NoSQL) veya <kbd>dosya-tabanlı</kbd> gibi farklı türde kimlik doğrulama biçimleri olarak kullanılırlar.
+**db.adapter :** Yetki doğrulama adaptörleri yetki doğrulama servisinde <kbd>Database</kbd> (RDBMS or NoSQL) veya <kbd>dosya-tabanlı</kbd> gibi farklı türde kimlik doğrulama biçimleri olarak kullanılırlar.
 
-**Model:** Model sınıfı yetki doğrulama sınıfına ait veritabanı işlemlerini içerir. Bu sınıfa genişleyerek bu sınıfı özelleştirebilirsiniz bunun için aşağıda veritabanı sorgularını özelleştirmek başlığına bakınız.
+**db.model :** Model sınıfı yetki doğrulama sınıfına ait veritabanı işlemlerini içerir. Bu sınıfa genişleyerek bu sınıfı özelleştirebilirsiniz bunun için aşağıda veritabanı sorgularını özelleştirmek başlığına bakınız.
 
-**Provider Name:** Veritabanı servis sağlayıcınızın ismidir. Veritabanı işlemlerinin hangi servis sağlayıcısının kullanması gerektiğini tanımlar.
+**db.provider.name :** Veritabanı servis sağlayıcınızın ismidir. Veritabanı işlemlerinin hangi servis sağlayıcısının kullanması gerektiğini tanımlar.
 
-**Connection:** Veritabanı servis sağlayıcısının hangi bağlantıyı seçmesi gerektiğini tanımlar.
+**db.provider.params.connection:** Veritabanı servis sağlayıcısının hangi bağlantıyı seçmesi gerektiğini tanımlar.
 
-**Tablename:** Veritabanı işlemleri için tablo ismini belirlemenize olanak sağlar. Bu konfigürasyon veritabanı işlemlerinde kullanılır.
+**db.tablename:** Veritabanı işlemleri için tablo ismini belirlemenize olanak sağlar. Bu konfigürasyon veritabanı işlemlerinde kullanılır.
 
 <a name="loading-service"></a>
 
 #### Servisi Yüklemek
 
-Yetki doğrulama paketi sınıflarına erişim <kbd>User</kbd> servisi üzerinden sağlanır, bu servis önceden <kbd>app/classes/Service</kbd> dizininde <kbd>User.php</kbd> olarak kayıt edilmiştir. <kbd>User</kbd> sınıfı yetki doğrulama servisine ait olan <kbd>Login</kbd>, <kbd>Identity</kbd> ve <kbd>Activity</kbd> gibi sınıfları bu servis üzerinden kontrol eder, böylece paket içerisinde kullanılan tüm sınıf metodlarına tek bir servis üzerinden erişim sağlanmış olur.
+Yetki doğrulama paketi sınıflarına erişim <kbd>User</kbd> servisi yani <kbd>AuthManager</kbd> üzerinden sağlanır, user servisi önceden <kbd>app/components.php</kbd> dosyası içerisinde aşağıdaki gibi tanımlıdır.
 
 ```php
-$this->user = $this->c->get('user');
+$c['app']->service(
+    [
+        'user' => 'Obullo\Authentication\AuthManager',
+    ]
+);
 ```
 
-<a name="calling-classes"></a>
-
-#### Sınıfları Çağırmak
-
-Aşağıda verilen örnek prototipler size yetki doğrulama sınıfı metodlarına <kbd>user</kbd> servisi üzerinden nasıl erişim sağlandığı hakkında bir fikir verebilir.
-
-##### Login Sınıfı
+<kbd>User</kbd> servisi yetki doğrulama servisine ait olan <kbd>Login</kbd>, <kbd>Identity</kbd> ve <kbd>Activity</kbd> gibi sınıfları kontrol eder, böylece paket içerisinde kullanılan tüm sınıflara tek bir servis üzerinden erişim sağlanmış olur.
 
 ```php
 $this->user->login->method();
-```
-##### Identity Sınıfı
-
-```php
 $this->user->identity->method();
-```
-##### Activity Sınıfı
-
-```php
 $this->user->activity->method();
-```
-
-##### Storage Sınıfı
-
-```php
 $this->user->storage->method();
 ```
 
@@ -453,13 +419,6 @@ namespace Membership;
 
 Class Login extends \Controller
 {
-    /**
-     * Index
-     * 
-     * @event->when("post")->subscribe('Event\Login\Attempt');
-     *
-     * @return void
-     */
     public function index()
     {
         if ($this->request->isPost()) {

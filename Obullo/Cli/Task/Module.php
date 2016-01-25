@@ -2,9 +2,9 @@
 
 namespace Obullo\Cli\Task;
 
-use Obullo\Cli\Controller;
 use Obullo\Cli\Console;
 use FilesystemIterator;
+use Obullo\Cli\Controller;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 
@@ -17,7 +17,7 @@ class Module extends Controller
      */
     public function logo() 
     {
-        echo Console::logo("Welcome to Module Manager (c) 2015");
+        echo Console::logo("Welcome to Module Manager (c) 2016");
         echo Console::description("Add / Remove modules. For more help type \$php task module help.");
     }
 
@@ -61,7 +61,7 @@ class Module extends Controller
         if (is_dir($moduleFolder.'/tasks')) {
             $this->recursiveCopy($moduleFolder. '/tasks', TASKS, false);
         }
-        $serviceFile = CONFIG .$this->c['app.env'].'/service/' .strtolower($module).'.php';
+        $serviceFile = CONFIG .$this->container->get('app')->getEnv().'/service/' .strtolower($module).'.php';
 
         if (is_dir($moduleFolder.'/service')) {
             copy($moduleFolder.'/service/'.strtolower($module).'.php', $serviceFile);
@@ -111,7 +111,7 @@ class Module extends Controller
             unlink(MODULES .'tasks/' .ucfirst($module).'.php');
         }
 
-        $serviceFile = CONFIG .$this->c['app.env'].'/service/' .strtolower($module).'.php';
+        $serviceFile = CONFIG .$this->container->get('app')->getEnv().'/service/' .strtolower($module).'.php';
 
         if (is_dir($moduleFolder .'/service') && is_file($serviceFile)) {
             unlink($serviceFile);

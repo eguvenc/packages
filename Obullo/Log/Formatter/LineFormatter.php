@@ -11,7 +11,7 @@ namespace Obullo\Log\Formatter;
 class LineFormatter
 {
     /**
-     * Format the line defined in service/logger.php
+     * Format the line defined in providers/logger.php
      *
      * [%datetime%] %channel%.%level%: --> %message% %context% %extra%\n
      * 

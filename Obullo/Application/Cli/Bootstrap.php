@@ -1,15 +1,5 @@
 <?php
 
-use Obullo\Container\Loader;
-use Obullo\Container\Container;
-use Obullo\Container\Dependency;
-use Obullo\Container\ContainerInterface;
-
-use Obullo\Config\Config;
-use Obullo\Application\Cli;
-use Obullo\Cli\NullRequest;
-use Obullo\Cli\NullResponse;
-
 /**
  * Detect environment
  * 
@@ -40,8 +30,8 @@ $env = $detectEnvironment();
  * 
  * @var object
  */
-$c = new Container(new Loader(ROOT ."app/".$env."/service", LOADER)); // Bind services to container
-$c['app.env'] = $env;
+$container = new League\Container\Container;
+$container->add('env', new League\Container\Argument\RawArgument($env));
 
 /**
  * Include application
@@ -49,38 +39,14 @@ $c['app.env'] = $env;
 require OBULLO .'Application/Cli.php';
 
 /**
- * Dependency
+ * Register core components
  */
-$c['dependency'] = function () use ($c) {
-    return new Dependency($c);
-};
+$container->share('config', 'Obullo\Config\Config')->withArgument($container);
+$container->share('app', 'Obullo\Application\Cli')->withArgument($container);
+$container->share('request', 'Obullo\Cli\NullRequest');
+$container->share('response', 'Obullo\Cli\NullResponse');
 
 /**
- * Config
+ * Initialize to application
  */
-$c['config'] = function () use ($c) {
-    return new Config($c);
-};
-
-/**
- * Application
- */
-$c['app'] = function () use ($c) {
-    return new Cli($c);
-};
-
-/**
- * Http request
- */
-$c['request'] = function () {
-    return new NullRequest;
-};
-
-/**
- * Http reponse
- */
-$c['response'] = function () {
-    return new NullResponse;
-};
-
-include APP .'components.php';
+require APP .'components.php';

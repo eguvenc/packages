@@ -31,7 +31,7 @@ Url sınıfı uygulamanızda kullandığınız iç ve dış html linklerini olu�
 
 <a name="config"></a>
 
-Url sınıfı <b>app/components.php</b> dosyasında servis olarak tanımlıdır. Url sınıfına ait konfigürasyon parametreleri <kbd>app/$env/service/url.php</kbd> dosyasından konfigüre edilir.
+Url sınıfı <kbd>app/components.php</kbd> dosyasında servis olarak tanımlıdır. Url sınıfına ait konfigürasyon parametreleri <kbd>app/$env/providers/url.php</kbd> dosyasından konfigüre edilir.
 
 ```php
 'params' => [
@@ -43,6 +43,10 @@ Url sınıfı <b>app/components.php</b> dosyasında servis olarak tanımlıdır.
     ]
 ]
 ```
+
+* <b>baseurl</b> : Url fonksiyonları kök adresi, genellikle "/" karakteri yeterli olur.
+* <b>assets.url</b> : Kaynaklar klasörü kök adresi genellikle "/" karakteri yeterli olur fakar eğer bir içerik sağlayıcı (cdn) kullanıyorsunuz buraya cdn adresinizi girebilirsiniz.
+* <b>assets.folder</b> : Uygulamanız içerisinde "public/" klasörü altındaki kaynaklar klasörünü belirler varsayılan klasör "/assets/" klasörüdür.
 
 <a name="methods"></a>
 

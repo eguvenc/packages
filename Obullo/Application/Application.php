@@ -9,8 +9,7 @@ use RuntimeException;
 use ReflectionFunction;
 use Obullo\Error\Debug;
 use Obullo\Http\Controller;
-use Obullo\Container\Dependency;
-use Obullo\Container\ContainerInterface as Container;
+use Interop\Container\ContainerInterface as Container;
 
 /**
  * Application
@@ -22,10 +21,9 @@ class Application implements ApplicationInterface
 {
     const VERSION = '1.0rc1';
 
-    protected $c;
+    protected $container;
     protected $fatalError;
     protected $exceptions = array();
-    protected $dependency;
 
     /**
      * Constructor
@@ -34,7 +32,7 @@ class Application implements ApplicationInterface
      */
     public function __construct(Container $container)
     {
-        $this->c = $container;
+        $this->container = $container;
     }
 
     /**
@@ -60,8 +58,8 @@ class Application implements ApplicationInterface
             $closure = $this->getFatalCallback();
             $e = new ErrorException($error['message'], $error['type'], 0, $error['file'], $error['line']);
             $exception = new \Obullo\Error\Exception;
-            
-            if ($this->c['app.env'] != 'production') {
+
+            if ($this->getEnv() != 'production') {
                 echo $exception->make($e);  // Print exceptions
             }
             if ($exception->isCatchable($e)) {
@@ -113,7 +111,7 @@ class Application implements ApplicationInterface
         $exception = new \Obullo\Error\Exception;
         $e = new ErrorException($message, $level, 0, $file, $line);
 
-        if ($this->c['app.env'] != 'production') {
+        if ($this->getEnv() != 'production') {
             echo $exception->make($e);  // Print exceptions to see errors
         }
         return $this->exceptionError($e);
@@ -130,7 +128,7 @@ class Application implements ApplicationInterface
     {
         $exception = new \Obullo\Error\Exception;
 
-        if ($this->c['app.env'] != 'production') {
+        if ($this->getEnv() != 'production') {
             echo $exception->make($e);  // Print exceptions to see errors
         }
         return $this->exceptionError($e);
@@ -148,6 +146,7 @@ class Application implements ApplicationInterface
         $exception = new \Obullo\Error\Exception;
         $return = false;
         if ($exception->isCatchable($e)) {
+
             foreach ($this->exceptions as $val) {
                 if ($val['exception']->isInstance($e)) {
                     $return = $val['closure']($e);
@@ -194,95 +193,31 @@ class Application implements ApplicationInterface
      * 
      * @return string
      */
-    public function env()
+    public function getEnv()
     {
-        return $this->c['app.env'];
+        return $this->container->get('env')->getValue();
     }
 
     /**
-     * Registers a service provider.
-     *
-     * @param array $providers provider name and namespace array
-     *
-     * @return object
-     */
-    public function provider(array $providers)
-    {
-        $this->c->provider($providers);
-        return $this;
-    }
-
-    /**
-     * Register services
-     * 
-     * @param array $services services
-     * 
-     * @return object
-     */
-    public function service(array $services)
-    {
-        $this->c->service($services);
-        return $this;
-    }
-
-    /**
-     * Register components & resolve dependencies
-     *
-     * @param array $namespaces component class name & namespaces
-     * 
-     * @return void
-     */
-    public function component(array $namespaces)
-    {   
-        $this->dependency = $this->c['dependency'];
-        foreach ($namespaces as $cid => $Class) {
-            $this->dependency->addComponent($cid, $Class);
-            $this->dependency->addDependency($cid);
-        }
-        return $this;
-    }
-
-    /**
-     * Creates dependency
-     * 
-     * @param array $deps dependencies
-     * 
-     * @return object
-     */
-    public function dependency(array $deps)
-    {
-        foreach ($deps as $cid) {
-            $this->dependency->addDependency($cid);
-        }
-        return $this;
-    }
-
-    /**
-     * Removes dependency
-     * 
-     * @param array $deps dependencies
-     * 
-     * @return object
-     */
-    public function removeDependency(array $deps)
-    {
-        foreach ($deps as $cid) {
-            $this->dependency->removeDependency($cid);
-        }
-        return $this;
-    }
-
-
-    /**
-     * Returns current version of Obullo
+     * Returns to current version of Obullo
      * 
      * @return string
      */
-    public function version()
+    public function getVersion()
     {
         return static::VERSION;
     }
-    
+
+    /**
+     * Returns to container object
+     * 
+     * @return string
+     */
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
     /**
      * Call controller methods from view files ( View files $this->method(); support ).
      * 
@@ -314,13 +249,13 @@ class Application implements ApplicationInterface
     public function __get($key)
     {
         $cid = 'app.'.$key;
-        if ($this->c->has($cid) ) {
-            return $this->c[$cid];
+        if ($this->container->has($cid) ) {
+            return $this->container->get($cid);
         }
         if (class_exists('Controller', false) && Controller::$instance != null) {
             return Controller::$instance->{$key};
         }
-        return $this->c[$key];
+        return $this->container->get($key);
     }
 
 }

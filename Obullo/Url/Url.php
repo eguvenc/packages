@@ -2,12 +2,12 @@
 
 namespace Obullo\Url;
 
+use Psr\Http\Message\UriInterface as Uri;
+use Psr\Http\Message\RequestInterface as Request;
+
 use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Config\ConfigInterface as Config;
 use Obullo\Container\ContainerInterface as Container;
-
-use Psr\Http\Message\UriInterface as Uri;
-use Psr\Http\Message\RequestInterface as Request;
 
 /**
  * Url Class
@@ -25,18 +25,18 @@ class Url implements UrlInterface
     protected $uri;
 
     /**
+     * Url
+     * 
+     * @var string
+     */
+    protected $url = '';
+
+    /**
      * Request
      * 
      * @var object
      */
     protected $request;
-
-    /**
-     * Logger
-     * 
-     * @var object
-     */
-    protected $logger;
 
     /**
      * Service Parameters
@@ -46,18 +46,18 @@ class Url implements UrlInterface
     protected $params;
 
     /**
+     * Logger
+     * 
+     * @var object
+     */
+    protected $logger;
+
+    /**
      * Url protocol
      * 
      * @var string
      */
     protected $protocol = '';
-
-    /**
-     * Url
-     * 
-     * @var string
-     */
-    protected $url = '';
 
     /**
      * Constructor
@@ -68,10 +68,10 @@ class Url implements UrlInterface
      */
     public function __construct(Request $request, Logger $logger, array $params)
     {
+        $this->logger = $logger;
+        $this->params = $params;
         $this->request = $request;
         $this->uri = $request->getUri();
-        $this->params = $params;
-        $this->logger = $logger;
 
         $this->logger->debug('Url Class Initialized');
     }
@@ -137,8 +137,8 @@ class Url implements UrlInterface
      */
     protected function clear()
     {
-        $this->protocol = '';
         $this->url = '';
+        $this->protocol = '';
     }
 
     /**

@@ -3,12 +3,11 @@
 namespace Obullo\View;
 
 use Closure;
-use Obullo\Http\Controller;
-use Obullo\Log\LoggerInterface as Logger;
-use Obullo\Container\ContainerInterface as Container;
-use Obullo\View\ViewInterface as View;
-
 use Obullo\Http\Stream;
+use Obullo\Http\Controller;
+use Obullo\View\ViewInterface as View;
+use Obullo\Log\LoggerInterface as Logger;
+use Interop\Container\ContainerInterface as Container;
 
 /**
  * Temlate Class
@@ -18,13 +17,6 @@ use Obullo\Http\Stream;
  */
 class Template implements TemplateInterface
 {
-    /**
-     * Container
-     * 
-     * @var object
-     */
-    protected $c;
-
     /**
      * View
      * 
@@ -40,16 +32,23 @@ class Template implements TemplateInterface
     protected $logger;
 
     /**
+     * Container
+     * 
+     * @var object
+     */
+    protected $container;
+
+    /**
      * Constructor
      * 
-     * @param object $container \Obullo\Container\ContainerInterface
-     * @param object $view      \Obullo\View\View
-     * @param object $logger    \Obullo\Log\LoggerInterface
+     * @param object $container container
+     * @param object $view      view
+     * @param object $logger    logger
      */
     public function __construct(Container $container, View $view, Logger $logger)
     {
-        $this->c = $container;
         $this->view = $view;
+        $this->container = $container;
         
         $this->logger = $logger;
         $this->logger->debug('Template Class Initialized');
@@ -132,7 +131,7 @@ class Template implements TemplateInterface
      */
     public function __get($key)
     {
-        return $this->c[$key];
+        return $this->container->get($key);
     }
 
 }

@@ -59,7 +59,6 @@ class User implements ServiceInterface
     }
 }
 
-/* Location: .app/classes/Service/User.php */
 ```
 Yukarıda gösterilen auth servis konfigürasyonundaki <b>db.model</b> anahtarını <kbd>\Auth\Model\User</kbd> olarak güncellediyseniz, aşağıda sizin için bir model örneği yaptık bu örneği değiştererek ihtiyaçlarınıza göre kullanabilirsiniz. Bunun için <kbd>Obullo\Authentication\Model\User</kbd> sınıfına bakın ve ezmek ( override ) istediğiniz method yada değişkenleri sınıfınız içerisine dahil edin.
 

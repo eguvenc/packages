@@ -3,8 +3,7 @@
 namespace Obullo\Form;
 
 use Obullo\Log\LoggerInterface as Logger;
-use Obullo\Config\ConfigInterface as Config;
-use Obullo\Container\ContainerInterface as Container;
+use Interop\Container\ContainerInterface as Container;
 use Obullo\Validator\ValidatorInterface as Validator;
 
 use Psr\Http\Message\RequestInterface as Request;
@@ -35,7 +34,7 @@ class Form
      *
      * @var object
      */
-    protected $c;
+    protected $container;
 
     /**
      * Notification config
@@ -70,17 +69,16 @@ class Form
      *
      * @param object $container \Obullo\Container\ContainerInterface
      * @param object $request   \Obullo\
-     * @param object $config    \Obullo\Config\ConfigInterface
      * @param object $logger    \Obullo\Log\LoggerInterface
+     * @param array  $params    service parameters
      */
-    public function __construct(Container $container, Request $request, Config $config, Logger $logger)
+    public function __construct(Container $container, Request $request, Logger $logger, array $params)
     {
-        $this->c = $container;
         $this->request = $request;
+        $this->container = $container;
 
-        $form = $config->load('form');
-        $this->error        = $form['error'];
-        $this->notification = $form['notification'];
+        $this->error        = $params['error'];
+        $this->notification = $params['notification'];
 
         $this->messages['success'] = static::ERROR;
         $this->messages['code'] = 0;
@@ -349,8 +347,8 @@ class Form
      */
     public function getValidationErrors($prefix = '', $suffix = '')
     {
-        if ($this->c->active('validator')) {
-            return $this->c['validator']->getErrorString($prefix, $suffix);
+        if ($this->container->hasShared('validator')) {
+            return $this->container->get('validator')->getErrorString($prefix, $suffix);
         }
     }
 
@@ -365,8 +363,8 @@ class Form
      */
     public function getError($field, $prefix = '', $suffix = '')
     {
-        if ($this->c->active('validator') && $this->isError($field)) {  // If we have validator object
-            return $this->c['validator']->getError($field, $prefix, $suffix);
+        if ($this->container->hasShared('validator') && $this->isError($field)) {  // If we have validator object
+            return $this->container->get('validator')->getError($field, $prefix, $suffix);
         }
     }
 
@@ -379,7 +377,7 @@ class Form
      */
     public function isError($field)
     {
-        return $this->c['validator']->isError($field);
+        return $this->container->get('validator')->isError($field);
     }
 
     /**
@@ -423,12 +421,12 @@ class Form
      */    
     public function getValue($field = '', $default = '')
     {
-        if ($this->c->active('validator')) { // If we have validator object
+        if ($this->container->hasShared('validator')) { // If we have load before validator object
 
-            $fieldData = $this->c['validator']->getFieldData();
+            $fieldData = $this->container->get('validator')->getFieldData();
 
             if (isset($fieldData[$field])) {
-                return $this->c['validator']->getValue($field, $default);
+                return $this->container->get('validator')->getValue($field, $default);
             }
         } elseif ($value = $this->request->post($field)) {
 
@@ -465,7 +463,7 @@ class Form
      */
     public function setSelect($field = '', $value = '', $default = false, $selectedString = ' selected="selected"')
     {
-        $fieldData = $this->c['validator']->getFieldData();
+        $fieldData = $this->container->get('validator')->getFieldData();
 
         if (! isset($fieldData[$field]) || ! isset($fieldData[$field]['postdata'])) {
 

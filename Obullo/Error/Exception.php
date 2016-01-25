@@ -91,13 +91,12 @@ class Exception
      */
     protected function display($e)
     {
-        global $c;
-        $request = $c['request'];
+        global $container;
 
         if (defined('STDIN')) {
             return $this->view('console', $e);
         }
-        if ($request->isAjax()) {
+        if ($container->get('request')->isAjax()) {
             return $this->view('ajax', $e);
         }
         return '<!DOCTYPE html> 

@@ -8,7 +8,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use SplQueue;
 use InvalidArgumentException;
 use Obullo\Http\Middleware\MiddlewareInterface;
-use Obullo\Container\ContainerInterface as Container;
+use Interop\Container\ContainerInterface as Container;
 
 /**
  * Pipe middleware like unix pipes.
@@ -36,7 +36,7 @@ class MiddlewarePipe implements MiddlewareInterface
      * 
      * @var object
      */
-    protected $c;
+    protected $container;
 
     /**
      * SplQueue
@@ -52,12 +52,12 @@ class MiddlewarePipe implements MiddlewareInterface
      */
     public function __construct(Container $container)
     {
-        $this->c = $container;
+        $this->container = $container;
         $this->pipeline = new SplQueue();
-        
-        $this->c['middleware']->add('Error')->setContainer($container);  // Error middleware must be defined end of the queue.
+        $middleware = $this->container->get('middleware');
+        $middleware->add('Error')->setContainer($container);  // Error middleware must be defined end of the queue.
 
-        foreach ($this->c['middleware']->getQueue() as $middleware) {
+        foreach ($middleware ->getQueue() as $middleware) {
             $this->pipe($middleware);
         }
     }
@@ -69,7 +69,7 @@ class MiddlewarePipe implements MiddlewareInterface
      */
     public function getRequest()
     {
-        return $this->c['request'];
+        return $this->container->get('request');
     }
 
     /**
@@ -84,11 +84,11 @@ class MiddlewarePipe implements MiddlewareInterface
         $class = '\\Http\Middlewares\FinalHandler\\Zend';
         $handler = new $class(
             [
-                'env' => $this->c['app.env']
+                'env' => $this->container->get('env')->getValue()
             ],
             $response
         );
-        $handler->setContainer($this->c);
+        $handler->setContainer($this->container);
         return $handler;
     }
 
@@ -113,7 +113,7 @@ class MiddlewarePipe implements MiddlewareInterface
         $out = null;
         $done = $this->getFinalHandler($response);
 
-        $next   = new Next($this->pipeline, $done, $this->c);
+        $next   = new Next($this->pipeline, $done, $this->container);
         $result = $next($request, $response);
 
         return ($result instanceof Response ? $result : $response);

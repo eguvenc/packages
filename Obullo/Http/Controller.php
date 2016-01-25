@@ -2,8 +2,8 @@
 
 namespace Obullo\Http;
 
-use Obullo\Http\ControllerInterface;
-use Obullo\Container\ContainerInterface as Container;
+use Obullo\Container\ControllerInterface;
+use League\Container\ImmutableContainerAwareTrait;
 
 /**
  * Obullo Layer ( Hmvc ) Based Controller.
@@ -13,13 +13,8 @@ use Obullo\Container\ContainerInterface as Container;
  */
 class Controller implements ControllerInterface
 {
-    /**
-     * Container
-     * 
-     * @var object
-     */
-    protected $c;
-
+    use ImmutableContainerAwareTrait;
+    
     /**
      * Controller instance
      * 
@@ -27,20 +22,6 @@ class Controller implements ControllerInterface
      */
     public static $instance = null;
     
-    /**
-     * Set container
-     * 
-     * @param Container $container container object
-     * 
-     * @return void
-     */
-    public function __setContainer(Container $container = null)
-    {
-        if ($this->c == null) {
-            $this->c = &$container;
-        }
-    }
-
     /**
      * Container proxy
      * 
@@ -53,7 +34,7 @@ class Controller implements ControllerInterface
         if (self::$instance == null || in_array($key, ['request', 'router', 'view'])) {  // Create new layer for each core classes ( Otherwise Layer does not work )
             self::$instance = &$this;
         }
-        return $this->c[$key];
+        return $this->container->get($key);
     }
 
     /**

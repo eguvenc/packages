@@ -3,6 +3,8 @@
 namespace Obullo\Log;
 
 use Obullo\Log\LoggerInterface as Logger;
+use Obullo\Container\ParamsAwareInterface;
+use League\Container\ImmutableContainerAwareInterface;
 
 /**
  * Log filter handler
@@ -21,14 +23,20 @@ class Filter
      */
     public static function handle(array $event)
     {
-        global $c;
+        if (empty($event['filters'])) {
+            return array();
+        }
         foreach ($event['filters'] as $value) {
             $Class = '\\'.$value['class'];
             $method = $value['method'];
 
-            $filter = $c['dependency']->resolve($Class);  // Resolve components
+            $filter = new $Class;  // Resolve components
 
-            if (method_exists($filter, 'setParams')) {
+            if ($filter instanceof ImmutableContainerAwareInterface) {
+                global $container;
+                $filter->setContainer($container);
+            }
+            if ($filter instanceof ParamsAwareInterface) {
                 $filter->setParams($value['params']); // Inject filter parameters
             }
             if (count($event['record']) > 0) {

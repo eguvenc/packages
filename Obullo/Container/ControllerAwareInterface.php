@@ -1,8 +1,8 @@
 <?php
 
-namespace Obullo\Http\Middleware;
+namespace Obullo\Container;
 
-use Obullo\Http\ControllerInterface as Controller;
+use Obullo\Container\ControllerInterface as Controller;
 
 /**
  * Inject controller

@@ -32,9 +32,10 @@ class Benchmark
      */
     public static function end($request, $extra = array())
     {
-        global $c;
-        $logger = $c['logger'];
-        $config = $c['config'];
+        global $container;
+        
+        $logger = $container->get('logger');
+        $config = $container->get('config');
 
         $time  = ($request == null) ? self::$time : $request->getAttribute('REQUEST_TIME_START');
 

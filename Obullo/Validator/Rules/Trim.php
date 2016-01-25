@@ -24,6 +24,7 @@ class Trim
         $field = $next;
         $value = trim($field->getValue());
         $field->setValue($value);
+        
         return $next();
     }
 }

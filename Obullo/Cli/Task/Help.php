@@ -2,8 +2,8 @@
 
 namespace Obullo\Cli\Task;
 
-use Obullo\Cli\Controller;
 use Obullo\Cli\Console;
+use Obullo\Cli\Controller;
 
 class Help extends Controller
 {

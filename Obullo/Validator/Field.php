@@ -5,6 +5,10 @@ namespace Obullo\Validator;
 use Closure;
 use RuntimeException;
 use Obullo\Validator\ValidatorInterface;
+use League\Container\ContainerAwareInterface;
+use League\Container\ImmutableContainerAwareTrait;
+use League\Container\ImmutableContainerAwareInterface;
+use Interop\Container\ContainerInterface as Container;
 
 /**
  * Form field
@@ -12,8 +16,10 @@ use Obullo\Validator\ValidatorInterface;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Field implements FieldInterface
+class Field implements FieldInterface, ImmutableContainerAwareInterface
 {
+    use ImmutableContainerAwareTrait;
+
     /**
      * Field name
      * 
@@ -41,13 +47,6 @@ class Field implements FieldInterface
      * @var object
      */
     protected $validator;
-
-    /**
-     * Dependency
-     * 
-     * @var object
-     */
-    protected $dependency;
 
     /**
      * Rules
@@ -98,18 +97,6 @@ class Field implements FieldInterface
     }
 
     /**
-     * Set dependency class
-     * 
-     * @param object $dependency container
-     *
-     * @return void
-     */
-    public function setDependency($dependency)
-    {
-        $this->dependency = $dependency;
-    }
-
-    /**
      * Call next rule
      * 
      * @return void
@@ -148,9 +135,14 @@ class Field implements FieldInterface
                     $this->setError($error);
                     $result = false;
                 } else {
-                    $Class  = $this->ruleArray[$key];
-                    $next   = $this->dependency->resolve($Class);
-                    $result = $next($this);
+                    $Class  = "\\".trim($this->ruleArray[$key], '\\');
+
+                    $nextRule = new $Class;
+
+                    if ($nextRule instanceof ImmutableContainerAwareInterface || $nextRule instanceof ContainerAwareInterface) {
+                        $nextRule->setContainer($this->container);
+                    }
+                    $result = $nextRule($this);
                 }
             }
             if (false === $result) {

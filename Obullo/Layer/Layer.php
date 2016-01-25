@@ -5,7 +5,7 @@ namespace Obullo\Layer;
 use stdClass;
 use Obullo\Http\Controller;
 use Obullo\Log\LoggerInterface as Logger;
-use Obullo\Container\ContainerInterface as Container;
+use Interop\Container\ContainerInterface as Container;
 
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -27,13 +27,6 @@ use Psr\Http\Message\ServerRequestInterface;
 class Layer
 {
     const CACHE_KEY = 'Layer:';
-    
-    /**
-     * Container
-     * 
-     * @var object
-     */
-    protected $c = null;
 
     /**
      * Layer uri string
@@ -78,17 +71,24 @@ class Layer
     protected $globals = array();
 
     /**
+     * Container
+     * 
+     * @var object
+     */
+    protected $container = null;
+
+    /**
      * Constructor
      * 
-     * @param object $c       \Obullo\Container\ContainerInterface
-     * @param array  $params  config parameters
-     * @param array  $globals http super globals
+     * @param object $container \Obullo\Container\ContainerInterface
+     * @param array  $params    config parameters
+     * @param array  $globals   http super globals
      */
-    public function __construct(Container $c, array $params, array $globals)
+    public function __construct(Container $container, array $params, array $globals)
     {
-        $this->c = $c;
         $this->params = $params;
         $this->globals = $globals;
+        $this->container = $container;
 
         register_shutdown_function(array($this, 'close'));  // Close current layer
     }
@@ -115,12 +115,16 @@ class Layer
         $this->request = clone Controller::$instance->request;
         $this->router = clone Controller::$instance->router;  // Create copy of original Router class.
 
-        $this->c['app.request'] = function () {
-            return $this->request;
-        };
-        $this->c['app.router'] = function () {
-            return $this->router;
-        };
+        // $this->c['app.request'] = function () {
+        //     return $this->request;
+        // };
+
+        $this->container->share('app.request', $this->request);
+        $this->container->share('app.router', $this->router);
+
+        // $this->c['app.router'] = function () {
+        //     return $this->router;
+        // };
         $this->createUri($request, $uri);
     }
 
@@ -134,16 +138,18 @@ class Layer
      */
     protected function createUri(ServerRequestInterface $request, $uri)
     {
-        unset($this->c['request']);   // Create new request object
+        // Create new request object
 
-        $this->c['request'] = function () use ($request) {
-            return $request;
-        };
-        $this->c['request']->getUri()->clear();     // Reset uri objects we will reuse it for layer
-        $this->c['request']->getUri()->setPath($uri);
+        $this->container->share('request', $request);
 
-        $this->c['router']->clear();   // Reset router objects we will reuse it for layer
-        $this->c['router']->init();
+        // $this->c['request'] = function () use ($request) {
+        //     return $request;
+        // };
+        $this->container->get('request')->getUri()->clear();     // Reset uri objects we will reuse it for layer
+        $this->container->get('request')->getUri()->setPath($uri);
+
+        $this->container->get('router')->clear();   // Reset router objects we will reuse it for layer
+        $this->container->get('router')->init();
     }
 
     /**
@@ -192,17 +198,19 @@ class Layer
     public function execute()
     {
         $id  = $this->getId();
-        $uri = $this->c['request']->getUri();
+        $uri = $this->container->get('request')->getUri();
 
         $this->uri = $uri->getPath();
         $uri->setPath($this->uri. '/' .$id); //  Create unique uri
         
-        $directory = $this->c['router']->getDirectory();
-        $className = $this->c['router']->getClass();
-        $method    = $this->c['router']->getMethod();
+        $router = $this->container->get('router');
 
-        $class = MODULES .$this->c['router']->getModule('/') .$directory.'/'.$className. '.php';
-        $className = '\\'.$this->c['router']->getNamespace().$className;
+        $directory = $router->getDirectory();
+        $className = $router->getClass();
+        $method    = $router->getMethod();
+
+        $class = MODULES .$router->getModule('/') .$directory.'/'.$className. '.php';
+        $className = '\\'.$router->getNamespace().$className;
 
         if (! class_exists($className, false)) {
             include $class;
@@ -211,9 +219,12 @@ class Layer
             return $this->show404($method);
         }
         $controller = new $className;
-        $controller->__setContainer($this->c);
+        $controller->setContainer($this->container);
 
-        if (! method_exists($controller, $method)) {
+        if ($method == 'setContainer' 
+            || $method == 'getContainer' 
+            || ! method_exists($controller, $method)
+        ) {
             return $this->show404($method);
         }
         ob_start();
@@ -281,14 +292,17 @@ class Layer
         $_GET = &$this->globals['_GET'];
         $_POST = &$this->globals['_POST'];
 
-        unset($this->c['request'], $this->c['router']);
+        // unset($this->c['request'], $this->c['router']);
 
-        $this->c['request'] = function () {
-            return $this->request;
-        };
-        $this->c['router'] = function () {
-            return $this->router;
-        };
+        $this->container->share('request', $this->request);
+        $this->container->share('router', $this->router);
+
+        // $this->c['request'] = function () {
+        //     return $this->request;
+        // };
+        // $this->c['router'] = function () {
+        //     return $this->router;
+        // };
         Controller::$instance = $this->controller;
         Controller::$instance->router = $this->router;
         Controller::$instance->request = $this->request;

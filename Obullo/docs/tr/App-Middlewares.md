@@ -218,16 +218,11 @@ class App implements MiddlewareInterface, ContainerAwareInterface {}
 Sonra katman sınıfı içerisinde setContainer() metodu ilan edilerek <kbd>$container</kbd> nesnesi elde edilebilir.
 
 ```php
-/**
- * Sets the Container.
- *
- * @param ContainerInterface|null $container object or null
- *
- * @return void
- */
 public function setContainer(Container $container = null)
 {
-    $this->c = $container;
+    $this->container = $container;
+
+    return $this;
 }
 ```
 
@@ -246,16 +241,11 @@ class Maintenance implements MiddlewareInterface, ParamsAwareInterface {}
 Sonra katman sınıfı içerisinde setParams() metodu ilan edilerek <kbd>$params</kbd> değişkeni elde edilebilir.
 
 ```php
-/**
- * Set allowed methods
- * 
- * @param array $params allowed methods
- *
- * @return void
- */
 public function setParams(array $params)
 {
     $this->params = $params;
+
+    return $this;
 }
 ```
 

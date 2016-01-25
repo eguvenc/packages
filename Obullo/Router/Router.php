@@ -8,7 +8,7 @@ use Obullo\Http\Controller;
 
 use Obullo\Log\LoggerInterface as Logger;
 use Psr\Http\Message\RequestInterface as Request;
-use Obullo\Container\ContainerInterface as Container;
+use Interop\Container\ContainerInterface as Container;
 
 use Obullo\Router\Route\Route;
 use Obullo\Router\Route\Group;
@@ -27,7 +27,6 @@ use Obullo\Router\Resolver\ClassResolver;
  */
 class Router implements RouterInterface
 {
-    protected $c;                            // Container
     protected $uri;                          // Uri class
     protected $domain;                       // Domain object
     protected $logger;                       // Logger class
@@ -35,6 +34,7 @@ class Router implements RouterInterface
     protected $route;                        // Route object
     protected $attach;                       // Attachment object
     protected $module = '';                  // Module name
+    protected $container;                    // Container
     protected $directory = '';               // Directory name
     protected $method = 'index';             // Default method is index and its immutable !
     protected $defaultController = '';       // Default controller name
@@ -51,7 +51,7 @@ class Router implements RouterInterface
      */
     public function __construct(Container $container, Request $request, Logger $logger)
     {
-        $this->c = $container;
+        $this->container = $container;
         $this->uri = $request->getUri();
         $this->logger = $logger;
         $this->domain = new Domain;
@@ -68,7 +68,7 @@ class Router implements RouterInterface
      */
     public function clear()
     {
-        $this->uri = $this->c['request']->getUri();   // Reset cloned URI object.
+        $this->uri = $this->container->get('request')->getUri();   // Reset cloned URI object.
         $this->class = '';
         $this->directory = '';
         $this->module = '';
@@ -297,7 +297,9 @@ class Router implements RouterInterface
     {
         if (count($val['when']) > 0) {  //  Dynamically add method not allowed middleware
 
-            $this->c['middleware']->add('NotAllowed')->setParams($val['when']);
+            $this->container->get('middleware')
+                ->add('NotAllowed')
+                ->setParams($val['when']);
         }
         // Do we have a back-reference ?
 

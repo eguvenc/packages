@@ -17,28 +17,31 @@ class Cli extends Application
      */
     public function init()
     {
-        $c = $this->c;
+        $container = $this->getContainer();
+        $app = $container->get('app');
+
         include APP .'errors.php';
 
         $this->registerErrorHandlers();
 
-        $logger     = $c['logger'];
-        $request    = $c['request'];
-        $translator = $c['translator'];
+        $logger     = $container->get('logger');
+        $request    = $container->get('request');
 
-        unset($c['router']);   // Replace router component
+        $container->share('router', 'Obullo\Cli\Router')
+            ->withArgument($request->getUri())
+            ->withArgument($logger);
 
-        $c['router'] = function () use ($request, $logger) {
-            return new \Obullo\Cli\Router($request->getUri(), $logger);
-        };
-        $translator->setLocale($translator->getDefault());  // Set default translation
-
+        if ($container->has('translator')) {
+            $translator = $container->get('translator');
+            $translator->setLocale($translator->getDefault());  // Set default translation
+        }
         register_shutdown_function(
             function () use ($logger) {
                 $this->registerFatalError();
                 $logger->shutdown();
             }
         );
+
     }
 
     /**
@@ -53,9 +56,9 @@ class Cli extends Application
     {    
         $this->init();
 
-        $router  = $this->c['router'];
-        $logger  = $this->c['logger'];
-        $request = $this->c['request'];
+        $router  = $this->container->get('router');
+        $logger  = $this->container->get('logger');
+        $request = $this->container->get('request');
 
         $router->init();
         $className = $router->getNamespace();
@@ -64,7 +67,7 @@ class Cli extends Application
             $this->router->classNotFound();
         }
         $controller = new $className;  // Call the controller
-        $controller->__setContainer($this->c);
+        $controller->setContainer($this->container);
         
         if (! method_exists($className, $router->getMethod())) {
             $this->router->methodNotFound();

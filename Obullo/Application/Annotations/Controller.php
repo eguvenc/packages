@@ -3,10 +3,10 @@
 namespace Obullo\Application\Annotations;
 
 use ReflectionClass;
-use Obullo\Container\ContainerInterface as Container;
+use Interop\Container\ContainerInterface as Container;
 
 /**
- * Annotations Reader for Controller ( Executes filters & events )
+ * Annotation Reader
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
@@ -18,7 +18,7 @@ class Controller
      * 
      * @var object
      */
-    protected $c;
+    protected $container;
 
     /**
      * Doc method
@@ -43,16 +43,11 @@ class Controller
      */
     public function setContainer(Container $container)
     {
-        $this->c = $container;
-        $this->c['annotation.middleware'] = function () {
-
-            return new Methods(
-
-                $this->c['request'],
-                $this->c['dependency'],
-                $this->c['middleware']
-            );
-        };
+        $this->container = $container;
+        $this->container->share(
+            'annotation.middleware',
+            'Obullo\Application\Annotations\Methods'
+        );
     }
 
     /**
@@ -96,6 +91,7 @@ class Controller
         $docs = explode("@", $docs);
 
         if (strpos($blocks, 'middleware->') > 0) {
+
             foreach ($docs as $line) {
                 $methods = explode('->', $line);  // explode every methods
                 array_shift($methods);            // remove class name "filter"
@@ -124,7 +120,7 @@ class Controller
         if (strpos($params, ',') > 0) {  // array support
             $parray = explode(',', $params);
         }
-        $this->c['annotation.middleware']->$method($parray);  // Execute middleware methods
+        $this->container->get('annotation.middleware')->$method($parray);  // Execute middleware methods
     }
 
     /**

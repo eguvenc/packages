@@ -14,6 +14,20 @@ use Exception;
 interface ApplicationInterface
 {
     /**
+     * Set error handlers
+     *
+     * @return void
+     */
+    public function registerErrorHandlers();
+
+    /**
+     * Register fatal error handler
+     * 
+     * @return mixed
+     */
+    public function registerFatalError();
+
+    /**
      * Sets application exception errors
      * 
      * @param Closure $closure function
@@ -32,6 +46,50 @@ interface ApplicationInterface
     public function fatal(Closure $closure);
 
     /**
+     * Error handler, convert all errors to exceptions
+     * 
+     * @param integer $level   name
+     * @param string  $message error message
+     * @param string  $file    file
+     * @param integer $line    line
+     * 
+     * @return boolean whether to continue displaying php errors
+     */
+    public function handleError($level, $message, $file = '', $line = 0);
+
+    /**
+     * Exception error handler
+     * 
+     * @param Exception $e exception class
+     * 
+     * @return boolean
+     */
+    public function handleException(Exception $e);
+
+    /**
+     * Exception log handler
+     * 
+     * @param Exception $e exception class
+     * 
+     * @return boolean
+     */
+    public function exceptionError($e);
+
+    /**
+     * Returns to fatal error closure
+     * 
+     * @return Closure object
+     */
+    public function getFatalCallback();
+
+    /**
+     * Returns to defined exception closures in app/errors.php
+     * 
+     * @return array
+     */
+    public function getExceptions();
+
+    /**
      * Is Cli ?
      *
      * Test to see if a request was made from the command line.
@@ -45,48 +103,12 @@ interface ApplicationInterface
      * 
      * @return string
      */
-    public function env();
-
-    /**
-     * Registers a service provider.
-     *
-     * @param array $providers provider name and namespace array
-     *
-     * @return object
-     */
-    public function provider(array $providers);
-
-    /**
-     * Register services
-     * 
-     * @param array $services services
-     * 
-     * @return object
-     */
-    public function service(array $services);
-
-    /**
-     * Register components & resolve dependencies
-     *
-     * @param array $namespaces component class name & namespaces
-     * 
-     * @return void
-     */
-    public function component(array $namespaces);
-
-    /**
-     * Creates dependency
-     * 
-     * @param array $deps dependencies
-     * 
-     * @return object
-     */
-    public function dependency(array $deps);
+    public function getEnv();
 
     /**
      * Returns current version of Obullo
      * 
      * @return string
      */
-    public function version();
+    public function getVersion();
 }

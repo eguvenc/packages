@@ -5,7 +5,7 @@ namespace Obullo\View;
 use Closure;
 use Obullo\Http\Controller;
 use Obullo\Log\LoggerInterface as Logger;
-use Obullo\Container\ContainerInterface as Container;
+use Interop\Container\ContainerInterface as Container;
 
 /**
  * View Class
@@ -16,18 +16,18 @@ use Obullo\Container\ContainerInterface as Container;
 class View implements ViewInterface
 {
     /**
-     * Container
-     * 
-     * @var object
-     */
-    protected $c;
-
-    /**
      * Logger
      * 
      * @var object
      */
     protected $logger;
+
+    /**
+     * Container
+     * 
+     * @var object
+     */
+    protected $container;
 
     /**
      * Protected variables
@@ -47,7 +47,7 @@ class View implements ViewInterface
      */
     public function __construct(Container $container, Logger $logger)
     {
-        $this->c = $container;
+        $this->container = $container;
         $this->logger = $logger;
         $this->logger->debug('View Class Initialized');
     }
@@ -80,7 +80,7 @@ class View implements ViewInterface
         if ($_VData === false || $_VInclude === false) {
             return $body;
         }
-        $response = $this->c['response'];
+        $response = $this->container->get('response');
         $response->getBody()->write($body);
         return $response;
     }
@@ -208,7 +208,7 @@ class View implements ViewInterface
          * So first we need check Controller is available if not we use container->router.
          */
         if (! class_exists('Obullo\Http\Controller', false) || Controller::$instance == null) {
-            $router = $this->c['router'];
+            $router = $this->container->get('router');
         } else {
             $router = &Controller::$instance->router;  // Use nested controller router ( @see the Layer package. )
         }
@@ -237,7 +237,7 @@ class View implements ViewInterface
      */
     public function __get($key)
     {
-        return $this->c[$key];
+        return $this->container->get($key);
     }
 
 }

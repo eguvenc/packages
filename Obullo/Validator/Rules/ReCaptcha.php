@@ -6,28 +6,18 @@ use Obullo\Captcha\CaptchaInterface;
 use Obullo\Validator\FieldInterface as Field;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+use League\Container\ImmutableContainerAwareTrait;
+use League\Container\ImmutableContainerAwareInterface;
+
 /**
  * ReCaptcha
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class ReCaptcha
+class ReCaptcha implements ImmutableContainerAwareInterface
 {
-    protected $request;
-    protected $recaptcha;
-
-    /**
-     * Constructor
-     * 
-     * @param Request $request   request
-     * @param Captcha $recaptcha recaptcha
-     */
-    public function __construct(Request $request, CaptchaInterface $recaptcha)
-    { 
-        $this->request = $request;
-        $this->recaptcha = $recaptcha;
-    }
+    use ImmutableContainerAwareTrait;
 
     /**
      * Call next
@@ -54,11 +44,13 @@ class ReCaptcha
      */    
     public function isValid(Field $field)
     {  
-        if ($this->request->isPost()) {
+        if ($this->getContainer()->get('request')->isPost()) {
 
-            $value = $this->request->post('g-recaptcha-response');
+            $value = $this->getContainer()
+                ->get('request')
+                ->post('g-recaptcha-response');
 
-            if (false == $this->recaptcha->result($value)->isValid()) {
+            if (false == $this->getContainer()->get('recaptcha')->result($value)->isValid()) {
                 $field->setError('OBULLO:VALIDATOR:CAPTCHA:VALIDATION');
                 return false;
             }

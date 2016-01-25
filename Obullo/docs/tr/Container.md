@@ -67,7 +67,7 @@ Servisler uygulama kalitesini arttıran aracı sınıflardır. Bir sınıfın se
 
 #### Servisleri Tanımlamak
 
-Servis konfigürasyonları <kbd>app/$env/service/</kbd> klasörü içerisinde tanımlanırlar ve çevre ortamı değiştiğinde ( local, test, production ) farklı davranışlar sergileyebilirler. Aşağıda session servisine ait konfigürasyon gösteriliyor.
+Servis konfigürasyonları <kbd>app/$env/providers/</kbd> klasörü içerisinde tanımlanırlar ve çevre ortamı değiştiğinde ( local, test, production ) farklı davranışlar sergileyebilirler. Aşağıda session servisine ait konfigürasyon gösteriliyor.
 
 ```php
 return array(
@@ -370,7 +370,7 @@ Yukarıda anlatılan her bir servis sağlayıcısına ait dökümentasyona <a hr
 Eğer kendi oluşturduğunuz servis sağlayıcınızı çalıştırmak istiyorsanız <kbd>.app/classes/Service/Providers</kbd> klasörü altında aşağıdaki örnekte gösterildiği gibi bir servis sağlayıcı oluşturmalısınız.
 
 ```php
-namespace Service\Providers;
+namespace ServiceProviders;
 
 use RuntimeException;
 use Obullo\Container\ContainerInterface as Container;
@@ -396,8 +396,6 @@ class Cache extends AbstractServiceProvider implements ServiceProviderInterface
         // ..
     }
 }
-
-/* Location: .app/classes/Service/Providers/Cache.php */
 ```
 
 Get metodu zorunlu diğer metotlar opsiyoneldir.
@@ -417,11 +415,78 @@ $c['app']->provider(
         'cache' => 'Service\Providers\CacheServiceProvider'
     ]
 );
-
-/* Location: .app/components.php */
 ```
 
 Artık servis sağlayıcınız uygulama içerisinde çalışmaya hazır.
+
+
+### Bağımlılık Enjeksiyonu
+
+Kendi yarattığınız bir sınıfa bağımlılık listesine eklediğiniz sınıfları enjekte etmek için sınıfı,
+
+```php
+new Namespace/ClassName;
+```
+
+yerine
+
+```php
+$c['dependency']->resolve('Namespace\ClassName');
+```
+
+<kbd>resolve()</kbd> metodu ile çağırın. Eğer <kbd>construct()</kbd> metodu içerisinde girilen değişken isimleri yukarıdaki bağımlılık listenizle uyuşuyorsa aşağıdaki gibi $request,  $logger ve diğer tanımlı olan bileşenleri sınıfınıza enjekte edebilirsiniz.
+
+
+```php
+namespace Example;
+
+use Psr\Http\Message\ServerRequestInterface as Request;
+
+use Obullo\Log\LoggerInterface as Logger;
+use Obullo\Config\ConfigInterface as Config;
+
+class MyClass
+{
+    protected $cookies;
+    protected $config;
+    protected $logger;
+
+    public function __construct(Request $request, Config $config, Logger $logger)
+    {
+        $this->cookies = $request->getCookieParams();
+        $this->config = $config;
+        $this->logger = $logger;
+
+        $this->logger->debug('MyClass Initialized');
+    }
+}
+```
+
+```php
+$myClass = $c['dependency']->resolve('Example\MyClass');
+
+var_dump($myClass); // object
+```
+
+Aşağıdaki gibi son argümanları kullanarak özel parametreler de gönderebilirsiniz.
+
+```php
+class MyClass
+{
+    public function __construct(Request $request, $param1 = '', $param2 = '')
+    {
+        var_dump($param1);
+        var_dump($param2);
+    }
+}
+```
+
+```php
+$myClass = $c['dependency']->resolve('Example\MyClass', 1, 2);
+
+// int(1)
+// int(2)
+```
 
 <a name="application-doc"></a>
 

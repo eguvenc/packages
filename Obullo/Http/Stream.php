@@ -183,7 +183,6 @@ class Stream implements StreamInterface
 
         $meta = stream_get_meta_data($this->resource);
         $mode = $meta['mode'];
-        // var_dump($meta);
 
         return (
             strstr($mode, 'x')

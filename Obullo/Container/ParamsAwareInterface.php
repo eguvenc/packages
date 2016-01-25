@@ -1,18 +1,25 @@
 <?php
 
-namespace Obullo\Http\Middleware;
+namespace Obullo\Container;
 
 /**
- * Inject array parameters
+ * Inject parameters
  */
 interface ParamsAwareInterface
 {
     /**
-     * Inject array parameters
+     * Inject controller object
      * 
      * @param array $params parameters
      * 
      * @return void
      */
     public function setParams(array $params);
+
+    /**
+     * Get parameters
+     * 
+     * @return array
+     */
+    public function getParams();
 }

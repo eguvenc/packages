@@ -9,8 +9,6 @@ use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use Obullo\Container\ContainerInterface as Container;
-
 /**
  * Dispatch middleware
  *
@@ -20,23 +18,6 @@ use Obullo\Container\ContainerInterface as Container;
  */
 class Dispatch
 {
-    /**
-     * Container 
-     * 
-     * @var object
-     */
-    protected $c;
-
-    /**
-     * Constructor
-     * 
-     * @param Container $c container
-     */
-    public function __construct(Container $c)
-    {
-        $this->c = $c;
-    }
-
     /**
      * Dispatch middleware
      *

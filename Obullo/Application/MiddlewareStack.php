@@ -3,6 +3,7 @@
 namespace Obullo\Application;
 
 use RuntimeException;
+use Interop\Container\ContainerInterface as Container;
 
 /**
  * Middleware stack
@@ -43,11 +44,11 @@ class MiddlewareStack implements MiddlewareStackInterface
     /**
      * Constructor
      * 
-     * @param Obullo\Container\Dependency $dependency object 
+     * @param Container $container object
      */
-    public function __construct($dependency)
+    public function __construct(Container $container)
     {
-        $this->dependency = $dependency;
+        $this->container = $container;
     }
 
     /**
@@ -165,7 +166,7 @@ class MiddlewareStack implements MiddlewareStackInterface
         $Class = $this->registered[$name];
         $this->names[$name] = $this->count;
 
-        return $this->queue[$this->count] = $this->dependency->resolve($Class);  // Store middlewares
+        return $this->queue[$this->count] = new $Class;  // Store middlewares
     }
 
     /**

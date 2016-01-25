@@ -6,7 +6,7 @@ use Obullo\Http\ServerRequestFactory;
 
 use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Config\ConfigInterface as Config;
-use Obullo\Container\ContainerInterface as Container;
+use Interop\Container\ContainerInterface as Container;
 
 /**
  * Layer Request
@@ -16,13 +16,6 @@ use Obullo\Container\ContainerInterface as Container;
  */
 class Request
 {
-    /**
-     * Container
-     * 
-     * @var object
-     */
-    protected $c;
-
     /**
      * Logger
      * 
@@ -45,15 +38,22 @@ class Request
     protected $globals;
 
     /**
+     * Container
+     * 
+     * @var object
+     */
+    protected $container;
+
+    /**
      * Constructor
      *
-     * @param object $c      ContainerInterface
-     * @param object $logger LoggerInterface
-     * @param array  $params service parameters
+     * @param object $container ContainerInterface
+     * @param object $logger    LoggerInterface
+     * @param array  $params    service parameters
      */
-    public function __construct(Container $c, Logger $logger, array $params)
+    public function __construct(Container $container, Logger $logger, array $params)
     {   
-        $this->c = $c;
+        $this->container = $container;
         $this->logger = $logger;
         $this->params = $params;
         
@@ -149,7 +149,7 @@ class Request
     public function newRequest($method, $uri = '/', $data = array(), $expiration = '')
     {
         $layer = new Layer(
-            $this->c,
+            $this->container,
             $this->params,
             $this->globals
         );
@@ -174,7 +174,7 @@ class Request
         /**
          * Cache support
          */
-        if ($this->params['cache'] && $response = $this->c['cache']->get($id)) {   
+        if ($this->params['cache'] && $response = $this->container->get('cache')->get($id)) {   
             $layer->restore();
             return base64_decode($response);
         }
@@ -185,7 +185,7 @@ class Request
          * Cache support
          */
         if (is_numeric($expiration)) {
-            $this->c['cache']->set($id, base64_encode($response), (int)$expiration); // Write to Cache
+            $this->container->get('cache')->set($id, base64_encode($response), (int)$expiration); // Write to Cache
         }
         $layer->restore();  // Restore controller objects
 
@@ -210,8 +210,10 @@ class Request
      */
     public function flush($uri, $data = array())
     {
-        $flush = new Flush($this->logger, $this->c['cache']);
-
+        $flush = new Flush(
+            $this->logger,
+            $this->container->get('cache')
+        );
         return $flush->uri($uri, $data);
     }
 
@@ -226,7 +228,7 @@ class Request
      */
     protected function log($uri, $id, $response)
     {
-        $uriString = md5($this->c['app']->request->getUri()->getPath());
+        $uriString = md5($this->container->get('app')->request->getUri()->getPath());
 
         $this->logger->debug(
             'Layer: '.strtolower($uri), 

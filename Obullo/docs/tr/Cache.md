@@ -124,7 +124,7 @@ class Cache implements ServiceInterface
 Cache servisi aracılığı ile cache metotlarına aşğıdaki gibi erişilebilir.
 
 ```php
-$this->c['cache']->metod();
+$this->container->get('cache')->metod();
 ```
 <a name="cache-drivers"></a>
 

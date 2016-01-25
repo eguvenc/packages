@@ -7,7 +7,7 @@ use RuntimeException;
 use Obullo\Http\Controller;
 use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Config\ConfigInterface as Config;
-use Obullo\Container\ContainerInterface as Container;
+use Interop\Container\ContainerInterface as Container;
 use Obullo\Translation\TranslatorInterface as Translator;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -20,9 +20,9 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  */
 class Validator implements ValidatorInterface
 {
-    protected $c;
     protected $config;
     protected $logger;
+    protected $container;
     protected $translator;
     protected $requestParams;
     protected $fieldData  = array();
@@ -44,23 +44,25 @@ class Validator implements ValidatorInterface
      * @param Request    $request    ServerRequestInterface
      * @param Translator $translator TranslatorInterface
      * @param Logger     $logger     LoggerInterface
+     * @param array      $params     service params
      */
     public function __construct(
         Container $container, 
         Config $config, 
         Request $request, 
         Translator $translator, 
-        Logger $logger
+        Logger $logger,
+        array $params
     ) {    
         mb_internal_encoding($config['locale']['charset']);
         
-        $this->c = $container;
+        $this->container = $container;
         $this->requestParams = $request->post();
         $this->config = $config;
         $this->logger = $logger;
         $this->translator = $translator;
+        $this->ruleArray = $params['rules'];
 
-        $this->ruleArray = $this->config->load('validator')['rules'];
         $this->translator->load('validator');
         $this->logger->debug('Validator Class Initialized');
     }
@@ -235,8 +237,8 @@ class Validator implements ValidatorInterface
             }
         }
         $field = new Field($row, $this->ruleArray);
+        $field->setContainer($this->container);
         $field->setValidator($this);
-        $field->setDependency($this->c['dependency']);
         $field();
     }
 

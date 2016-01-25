@@ -9,7 +9,8 @@ use ErrorException;
 use RuntimeException;
 use Obullo\Queue\Queue;
 use Obullo\Error\ErrorHandler;
-use Obullo\Container\ContainerInterface as Container;
+use Obullo\Config\ConfigInterface as Config;
+use Interop\Container\ContainerInterface as Container;
 
 /**
  * Logger Class
@@ -19,8 +20,8 @@ use Obullo\Container\ContainerInterface as Container;
  */
 class Logger extends AbstractLogger implements LoggerInterface
 {
-    protected $c;                             // Container
     protected $p = 100;                       // Default priority
+    protected $container;                     // Container
     protected $params = array();              // Service parameters
     protected $channel = 'system';            // Default log channel
     protected $writer;                        // Default writer
@@ -49,13 +50,14 @@ class Logger extends AbstractLogger implements LoggerInterface
      * Constructor
      *
      * @param object $container container
+     * @param object $config    config
      * @param array  $params    parameters
      */
-    public function __construct(Container $container, $params = array())
+    public function __construct(Container $container, Config $config, $params = array())
     {
-        $this->c = $container;
-        $this->params  = $params;
-        $this->enabled = $container['config']['log']['enabled'];
+        $this->params = $params;
+        $this->container = $container;
+        $this->enabled = $config['log']['enabled'];
         
         $this->initialize();
     }
@@ -68,7 +70,7 @@ class Logger extends AbstractLogger implements LoggerInterface
     public function initialize()
     {
         $this->channel = $this->params['default']['channel'];
-        $this->detectRequest($this->c['request']);
+        $this->detectRequest($this->container->get('request'));
     }
 
     /**
@@ -216,7 +218,6 @@ class Logger extends AbstractLogger implements LoggerInterface
         if (! $this->isEnabled()) {
             return $this;
         }
-
         if (is_object($message) && $message instanceof Exception) {
             $this->logExceptionError($message);
             return $this;
@@ -274,6 +275,9 @@ class Logger extends AbstractLogger implements LoggerInterface
      */
     protected function sendToWriterQueue($recordUnformatted, $priority = null)
     {
+        if (empty($this->priorityQueue)) {
+            throw new LogicException("Please set a log writer using setWriter method.");
+        }
         if (! empty($recordUnformatted)) {
             $this->connect(true);
             $this->priorityQueue[$this->writer]->insert($recordUnformatted, $priority);
@@ -508,22 +512,11 @@ class Logger extends AbstractLogger implements LoggerInterface
             $this->execHandlers();
             $payload = $this->getPayload();
 
-            if ($this->params['queue']['enabled']) { // Queue Logger
+            $Class = '\\'.trim($this->params['push']['handler'], '\\');
 
-                $this->c['queue']
-                    ->push(
-                        'Workers@Logger',
-                        $this->params['queue']['job'],
-                        $payload,
-                        $this->params['queue']['delay']
-                    );
-
-            } else {
-
-                $worker = new \Workers\Logger;
-                $worker->setContainer($this->c);
-                $worker->fire(null, $payload);
-            }
+            $worker = new $Class($this->params);
+            $worker->setContainer($this->container);
+            $worker->fire(null, $payload);
         }
     }
 

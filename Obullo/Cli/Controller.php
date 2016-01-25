@@ -2,8 +2,8 @@
 
 namespace Obullo\Cli;
 
-use Obullo\Cli\ControllerInterface;
-use Obullo\Container\ContainerInterface as Container;
+use Obullo\Container\ControllerInterface;
+use League\Container\ImmutableContainerAwareTrait;
 
 /**
  * Obullo Layer ( Hmvc ) Based Controller.
@@ -13,26 +13,14 @@ use Obullo\Container\ContainerInterface as Container;
  */
 class Controller implements ControllerInterface
 {
+    use ImmutableContainerAwareTrait;
+
     /**
-     * Container
+     * Controller instance
      * 
      * @var object
      */
-    protected $c; 
-    
-    /**
-     * Set container
-     * 
-     * @param Container $container container object
-     * 
-     * @return void
-     */
-    public function __setContainer(Container $container = null)
-    {
-        if ($this->c == null) {
-            $this->c = &$container;
-        }
-    }
+    public static $instance = null;
 
     /**
      * Container proxy
@@ -43,7 +31,10 @@ class Controller implements ControllerInterface
      */
     public function __get($key)
     {
-        return $this->c[$key];
+        if (self::$instance == null) {
+            self::$instance = &$this;
+        }
+        return $this->getContainer()->get($key);
     }
 
     /**

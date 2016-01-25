@@ -5,30 +5,18 @@ namespace Obullo\Validator\Rules;
 use Obullo\Validator\FieldInterface as Field;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+use League\Container\ImmutableContainerAwareTrait;
+use League\Container\ImmutableContainerAwareInterface;
+
 /**
  * Matches
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Matches
+class Matches implements ImmutableContainerAwareInterface
 {
-    /**
-     * Request
-     * 
-     * @var object
-     */
-    protected $request;
-
-    /**
-     * Constructor
-     * 
-     * @param Request $request request
-     */
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
-    }
+    use ImmutableContainerAwareTrait;
 
     /**
      * Call next
@@ -61,7 +49,7 @@ class Matches
      */    
     public function isValid($value, $matchField)
     {   
-        $matchField = $this->request->post($matchField);
+        $matchField = $this->getContainer()->get('request')->post($matchField);
 
         if (! $matchField) {
             return false;                

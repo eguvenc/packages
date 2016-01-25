@@ -8,7 +8,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Exception;
 use Relay\RelayBuilder;
 use Obullo\Http\Middleware\MiddlewareInterface;
-use Obullo\Container\ContainerInterface as Container;
+use Interop\Container\ContainerInterface as Container;
 
 /**
  * Relay wrapper
@@ -23,16 +23,16 @@ class MiddlewarePipe implements MiddlewareInterface
      * 
      * @var object
      */
-    protected $c;
+    protected $container;
 
     /**
      * Constructor
      * 
-     * @param Obullo\Container\ContainerInterface $container container
+     * @param container $container container
      */
     public function __construct(Container $container)
     {   
-        $this->c = $container;
+        $this->container = $container;
     }
 
     /**
@@ -42,7 +42,7 @@ class MiddlewarePipe implements MiddlewareInterface
      */
     public function getRequest()
     {
-        return $this->c['request'];
+        return $this->container->get('request');
     }
 
     /**
@@ -57,11 +57,11 @@ class MiddlewarePipe implements MiddlewareInterface
         $class = '\\Http\Middlewares\FinalHandler\\Relay';
         $handler = new $class(
             [
-                'env' => $this->c['app.env']
+                'env' => $this->container->get('env')->getValue()
             ],
             $response
         );
-        $handler->setContainer($this->c);
+        $handler->setContainer($this->container);
         return $handler;
     }
 
@@ -81,7 +81,10 @@ class MiddlewarePipe implements MiddlewareInterface
 
         try {
                     
-            $dispatcher = $this->pipe($this->c['middleware']->getQueue(), $response);
+            $dispatcher = $this->pipe(
+                $this->container->get('middleware')->getQueue(),
+                $response
+            );
             $response = $dispatcher($request, $response);
 
         } catch (Exception $e) {

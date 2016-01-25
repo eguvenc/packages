@@ -104,7 +104,7 @@ Redis sürücüsü seçildiğinde bazı ek özellikler ve metotlar gelir. Aşağ
 Cache kütüphanesi bağımsız olarak kullanılmak istendiği durumlarda servis sağlayıcısından direkt olarak çağrılabilir. Servis sağlayıcı yüklendiği zaman kütüphaneyi bir değişkene atayıp yarattığınız bağlantıya ait metotlara ulaşabilirsiniz.
 
 ```php
-$this->cache = $this->c['app']->provider('cache')->get(
+$this->cache = $this->container->get('cache')->shared(
       [
         'driver' => 'redis', 
         'connection' => 'default'
