@@ -20,7 +20,7 @@ class Exception
      * 
      * @return string view
      */
-    public function withBody(\Exception $e)
+    public function withBody($e)
     {
         $html = $this->make($e);
 
@@ -36,7 +36,7 @@ class Exception
      * 
      * @return string view
      */
-    public function make(\Exception $e)
+    public function make($e)
     {
         if (! $this->isDisplayable($e)) {
             return;
@@ -91,12 +91,11 @@ class Exception
      */
     protected function display($e)
     {
-        global $container;
-
         if (defined('STDIN')) {
             return $this->view('console', $e);
         }
-        if ($container->get('request')->isAjax()) {
+        $HTTP_X_REQUESTED_WITH = filter_input(INPUT_SERVER, 'HTTP_X_REQUESTED_WITH');
+        if (strtolower($HTTP_X_REQUESTED_WITH) === 'xmlhttprequest') {
             return $this->view('ajax', $e);
         }
         return '<!DOCTYPE html> 
@@ -118,7 +117,7 @@ class Exception
      * 
      * @return boolean
      */
-    protected static function hasPerformanceBoostErrors(\Exception $e)
+    protected static function hasPerformanceBoostErrors($e)
     {
         if ($e->getCode() == 2 
             && substr($e->getFile(), -9) == 'Layer.php' 

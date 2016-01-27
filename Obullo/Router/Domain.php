@@ -109,18 +109,18 @@ class Domain
     /**
     * Detect static domain
     * 
-    * @param null|array $group subdomain
+    * @param null|array $options subdomain
     * 
     * @return void
     */
-    public function match($group = null)
+    public function match($options = null)
     {
         $name = $this->getHost();
 
-        if (isset($group['domain'])) {
-            $name = $group['domain'];
+        if (isset($options['domain'])) {
+            $name = $options['domain'];
         }
-        if ($match = $this->hasMatch($name)) { // If host matched with $group['domain'] assign domain as $group['domain']
+        if ($match = $this->hasMatch($name)) { // If host matched with $options['domain'] assign domain as $options['domain']
             $this->setName($match);
             return true;                // Regex match.
         }

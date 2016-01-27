@@ -38,13 +38,13 @@ interface MiddlewareStackInterface
     public function add($name);
 
     /**
-     * Returns true if middleware actively used otherwise false
+     * Returns true if middleware attached otherwise false
      * 
      * @param string $name middleware name
      * 
      * @return boolean
      */
-    public function active($name);
+    public function isAdded($name);
 
     /**
      * Returns to middleware object to inject parameters

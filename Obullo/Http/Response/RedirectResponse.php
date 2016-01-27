@@ -40,7 +40,7 @@ class RedirectResponse
             );
         }
         $uri = (string) $uri;
-        if (strpos('http') === false) {
+        if (strpos($uri, 'http') === false) {
             $uri = '/'.ltrim($uri, '/');
         }
         $headers['location'] = [$uri];

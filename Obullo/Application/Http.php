@@ -7,12 +7,12 @@ use Psr\Http\Message\ResponseInterface as Response;
 
 use Obullo\Container\ParamsAwareInterface;
 use Obullo\Container\ControllerAwareInterface;
+use League\Container\ContainerAwareInterface;
 use League\Container\ImmutableContainerAwareInterface;
 
+use ReflectionClass;
 use Obullo\Router\RouterInterface as Router;
 use Obullo\Application\MiddlewareStackInterface as MiddlewareStack;
-
-use ReflectionClass;
 
 /**
  * Http Application
@@ -32,7 +32,7 @@ class Http extends Application
      */
     public function init()
     {
-        $container = $this->getContainer();  // make global
+        $container = $this->getContainer();  // Make global
         $app = $container->get('app');
 
         include APP .'errors.php';
@@ -137,7 +137,8 @@ class Http extends Application
         foreach ($middleware->getNames() as $name) {
 
             $object = $middleware->get($name);
-            if ($object instanceof ImmutableContainerAwareInterface) {
+            
+            if ($object instanceof ImmutableContainerAwareInterface || $object instanceof ContainerAwareInterface) {
                 $object->setContainer($this->getContainer());
             }
             if ($this->controller != null && $object instanceof ControllerAwareInterface) {

@@ -73,7 +73,6 @@ $container->share('router', 'Obullo\Router\Router')
     ->withArgument($container->get('request'))
     ->withArgument($container->get('logger'));
 
-
 /**
  * Initialize to application
  */

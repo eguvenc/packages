@@ -48,13 +48,6 @@ class Attach
     protected $attach = array();
 
     /**
-     * Host
-     * 
-     * @var string
-     */
-    protected $host;
-
-    /**
      * Constructor
      * 
      * @param Router $router router
@@ -63,9 +56,7 @@ class Attach
     {
         $this->router = $router;
         $this->domain = $router->getDomain();
-        $this->group  = $router->getGroup()->getArray();
-        $this->host   = $this->domain->getHost();
-        $this->domainName = $this->domain->getName();
+        $this->group  = $router->getGroup();
     }
 
     /**
@@ -77,37 +68,34 @@ class Attach
      */
     public function add($route)
     {
-        $match = $this->domain->match($this->group);
-                                                          // Domain Regex Support, if we have defined domain and not match with host don't run the middleware.
-        if (isset($this->group['domain']) && ! $match) {  // If we have defined domain and not match with host don't run the middleware.
+        $options = $this->group->getOptions();
+        $match   = $this->domain->match($options);
+                                                      // Domain Regex Support, if we have defined domain and not match with host don't run the middleware.
+        if (isset($options['domain']) && ! $match) {  // If we have defined domain and not match with host don't run the middleware.
             return;
         }
         // Attach Regex Support
 
         $host = str_replace(
-            $this->domain->getSubName($this->domainName),
+            $this->domain->getSubName($this->domain->getName()),
             '',
-            $this->host
+            $this->domain->getHost()
         );
-
-        if (! $this->domain->isSub($this->domainName) && $this->domain->isSub($this->host)) {
-            $host = $this->host;  // We have a problem when the host is subdomain but config domain not. This fix the isssue.
+        if (! $this->domain->isSub($this->domain->getName()) && $this->domain->isSub($this->domain->getHost())) {
+            $host = $this->domain->getHost();  // We have a problem when the host is subdomain but config domain not. This fix the isssue.
         }
-        
-        if ($this->domainName != $host) {
+        if ($this->domain->getName() != $host) {
             return;
         }
-
-        if (! isset($this->group['domain'])) {
-            $this->group['domain'] = $this->domain->getImmutable();
+        if (! isset($options['domain'])) {
+            $options['domain'] = $this->domain->getImmutable();
         }
-
-        if (isset($this->group['middleware'])) {
+        if (isset($options['middleware'])) {
 
             $this->toAttach(
-                $this->group['middleware'],
+                $options['middleware'],
                 $route,
-                $this->group
+                $options
             );
         }
     }
@@ -125,7 +113,10 @@ class Attach
         $lastRoute = end($routes);
         $route = $lastRoute['match'];
 
-        $this->toAttach($middlewares, $route);
+        $this->toAttach(
+            $middlewares,
+            $route
+        );
     }
 
     /**
@@ -143,7 +134,7 @@ class Attach
 
         foreach ($middlewares as $middleware) {
 
-            $this->attach[$this->domainName][] = array(
+            $this->attach[$this->domain->getName()][] = array(
                 'name' => $middleware,
                 'options' => $options,
                 'route' => trim($route, '/'), 
@@ -159,10 +150,10 @@ class Attach
      */
     public function getArray()
     {
-        if (! isset($this->attach[$this->domainName])) {  // Check first
+        if (! isset($this->attach[$this->domain->getName()])) {  // Check first
             return array();
         }
-        return $this->attach[$this->domainName];
+        return $this->attach[$this->domain->getName()];
     }
 
 }

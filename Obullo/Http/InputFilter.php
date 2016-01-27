@@ -18,7 +18,7 @@ class InputFilter implements ContainerAwareInterface
      * 
      * @var object
      */
-    protected $c;
+    protected $container;
 
     /**
      * Current input value
@@ -43,7 +43,7 @@ class InputFilter implements ContainerAwareInterface
      */
     public function setContainer(Container $container = null)
     {
-        $this->c = $container;
+        $this->container = $container;
     }
 
     /**
@@ -66,7 +66,7 @@ class InputFilter implements ContainerAwareInterface
      */
     public function getFilter()
     {
-        return $this->c[$this->filter];
+        return $this->container->get($this->filter);
     }
 
     /**

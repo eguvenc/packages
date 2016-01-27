@@ -65,11 +65,11 @@ class Route
      */
     public function add($methods, $match, $rewrite = null, $closure = null)
     {
-        $group = $this->router->getGroup();
+        $options = $this->router->getGroup()->getOptions();
 
         $this->routes[$this->domainName][] = array(
-            'group' => $this->_getGroupNameValue($group),
-            'sub.domain' => $this->_getSubDomainValue($this->domainName, $group),
+            'group' => $this->_getGroupNameValue($options),
+            'sub.domain' => $this->_getSubDomainValue($this->domainName, $options),
             'when' => $methods, 
             'match' => trim($match, '/'),
             'rewrite' => trim($rewrite, '/'),
@@ -145,30 +145,30 @@ class Route
     /**
      * Get group value
      *
-     * @param null|array $group data
+     * @param null|array $options group data
      * 
      * @return string
      */
-    private function _getGroupNameValue($group = null)
+    private function _getGroupNameValue($options = null)
     {
-        if (! isset($group['name'])) {
-            $group['name'] = 'UNNAMED';
+        if (! isset($options['name'])) {
+            $options['name'] = 'UNNAMED';
         }
-        return $group['name'];
+        return $options['name'];
     }
 
     /**
      * Get subdomain value
      *
-     * @param string     $domain name
-     * @param null|array $group  data
+     * @param string     $domain  name
+     * @param null|array $options group data
      * 
      * @return mixed
      */
-    private function _getSubDomainValue($domain, $group = null)
+    private function _getSubDomainValue($domain, $options = null)
     {
         if ($this->domain->isSub($domain)) {
-            return $group['domain'];
+            return $options['domain'];
         }
         return null;
     }

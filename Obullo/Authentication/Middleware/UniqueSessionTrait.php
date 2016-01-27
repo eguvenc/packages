@@ -11,7 +11,7 @@ trait UniqueSessionTrait
      */
     public function killSessions()
     {
-         $params = $this->c['auth.params'];
+         $params = $this->getContainer()->get('auth.params');
 
         if ($params['middleware']['unique.session']) {  // Unique session is the property whereby a single action of login activity
 

@@ -350,7 +350,7 @@ class Translator implements TranslatorInterface
     {
         if (defined('STDIN') || $this->params['default']['set'] == false) {
             return;
-        }            
+        }
         $this->container->get('cookie')
             ->name($this->params['cookie']['name'])
             ->value($this->getLocale())

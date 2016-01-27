@@ -141,8 +141,11 @@ class Router implements RouterInterface
      */
     protected function route($methods, $match, $rewrite = null, $closure = null)
     {
-        if ($this->domain->match($this->group) === false && $this->group['domain'] !== null) {
-            return;
+        if (is_object($this->group)) {
+            $options = $this->group->getOptions();
+            if ($this->domain->match($options) === false && $options['domain'] !== null) {
+                return;
+            }
         }
         if ($this->route == null) {
             $this->route = new Route($this);
@@ -497,17 +500,17 @@ class Router implements RouterInterface
     /**
      * Set grouped routes, options like middleware
      * 
-     * @param array  $group   domain, directions and middleware name
+     * @param array  $options domain, directions and middleware name
      * @param object $closure which contains $this->attach(); methods
      * 
      * @return object
      */
-    public function group(array $group, Closure $closure)
+    public function group(array $options, Closure $closure)
     {
         if ($this->group == null) {
             $this->group = new Group($this, $this->uri);
         }
-        $this->group->add($group, $closure);
+        $this->group->add($options, $closure);
         return $this;
     }
 
@@ -564,9 +567,9 @@ class Router implements RouterInterface
     }
 
     /**
-     * Returns to group array
+     * Returns to group object
      * 
-     * @return array
+     * @return object
      */
     public function getGroup()
     {

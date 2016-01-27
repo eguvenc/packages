@@ -29,11 +29,11 @@ class Group
     protected $domain;
 
     /**
-     * Route groups
+     * Route group data
      * 
      * @var array
      */
-    protected $group = array();
+    protected $options = array();
 
     /**
      * Constructor
@@ -51,28 +51,27 @@ class Group
     /**
      * Create grouped routes
      * 
-     * @param array  $group   domain, directions and middleware name
+     * @param array  $options domain, directions and middleware name ..
      * @param object $closure which contains $this->attach(); methods
      * 
      * @return object
      */
-    public function add(array $group, Closure $closure)
+    public function add(array $options, Closure $closure)
     {
-        if (isset($group['match']) && ! $this->match($group)) {
+        if (isset($options['match']) && ! $this->match($options)) {
             return $this;
         }
-        if (! $this->domain->match($group)) {  // When groups run, if domain not match with regex don't continue.
-            return $this;                      // Forexample we define a sub domain but group domain does not match
-        }                                      // so we need to stop the propagation.
-        $this->group = $group;
+        if (! $this->domain->match($options)) {  // When groups run, if domain not match with regex don't continue.
+            return $this;                        // Forexample we define a sub domain but group domain does not match
+        }                                        // so we need to stop the propagation.
+        $this->options = $options;
 
         $closure = Closure::bind(
             $closure,
             $this->router,
             get_class($this->router)
         );
-
-        $subDomain = $this->getSubDomainValue($group);
+        $subDomain = $this->getSubDomainValue($options);
         $closure($subDomain);
 
         $this->reset();  // Reset group variable after foreach group definition
@@ -81,13 +80,13 @@ class Group
     /**
      * Detect class namespace
      * 
-     * @param array $group array
+     * @param array $options array
      * 
      * @return bool
      */
-    protected function match(array $group)
+    protected function match(array $options)
     {
-        if ($this->hasMatch($group['match'])) {
+        if ($this->hasMatch($options['match'])) {
             return true;
         }
         return false;
@@ -141,14 +140,14 @@ class Group
     /**
      * Get subdomain value
      *
-     * @param array $group data
+     * @param array $options group data
      * 
      * @return string
      */
-    protected function getSubDomainValue(array $group)
+    protected function getSubDomainValue(array $options)
     {
         $matches = $this->domain->getMatches();
-        $domainName = (isset($group['domain'])) ? $group['domain'] : null;
+        $domainName = (isset($options['domain'])) ? $options['domain'] : null;
 
         $sub = false;
         if (isset($matches[$domainName])) {
@@ -158,13 +157,13 @@ class Group
     }
 
     /**
-     * Reset group variable
+     * Reset group options
      * 
      * @return void
      */
     public function reset()
     {
-        $this->group = array('name' => 'UNNAMED', 'domain' => null);
+        $this->options = array('name' => 'UNNAMED', 'domain' => null);
     }
 
     /**
@@ -172,9 +171,9 @@ class Group
      * 
      * @return array
      */
-    public function getArray()
+    public function getOptions()
     {
-        return $this->group;
+        return $this->options;
     }
 
 }

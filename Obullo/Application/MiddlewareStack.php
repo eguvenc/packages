@@ -74,7 +74,7 @@ class MiddlewareStack implements MiddlewareStackInterface
      */
     public function has($name)
     {
-        if (isset($this->registered[$name])) {
+        if (array_key_exists($name, $this->registered)) {
             return true;
         }
         return false;
@@ -105,13 +105,13 @@ class MiddlewareStack implements MiddlewareStackInterface
     }
 
     /**
-     * Check middleware is active
+     * Check middleware has 
      * 
      * @param string $name middleware name
      * 
      * @return boolean
      */
-    public function active($name)
+    public function isAdded($name)
     {
         $this->validateMiddleware($name);
 

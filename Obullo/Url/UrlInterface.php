@@ -11,22 +11,13 @@ namespace Obullo\Url;
 interface UrlInterface
 {
     /**
-     * Create link with http protocol
-     * 
-     * @param string $protocol http protocol
-     * 
-     * @return void
-     */
-    public function withProtocol($protocol = null);
-
-    /**
-     * Create asset with an external url
+     * Create url
      * 
      * @param string $url url
      * 
      * @return object
      */
-    public function withUrl($url = null);
+    public function createUrl($url);
 
     /**
      * Anchor Link
@@ -40,6 +31,25 @@ interface UrlInterface
      * @return string
      */
     public function anchor($uri = '', $title = '', $attributes = '');
+
+    /**
+     * Creates an anchor based on the "external" URL.
+     *
+     * @param string $label      the link name
+     * @param mixed  $attributes any attributes
+     * 
+     * @return string
+     */
+    public function makeAnchor($label = '', $attributes = '');
+
+    /**
+     * Creates an asset url based on the "external" URL.
+     *
+     * Creates an anchor based on the local URL.
+     * 
+     * @return string
+     */
+    public function makeAsset();
 
     /**
      * Create static assets urls
