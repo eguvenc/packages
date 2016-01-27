@@ -1,13 +1,11 @@
 <?php
 
-namespace Obullo\Container;
-
-use Obullo\Container\ControllerInterface as Controller;
+namespace Obullo\Http;
 
 /**
  * Inject controller
  */
-interface ControllerAwareInterface
+interface ControllerInterface
 {
     /**
      * Inject controller object

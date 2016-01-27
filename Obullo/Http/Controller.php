@@ -2,7 +2,6 @@
 
 namespace Obullo\Http;
 
-use Obullo\Container\ControllerInterface;
 use League\Container\ImmutableContainerAwareTrait;
 
 /**
@@ -11,7 +10,7 @@ use League\Container\ImmutableContainerAwareTrait;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Controller implements ControllerInterface
+class Controller implements ImmutableControllerInterface
 {
     use ImmutableContainerAwareTrait;
     

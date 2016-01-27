@@ -2,8 +2,8 @@
 
 namespace Obullo\Http;
 
-use Obullo\Container\ContainerInterface as Container;
-use Obullo\Container\ContainerAwareInterface;
+use Obullo\Container\ImmutableContainerAwareInterface;
+use Obullo\Container\ImmutableContainerAwareTrait;
 
 /**
  * Input Filter
@@ -11,14 +11,9 @@ use Obullo\Container\ContainerAwareInterface;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class InputFilter implements ContainerAwareInterface
+class InputFilter implements ImmutableContainerAwareInterface
 {
-    /**
-     * Container
-     * 
-     * @var object
-     */
-    protected $container;
+    use ImmutableContainerAwareTrait;
 
     /**
      * Current input value
@@ -33,18 +28,6 @@ class InputFilter implements ContainerAwareInterface
      * @var string
      */
     protected $filter;
-
-    /**
-     * Container
-     * 
-     * @param Contaner $container object
-     * 
-     * @return void
-     */
-    public function setContainer(Container $container = null)
-    {
-        $this->container = $container;
-    }
 
     /**
      * Set filter name

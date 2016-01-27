@@ -1,11 +1,13 @@
 <?php
 
-namespace Obullo\Container;
+namespace Obullo\Http;
+
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
  * Inject parameters
  */
-interface RequestAwareInterface
+interface ImmutableRequestAwareInterface
 {
     /**
      * Set params

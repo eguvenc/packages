@@ -1,6 +1,6 @@
 <?php
 
-namespace Obullo\Container;
+namespace Obullo\Log;
 
 /**
  * Inject parameters

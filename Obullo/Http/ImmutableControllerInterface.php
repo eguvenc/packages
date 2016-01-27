@@ -1,6 +1,6 @@
 <?php
 
-namespace Obullo\Container;
+namespace Obullo\Http;
 
 use Interop\Container\ContainerInterface as InteropContainerInterface;
 
@@ -10,7 +10,7 @@ use Interop\Container\ContainerInterface as InteropContainerInterface;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-interface ControllerInterface
+interface ImmutableControllerInterface
 {
     /**
      * Set container

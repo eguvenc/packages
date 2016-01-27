@@ -5,8 +5,8 @@ namespace Obullo\Application;
 use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
+use Obullo\Http\ControllerAwareInterface;
 use Obullo\Container\ParamsAwareInterface;
-use Obullo\Container\ControllerAwareInterface;
 use League\Container\ContainerAwareInterface;
 use League\Container\ImmutableContainerAwareInterface;
 
