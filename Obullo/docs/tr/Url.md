@@ -15,14 +15,23 @@ Url sınıfı uygulamanızda kullandığınız iç ve dış html linklerini olu�
         <a href="#methods">Metotlara Erişim</a>
         <ul>
             <li><a href="#anchor">$this->url->anchor()</a></li>
-            <li><a href="#withProtocolAnchor">$this->url->withProtocol()->anchor()</a></li>
             <li><a href="#asset">$this->url->asset()</a></li>
-            <li><a href="#withUrlAsset">$this->url->withUrl()->asset()</a></li>
-            <li><a href="#baseUrl">$this->url->baseUrl()</a></li>
-            <li><a href="#siteUrl">$this->url->siteUrl()</a></li>
-            <li><a href="#withProtocolSiteUrl">$this->url->withProtocol()->siteUrl()</a></li>
-            <li><a href="#currentUrl">$this->url->currentUrl()</a></li>
+            <li><a href="#getBaseUrl">$this->url->getBaseUrl()</a></li>
+            <li><a href="#getCurrentUrl">$this->url->getCurrentUrl()</a></li>
             <li><a href="#prep">$this->url->prep()</a></li>
+            <li>
+                <a href="#chain">Zincirleme Metotlar</a>
+                <ul>
+                    <li><a href="#withAnchor">$this->url->withHost()->withAnchor()</a></li>
+                    <li><a href="#withAsset">$this->url->withHost()->withAsset()</a></li>
+                    <li><a href="#withScheme">$this->url->withHost()->withScheme()</a></li>
+                    <li><a href="#withUserInfo">$this->url->withHost()->withUserInfo()</a></li>
+                    <li><a href="#withPort">$this->url->withHost()->withPort()</a></li>
+                    <li><a href="#withPath">$this->url->withHost()->withPath()</a></li>
+                    <li><a href="#withQuery">$this->url->withHost()->withQuery()</a></li>
+                    <li><a href="#getUriString">$this->url->withHost()->getUriString()</a></li>
+                </ul>
+            </li>
         </ul>
     </li>
 </ul>
@@ -31,7 +40,7 @@ Url sınıfı uygulamanızda kullandığınız iç ve dış html linklerini olu�
 
 <a name="config"></a>
 
-Url sınıfı <kbd>app/components.php</kbd> dosyasında servis olarak tanımlıdır. Url sınıfına ait konfigürasyon parametreleri <kbd>app/$env/providers/url.php</kbd> dosyasından konfigüre edilir.
+Url sınıfı <kbd>app/components.php</kbd> dosyasında servis sağlayıcısı olarak tanımlıdır. Url sınıfına ait servis parametreleri <kbd>app/$env/providers/url.php</kbd> dosyasından konfigüre edilir.
 
 ```php
 'params' => [
@@ -45,20 +54,26 @@ Url sınıfı <kbd>app/components.php</kbd> dosyasında servis olarak tanımlıd
 ```
 
 * <b>baseurl</b> : Url fonksiyonları kök adresi, genellikle "/" karakteri yeterli olur.
-* <b>assets.url</b> : Kaynaklar klasörü kök adresi genellikle "/" karakteri yeterli olur fakar eğer bir içerik sağlayıcı (cdn) kullanıyorsunuz buraya cdn adresinizi girebilirsiniz.
-* <b>assets.folder</b> : Uygulamanız içerisinde "public/" klasörü altındaki kaynaklar klasörünü belirler varsayılan klasör "/assets/" klasörüdür.
+* <b>assets.url</b> : Kaynaklar kök adresi, genellikle "/" karakteri yeterli olur. Buraya bir <kbd>cdn</kbd> sağlayıcı adresi de girilebilir.
+* <b>assets.folder</b> : Kaynaklar klasörünü belirler varsayılan klasör "/assets/" klasörüdür.
 
 <a name="methods"></a>
 
 ### Metotlara Erişim
 
 ```php
-$this->c['url']->method();
+$this->url->method();
+```
+
+Konteyner içerisinden,
+
+```php
+$container->get('url')->method();
 ```
 
 <a name="anchor"></a>
 
-#### $this->url->anchor()
+#### $this->url->anchor($uri, $label = '', $attributes = '')
 
 Yerel site adresinize göre standart bir HTML bağlantı çıktısı oluşturur.
 
@@ -82,38 +97,9 @@ echo $this->url->anchor('welcome', 'Click Here', ' title="Welcome" class="btn bt
 <a href="/welcome" title="Welcome" class="btn btn-default">Click Here</a>
 ```
 
-<a name="withProtocolAnchor"></a>
-
-#### $this->url->withProtocol()->anchor()
-
-Eğer geçerli protokol ile bir bağlantı oluşturulmak isteniyorsa withProtocol() metodu kullanılır.
-
-
-```php
-echo $this->url->withProtocol()->anchor('test.com', 'Welcome');
-```
-
-Çıktı
-
-```php
-<a href="http://test.com">Click Here</a>
-```
-
-Kesin bir protokol berlirtilirse aşağıdaki gibi bir çıktı alınır.
-
-```php
-echo $this->url->withProtocol('https://')->anchor('test.com', 'Welcome');
-```
-
-Çıktı
-
-```php
-<a href="https://test.com">Click Here</a>
-```
-
 <a name="asset"></a>
 
-#### $this->url->asset()
+#### $this->url->asset($path)
 
 Public dizini içerisinde yer alan bir kaynak dosyasına ait url adresi oluşturmak için asset fonksiyonu kullanılır.
 
@@ -153,56 +139,14 @@ O zaman alacağınız çıktı aşağıdaki gibi olur.
 http://static.example.com/assets/images/logo.png 
 ```
 
-<a name="withUrlAsset"></a>
+<a name="getBaseUrl"></a>
 
-#### $this->url->withUrl()->asset()
-
-Harici bir url ile de bir kaynak url oluşturulabilir.
-
-```php
-echo $this->url
-    ->withUrl('test.com')
-    ->asset('images/logo.png');
-```
-
-Çıktı
-
-```php
-http://test.com/assets/images/logo.png
-```
-
-Geçerli protokol ile bir kaynak url.
-
-```php
-echo $this->url->withProtocol()->withUrl('test.com')->asset('images/logo.png');
-```
-
-Çıktı
-
-```php
-http://test.com/assets/images/logo.png
-```
-
-Güvenli protokol ile bir kaynak url.
-
-```php
-echo $this->url->withProtocol('https://')->withUrl('test.com')->asset('images/logo.png');
-```
-
-Çıktı
-
-```php
-https://test.com/assets/images/logo.png
-```
-
-<a name="baseUrl"></a>
-
-#### $this->url->baseUrl()
+#### $this->url->getBaseUrl()
 
 Konfigürasyonda tanımlı olan kök url adresine geri döner.
 
 ```php
-echo $this->url->baseUrl();
+echo $this->url->getBaseUrl();
 ```
 
 Çıktı
@@ -214,7 +158,7 @@ echo $this->url->baseUrl();
 Bir url adresi ile birlikte kök url adresi alınabilir.
 
 ```php
-echo $this->url->baseUrl('examples/forms');
+echo $this->url->getBaseUrl('examples/forms');
 ```
 
 Çıktı
@@ -223,82 +167,14 @@ echo $this->url->baseUrl('examples/forms');
 /examples/forms
 ```
 
-<a name="siteUrl"></a>
+<a name="getCurrentUrl"></a>
 
-#### $this->url->siteUrl()
-
-Base Url adresi ile beraber oluşturulması istenen site url adresine geri döner.
-
-```php
-echo $this->url->siteUrl();
-```
-
-Çıktı
-
-```php
-/
-```
-
-Eğer konfigurasyon dosyasında base Url adresi tanımlı ise 
-
-```php
-'baseurl'  => 'example.com',
-```
-
-Site 
-
-```php
-echo $this->url->siteUrl('examples/forms');
-```
-
-Çıktı
-
-```php
-http://example.com/examples/forms
-```
-
-<a name="withProtocolSiteUrl"></a>
-
-#### $this->url->withProtocol()->siteUrl()
-
-Girilen url adresi ile beraber base Url adresini döner. Eğer protokol metodu kullanılırsa konfigürasyonda olan tanımlı protokol geçerli protokol ile değiştirilir.
-
-```php
-echo $this->url->withProtocol()->siteUrl('examples/forms');
-```
-
-Muhtemel çıktılar
-
-```php
-http://example.com/examples/forms
-```
-
-Geçerli protokol güvenli ise
-
-```php
-https://example.com/examples/forms
-```
-
-Güvenli protokole zorlama
-
-```php
-echo $this->url->withProtocol('https://')->siteUrl('examples/forms');
-```
-
-Çıktı
-
-```php
-https://example.com/examples/forms
-```
-
-<a name="currentUrl"></a>
-
-#### $this->url->currentUrl()
+#### $this->url->getCurrentUrl()
 
 Tarayıcıda kullanıcının gezdiği geçerli url adresine geri döner.
 
 ```php
-echo $this->url->currentUrl();
+echo $this->url->getCurrentUrl();
 ```
 
 Çıktı
@@ -334,4 +210,202 @@ echo $this->url->prep('https://example.com');
 
 ```php
 https://example.com
+```
+
+
+<a name="chain"></a>
+
+### Zincirleme Metotlar
+
+Dinamik url adresleri oluşturmak için <kbd>Http\Uri</kbd> nesnesine geri döner.
+
+<a name="withAnchor"></a>
+
+##### $this->url->withHost()->withAnchor()
+
+Dinamik url bağlantıları oluşturmak için withAnchor metodu kullanılır.
+
+```php
+echo $this->url->withHost('example.com')
+    ->withScheme('https')
+    ->withAnchor('Click Here');
+```
+
+Çıktı
+
+```php
+<a href="http://example.com">Click Here</a>
+```
+
+Eğer bir url berlirtilmezse geçerli host adresi host olarak kabul edilir.
+
+```php
+echo $this->url->withHost()
+    ->withPath('en')
+    ->withAnchor('Click Here');
+```
+
+Çıktı
+
+```php
+<a href="http://mylocalproject/en">Click Here</a>
+```
+
+<a name="withAsset"></a>
+
+##### $this->url->withHost()->withAsset()
+
+Dinamik kaynak url adresleri oluşturmak için withAsset metodu kullanılır.
+
+```php
+echo $this->url->withHost('static.example.com')
+    ->withScheme('http')
+    ->withAsset('images/logo.png');
+```
+
+Çıktı
+
+```php
+http://static.example.com/assets/images/logo.png
+```
+
+Eğer konfigürasyonda kaynak url tanımlı ise host adı girmeye gerek kalmaz.
+
+```php
+echo $this->url->withHost()
+    ->withAsset('images/logo.png');
+```
+
+Çıktı
+
+```php
+http://static.example.com/assets/images/logo.png
+```
+
+Güvenli protokol ile bir kaynak url.
+
+```php
+echo $this->url->withHost('static.example.com')
+    ->withScheme('https')
+    ->withAsset('css/welcome.css');
+```
+
+Çıktı
+
+```php
+https://static.example.com/assets/css/welcome.css
+```
+
+<a name="withScheme"></a>
+
+##### $this->url->withHost()->withScheme()
+
+Eğer geçerli protokol ile bir bağlantı oluşturulmak isteniyorsa withScheme() metodu kullanılır.
+
+```php
+echo $this->url->withHost('example.com')
+    ->withScheme('https')
+    ->getUriString();
+```
+
+Çıktı
+
+```php
+https://test.com
+```
+
+Kesin bir url berlirtilmezse varsayılan olarak baseUrl kullanılır.
+
+<a name="withUserInfo"></a>
+
+##### $this->url->withHost()->withUserInfo()
+
+Geçerli url adresine port ekler.
+
+```php
+echo $this->url->withHost('example.com')
+    ->withScheme('http')
+    ->withUserInfo('username', '123456')
+    ->getUriString();
+```
+
+Çıktı
+
+```php
+http://username:123456@example.com
+```
+
+<a name="withPort"></a>
+
+##### $this->url->withHost()->withPort()
+
+Geçerli url adresine port ekler.
+
+```php
+echo $this->url->withHost('example.com')
+    ->withScheme('https')
+    ->withPort(9090)
+    ->getUriString();
+```
+
+Çıktı
+
+```php
+https://test.com:9090
+```
+
+<a name="withPath"></a>
+
+##### $this->url->withHost()->withPath()
+
+Geçerli url adresine dizin ekler.
+
+```php
+echo $this->url->withHost('example.com')
+    ->withScheme('https')
+    ->withPath('forum/welcome')
+    ->getUriString();
+```
+
+Çıktı
+
+```php
+https://test.com/forum/welcome
+```
+
+<a name="withQuery"></a>
+
+##### $this->url->withHost()->withQuery()
+
+Geçerli url adresine sorgu parçaları ekler.
+
+```php
+echo $this->url->withHost('example.com')
+    ->withScheme('http')
+    ->withPath('en')
+    ->withQuery("a=1&b=2")
+    ->getUriString();
+```
+
+Çıktı
+
+```php
+http://example.com/en?a=1&b=2
+```
+
+<a name="getUriString"></a>
+
+##### $this->url->withHost()->getUriString();
+
+EN son üretilen uri değerine döner.
+
+```php
+echo $this->url->withHost('example.com')
+    ->getUriString();
+```
+
+Çıktı
+
+```php
+http://example.com
 ```

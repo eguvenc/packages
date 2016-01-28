@@ -2,12 +2,8 @@
 
 namespace Obullo\Url;
 
-use Psr\Http\Message\UriInterface as Uri;
-use Psr\Http\Message\RequestInterface as Request;
-
+use Interop\Container\ContainerInterface as Container;
 use Obullo\Log\LoggerInterface as Logger;
-use Obullo\Config\ConfigInterface as Config;
-use League\Container\ContainerInterface as Container;
 
 /**
  * Url Class
@@ -22,7 +18,28 @@ class Url
      * 
      * @var string
      */
-    protected $url = '';
+    protected $url;
+
+    /**
+     * Parameters
+     * 
+     * @var array
+     */
+    protected $params;
+
+    /**
+     * Request
+     * 
+     * @var request
+     */
+    protected $request;
+
+    /**
+     * Logger
+     * 
+     * @var object
+     */
+    protected $logger;
 
     /**
      * Url scheme
@@ -32,39 +49,40 @@ class Url
     protected $scheme;
 
     /**
+     * Container
+     * 
+     * @var object
+     */
+    protected $container;
+
+    /**
      * Constructor
      * 
      * @param ContainerInterface $container container
-     * @param RequestInterface   $request   request
      * @param LoggerInterface    $logger    logger
      * @param array              $params    service parameters
      */
-    public function __construct(Container $container, Request $request, Logger $logger, array $params)
+    public function __construct(Container $container, Logger $logger, array $params)
     {
         $this->logger = $logger;
         $this->params = $params;
-        $this->request = $request;
+        $this->request = $container->get('app')->request;  // Assign global request object
         $this->container = $container;
-        $this->uri = $request->getUri();
 
         $this->logger->debug('Url Class Initialized');
     }
 
     /**
-     * Create new url
-     * 
-     * @param string $url url
-     * 
-     * @return object
+     * {@inheritdoc}
      */
-    public function createUrl($url = '')
+    public function withHost($data = null)
     {
         $this->url = new \Obullo\Http\Uri;
 
-        if (empty($url)) {
-            $url = $this->_getSiteUrl($url);
+        if (empty($data)) {
+            $data = $this->request->getUri()->getHost();
         }
-        $this->url = $this->url->withHost($url);
+        $this->url = $this->url->withHost($data);
         return $this;
     }
 
@@ -84,18 +102,6 @@ class Url
     public function withUserInfo($user, $password = null)
     {
         $this->url = $this->url->withUserInfo($user, $password);
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function withHost($data = null)
-    {
-        if (empty($data)) {
-            $data = $this->_getSiteUrl($data);
-        }
-        $this->url = $this->url->withHost($data);
         return $this;
     }
 
@@ -127,62 +133,6 @@ class Url
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getScheme()
-    {
-        return $this->url->getScheme();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getUserInfo()
-    {
-        return $this->url->getUserInfo();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getHost()
-    {
-        return $this->url->getHost();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPort()
-    {
-        return $this->url->getPort();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPath()
-    {
-        return $this->url->getPath();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getQuery()
-    {
-        return $this->url->getQuery();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFragment()
-    {
-        return $this->url->getFragment();
-    }
-
-    /**
      * Returns to last created url string
      * 
      * @return string
@@ -190,6 +140,18 @@ class Url
     public function getUrl()
     {
         return $this->url;
+    }
+
+    /**
+     * Returns to url string
+     * 
+     * @return string
+     */
+    public function __toString()
+    {
+        if (! empty($this->url)) {
+            return $this->getUriString();
+        }
     }
 
     /**
@@ -208,18 +170,20 @@ class Url
      * @param string $uri        the URL
      * @param string $label      the link name
      * @param mixed  $attributes any attributes
+     * @param bool   $baseUrl    whether to use base url
      * 
      * @return string
      */
-    public function anchor($uri = '', $label = '', $attributes = '')
+    public function anchor($uri = '', $label = '', $attributes = '', $baseUrl = true)
     {
-        $siteUrl = $this->_getSiteUrl($uri);
-        
+        if ($baseUrl) {
+            $uri = $this->getBaseUrl($uri);
+        }
         if (empty($label)) {
-            $label = $siteUrl;
+            $label = $uri;
         }
         $attributes = ($attributes != '') ? self::parseAttributes($attributes) : '';
-        $anchor = '<a href="' .$siteUrl . '"' . $attributes . '>' . (string)$label . '</a>';
+        $anchor = '<a href="' .$uri . '"' . $attributes . '>' . (string)$label . '</a>';
         $this->clear();
         return $anchor;        
     }
@@ -232,9 +196,9 @@ class Url
      * 
      * @return string
      */
-    public function makeAnchor($label = '', $attributes = '')
+    public function withAnchor($label = '', $attributes = '')
     {
-        return $this->anchor($this->getUriString(), $label, $attributes);
+        return $this->anchor($this->getUriString(), $label, $attributes, false);
     }
 
     /**
@@ -244,7 +208,7 @@ class Url
      * 
      * @return string
      */
-    public function makeAsset($path = '')
+    public function withAsset($path = '')
     {
         return $this->getUriString().$this->asset($path, true);
     }
@@ -287,60 +251,15 @@ class Url
     }
 
     /**
-     * Get site url
-     * 
-     * @param string $uri uri
-     * 
-     * @return string site url
-     */
-    private function _getSiteUrl($uri)
-    {
-        $siteUri = $this->siteUrl($uri);
-
-        return ( ! preg_match('!^\w+://! i', $uri)) ? $siteUri : $uri;
-    }
-
-    /**
      * Get Base URL
      * 
      * @param string $uri custom uri
      * 
      * @return string
      */
-    public function baseUrl($uri = '')
+    public function getBaseUrl($uri = '')
     {
-        $baseUrl = rtrim($this->params['baseurl'], '/') .'/'. ltrim($uri, '/');
-
-        if ($baseUrl != '' && $baseUrl != '/') {
-            $baseUrl = $this->prep($baseUrl);
-        }
-        return $baseUrl;
-    }
-
-    /**
-     * Site URL
-     *
-     * @param string $uri the URI string
-     * 
-     * @return string
-     */
-    public function siteUrl($uri = '')
-    {
-        $baseUrl = $this->baseUrl();
-
-        if (is_array($uri)) {
-            $uri = implode('/', $uri);
-        }
-        if ($baseUrl == '/') {
-            $baseUrl = '';
-        } elseif (! empty($this->scheme)) {
-            $baseUrl = preg_replace('#^https?:\/\/#i', '', $baseUrl);
-        }
-        if ($uri == '') {
-            return $baseUrl;
-        } 
-        $url = $baseUrl. trim($uri, '/');
-        return $url;
+        return rtrim($this->params['baseurl'], '/') .'/'. ltrim($uri, '/');
     }
 
     /**
@@ -348,9 +267,9 @@ class Url
      *
      * @return string
      */
-    public function currentUrl()
+    public function getCurrentUrl()
     {
-        return $this->siteUrl($this->request->getUri()->getRequestUri());
+        return $this->getBaseUrl($this->request->getUri()->getRequestUri());
     }
 
     /**

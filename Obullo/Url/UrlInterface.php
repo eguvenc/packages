@@ -11,13 +11,48 @@ namespace Obullo\Url;
 interface UrlInterface
 {
     /**
-     * Create url
-     * 
-     * @param string $url url
-     * 
-     * @return object
+     * {@inheritdoc}
      */
-    public function createUrl($url);
+    public function withHost($data = null);
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withScheme($data);
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withUserInfo($user, $password = null);
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withPort($data);
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withPath($data);
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withQuery($data);
+
+    /**
+     * Returns to last created url string
+     * 
+     * @return string
+     */
+    public function getUriString();
+
+    /**
+     * Returns to last created url string
+     * 
+     * @return string
+     */
+    public function getUrl();
 
     /**
      * Anchor Link
@@ -40,7 +75,7 @@ interface UrlInterface
      * 
      * @return string
      */
-    public function makeAnchor($label = '', $attributes = '');
+    public function withAnchor($label = '', $attributes = '');
 
     /**
      * Creates an asset url based on the "external" URL.
@@ -49,7 +84,7 @@ interface UrlInterface
      * 
      * @return string
      */
-    public function makeAsset();
+    public function withAsset();
 
     /**
      * Create static assets urls
@@ -67,23 +102,14 @@ interface UrlInterface
      * 
      * @return string
      */
-    public function baseUrl($uri = '');
-
-    /**
-     * Site URL
-     *
-     * @param string $uri the URI string
-     * 
-     * @return string
-     */
-    public function siteUrl($uri = '');
+    public function getBaseUrl($uri = '');
 
     /**
      * Get current url
      *
      * @return string
      */
-    public function currentUrl();
+    public function getCurrentUrl();
 
     /**
      * Prep URL
