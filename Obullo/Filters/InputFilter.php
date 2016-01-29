@@ -1,6 +1,6 @@
 <?php
 
-namespace Obullo\Http;
+namespace Obullo\Filters;
 
 use Obullo\Container\ImmutableContainerAwareInterface;
 use Obullo\Container\ImmutableContainerAwareTrait;

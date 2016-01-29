@@ -4,8 +4,6 @@ namespace Obullo\Validator;
 
 use Closure;
 use RuntimeException;
-use Obullo\Validator\ValidatorInterface;
-use League\Container\ContainerAwareInterface;
 use League\Container\ImmutableContainerAwareTrait;
 use League\Container\ImmutableContainerAwareInterface;
 use Interop\Container\ContainerInterface as Container;
@@ -16,9 +14,9 @@ use Interop\Container\ContainerInterface as Container;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Field implements FieldInterface, ImmutableContainerAwareInterface
+class Field implements FieldInterface, ImmutableValidatorAwareInterface, ImmutableContainerAwareInterface
 {
-    use ImmutableContainerAwareTrait;
+    use ImmutableContainerAwareTrait, ImmutableValidatorAwareTrait;
 
     /**
      * Field name
@@ -42,13 +40,6 @@ class Field implements FieldInterface, ImmutableContainerAwareInterface
     protected $value;
 
     /**
-     * Validator
-     * 
-     * @var object
-     */
-    protected $validator;
-
-    /**
      * Rules
      * 
      * @var array
@@ -63,37 +54,16 @@ class Field implements FieldInterface, ImmutableContainerAwareInterface
     protected $params = array();
 
     /**
-     * Rule config
-     * 
-     * @var array
-     */
-    protected $ruleArray = array();
-
-    /**
      * Constructor
      * 
-     * @param array $row       field     data
-     * @param array $ruleArray ruleArray config
+     * @param array $row field     data
      */
-    public function __construct($row, $ruleArray = array())
+    public function __construct($row)
     {
         $this->name  = $row['field'];
         $this->label = $row['label'];
         $this->value = $row['postdata'];
         $this->rules = $row['rules'];
-        $this->ruleArray = $ruleArray;
-    }
-
-    /**
-     * Set validator object
-     * 
-     * @param object $validator validator
-     *
-     * @return void
-     */
-    public function setValidator(ValidatorInterface $validator)
-    {
-        $this->validator = $validator;
     }
 
     /**
@@ -101,66 +71,11 @@ class Field implements FieldInterface, ImmutableContainerAwareInterface
      * 
      * @return void
      */
-    public function next()
+    public function getNextRule()
     {
-        $rule = array_shift($this->rules);
-
-        if (! empty($rule)) {
-                              
-            if (strpos($rule, '(') > 0) {
-                
-                $matches = RuleParameter::parse($rule);
-                $rule = $matches[0];
-                $this->params = $matches[1];
-            }
-            $callbacks = $this->validator->getCallbacks(); // Is the rule has a callback?
-
-            if (substr($rule, 0, 9) == 'callback_' && array_key_exists($rule, $callbacks)) {
-
-                $next = Closure::bind(
-                    $callbacks[$rule],
-                    $this->validator,
-                    get_class($this->validator)
-                );
-                $result = $next($this);
-
-            } else {
-
-                $key = strtolower($rule);
-                if (! array_key_exists($key, $this->ruleArray)) {  // If rule does not exist.
-                    $error = sprintf(
-                        "%s rule is not defined in configuration file.",
-                        ucfirst($key)
-                    );
-                    $this->setError($error);
-                    $result = false;
-                } else {
-                    $Class  = "\\".trim($this->ruleArray[$key], '\\');
-
-                    $nextRule = new $Class;
-
-                    if ($nextRule instanceof ImmutableContainerAwareInterface || $nextRule instanceof ContainerAwareInterface) {
-                        $nextRule->setContainer($this->container);
-                    }
-                    $result = $nextRule($this);
-                }
-            }
-            if (false === $result) {
-                $this->validator->dispatchErrors($this, $rule);
-            }
-        }
+        return array_shift($this->rules);
     }
     
-    /**
-     * Invoke next rule
-     * 
-     * @return boolean
-     */
-    public function __invoke()
-    {
-        return $this->next();
-    }
-
     /**
      * Returns to field name
      * 
@@ -194,15 +109,15 @@ class Field implements FieldInterface, ImmutableContainerAwareInterface
     /**
      * Returns to field parameters
      * 
-     * @return array
+     * @return array|boolean
      */
     public function getParams()
     {
-        return $this->params;
+        return isset($this->params[0]) ? $this->params : false;
     }
 
     /**
-     * Set rule params
+     * Set field rule params e.g. min(5)|max(500)
      * 
      * @param array $params rule params
      *
@@ -222,7 +137,7 @@ class Field implements FieldInterface, ImmutableContainerAwareInterface
      */
     public function setValue($value)
     {
-        $this->validator->setValue($this->getName(), $value);
+        $this->getValidator()->setValue($this->getName(), $value);
     }
 
     /**
@@ -234,7 +149,17 @@ class Field implements FieldInterface, ImmutableContainerAwareInterface
      */
     public function setError($value)
     {
-        $this->validator->setError($this->getName(), $value);
+        $this->getValidator()->setError($this->getName(), $value);
+    }
+
+    /**
+     * Returns to0 field error
+     *
+     * @return void
+     */
+    public function getError()
+    {
+        return $this->getValidator()->getError($this->getName());
     }
 
     /**
@@ -246,7 +171,7 @@ class Field implements FieldInterface, ImmutableContainerAwareInterface
      */
     public function setMessage($message)
     {
-        $this->validator->setMessage($message);
+        $this->getValidator()->setMessage($message);
     }
 
 } 

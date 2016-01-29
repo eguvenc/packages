@@ -164,6 +164,9 @@ class Validator implements ValidatorInterface
             $this->validation = true;
             return true;
         }
+        if ($this->container->hasShared('form')) {
+            $this->container->get('form')->setErrors($this);  // Assign validation errors to form object
+        }
         return false;         // Validation fails
     }
 
@@ -236,10 +239,13 @@ class Validator implements ValidatorInterface
                 $row['postdata'] = $this->fieldData[$field]['postdata'] = $this->requestParams[$field];
             }
         }
-        $field = new Field($row, $this->ruleArray);
+        $field = new Field($row);
         $field->setContainer($this->container);
         $field->setValidator($this);
-        $field();
+
+        $next = new Next;
+        $next->setValidator($this);
+        $next($field);
     }
 
     /**
@@ -555,12 +561,22 @@ class Validator implements ValidatorInterface
     }
 
     /**
+     * Returns to validator rule configuration array
+     * 
+     * @return array
+     */
+    public function getRules()
+    {
+        return $this->ruleArray;
+    }
+
+    /**
      * Returns to container 
      * 
      * @return object
      */
     public function getContainer()
     {
-        return $this->c;
+        return $this->container;
     }
 }

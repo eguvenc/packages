@@ -15,30 +15,17 @@ class Alnum
     /**
      * Call next
      * 
-     * @param Field $next object
+     * @param Field    $field object
+     * @param Callable $next  object
      * 
      * @return object
      */
-    public function __invoke(Field $next)
+    public function __invoke(Field $field, Callable $next)
     {
-        $field = $next;
-        $value = $field->getValue();
+        if (ctype_alnum($field->getValue())) {
 
-        if ($this->isValid($value)) {
-            return $next();
+            return $next($field);
         }
         return false;
-    }
-
-    /**
-     * Alpha numeric
-     * 
-     * @param string $value string
-     *
-     * @return bool
-     */         
-    public function isValid($value)
-    {
-        return (! ctype_alnum($value)) ? false : true;
     }
 }

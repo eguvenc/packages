@@ -15,30 +15,15 @@ class Required
     /**
      * Call next
      * 
-     * @param Field $next object
+     * @param Field    $field object
+     * @param Callable $next  object
      * 
      * @return object
      */
-    public function __invoke(Field $next)
+    public function __invoke(Field $field, Callable $next)
     {
-        $field = $next;
         $value = $field->getValue();
 
-        if ($this->isValid($value)) {
-            return $next();
-        }
-        return false;
-    }
-
-    /**
-     * Empty or not
-     * 
-     * @param string $value value
-     * 
-     * @return bool
-     */    
-    public function isValid($value)
-    {        
         if (is_object($value) || is_null($value)) {
             return false;
         }
@@ -63,7 +48,9 @@ class Required
         if (is_bool($value) && ($value == false)) {
             return false;
         }
-        return true;
+        
+        return $next($field);
     }
+
 }
 

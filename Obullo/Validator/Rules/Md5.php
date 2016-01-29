@@ -15,15 +15,16 @@ class Md5
     /**
      * Call next
      * 
-     * @param Field $next object
+     * @param Field    $field object
+     * @param Callable $next  object
      * 
      * @return object
      */
-    public function __invoke(Field $next)
+    public function __invoke(Field $field, Callable $next)
     {
-        $field = $next;
         $value = md5($field->getValue());
         $field->setValue($value);
-        return $next();
+
+        return $next($field);
     }
 }

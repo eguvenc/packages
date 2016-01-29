@@ -14,29 +14,6 @@ use Obullo\Validator\ValidatorInterface as Validator;
 interface FieldInterface
 {
     /**
-     * Set validator object
-     * 
-     * @param object $validator validator
-     *
-     * @return void
-     */
-    public function setValidator(Validator $validator);
-
-    /**
-     * Call next rule
-     * 
-     * @return void
-     */
-    public function next();
-
-    /**
-     * Invoke next rule
-     * 
-     * @return boolean
-     */
-    public function __invoke();
-
-    /**
      * Sets field value
      * 
      * @param mixed $value value

@@ -5,6 +5,7 @@ namespace Obullo\Validator\Rules;
 use Obullo\Security\CsrfInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+use Obullo\Validator\FieldInterface as Field;
 use League\Container\ImmutableContainerAwareTrait;
 use League\Container\ImmutableContainerAwareInterface;
 
@@ -14,43 +15,28 @@ use League\Container\ImmutableContainerAwareInterface;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Csrf implements ImmutableContainerAwareInterface
+class Csrf extends AbstractRule implements ImmutableContainerAwareInterface
 {
     use ImmutableContainerAwareTrait;
 
     /**
-     * Call next
-     * 
-     * @param Field $next object
-     * 
-     * @return object
-     */
-    public function __invoke(Field $next)
-    {
-        $field = $next;
-        if ($this->isValid($field)) {
-            return $next();
-        }
-        return false;
-    }
-
-    /**
      * Check csrf code
-     * 
-     * @param Field $field field object
      * 
      * @return boolean
      */
-    public function isValid(Field $field)
+    public function isValid()
     {
+        $field     = $this->getField();
         $container = $this->getContainer();
-        $request = $container->get('request');
+        $request   = $container->get('request');
 
         if ($request->getMethod() == 'POST') {
 
-            if (! $container->get('csrf')->verify($request)) {
+            $csrf = $container->get('csrf');
 
-                $code = $container->get('csrf')->getErrorCode();
+            if (! $csrf->verify($request)) {
+
+                $code = $csrf->getErrorCode();
                 
                 switch ($code) {
                 case 00:

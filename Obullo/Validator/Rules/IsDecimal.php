@@ -2,35 +2,14 @@
 
 namespace Obullo\Validator\Rules;
 
-use Obullo\Validator\FieldInterface as Field;
-
 /**
  * IsDecimal
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class IsDecimal
+class IsDecimal extends AbstractRule
 {
-    /**
-     * Call next
-     * 
-     * @param Field $next object
-     * 
-     * @return object
-     */
-    public function __invoke(Field $next)
-    {
-        $field = $next;
-        $value = $field->getValue();
-        $params = $field->getParams();
-
-        if ($this->isValid($value, $params)) {
-            return $next();
-        }
-        return false;
-    }
-
     /**
      * IsDecimal
      *

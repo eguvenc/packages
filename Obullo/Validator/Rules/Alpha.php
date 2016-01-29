@@ -13,24 +13,6 @@ use Obullo\Validator\FieldInterface as Field;
 class Alpha
 {
     /**
-     * Call next
-     * 
-     * @param Field $next object
-     * 
-     * @return object
-     */
-    public function __invoke(Field $next)
-    {
-        $field = $next;
-        $value = $field->getValue();
-
-        if ($this->isValid($value)) {
-            return $next();
-        }
-        return false;
-    }
-    
-    /**
      * Alpha
      * 
      * @param string $value string

@@ -219,8 +219,11 @@ class Form
      *
      * @return void
      */
-    public function setErrors($errors)
+    public function setErrors($errors = null)
     {
+        if ($errors == null) {
+            $errors = $this->container->get('validator');
+        }
         if (is_object($errors) && $errors instanceof Validator) {
 
             $errorArray = $errors->getErrors();  // Get validator errors

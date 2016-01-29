@@ -15,37 +15,20 @@ class Min
     /**
      * Call next
      * 
-     * @param Field $next object
+     * @param Field    $field object
+     * @param Callable $next  object
      * 
      * @return object
      */
-    public function __invoke(Field $next)
+    public function __invoke(Field $field, Callable $next)
     {
-        $field  = $next;
-        $value  = $field->getValue();
-        $params = $field->getParams();
-
-        $length = isset($params[0]) ? (string)$params[0] : '0';
-
-        if ($this->isValid($value, $length)) {
-            return $next();
+        $length = '0';
+        if ($params = $field->getParams()) {
+            $length = (string)$params[0];
         }
-        return false;
-    }
-
-    /**
-     * Minimum length
-     * 
-     * @param string $value  value
-     * @param int    $length length
-     * 
-     * @return bool
-     */    
-    public function isValid($value, $length = '0')
-    {   
-        if (! ctype_digit($length)) {
+        if (mb_strlen($field->getValue()) < $length) {
             return false;
         }
-        return (mb_strlen($value) < $length) ? false : true;   
+        return $next($field);
     }
 }

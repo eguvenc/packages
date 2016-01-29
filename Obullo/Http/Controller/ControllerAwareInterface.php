@@ -1,13 +1,11 @@
 <?php
 
-namespace Obullo\Http;
-
-use Obullo\Http\ImmutableControllerInterface as Controller;
+namespace Obullo\Http\Controller;
 
 /**
  * Inject controller
  */
-interface ImmutableControllerAwareInterface
+interface ControllerAwareInterface
 {
     /**
      * Inject controller object

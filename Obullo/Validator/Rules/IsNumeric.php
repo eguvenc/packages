@@ -2,34 +2,14 @@
 
 namespace Obullo\Validator\Rules;
 
-use Obullo\Validator\FieldInterface as Field;
-
 /**
  * IsNumeric
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class IsNumeric
+class IsNumeric extends AbstractRule
 {
-    /**
-     * Call next
-     * 
-     * @param Field $next object
-     * 
-     * @return object
-     */
-    public function __invoke(Field $next)
-    {
-        $field = $next;
-        $value = $field->getValue();
-
-        if ($this->isValid($value)) {
-            return $next();
-        }
-        return false;
-    }
-    
     /**
      * Minimum length
      * 

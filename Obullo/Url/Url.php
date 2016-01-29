@@ -263,16 +263,6 @@ class Url
     }
 
     /**
-     * Get current url
-     *
-     * @return string
-     */
-    public function getCurrentUrl()
-    {
-        return $this->getBaseUrl($this->request->getUri()->getRequestUri());
-    }
-
-    /**
      * Parse out the attributes
      *
      * Some of the functions use this

@@ -17,7 +17,6 @@ Url sınıfı uygulamanızda kullandığınız iç ve dış html linklerini olu�
             <li><a href="#anchor">$this->url->anchor()</a></li>
             <li><a href="#asset">$this->url->asset()</a></li>
             <li><a href="#getBaseUrl">$this->url->getBaseUrl()</a></li>
-            <li><a href="#getCurrentUrl">$this->url->getCurrentUrl()</a></li>
             <li><a href="#prep">$this->url->prep()</a></li>
             <li>
                 <a href="#chain">Zincirleme Metotlar</a>
@@ -165,22 +164,6 @@ echo $this->url->getBaseUrl('examples/forms');
 
 ```php
 /examples/forms
-```
-
-<a name="getCurrentUrl"></a>
-
-#### $this->url->getCurrentUrl()
-
-Tarayıcıda kullanıcının gezdiği geçerli url adresine geri döner.
-
-```php
-echo $this->url->getCurrentUrl();
-```
-
-Çıktı
-
-```
-/welcome?foo=bar 
 ```
 
 <a name="prep"></a>

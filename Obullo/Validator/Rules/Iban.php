@@ -4,14 +4,13 @@ namespace Obullo\Validator\Rules;
 
 use InvalidArgumentException;
 use Obullo\Utils\ArrayUtils;
-use Obullo\Validator\FieldInterface as Field;
 
 /**
  * Validates IBAN Numbers (International Bank Account Numbers)
  *
  * Borrowed from Zend.
  */
-class Iban
+class Iban extends AbstractRule
 {
     const NOTSUPPORTED     = 'OBULLO:VALIDATOR:IBAN:NOTSUPPORTED';
     const SEPANOTSUPPORTED = 'OBULLO:VALIDATOR:IBAN:SEPANOTSUPPORTED';
@@ -116,22 +115,6 @@ class Iban
     );
 
     /**
-     * Call next
-     * 
-     * @param Field $next object
-     * 
-     * @return object
-     */
-    public function __invoke(Field $next)
-    {
-        $field = $next;
-        if ($this->isValid($field)) {
-            return $next();
-        }
-        return false;
-    }
-
-    /**
      * Returns the optional country code by ISO 3166-1
      *
      * @return string|null
@@ -190,17 +173,23 @@ class Iban
     /**
      * Returns true if field $value is a valid IBAN
      * 
-     * @param Field $field object
-     * 
      * @return boolean
      */
-    public function isValid(Field $field)
+    public function isValid()
     {
-        $value = $field->getValue();
+        $field  = $this->getField();
+        $value  = $field->getValue();
         $params = $field->getParams();
-        $countryCode = (isset($params[0])) ? $params[0] : '';
-        $allowNonSepa = (isset($params[1])) ? (bool)$params[1] : true;
 
+        $countryCode  = '';
+        $allowNonSepa = true;
+
+        if ($params) {
+            $countryCode = $params[0];
+        }
+        if (isset($params[1])) {
+            $allowNonSepa = (bool)$params[1];
+        }
         if (empty($countryCode)) {
             $field->setError(self::NOTSUPPORTED);
             return false;

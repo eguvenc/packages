@@ -15,30 +15,17 @@ class AlfaDash
     /**
      * Call next
      * 
-     * @param Field $next object
+     * @param Field    $field object
+     * @param Callable $next  object
      * 
      * @return object
      */
-    public function __invoke(Field $next)
+    public function __invoke(Field $field, Callable $next)
     {
-        $field  = $next;
-        $value  = $field->getValue();
+        if (preg_match("/^([-a-z_\-])+$/i", $field->getValue())) {
 
-        if ($this->isValid($value)) {
-            return $next();
+            return $next($field);
         }
         return false;
-    }
-
-    /**
-     * AlphaDash
-     * 
-     * @param string $value string
-     *
-     * @return bool
-     */         
-    public function isValid($value)
-    {
-        return ( ! preg_match("/^([-a-z_\-])+$/i", $value)) ? false : true;
     }
 }

@@ -3,6 +3,7 @@
 namespace Obullo\Http;
 
 use League\Container\ImmutableContainerAwareTrait;
+use Obullo\Http\Controller\ImmutableControllerInterface;
 
 /**
  * Obullo Layer ( Hmvc ) Based Controller.

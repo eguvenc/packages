@@ -15,46 +15,31 @@ class Email
     /**
      * Call next
      * 
-     * @param Field $next object
+     * @param Field    $field object
+     * @param Callable $next  object
      * 
      * @return object
      */
-    public function __invoke(Field $next)
+    public function __invoke(Field $field, Callable $next)
     {
-        $field  = $next;
-        $value  = $field->getValue();
-        $params = $field->getParams();
+        $dnsCheck = false;
+        if ($params = $field->getParams()) {
+            $dnsCheck = (bool)$params[0];
+        }
+        $isValid = (filter_var($field->getValue(), FILTER_VALIDATE_EMAIL)) === false ? false : true;
 
-        $dnsCheck = isset($params[0]) ? (bool)$params[0] : false;
+        if ($isValid) {
 
-        if ($this->isValid($value, $dnsCheck)) {
-            return $next();
+            if ($dnsCheck) {
+                $username = null;
+                $domain   = null;
+                list($username, $domain) = explode('@', $field->getValue());
+                if (! checkdnsrr($domain, 'MX')) {
+                    return false;
+                }
+            }
+            return $next($field);
         }
         return false;
-    }
-
-    /**
-     * Valid Email
-     *
-     * @param string  $value    email
-     * @param boolean $dnsCheck check dns
-     * 
-     * @return bool
-     */    
-    public function isValid($value, $dnsCheck = false)
-    {
-        $isValid = (filter_var($value, FILTER_VALIDATE_EMAIL)) === false ? false : true;
-
-        if ($isValid && $dnsCheck) {
-            $username = null;
-            $domain   = null;
-            list($username, $domain) = explode('@', $value);
-            if (! checkdnsrr($domain, 'MX')) {
-                return false;
-            }
-            return true;
-        }
-        
-        return $isValid;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Obullo\Cli;
 
-use Obullo\Http\ImmutableControllerInterface;
+use Obullo\Http\Controller\ImmutableControllerInterface;
 use League\Container\ImmutableContainerAwareTrait;
 
 /**

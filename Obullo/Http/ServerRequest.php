@@ -7,6 +7,7 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 
+use Obullo\Filters\InputFilter;
 use League\Container\ContainerAwareTrait;
 use Interop\Container\ContainerInterface as Container;
 

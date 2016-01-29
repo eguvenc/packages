@@ -19,28 +19,7 @@ class Date
      * 
      * @var string
      */
-    public $format = '';
-
-    /**
-     * Call next
-     * 
-     * @param Field $next object
-     * 
-     * @return object
-     */
-    public function __invoke(Field $next)
-    {
-        $field = $next;
-        $value  = $field->getValue();
-        $params = $field->getParams();
-
-        $this->format = isset($params[0]) ? $params[0] : 'Y-m-d';
-
-        if ($this->isValid($value)) {
-            return $next();
-        }
-        return false;
-    }
+    public $format = 'Y-m-d';
 
     /**
      * Date check
@@ -50,7 +29,10 @@ class Date
      * @return bool
      */    
     public function isValid($value)
-    {   
+    {
+        if ($params = $this->getField()->getParams()) {
+            $this->format = $params[0];
+        }
         return (! $this->convertToDateTime($value)) ? false : true ;
     }
 

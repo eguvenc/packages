@@ -1,6 +1,6 @@
 <?php
 
-namespace Obullo\Http;
+namespace Obullo\Http\Controller;
 
 use Interop\Container\ContainerInterface as InteropContainerInterface;
 
