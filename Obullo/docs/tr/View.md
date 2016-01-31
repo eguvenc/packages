@@ -11,14 +11,8 @@ Bir view dosyası basitçe html başlık ve gövdesinden oluşan bütün bir web
             <li><a href="#addFolder">$this->view->addFolder()</a></li>
             <li><a href="#load">$this->view->load()</a></li>
             <li><a href="#get">$this->view->get()</a></li>
-            <li><a href="#getStream">$this->view->getStream()</a></li>
-            <li>
-                <a href="#variables">Değişkenler Atamak</a> 
-                <ul>
-                    <li><a href="#array">Array yöntemi</a></li>
-                    <li><a href="#assign">$this->view->assign()</a></li>
-                </ul>
-            </li>
+            <li><a href="#withStream">$this->view->withStream()</a></li>
+            <li><a href="#withData">$this->view->withData()</a></li>
         </ul>
     </li>
 
@@ -137,58 +131,40 @@ class Footer extends Controller
 }
 ```
 
-<a name="getStream"></a>
+<a name="withStream"></a>
 
-#### $this->view->getStream();
+#### $this->view->withStream();
 
-Varolan bir görünüm dosyası ile bir response gövdesi oluşturmak için kullanılır. Bu metot <kbd>Obullo\Http\Stream</kbd> nesnesine geri döner.
+Daha çok bir görünüm dosyası ile bir response gövdesi oluşturmak için kullanılır. Bu metod <kbd>Obullo\Http\Stream</kbd> nesnesine geri döner.
 
 ```php
-$body = $this->view->getStream('templates::maintenance');
+$body = $this->view->withStream()->get('templates::maintenance');
 
 return $response->withStatus(404)
     ->withHeader('Content-Type', 'text/html')
     ->withBody($body);
 ```
 
-<a name="variables"></a>
-
-#### Değişkenler Atamak
-
-View nesnesine load metotlarının ikinci parameteresinden array türünde veri göndererek yada assign metodu ile değişkenler atanabilir.
-
-<a name="array"></a>
-
-##### Array Yöntemi
+yada string türünde bir girdi ile stream nesnesi aşağıdaki gibi elde edilebilir.
 
 ```php
-$this->view->load(
-  'welcome', 
-  [
-    'foo' => 'bar',
-    'colors' => [
-        'red',
-        'green',
-        'blue',
-    ]
-  ]
-);
+$body = $this->view->withStream("Example view")->get();
 ```
 
-<a name="assign"></a>
+<a name="withData"></a>
 
-##### $this->view->assign();
+#### $this->view->withData();
 
-Assign metodu da değişken atamak için diğer bir alternatiftir.
+Değişken atamak için diğer bir alternatiftir.
 
 ```php
-$this->view->assign('foo', 'bar');
+$this->view->withData('foo', 'bar');
 ```
 
-String türü veya aşağıdaki array türü ile veriler gönderilebilir.
+String türü veya aşağıdaki gibi array türü ile veriler gönderilebilir.
 
 ```php
-$this->view->assign(
+$this->view->withData(
   [
      'key' => 'value'
   ]

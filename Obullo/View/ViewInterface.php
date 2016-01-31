@@ -31,14 +31,13 @@ interface ViewInterface
     public function get($filename, $data = array());
 
     /**
-     * Get as stream
-     * 
-     * @param string $filename filename
-     * @param array  $data     data
+     * With http stream
+     *
+     * @param object $stream stream
      * 
      * @return object stream
      */
-    public function getStream($filename, $data = array());
+    public function withStream($stream = null);
 
     /**
      * Set variables
@@ -48,7 +47,7 @@ interface ViewInterface
      * 
      * @return void
      */
-    public function assign($key, $val = null);
+    public function withData($key, $val);
 
     /**
      * Render view

@@ -7,6 +7,7 @@ use Obullo\Http\Stream;
 use Obullo\Http\Controller;
 use Obullo\Log\LoggerInterface as Logger;
 use Interop\Container\ContainerInterface as Container;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * View Class
@@ -29,6 +30,20 @@ class View implements ViewInterface
      * @var array
      */
     protected $params = array();
+
+    /**
+     * Stream
+     * 
+     * @var object
+     */
+    protected $stream;
+
+    /**
+     * Stream template
+     * 
+     * @var string
+     */
+    protected $template;
 
     /**
      * Container
@@ -100,40 +115,6 @@ class View implements ViewInterface
     }
 
     /**
-     * Set variables
-     * 
-     * @param mixed $key key
-     * @param mixed $val val
-     * 
-     * @return object
-     */
-    public function assign($key, $val = null)
-    {
-        if (is_array($key)) {
-            foreach ($key as $k => $v) {
-                $this->data($k, $v);
-            }
-        } else {
-            $this->data($key, $val);
-        }
-        return $this;
-    }
-
-    /**
-     * Set variables
-     * 
-     * @param string $key view key data
-     * @param mixed  $val mixed
-     * 
-     * @return object
-     */
-    protected function data($key, $val)
-    {
-        $this->data[$key] = $val;
-        return $this;
-    }
-
-    /**
      * Include nested view files from current module /view folder
      * 
      * @param string $filename filename
@@ -154,25 +135,76 @@ class View implements ViewInterface
      * 
      * @return string
      */
-    public function get($filename, $data = array())
+    public function get($filename = null, $data = array())
     {
-        return $this->renderNestedView($filename, $data, false);
+        $template = $this->template;
+        if ($filename != null) {
+            $template = $this->renderNestedView($filename, $data, false);
+        }
+        if (is_object($this->stream) && $this->stream instanceof StreamInterface) {
+
+            if (false == $this->stream->getContents()) {  // Write if content empty.
+                $this->stream->write($template);
+            }
+            $body = $this->stream;
+            $this->template = $this->stream = null;
+            return $body;
+        }
+        return $template;
     }
 
     /**
-     * Get as stream
+     * Set variables
      * 
-     * @param string $filename filename
-     * @param array  $data     data
+     * @param mixed $key key
+     * @param mixed $val val
+     * 
+     * @return object
+     */
+    public function withData($key, $val)
+    {
+        if (is_array($key)) {
+            foreach ($key as $k => $v) {
+                $this->data($k, $v);
+            }
+        } else {
+            $this->data($key, $val);
+        }
+        return $this;
+    }    
+
+    /**
+     * With http stream
+     *
+     * @param object $stream stream
      * 
      * @return object stream
      */
-    public function getStream($filename, $data = array())
+    public function withStream($stream = null)
     {
-        $template = $this->get($filename, $data);
-        $body = new Stream(fopen('php://temp', 'r+'));
-        $body->write($template);
-        return $body;
+        if (is_object($stream)) {
+            $this->stream = $stream;
+        } else {
+            $this->stream = new Stream(fopen('php://temp', 'r+'));
+        }
+        if (is_string($stream)) {
+            $this->template = $stream;
+        }
+        return $this;
+    }
+
+    /**
+     * Set variables
+     * 
+     * @param string $key view key data
+     * @param mixed  $val mixed
+     * 
+     * @return object
+     */
+    protected function data($key, $val)
+    {
+        $this->data[$key] = $val;
+        return $this;
     }
 
     /**
