@@ -2,13 +2,15 @@
 
 namespace Obullo\Config;
 
+use Obullo\Config\ConfigInterface as Config;
+
 /**
  * Config Aware Interface
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-interface ConfigAwareInterface
+interface ImmutableConfigAwareInterface
 {
     /**
      * Set configuration array or object
@@ -25,4 +27,5 @@ interface ConfigAwareInterface
      * @return object
      */
     public function getConfig();
+
 }
