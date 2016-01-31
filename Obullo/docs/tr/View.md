@@ -137,6 +137,20 @@ class Footer extends Controller
 }
 ```
 
+<a name="getStream"></a>
+
+#### $this->view->getStream();
+
+Varolan bir görünüm dosyası ile bir response gövdesi oluşturmak için kullanılır. Bu metot <kbd>Obullo\Http\Stream</kbd> nesnesine geri döner.
+
+```php
+$body = $this->view->getStream('templates::maintenance');
+
+return $response->withStatus(404)
+    ->withHeader('Content-Type', 'text/html')
+    ->withBody($body);
+```
+
 <a name="variables"></a>
 
 #### Değişkenler Atamak
@@ -179,20 +193,6 @@ $this->view->assign(
      'key' => 'value'
   ]
 );
-```
-
-<a name="getStream"></a>
-
-##### $this->view->getStream();
-
-Varolan bir görünüm dosyası ile bir response gövdesi oluşturmak için kullanılır. Bu metot <kbd>Obullo\Http\Stream</kbd> nesnesine geri döner.
-
-```php
-$body = $this->view->getStream('templates::maintenance');
-
-return $response->withStatus(404)
-    ->withHeader('Content-Type', 'text/html')
-    ->withBody($body);
 ```
 
 <a name="layers"></a>
