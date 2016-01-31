@@ -47,6 +47,6 @@ $container->share('request', 'Obullo\Cli\NullRequest');
 $container->share('response', 'Obullo\Cli\NullResponse');
 
 /**
- * Initialize to application
+ * Register app providers
  */
-require APP .'components.php';
+require APP .'providers.php';

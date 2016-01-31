@@ -40,7 +40,7 @@ Oturum sınıfı kullanıcılar uygulamayı gezerken statülerini devam ettirmey
 
 <a name="config"></a>
 
-Session sınıfı <b>app/components.php</b> dosyasında servis olarak tanımlıdır. Servis sağlayıcısı, save handler ve diğer ayarlar <kbd>app/$env/providers/session.php</kbd> dosyasından konfigüre edilir.
+Session sınıfı <b>app/providers.php</b> dosyasında servis olarak tanımlıdır. Servis sağlayıcısı, save handler ve diğer ayarlar <kbd>app/$env/providers/session.php</kbd> dosyasından konfigüre edilir.
 
 ```php
 'methods' => [

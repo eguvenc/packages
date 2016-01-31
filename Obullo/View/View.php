@@ -3,6 +3,7 @@
 namespace Obullo\View;
 
 use Closure;
+use Obullo\Http\Stream;
 use Obullo\Http\Controller;
 use Obullo\Log\LoggerInterface as Logger;
 use Interop\Container\ContainerInterface as Container;
@@ -23,6 +24,13 @@ class View implements ViewInterface
     protected $logger;
 
     /**
+     * Service parameters
+     * 
+     * @var array
+     */
+    protected $params = array();
+
+    /**
      * Container
      * 
      * @var object
@@ -30,94 +38,85 @@ class View implements ViewInterface
     protected $container;
 
     /**
-     * Protected variables
+     * Data
      * 
      * @var array
      */
-    protected $_boolStack   = array();    // Boolean type view variables
-    protected $_arrayStack  = array();    // Array type view variables
-    protected $_stringStack = array();    // String type view variables
-    protected $_objectStack = array();    // Object type view variables
+    protected $data = array();
+
+    /**
+     * View folders
+     * 
+     * @var array
+     */
+    protected $folders = array();
 
     /**
      * Constructor
      * 
      * @param object $container container
      * @param object $logger    logger
+     * @param array  $params    service provider parameters
      */
-    public function __construct(Container $container, Logger $logger)
+    public function __construct(Container $container, Logger $logger, array $params)
     {
         $this->container = $container;
+        $this->params = $params;
         $this->logger = $logger;
         $this->logger->debug('View Class Initialized');
     }
 
     /**
-     * Get body / write body
+     * Register view folder
      * 
-     * @param string  $_Vpath     full path
-     * @param string  $_Vfilename filename
-     * @param string  $_VData     mixed data
-     * @param boolean $_VInclude  fetch as string or include
-     * 
-     * @return mixed
+     * @param string $name folder name
+     * @param string $path folder path
+     *
+     * @return void
      */
-    public function getBody($_Vpath, $_Vfilename, $_VData = null, $_VInclude = true)
+    public function addFolder($name, $path = null)
     {
-        $_VInclude = ($_VData === false) ? false : $_VInclude;
-
-        $this->assignVariables($_VData);
-
-        extract($this->_stringStack, EXTR_SKIP);
-        extract($this->_arrayStack, EXTR_SKIP);
-        extract($this->_objectStack, EXTR_SKIP);
-        extract($this->_boolStack, EXTR_SKIP);
-
-        ob_start();
-        include $_Vpath . $_Vfilename . '.php';
-        $body = ob_get_clean();
-        
-        if ($_VData === false || $_VInclude === false) {
-            return $body;
-        }
-        $response = $this->container->get('response');
-        $response->getBody()->write($body);
-        return $response;
+        $this->folders[$name] = $path;
     }
 
     /**
-     * Assign view variables
-     * 
-     * @param array $_VData view data
-     * 
-     * @return void
+     * Check folders & returns to array if yes.
+     *
+     * @return boolean
      */
-    protected function assignVariables($_VData)
+    public function hasFolders()
     {
-        if (is_array($_VData)) {
-            foreach ($_VData as $key => $value) {
-                $this->assign($key, $value);
-            }
-        }
+        return (empty($this->folders)) ? false : $this->getFolders();
+    }
+
+    /**
+     * Returns to folders
+     * 
+     * @return array
+     */
+    public function getFolders()
+    {
+        return $this->folders;
     }
 
     /**
      * Set variables
      * 
-     * @param mixed $key view key => data or combined array
-     * @param mixed $val mixed
+     * @param mixed $key key
+     * @param mixed $val val
      * 
-     * @return void
+     * @return object
      */
     public function assign($key, $val = null)
     {
         if (is_array($key)) {
-            foreach ($key as $_k => $_v) {
-                $this->assignVar($_k, $_v);
+            foreach ($key as $k => $v) {
+                $this->data($k, $v);
             }
         } else {
-            $this->assignVar($key, $val);
+            $this->data($key, $val);
         }
+        return $this;
     }
 
     /**
@@ -126,41 +125,12 @@ class View implements ViewInterface
      * @param string $key view key data
      * @param mixed  $val mixed
      * 
-     * @return void
+     * @return object
      */
-    protected function assignVar($key, $val)
+    protected function data($key, $val)
     {
-        if (is_int($val)) {
-            $this->_stringStack[$key] = $val;
-            return;
-        }
-        if (is_string($val)) {
-            $this->_stringStack[$key] = $val;
-            return;
-        }
-        $this->_arrayStack[$key] = array();  // Create empty array
-        if (is_array($val)) {
-            if (count($val) == 0) {
-                $this->_arrayStack[$key] = array();
-            } else {
-                foreach ($val as $array_key => $value) {
-                    $this->_arrayStack[$key][$array_key] = $value;
-                }
-            }
-        }
-        if (is_object($val)) {
-            $this->_objectStack[$key] = $val;
-            $this->_arrayStack = array();
-            return;
-        }
-        if (is_bool($val)) {
-            $this->_boolStack[$key] = $val;
-            $this->_arrayStack = array();
-            return;
-        }
-        $this->_stringStack[$key] = $val;
-        $this->_arrayStack = array();
-        return;
+        $this->data[$key] = $val;
+        return $this;
     }
 
     /**
@@ -171,7 +141,7 @@ class View implements ViewInterface
      * 
      * @return string                      
      */
-    public function load($filename, $data = null)
+    public function load($filename, $data = array())
     {
         return $this->renderNestedView($filename, $data, true);
     }
@@ -184,9 +154,25 @@ class View implements ViewInterface
      * 
      * @return string
      */
-    public function get($filename, $data = null)
+    public function get($filename, $data = array())
     {
         return $this->renderNestedView($filename, $data, false);
+    }
+
+    /**
+     * Get as stream
+     * 
+     * @param string $filename filename
+     * @param array  $data     data
+     * 
+     * @return object stream
+     */
+    public function getStream($filename, $data = array())
+    {
+        $template = $this->get($filename, $data);
+        $body = new Stream(fopen('php://temp', 'r+'));
+        $body->write($template);
+        return $body;
     }
 
     /**
@@ -194,11 +180,11 @@ class View implements ViewInterface
      * 
      * @param string  $filename filename
      * @param mixed   $data     array data
-     * @param boolean $include  no include ( fetch as string )
+     * @param boolean $include  fetch as string or return
      * 
      * @return string                      
      */
-    protected function renderNestedView($filename, $data, $include = true)
+    protected function renderNestedView($filename, $data = array(), $include = true)
     {
         /**
          * IMPORTANT:
@@ -212,32 +198,44 @@ class View implements ViewInterface
         } else {
             $router = &Controller::$instance->router;  // Use nested controller router ( @see the Layer package. )
         }
-
         $path = $router->getModule('/') . $router->getDirectory();
         $path = (empty($path)) ? 'views' : $path;  // Read view file from /modules/views/ folder
-
         /**
-         * Fetch view ( also it can be nested )
+         * End layer package support
          */
-        $return = $this->getBody(
-            MODULES .$path .'/view/',
-            $filename,
-            $data,
-            $include
-        );
-        return $return;
+        $body = $this->render($filename, MODULES .$path .'/view/', $data);
+
+        if ($include === false) {
+            return $body;
+        }
+        $response = $this->container->get('response');
+        $response->getBody()->write($body);
+        return $response;
     }
 
     /**
-     * Make available controller variables in view files
+     * Render view
      * 
-     * @param string $key Controller variable name
+     * @param string $filename filename
+     * @param string $path     path
+     * @param array  $data     data
      * 
-     * @return void
+     * @return string
      */
-    public function __get($key)
+    public function render($filename, $path, $data = array())
     {
-        return $this->container->get($key);
+        $data = array_merge($this->data, $data);
+
+        $engineClass = "\\".trim($this->params['engine'], '\\');
+        $engine = new $engineClass($path);
+        $engine->setContainer($this->container);
+
+        if ($folders = $this->hasFolders()) {
+            foreach ($folders as $name => $folder) {
+                $engine->addFolder($name, $folder);
+            }
+        }
+        return $engine->render($filename, $data);
     }
 
 }

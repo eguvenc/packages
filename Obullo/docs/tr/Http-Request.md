@@ -64,7 +64,7 @@ Http paketi Psr7 Standartlarını destekler ve Zend-Diactoros kütüphanesi bile
 $this->c['request']->method();
 ```
 
-Request sınıfı <kbd>app/components.php</kbd> dosyasında tanımlı olduğundan çağrıldığında conteiner sınıfı içerisinden yüklenir.
+Request sınıfı <kbd>app/providers.php</kbd> dosyasında tanımlı olduğundan çağrıldığında conteiner sınıfı içerisinden yüklenir.
 
 <a name="super-globals"></a>
 

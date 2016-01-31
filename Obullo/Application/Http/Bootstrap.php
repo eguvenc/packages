@@ -61,9 +61,9 @@ $container->share(
 );
 
 /**
- * Register app components
+ * Register app providers
  */
-require APP .'components.php';
+require APP .'providers.php';
 
 /**
  * Register router

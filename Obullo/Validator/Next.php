@@ -56,12 +56,6 @@ class Next implements ImmutableValidatorAwareInterface
                 $result = $this->callNextClass($field, $rule);
             }
 
-            // if ($field->getName() == 'email') {
-
-            //     var_dump($result);
-            //     var_dump($field->getName());
-            // }
-
             if (false === $result) {
                 $this->getValidator()->dispatchErrors($field, $rule);
             }

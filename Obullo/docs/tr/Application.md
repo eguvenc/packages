@@ -227,13 +227,13 @@ Bileşenler uygulamada yüklendiğinde önceden tanımlanmış çekirdek sınıf
 
 #### Bileşenleri Tanımlamak
 
-Bir bileşenin uygulama içerisinde çalışabilmesi için <kbd>app/components.php</kbd> dosyasına tanımlı olması gerekir. Bileşenler uygulamanın her yerinde kullanılma ihtimalleri yüksek olan sınıflardır. Bir bileşeni onun uygulama içerisindeki görevini bilmeden kaldırdıysanız uygulamanız düzgün çalışmayabilir. Bir bileşen tanımlandıktan sonra konteyner sınıfı içerisinde kayıt edilir ve çağrılmadığı sürece uygulamaya yüklenmez. Bileşenin yüklenmesi için aşağıdaki gibi en az bir defa çağrılması gerekir.
+Bir bileşenin uygulama içerisinde çalışabilmesi için <kbd>app/providers.php</kbd> dosyasına tanımlı olması gerekir. Bileşenler uygulamanın her yerinde kullanılma ihtimalleri yüksek olan sınıflardır. Bir bileşeni onun uygulama içerisindeki görevini bilmeden kaldırdıysanız uygulamanız düzgün çalışmayabilir. Bir bileşen tanımlandıktan sonra konteyner sınıfı içerisinde kayıt edilir ve çağrılmadığı sürece uygulamaya yüklenmez. Bileşenin yüklenmesi için aşağıdaki gibi en az bir defa çağrılması gerekir.
 
 ```php
 $this->c['view'];
 ```
 
-Bileşenler <kbd>app/components.php</kbd> dosyasında aşağıdaki gibi tanımlanırlar.
+Bileşenler <kbd>app/providers.php</kbd> dosyasında aşağıdaki gibi tanımlanırlar.
 
 ```php
 $c['app']->component(
@@ -338,7 +338,7 @@ Set türündeki metotlar uygulama sınıfındaki varolan değişkenlere yeni de�
 
 ##### $c['app']->provider(array $providers);
 
-<kbd>app/components.php</kbd> dosyası içerisinde servis sağlayıcısı tanımlanmasını sağlar.
+<kbd>app/providers.php</kbd> dosyası içerisinde servis sağlayıcısı tanımlanmasını sağlar.
 
 ```php
 $c['app']->provider(
@@ -354,7 +354,7 @@ $c['app']->provider(
 
 ##### $c['app']->service(array $services);
 
-<kbd>app/components.php</kbd> dosyası içerisinde servisler oluşturmanızı sağlar.
+<kbd>app/providers.php</kbd> dosyası içerisinde servisler oluşturmanızı sağlar.
 
 ```php
 $c['app']->service(
@@ -369,7 +369,7 @@ $c['app']->service(
 
 ##### $c['app']->component(array $components);
 
-<kbd>app/components.php</kbd> dosyası içerisinde bileşenler oluşturmanızı sağlar.
+<kbd>app/providers.php</kbd> dosyası içerisinde bileşenler oluşturmanızı sağlar.
 
 ```php
 $c['app']->component(
@@ -383,7 +383,7 @@ $c['app']->component(
 
 ##### $c['app']->dependency(array $deps);
 
-<kbd>app/components.php</kbd> dosyası içerisinde bağımlılık yönetimi için yeni sınıflar eklemenizi sağlar.
+<kbd>app/providers.php</kbd> dosyası içerisinde bağımlılık yönetimi için yeni sınıflar eklemenizi sağlar.
 
 ```php
 $c['app']->dependency(

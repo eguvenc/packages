@@ -50,7 +50,7 @@ Son olarak olay anını ne kadar çok dinleyicimiz  ( <b>listeners / subscribers
 
 ### Çalıştırma
 
-Event sınıfı <kbd>app/components.php</kbd> dosyası içerisinde tanımlıdır ve konteyner içerisinden çağrılarak çalıştırılır.
+Event sınıfı <kbd>app/providers.php</kbd> dosyası içerisinde tanımlıdır ve konteyner içerisinden çağrılarak çalıştırılır.
 
 <a name="methods"></a>
 

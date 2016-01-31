@@ -281,7 +281,7 @@ Böylece <b>veritabanı</b> servis sağlayıcısı sayesinde uygulamada kullanı
 
 #### Servis Sağlayıcısı
 
-Mevcut olan servis sağlayıcısı <b>DatabaseServiceProvider.php</b> olarak tanımlıdır ve <b>DoctirneServiceProvider.php</b> olarak <kbd>app/components.php</kbd> dosyasından değiştirilmelidir.
+Mevcut olan servis sağlayıcısı <b>DatabaseServiceProvider.php</b> olarak tanımlıdır ve <b>DoctirneServiceProvider.php</b> olarak <kbd>app/providers.php</kbd> dosyasından değiştirilmelidir.
 
 ```php
 $c['app']->provider(

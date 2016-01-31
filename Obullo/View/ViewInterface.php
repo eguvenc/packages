@@ -18,7 +18,7 @@ interface ViewInterface
      * 
      * @return string                      
      */
-    public function load($filename, $data = null);
+    public function load($filename, $data = array());
 
     /**
      * Get nested view files as string from current module /view folder
@@ -28,12 +28,22 @@ interface ViewInterface
      * 
      * @return string
      */
-    public function get($filename, $data = null);
+    public function get($filename, $data = array());
+
+    /**
+     * Get as stream
+     * 
+     * @param string $filename filename
+     * @param array  $data     data
+     * 
+     * @return object stream
+     */
+    public function getStream($filename, $data = array());
 
     /**
      * Set variables
      * 
-     * @param mixed $key view key => data or combined array
+     * @param mixed $key key
      * @param mixed $val mixed
      * 
      * @return void
@@ -41,15 +51,14 @@ interface ViewInterface
     public function assign($key, $val = null);
 
     /**
-     * Get body / write & return to body
+     * Render view
      * 
-     * @param string  $_Vpath     full path
-     * @param string  $_Vfilename filename
-     * @param string  $_VData     mixed data
-     * @param boolean $_VInclude  fetch as string or include
+     * @param string $filename filename
+     * @param string $path     path
+     * @param array  $data     data
      * 
-     * @return mixed
+     * @return string
      */
-    public function getBody($_Vpath, $_Vfilename, $_VData = null, $_VInclude = true);
-    
+    public function render($filename, $path, $data = array());
+   
 }

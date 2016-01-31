@@ -64,7 +64,7 @@ Http paketi Psr7 Standartlarını destekler ve Zend-Diactoros kütüphanesi bile
 ```php
 $this->c['response']->method();
 ```
-Konteyner nesnesi ile yüklenmesi gerekir. Response sınıfı <kbd>app/components.php</kbd> dosyası içerisinde komponent olarak tanımlıdır.
+Konteyner nesnesi ile yüklenmesi gerekir. Response sınıfı <kbd>app/providers.php</kbd> dosyası içerisinde komponent olarak tanımlıdır.
 
 > **Not:** Kontrolör sınıfı içerisinden bu sınıfa $this->response yöntemi ile de ulaşılabilir.
 

@@ -187,7 +187,7 @@ Katman sınıfı içerisindeki bazı metotlar uygulamaya özgü özel işlevleri
 
 #### Komponent Enjeksiyonu
 
-Bir katmana <kbd>app/components.php</kbd> içerisindeki tanımlı kütüphaneleri enjekte edebilmek için <kbd>__construct()</kbd> metodu içerisinden aşağıdaki gibi kütüphane isimlerinin çağırılması yeterli olur.
+Bir katmana <kbd>app/providers.php</kbd> içerisindeki tanımlı kütüphaneleri enjekte edebilmek için <kbd>__construct()</kbd> metodu içerisinden aşağıdaki gibi kütüphane isimlerinin çağırılması yeterli olur.
 
 ```php
 /**

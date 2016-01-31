@@ -103,7 +103,7 @@ $2a$12$Some22CharacterSaltXXO6NC3ydPIrirIzk1NdnTz0L/aCaHnlBa
 
 ### Çalıştırma
 
-Şifre sınıfının çalışabilmesi için <kbd>app/components.php</kbd> dosyasından bileşen olarak konfigüre edilmesi gerekir.
+Şifre sınıfının çalışabilmesi için <kbd>app/providers.php</kbd> dosyasından bileşen olarak konfigüre edilmesi gerekir.
 
 ```php
 $c['app']->component(

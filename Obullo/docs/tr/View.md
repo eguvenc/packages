@@ -1,14 +1,17 @@
 
-## Görünümler (Views)
+## Görünümler
 
 Bir view dosyası basitçe html başlık ve gövdesinden oluşan bütün bir web sayfası olabileceği gibi, belirli bir sayfanın parçası (header, footer, sidebar) da olabilir.
 
 <ul>
     <li>
-        <a href="#loadingViews">View Sınıfı</a>
+        <a href="#loading-class">View Sınıfı</a>
         <ul>
+            <li><a href="#serviceProvider">Servis Sağlayıcı</a></li>
+            <li><a href="#addFolder">$this->view->addFolder()</a></li>
             <li><a href="#load">$this->view->load()</a></li>
             <li><a href="#get">$this->view->get()</a></li>
+            <li><a href="#getStream">$this->view->getStream()</a></li>
             <li>
                 <a href="#variables">Değişkenler Atamak</a> 
                 <ul>
@@ -30,16 +33,6 @@ Bir view dosyası basitçe html başlık ve gövdesinden oluşan bütün bir web
               </li>
         </ul>
     </li>
-
-    <li>
-        <a href="#templates">Template Sınıfı</a> 
-        <ul>
-            <li><a href="#t_load">$this->template->load()</a></li>
-            <li><a href="#t_get">$this->template->get()</a></li>
-            <li><a href="#t_make">$this->template->make()</a></li>
-        </ul>
-    </li>
-
 </ul>
 
 <a name="loading-class"></a>
@@ -48,25 +41,55 @@ Bir view dosyası basitçe html başlık ve gövdesinden oluşan bütün bir web
 
 Bir view dosyası bir modüle ait ise modül dizini içerisindeki <kbd>/modules/$moduleName/view</kbd> klasörü içerisinden, bir kontrolöre bağlı bir view dosyası ise <kbd>/modules/views/</kbd> klasöründen çağrılır.
 
+<a name="serviceProvider"></a>
+
+#### Servis Sağlayıcı
+
+View sınıfına ait servis sağlayıcısı <kbd>app/providers.php</kbd> dosyasından yönetilir.
+
+```php
+$container->share('view', 'Obullo\View\View')
+    ->withArgument($container)
+    ->withArgument($container->get('logger'))
+    ->withArgument($config->getParams())
+    ->withMethodCall(
+        'addFolder',
+        [
+            'templates',
+            TEMPLATES
+        ]
+    );
+```
+
+Servis sağlayıcısı view sınıfına ait önkonfigurasyonu yönetir.
+
+<a name="addFolder"></a>
+
+#### $this->view->addFolder();
+
+Görünüm sınıfına klasörler konfigüre eder.
+
+```php
+$this->view->addFolder('templates', '/resources/templates/');
+```
+
+Tanımladığınız klasörden view dosyalarına ulaşmak için <kbd>:</kbd> karakteri kullanılır.
+
+```php
+$string = $this->view->get('templates::maintenance');
+```
+
 <a name="load"></a>
 
 #### $this->view->load();
 
 ```php
-use Obullo\Http\Controller;
-
-class Welcome extends Controller
-{
-    public function index()
-    {
-        $this->view->load(
-          'welcome', 
-          [
-            'foo' => 'bar'
-          ]
-        );
-    }
-}
+$this->view->load(
+  'welcome', 
+  [
+    'foo' => 'bar'
+  ]
+);
 ```
 
 Welcome kontrolör dosyasında olduğu gibi kontrolör dosyası bir modül içerisinde değilse <kbd>/modules/views/view</kbd> klasöründe oluşturulmalıdır.
@@ -156,6 +179,20 @@ $this->view->assign(
      'key' => 'value'
   ]
 );
+```
+
+<a name="getStream"></a>
+
+##### $this->view->getStream();
+
+Varolan bir görünüm dosyası ile bir response gövdesi oluşturmak için kullanılır. Bu metot <kbd>Obullo\Http\Stream</kbd> nesnesine geri döner.
+
+```php
+$body = $this->view->getStream('templates::maintenance');
+
+return $response->withStatus(404)
+    ->withHeader('Content-Type', 'text/html')
+    ->withBody($body);
 ```
 
 <a name="layers"></a>
@@ -257,44 +294,4 @@ Katmanların nasıl çalıştığını anlamak için oluşturduğunuz bir katman
 
 ```php
 http://myproject/views/navbar
-```
-
-<a name="templates"></a>
-
-### Template Sınıfı
-
-Template sınıfı <kbd>/resources/templates/</kbd> klasöründe oluşturulan genel view dosyalarını yüklemek için yardımcı bir sınıf olarak kullanılır.
-
-<a name="t_load"></a>
-
-#### $this->template->load()
-
-View sınıfı load metodu gibi çalışır. Fakat view dosyası view klasörü yerine <kbd>/resources/templates/</kbd> klasöründen yüklenir.
-
-```php
-$this->view->load('error', ['error' => 'my error message']);
-```
-
-<a name="t_get"></a>
-
-#### $this->template->get()
-
-View sınıfı get metodu gibi çalışır. Fakat view dosyası view klasörü yerine <kbd>/resources/templates/</kbd> klasöründen yüklenir.
-
-```php
-echo $this->view->get('maintenance');
-```
-
-<a name="t_make"></a>
-
-#### $this->template->make()
-
-Varolan bir görünüm dosyası ile bir response gövdesi oluşturmak için kullanılır.
-
-```php
-$body = $this->c['template']->make('maintenance');
-
-return $response->withStatus(404)
-    ->withHeader('Content-Type', 'text/html')
-    ->withBody($body);
 ```

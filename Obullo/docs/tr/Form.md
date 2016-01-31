@@ -162,7 +162,7 @@ echo $this->form->getMessage();
 
 ### Çalıştırma
 
-Form sınıfı <kbd>app/components.php</kbd> dosyası içerisinde tanımlıdır ve konteyner içerisinden çağrılarak çalıştırılır.
+Form sınıfı <kbd>app/providers.php</kbd> dosyası içerisinde tanımlıdır ve konteyner içerisinden çağrılarak çalıştırılır.
 
 <a name="loading-service"></a>
 

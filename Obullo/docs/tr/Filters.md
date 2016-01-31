@@ -3,7 +3,7 @@
 
 Bir uygulamada kullanıcı girdilerini filtrelemek uygulama güvenliği açısından büyük önem taşır. Kullanıcı girdilerine güvenerek filtrelemeyi ihmal etmek uygulama içeriğinize, kullanıcı verilerine hatta uygulamanın barındırıldığı sunucu üzerinde izinsiz girişlere neden olabilir.
 
-Obullo da filtreleme iki ayrı sınıf ile yapılır doğrulama filtresi için <b>Is</b> sınıfı ve arındırma filtresi için <b>Clean</b> sınıfı kullanılır. Bu filtreler <kbd>app/components.php</kbd> dosyası içerisinde komponent olarak tanımlıdırlar. Eğer sizinde uygulamaya özgü filtreleriniz oluşursa onları aynı dosyada komponent olarak tanımlayabilir yada mevcut komponente genişleyerek kendi fonksiyonlarınınızı dahil edebilirsiniz.
+Obullo da filtreleme iki ayrı sınıf ile yapılır doğrulama filtresi için <b>Is</b> sınıfı ve arındırma filtresi için <b>Clean</b> sınıfı kullanılır. Bu filtreler <kbd>app/providers.php</kbd> dosyası içerisinde komponent olarak tanımlıdırlar. Eğer sizinde uygulamaya özgü filtreleriniz oluşursa onları aynı dosyada komponent olarak tanımlayabilir yada mevcut komponente genişleyerek kendi fonksiyonlarınınızı dahil edebilirsiniz.
 
 <ul>
 <li>

@@ -183,7 +183,7 @@ Mevcut Kuyruk Sınıfları
 
 #### Servis Sağlayıcı Konfigürasyonu
 
-Servis ayarlarında tanımladığınız servis sağlayıcısının <kbd>app/components.php</kbd> içerisinden tanımlı olması gerekir.
+Servis ayarlarında tanımladığınız servis sağlayıcısının <kbd>app/providers.php</kbd> içerisinden tanımlı olması gerekir.
 
 ```php
 $c['app']->provider(

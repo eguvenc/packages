@@ -79,7 +79,7 @@ Bu özelliğin yanında katman içerisinde bir kez yapılması gereken veritaban
 
 ### Çalıştırma
 
-Katman sınıfı <kbd>app/components.php</kbd> dosyasında tanımlıdır bu yüzdan ayrıca konfigüre edilmeye gerek duymaz.
+Katman sınıfı <kbd>app/providers.php</kbd> dosyasında tanımlıdır bu yüzdan ayrıca konfigüre edilmeye gerek duymaz.
 
 <a name="methods"></a>
 

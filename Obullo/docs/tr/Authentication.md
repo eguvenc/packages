@@ -309,7 +309,7 @@ return array(
 
 #### Servisi Yüklemek
 
-Yetki doğrulama paketi sınıflarına erişim <kbd>User</kbd> servisi yani <kbd>AuthManager</kbd> üzerinden sağlanır, user servisi önceden <kbd>app/components.php</kbd> dosyası içerisinde aşağıdaki gibi tanımlıdır.
+Yetki doğrulama paketi sınıflarına erişim <kbd>User</kbd> servisi yani <kbd>AuthManager</kbd> üzerinden sağlanır, user servisi önceden <kbd>app/providers.php</kbd> dosyası içerisinde aşağıdaki gibi tanımlıdır.
 
 ```php
 $c['app']->service(

@@ -95,7 +95,7 @@ return array(
 );
 ```
 
-Bir servisin çalışabilmesi için yardımcı bir sınıf üzerinden ( Service Manager ) yapılandırılması ve bu sınıfın <kbd>app/components.php</kbd> dosyasında aşağıdaki gibi tanımlanması gerekir.
+Bir servisin çalışabilmesi için yardımcı bir sınıf üzerinden ( Service Manager ) yapılandırılması ve bu sınıfın <kbd>app/providers.php</kbd> dosyasında aşağıdaki gibi tanımlanması gerekir.
 
 ```php
 $c['app']->service(
@@ -204,7 +204,7 @@ Bir servis sağlayıcısı sınıfı yanlış yazılmış yada yapılandırılm�
 
 #### Servis Sağlayıcılarını Tanımlamak
 
-Servis sağlayıcılarının <kbd>app/components.php</kbd> dosyasında tanımlı olmaları gerekir. Tanımlama sıralamasında öncelik önemlidir. Uygulamada ilk yüklenenen servis sağlayıcıları her zaman en üstte tanımlanmalıdır.
+Servis sağlayıcılarının <kbd>app/providers.php</kbd> dosyasında tanımlı olmaları gerekir. Tanımlama sıralamasında öncelik önemlidir. Uygulamada ilk yüklenenen servis sağlayıcıları her zaman en üstte tanımlanmalıdır.
 
 ```php
 $c['app']->provider(
@@ -407,7 +407,7 @@ interface ServiceProviderInterface
 }
 ```
 
-Servis sağlayıcısını aşağıdaki gibi <kbd>.app/components.php</kbd> dosyası içerisine tanımlayın.
+Servis sağlayıcısını aşağıdaki gibi <kbd>.app/providers.php</kbd> dosyası içerisine tanımlayın.
 
 ```php
 $c['app']->provider(

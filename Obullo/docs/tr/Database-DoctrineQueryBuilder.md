@@ -98,7 +98,7 @@ Konfigürasyon için <b>DoctrineDBALServiceProvider</b> ve <b>DoctrineQueryBuild
 
 #### Bağımlılıklar
 
-Sorgu oluşturucu <b>DoctrineDBALServiceProvider</b> servis sağlayıcısı olmadan çalışamaz. Eğer servis sağlayıcısı tanımlı değilse <kbd>app/components.php</kbd> dosyasındaki database anahtarına aşağıdaki gibi tanımlamanız gerekir.
+Sorgu oluşturucu <b>DoctrineDBALServiceProvider</b> servis sağlayıcısı olmadan çalışamaz. Eğer servis sağlayıcısı tanımlı değilse <kbd>app/providers.php</kbd> dosyasındaki database anahtarına aşağıdaki gibi tanımlamanız gerekir.
 
 ```php
 $c['app']->provider(
@@ -109,7 +109,7 @@ $c['app']->provider(
     ]
 );
 
-/* Location: .app/components.php */
+/* Location: .app/providers.php */
 ```
 
 Böylelikle mevcut database servis sağlayıcısını doctrine dbal servis sağlayıcısı ile değiştirmiş olduk. Bu değişiklikten sonra varolan veritabanı fonksiyonlarınızda herhangi bir değişikliğe gitmenize gerek kalmaz.
@@ -120,7 +120,7 @@ Böylelikle mevcut database servis sağlayıcısını doctrine dbal servis sağl
 
 Sorgu oluşturucu <b>DoctrineQueryBuilderServiceProvider</b> isimli servis sağlayıcısı üzerinden çalışır. Servis sağlayıcı database servis sağlayıcısına bağlanarak önceden tanımlı olan bağlantı adına ilişkin veriler ile sorgu oluşturucuya ait veritabanı bağlantısını kurar. 
 
-Eğer servis sağlayıcısı tanımlı değilse <kbd>app/components.php</kbd> dosyasına aşağıdaki gibi <b>this->db</b> anahtarına tanımlamanız önerilir.
+Eğer servis sağlayıcısı tanımlı değilse <kbd>app/providers.php</kbd> dosyasına aşağıdaki gibi <b>this->db</b> anahtarına tanımlamanız önerilir.
 
 ```php
 $c['app']->provider(
@@ -132,7 +132,7 @@ $c['app']->provider(
     ]
 );
 
-/* Location: .app/components.php */
+/* Location: .app/providers.php */
 ```
 
 <a name="methods"></a>

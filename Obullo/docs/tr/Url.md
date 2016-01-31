@@ -39,7 +39,7 @@ Url sınıfı uygulamanızda kullandığınız iç ve dış html linklerini olu�
 
 <a name="config"></a>
 
-Url sınıfı <kbd>app/components.php</kbd> dosyasında servis sağlayıcısı olarak tanımlıdır. Url sınıfına ait servis parametreleri <kbd>app/$env/providers/url.php</kbd> dosyasından konfigüre edilir.
+Url sınıfı <kbd>app/providers.php</kbd> dosyasında servis sağlayıcısı olarak tanımlıdır. Url sınıfına ait servis parametreleri <kbd>app/$env/providers/url.php</kbd> dosyasından konfigüre edilir.
 
 ```php
 'params' => [
