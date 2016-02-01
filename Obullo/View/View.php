@@ -25,13 +25,6 @@ class View implements ViewInterface
     protected $logger;
 
     /**
-     * Service parameters
-     * 
-     * @var array
-     */
-    protected $params = array();
-
-    /**
      * Stream
      * 
      * @var object
@@ -58,6 +51,13 @@ class View implements ViewInterface
      * @var array
      */
     protected $data = array();
+
+    /**
+     * Service parameters
+     * 
+     * @var array
+     */
+    protected $params = array();
 
     /**
      * View folders
@@ -99,19 +99,9 @@ class View implements ViewInterface
      *
      * @return boolean
      */
-    public function hasFolders()
-    {
-        return (empty($this->folders)) ? false : $this->getFolders();
-    }
-
-    /**
-     * Returns to folders
-     * 
-     * @return array
-     */
     public function getFolders()
     {
-        return $this->folders;
+        return (empty($this->folders)) ? false : $this->folders;
     }
 
     /**
@@ -231,11 +221,13 @@ class View implements ViewInterface
             $router = &Controller::$instance->router;  // Use nested controller router ( @see the Layer package. )
         }
         $path = $router->getModule('/') . $router->getDirectory();
-        $path = (empty($path)) ? 'views' : $path;  // Read view file from /modules/views/ folder
+
+        $folder = (empty($path)) ? MODULES .'views' : MODULES .$path .'/view';
+
         /**
          * End layer package support
          */
-        $body = $this->render($filename, MODULES .$path .'/view/', $data);
+        $body = $this->render($filename, $folder, $data);
 
         if ($include === false) {
             return $body;
@@ -262,7 +254,7 @@ class View implements ViewInterface
         $engine = new $engineClass($path);
         $engine->setContainer($this->container);
 
-        if ($folders = $this->hasFolders()) {
+        if ($folders = $this->getFolders()) {
             foreach ($folders as $name => $folder) {
                 $engine->addFolder($name, $folder);
             }

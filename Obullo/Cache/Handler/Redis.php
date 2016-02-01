@@ -5,7 +5,6 @@ namespace Obullo\Cache\Handler;
 use ReflectionClass;
 use RuntimeException;
 use Obullo\Cache\CacheInterface;
-use Obullo\Config\ConfigInterface;
 
 /**
  * Redis Caching Class
@@ -36,13 +35,13 @@ class Redis implements CacheInterface
     /**
      * Constructor
      * 
-     * @param object $config \Obullo\Config\ConfigInterface
      * @param object $redis  \Redis
+     * @param object $params Service parameters
      */
-    public function __construct(ConfigInterface $config, \Redis $redis)
+    public function __construct(\Redis $redis, array $params)
     {
-        $this->redis = $redis;
-        $this->config = $config->load('cache/redis');
+        $this->redis  = $redis;
+        $this->params = $params;
 
         if (! $this->connect()) {
             throw new RuntimeException(
@@ -76,10 +75,10 @@ class Redis implements CacheInterface
      */
     protected function openNodeConnections()
     {
-        if (empty($this->config['nodes'][0]['host']) || empty($this->config['nodes'][0]['port'])) {  // If we have no slave servers
+        if (empty($this->params['nodes'][0]['host']) || empty($this->params['nodes'][0]['port'])) {  // If we have no slave servers
             return;
         }
-        foreach ($this->config['nodes'] as $servers) {
+        foreach ($this->params['nodes'] as $servers) {
             if (empty($servers['host']) || empty($servers['port'])) {
                 throw new RuntimeException(
                     sprintf(

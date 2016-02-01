@@ -7,7 +7,6 @@ use Obullo\Captcha\AbstractProvider;
 use Obullo\Captcha\CaptchaInterface;
 
 use Obullo\Log\LoggerInterface as Logger;
-use Obullo\Container\ContainerInterface as Container;
 use Obullo\Translation\TranslatorInterface as Translator;
 use Psr\Http\Message\RequestInterface as Request;
 
@@ -86,21 +85,18 @@ class ReCaptcha extends AbstractProvider implements CaptchaInterface
 
     /**
      * Constructor
-     *
-     * @param object $container  \Obullo\Container\ContainerInterface
+     * 
      * @param object $request    \Psr\Http\Message\RequestInterface
      * @param object $translator \Obullo\Translation\TranslatorInterface
      * @param object $logger     \Obullo\Log\LoggerInterface
      * @param array  $params     service parameters
      */
     public function __construct(
-        Container $container,
         Request $request,
         Translator $translator,
         Logger $logger,
         array $params
     ) {
-        $this->c = $container;
         $this->params = $params;
         $this->request = $request;
         $this->translator = $translator;

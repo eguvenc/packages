@@ -3,8 +3,8 @@
 namespace Obullo\Session;
 
 use Obullo\Log\LoggerInterface as Logger;
-use Obullo\Container\ServiceProviderInterface as Provider;
-
+use Obullo\Config\ConfigInterface as Config;
+use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
 use Psr\Http\Message\RequestInterface as Request;
 
 /**
@@ -46,13 +46,15 @@ class Session implements SessionInterface
     /**
      * Constructor
      * 
+     * @param object $config   config
      * @param object $provider \Obullo\Service\ServiceProviderInterface
      * @param object $request  \Psr\Http\Message\RequestInterface
      * @param object $logger   \Obullo\Log\LoggerInterface
      * @param array  $params   service parameters
      */
-    public function __construct(Provider $provider, Request $request, Logger $logger, array $params) 
+    public function __construct(Config $config, ServiceProvider $provider, Request $request, Logger $logger, array $params) 
     {
+        $this->config = $config;
         $this->params = $params;
         $this->provider = $provider;
 
@@ -93,6 +95,7 @@ class Session implements SessionInterface
     public function registerSaveHandler($handler)
     {
         $this->saveHandler = new $handler($this->provider, $this->params);
+
         session_set_save_handler(
             array($this->saveHandler, 'open'),
             array($this->saveHandler, 'close'),
@@ -170,6 +173,7 @@ class Session implements SessionInterface
     public function readSession()
     {
         $name = $this->getName();
+        
         $cookie = (isset($this->cookie[$name])) ? $this->cookie[$name] : false;
         if ($cookie === false) {
             return false;
@@ -326,7 +330,7 @@ class Session implements SessionInterface
     public function getTime()
     {
         $time = time();
-        if (strtolower($this->params['locale']['timezone']) == 'gmt') {
+        if (strtolower($this->config['locale']['timezone']) == 'gmt') {
             $now = time();
             $time = mktime(gmdate("H", $now), gmdate("i", $now), gmdate("s", $now), gmdate("m", $now), gmdate("d", $now), gmdate("Y", $now));
         }
@@ -344,6 +348,16 @@ class Session implements SessionInterface
     }
 
     /**
+     * Returns to service parameters
+     * 
+     * @return array
+     */
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+    /**
      * Remember me
      * 
      * @param integer $lifetime         default 3600
@@ -353,7 +367,7 @@ class Session implements SessionInterface
      */
     public function rememberMe($lifetime = null, $deleteOldSession = true)
     {
-        $reminder = new Remminder;
+        $reminder = new Remminder($this);
         $reminder->rememberMe($lifetime, $deleteOldSession);
     }
 
@@ -364,7 +378,7 @@ class Session implements SessionInterface
      */
     public function forgetMe()
     {
-        $reminder = new Remminder;
+        $reminder = new Remminder($this);
         $reminder->forgetMe();
     }
 

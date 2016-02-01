@@ -2,7 +2,7 @@
 
 namespace Obullo\Session\SaveHandler;
 
-use Obullo\Container\ServiceProviderInterface as Provider;
+use Obullo\Container\ServiceProviderInterface as ServiceProvider;
 
 /**
  * Cache Save Handler
@@ -27,13 +27,6 @@ class Cache implements SaveHandlerInterface
     protected $storage;
 
     /**
-     * Service provider
-     * 
-     * @var object
-     */
-    protected $provider;
-
-    /**
      * Redis key name
      * 
      * @var string
@@ -50,10 +43,10 @@ class Cache implements SaveHandlerInterface
     /**
      * Constructor
      *
-     * @param object $provider \Obullo\Service\ServiceProviderInterface
+     * @param object $provider provider
      * @param array  $params   service parameters
      */
-    public function __construct(Provider $provider, array $params)
+    public function __construct(ServiceProvider $provider, array $params)
     {
         $this->params = $params;
         $this->provider = $provider;
@@ -73,10 +66,9 @@ class Cache implements SaveHandlerInterface
     {
         $savePath = null;
         $sessionName = null;
-        $this->storage = $this->provider->get(
+        $this->storage = $this->provider->shared(
             [
-                'driver' => $this->params['provider']['params']['driver'],
-                'connection' => $this->params['provider']['params']['connection']
+                'connection' => $this->params['provider']['connection']
             ]
         );
         return is_object($this->storage) ? true : false;

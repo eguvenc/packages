@@ -4,7 +4,6 @@ namespace Obullo\Cache\Handler;
 
 use RuntimeException;
 use Obullo\Cache\CacheInterface;
-use Obullo\Config\ConfigInterface;
 
 /**
  * File Caching Class
@@ -21,21 +20,30 @@ class File implements CacheInterface
      * 
      * @var string
      */
-    public $filePath;
+    public $filePath = '/tmp/';
 
     /**
      * Constructor
-     * 
-     * @param object $config \Obullo\Config\ConfigInterface
+     *
+     * @param string $path resource path
      */
-    public function __construct(ConfigInterface $config)
+    public function __construct($path = '/resources/data/cache/')
     {
-        $this->filePath = $config->load('cache/file')['path'];
-        $filePath = ltrim($this->filePath, '/');
+        $this->filePath = ltrim($path, '/');
 
-        if (strpos($filePath, 'resources') === 0) {
-            $this->filePath = ROOT. $filePath . '/';
+        if (strpos($this->filePath, 'resources') === 0) {
+            $this->filePath = ROOT. $this->filePath . '/';
         }
+        $this->connect();
+    }
+
+    /**
+     * Connect to file.
+     * 
+     * @return void
+     */
+    public function connect()
+    {
         if (! is_writable($this->filePath)) {
             throw new RuntimeException(
                 sprintf(
@@ -217,7 +225,7 @@ class File implements CacheInterface
      */
     public function getAllKeys()
     {
-        $dh  = opendir($this->filePath);
+        $dh = opendir($this->filePath);
         while (false !== ($fileName = readdir($dh))) {
             if (substr($fileName, 0, 1) !== '.') {
                 $files[] = $fileName;
@@ -233,7 +241,7 @@ class File implements CacheInterface
      */
     public function getAllData()
     {
-        $dh  = opendir($this->filePath);
+        $dh = opendir($this->filePath);
         while (false !== ($fileName = readdir($dh))) {
             if (substr($fileName, 0, 1) !== '.') {
                 $temp = file_get_contents($this->filePath . $fileName);
@@ -299,16 +307,6 @@ class File implements CacheInterface
             );
         }
         return false;
-    }
-
-    /**
-     * Connect to file.
-     * 
-     * @return void
-     */
-    public function connect()
-    {
-        return;
     }
 
     /**

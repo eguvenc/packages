@@ -11,6 +11,23 @@ namespace Obullo\View;
 interface ViewInterface
 {
     /**
+     * Register view folder
+     * 
+     * @param string $name folder name
+     * @param string $path folder path
+     *
+     * @return void
+     */
+    public function addFolder($name, $path = null);
+
+    /**
+     * Check folders & returns to array if yes.
+     *
+     * @return boolean
+     */
+    public function getFolders();
+
+    /**
      * Include nested view files from current module /view folder
      * 
      * @param string $filename filename

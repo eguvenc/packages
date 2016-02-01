@@ -11,7 +11,7 @@ use Obullo\Log\LoggerInterface as Logger;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Url
+class Url implements UrlInterface
 {
     /**
      * Url

@@ -10,8 +10,8 @@ use Obullo\Captcha\CaptchaInterface;
 use Obullo\Url\UrlInterface as Url;
 use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Session\SessionInterface as Session;
-use Obullo\Container\ContainerInterface as Container;
 use Obullo\Translation\TranslatorInterface as Translator;
+
 use Psr\Http\Message\UriInterface as Uri;
 use Psr\Http\Message\RequestInterface as Request;
 
@@ -23,7 +23,6 @@ use Psr\Http\Message\RequestInterface as Request;
  */
 class Image extends AbstractProvider implements CaptchaInterface
 {
-    protected $c;
     protected $url;
     protected $request;
     protected $params = array();
@@ -54,8 +53,7 @@ class Image extends AbstractProvider implements CaptchaInterface
 
     /**
      * Constructor
-     *
-     * @param object $container  \Obullo\Container\ContainerInterface
+     * 
      * @param object $url        \Obullo\Url\UrlInterface
      * @param object $request    \Psr\Http\Message\RequestInterface
      * @param object $session    \Obullo\Session\SessionInterface
@@ -64,7 +62,6 @@ class Image extends AbstractProvider implements CaptchaInterface
      * @param array  $params     service parameters
      */
     public function __construct(
-        Container $container,
         Url $url,
         Request $request,
         Session $session,
@@ -72,7 +69,6 @@ class Image extends AbstractProvider implements CaptchaInterface
         Logger $logger,
         array $params
     ) {
-        $this->c = $container;
         $this->url = $url;
         $this->request = $request;
         $this->params = $params;
@@ -86,22 +82,6 @@ class Image extends AbstractProvider implements CaptchaInterface
     }
 
     /**
-     * Set captcha parameters
-     * 
-     * @param array $params parameters
-     *
-     * @return $this
-     */
-    public function setParameters($params = array())
-    {
-        if (count($params) > 0) {
-            foreach ($params as $method => $arg) {
-                $this->{$method}($arg);
-            }
-        }
-    }
-
-    /**
      * Initialize
      * 
      * @return void
@@ -109,10 +89,8 @@ class Image extends AbstractProvider implements CaptchaInterface
     public function init()
     {
         $this->buildHtml();
-        $this->fonts = array_keys($this->params['fonts']);
-        $this->imageUrl = $this->url->siteUrl($this->params['form']['img']['attributes']['src']); // add Directory Seperator ( / )
-        $this->paramsFontPath  = ROOT . $this->params['font']['path'] . '/';
-        $this->defaultFontPath = OBULLO . 'Captcha/Fonts/';
+        $this->imageUrl = $this->url->getBaseUrl($this->params['form']['img']['attributes']['src']); // add Directory Seperator ( / )
+        $this->defaultFontPath = RESOURCES .'fonts/';
     }
 
     /**
@@ -297,23 +275,11 @@ class Image extends AbstractProvider implements CaptchaInterface
             $str  = str_replace('.ttf', '', $font); // Remove the .ttf extension.
             $font = array($str => $str);
         }
-        $this->fonts = $font;
-        return $this;
-    }
+        $this->fonts = array_keys($font);
 
-    /**
-     * Exclude font you don't want
-     * 
-     * @param mixed $font font
-     * 
-     * @return object
-     */
-    public function excludeFont($font)
-    {
-        if (! is_array($font)) {
-            $font = array($font);
-        }
-        $this->setFont(array_diff($this->getFonts(), $font));
+        // var_dump($this->fonts);
+
+        // die;
         return $this;
     }
 
@@ -327,7 +293,6 @@ class Image extends AbstractProvider implements CaptchaInterface
     public function appendFont($font)
     {
         $this->fonts[] = str_replace('.ttf', '', $font); // Remove the .ttf extension.
-
         return $this;
     }
 
@@ -434,12 +399,13 @@ class Image extends AbstractProvider implements CaptchaInterface
     {
         $code  = '';
         $defaultPool = $this->params['characters']['default']['pool'];
-        $possible = $this->params['characters']['pools'][$defaultPool];
+        $possible    = $this->params['characters']['pools'][$defaultPool];
+        $charset     = strtoupper($this->params['locale']['charset']);
 
         for ($i = 0; $i < $this->params['characters']['length']; $i++) {
             $code .= mb_substr(
                 $possible,
-                mt_rand(0, mb_strlen($possible, $this->params['locale']['charset']) - 1), 1, $this->params['locale']['charset']
+                mt_rand(0, mb_strlen($possible, $charset) - 1), 1, $charset
             );
         }
         $this->setCode($code);
@@ -456,6 +422,7 @@ class Image extends AbstractProvider implements CaptchaInterface
         $this->generateCode();  // generate captcha code
         $this->imageCreate();
         $this->filledEllipse();
+
         if ($this->params['image']['wave']) {
             $this->waveImage();
         }
@@ -534,16 +501,15 @@ class Image extends AbstractProvider implements CaptchaInterface
     protected function filledEllipse()
     {
         $fonts = $this->getFonts();
+        
         if (sizeof($fonts) == 0) {
             throw new RuntimeException('Image CAPTCHA requires fonts.');
         }
         $randFont = array_rand($fonts);
-        $fontPath = $this->defaultFontPath . $this->params['fonts'][$fonts[$randFont]];
+        $fontPath = $this->defaultFontPath . $fonts[$randFont].'.ttf';
 
-        if (strpos($fonts[$randFont], '.ttf')) {
-            $fontPath = $this->paramsFontPath . $this->params['fonts'][$fonts[$randFont]];
-        }
         if ($this->params['mod'] != 'cool') {
+
             $wHvalue = $this->width / $this->params['image']['height'];
             $wHvalue = $this->params['image']['height'] * $wHvalue;
             for ($i = 0; $i < $wHvalue; $i++) {
@@ -561,7 +527,9 @@ class Image extends AbstractProvider implements CaptchaInterface
         $x = ($this->width - $textbox[4]) / 2;
         $y = ($this->params['image']['height'] - $textbox[5]) / 2;
 
-        $this->setImageId(md5($this->session->get('session_id') . uniqid(time())));  // Generate an unique image id using the session id, an unique id and time.
+        $imageId = md5($this->session->get('session_id') . uniqid(time()));
+
+        $this->setImageId($imageId);  // Generate an unique image id using the session id, an unique id and time.
         imagettftext($this->image, $this->params['font']['size'], 0, $x, $y, $this->textColor, $fontPath, $this->getCode()) or die('Error in imagettftext function');
     }
 

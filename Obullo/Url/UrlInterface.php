@@ -105,13 +105,6 @@ interface UrlInterface
     public function getBaseUrl($uri = '');
 
     /**
-     * Get current url
-     *
-     * @return string
-     */
-    public function getCurrentUrl();
-
-    /**
      * Prep URL
      *
      * Simply adds the http:// part if missing

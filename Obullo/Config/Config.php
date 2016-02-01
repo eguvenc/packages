@@ -81,6 +81,7 @@ class Config implements ConfigInterface
      */
     public function load($filename)
     {
+        $filename = str_replace('::', '/', $filename);  // Folder support e.g. cache::redis 
         $container = $this->container; //  Make available $container variable in config files.
 
         if (isset($this->array[$filename])) {   // Is file loaded before ?
