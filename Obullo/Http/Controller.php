@@ -34,7 +34,7 @@ class Controller implements ImmutableControllerInterface
         if (self::$instance == null || in_array($key, ['request', 'router', 'view'])) {  // Create new layer for each core classes ( Otherwise Layer does not work )
             self::$instance = &$this;
         }
-        return $this->container->get($key);
+        return $this->getContainer()->get($key);
     }
 
     /**

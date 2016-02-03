@@ -5,14 +5,14 @@ namespace Obullo\Application;
 use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
-use Obullo\Http\Controller\ControllerAwareInterface;
 use Obullo\Container\ParamsAwareInterface;
 use League\Container\ContainerAwareInterface;
 use League\Container\ImmutableContainerAwareInterface;
+use Obullo\Http\Controller\ControllerAwareInterface;
 
 use ReflectionClass;
 use Obullo\Router\RouterInterface as Router;
-use Obullo\Application\MiddlewareStackInterface as MiddlewareStack;
+use Obullo\Application\MiddlewareStackInterface as Middleware;
 
 /**
  * Http Application
@@ -56,7 +56,7 @@ class Http extends Application
      * 
      * @return void
      */
-    protected function boot(Router $router, MiddlewareStack $middleware)
+    protected function boot(Router $router, Middleware $middleware)
     {
         $router->init();
 
@@ -96,7 +96,7 @@ class Http extends Application
      * 
      * @return void
      */
-    protected function bootMiddlewares(Router $router, MiddlewareStack $middleware)
+    protected function bootMiddlewares(Router $router, Middleware $middleware)
     {
         $request = $this->container->get('request');
 
@@ -132,7 +132,7 @@ class Http extends Application
      * 
      * @return void
      */
-    protected function inject(MiddlewareStack $middleware)
+    protected function inject(Middleware $middleware)
     {
         foreach ($middleware->getNames() as $name) {
 

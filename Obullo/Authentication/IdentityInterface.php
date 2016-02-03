@@ -1,10 +1,10 @@
 <?php
 
-namespace Obullo\Authentication\User;
+namespace Obullo\Authentication;
 
-use Psr\Http\Message\ServerRequestInterface as Request;
 use Obullo\Session\SessionInterface as Session;
-use Obullo\Container\ContainerInterface as Container;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Interop\Container\ContainerInterface as Container;
 use Obullo\Authentication\Storage\StorageInterface as Storage;
 
 /**
@@ -18,13 +18,13 @@ interface IdentityInterface
     /**
      * Constructor
      *
-     * @param object $c       container
-     * @param object $request psr7 request
-     * @param object $session storage
-     * @param object $storage auth storage
-     * @param object $params  auth config parameters
+     * @param object $container container
+     * @param object $request   psr7 request
+     * @param object $session   storage
+     * @param object $storage   auth storage
+     * @param object $params    auth config parameters
      */
-    public function __construct(Container $c, Request $request, Session $session, Storage $storage, array $params);
+    public function __construct(Container $container, Request $request, Session $session, Storage $storage, array $params);
 
     /**
      * Initializer
@@ -62,6 +62,16 @@ interface IdentityInterface
      * @return boolean
      */
     public function isTemporary();
+
+    /**
+     * Set expire time
+     * 
+     * @param int    $ttl   expire
+     * @param string $block __temporary or __permanent
+     * 
+     * @return void
+     */
+    public function expire($ttl, $block = '__permanent');
 
     /**
      * Move permanent identity to temporary block

@@ -12,9 +12,6 @@ use Obullo\Utils\Process\Exception\ProcessTimedOutException;
  * start independent PHP processes.
  *
  * This file is borrowed from Symfony process package 
- * 
- * @copyright 2009-2016 Obullo
- * @license   http://opensource.org/licenses/MIT MIT license
  */
 
 class Process

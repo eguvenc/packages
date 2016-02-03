@@ -3,7 +3,7 @@
 namespace Obullo\Authentication\Storage;
 
 use Obullo\Session\SessionInterface as Session;
-use Obullo\Container\ServiceProviderInterface as Provider;
+use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
 
 /**
  * Null Storage
@@ -20,11 +20,11 @@ class Null extends AbstractNull implements StorageInterface
     /**
      * Constructor
      * 
-     * @param object $session  session
      * @param object $provider provider
+     * @param object $session  session
      * @param array  $params   parameters
      */
-    public function __construct(Session $session, Provider $provider, array $params)
+    public function __construct(ServiceProvider $provider, Session $session, array $params)
     {
         $provider = $params = null;
         $this->cacheKey = (string)$params['cache.key'];

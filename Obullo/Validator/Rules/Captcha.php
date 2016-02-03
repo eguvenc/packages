@@ -3,9 +3,6 @@
 namespace Obullo\Validator\Rules;
 
 use Obullo\Validator\FieldInterface as Field;
-use Obullo\Captcha\CaptchaInterface;
-use Psr\Http\Message\ServerRequestInterface as Request;
-
 use League\Container\ImmutableContainerAwareTrait;
 use League\Container\ImmutableContainerAwareInterface;
 
@@ -20,26 +17,26 @@ class Captcha implements ImmutableContainerAwareInterface
     use ImmutableContainerAwareTrait;
 
     /**
-     * Check captcha
+     * Call next
      * 
-     * @param string $value string
+     * @param Field    $field object
+     * @param Callable $next  object
      * 
-     * @return bool
-     */    
-    public function isValid($value)
-    {   
-        $field     = $this->getField();
+     * @return object
+     */
+    public function __invoke(Field $field, Callable $next)
+    {
         $container = $this->getContainer();
 
         if ($container->get('request')->isPost()) {
 
-            if (false == $container->get('captcha')->result($value)->isValid()) {
-                
+            if (false == $container->get('captcha')->result($field->getValue())->isValid()) {
                 $field->setError('OBULLO:VALIDATOR:CAPTCHA:VALIDATION');
                 return false;
             }
-            return true;
+            return $next($field);
         }
         return false;
     }
+
 }

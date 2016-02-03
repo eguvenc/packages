@@ -4,8 +4,6 @@ namespace Obullo\Cache\Handler;
 
 use RuntimeException;
 use Obullo\Cache\CacheInterface;
-use Obullo\Config\ConfigInterface;
-use Obullo\Container\ContainerInterface;
 
 /**
  * Memcache Caching Class
@@ -16,11 +14,11 @@ use Obullo\Container\ContainerInterface;
 class Memcache implements CacheInterface
 {
     /**
-     * Container
+     * Service parameters
      * 
-     * @var object
+     * @var array
      */
-    protected $c;
+    protected $params;
 
     /**
      * Memcache object
@@ -28,7 +26,7 @@ class Memcache implements CacheInterface
      * @var object
      */
     protected $memcache;
-
+    
     /**
      * Default memcache connection
      * 
@@ -39,15 +37,15 @@ class Memcache implements CacheInterface
     /**
      * Constructor
      * 
-     * @param object $config   \Obullo\Config\ConfigInterface
      * @param object $memcache \Memcache
+     * @param array  $params   service params
      */
-    public function __construct(ConfigInterface $config, \Memcache $memcache)
+    public function __construct(\Memcache $memcache, array $params)
     {
         $this->memcache = $memcache;
-        $this->config = $config->load('cache/memcache');
+        $this->params   = $params;
 
-        $this->defaultConnection = $this->config['connections'][key($this->config['connections'])];
+        $this->defaultConnection = $this->params['connections'][key($this->params['connections'])];
         $this->connect();
     }
 
@@ -69,14 +67,14 @@ class Memcache implements CacheInterface
      */
     protected function openNodeConnections()
     {
-        if (! empty($this->config['nodes'][0]['host']) && ! empty($this->config['nodes'][0]['port'])) {
-            array_unshift($this->config['nodes'], $this->defaultConnection);  // Add default connection to nodes
+        if (! empty($this->params['nodes'][0]['host']) && ! empty($this->params['nodes'][0]['port'])) {
+            array_unshift($this->params['nodes'], $this->defaultConnection);  // Add default connection to nodes
         } else {
             return;  // If there is no node.
         }
         $default = $this->defaultConnection['options'];
 
-        foreach ($this->config['nodes'] as $servers) {
+        foreach ($this->params['nodes'] as $servers) {
             if (empty($servers['host']) || empty($servers['port'])) {
                 throw new RuntimeException(
                     sprintf(

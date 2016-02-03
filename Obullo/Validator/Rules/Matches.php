@@ -26,10 +26,7 @@ class Matches implements ImmutableContainerAwareInterface
      */
     public function __invoke(Field $field, Callable $next)
     {
-        $matchField = '';
-        if ($params = $field->getParams()) {
-            $matchField = $params[0];
-        }
+        $matchField = $field->getRule()->getParam(0, '');
         $container  = $this->getContainer();
 
         if ($matchValue = $container->get('request')->post($matchField)) {

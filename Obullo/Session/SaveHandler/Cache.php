@@ -2,7 +2,7 @@
 
 namespace Obullo\Session\SaveHandler;
 
-use Obullo\Container\ServiceProviderInterface as ServiceProvider;
+use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
 
 /**
  * Cache Save Handler
@@ -55,7 +55,7 @@ class Cache implements SaveHandlerInterface
     }
 
     /**
-    * Php5 session handler interface open function
+    * Php5 session handler : open storage connection
     * 
     * @param string $savePath    save path 
     * @param string $sessionName session name
@@ -64,8 +64,7 @@ class Cache implements SaveHandlerInterface
     */
     public function open($savePath, $sessionName)
     {
-        $savePath = null;
-        $sessionName = null;
+        $savePath = $sessionName = null;
         $this->storage = $this->provider->shared(
             [
                 'connection' => $this->params['provider']['connection']

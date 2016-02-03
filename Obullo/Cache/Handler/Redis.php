@@ -22,6 +22,13 @@ class Redis implements CacheInterface
     protected $redis;
 
     /**
+     * Service parameters
+     * 
+     * @var array
+     */
+    protected $params;
+
+    /**
      * Available serializers
      * 
      * @var array

@@ -199,6 +199,7 @@ class Logger extends AbstractLogger implements LoggerInterface
         }
         $end = end($this->track);
         $handler = $end['name'];
+
         $this->filters[$handler][] = array('class' => $this->filterNames[$name], 'method' => $method, 'params' => $params);
         return $this;
     }

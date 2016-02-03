@@ -99,6 +99,7 @@ class Form
         $this->messages['messages'][] = (string)$message;
         $this->messages['success'] = static::ERROR;
         $this->messages['code'] = 0;
+        $this->setErrors();
     }
 
     /**

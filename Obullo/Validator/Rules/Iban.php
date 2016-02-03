@@ -2,15 +2,16 @@
 
 namespace Obullo\Validator\Rules;
 
-use InvalidArgumentException;
 use Obullo\Utils\ArrayUtils;
+use InvalidArgumentException;
+use Obullo\Validator\FieldInterface as Field;
 
 /**
  * Validates IBAN Numbers (International Bank Account Numbers)
  *
  * Borrowed from Zend.
  */
-class Iban extends AbstractRule
+class Iban
 {
     const NOTSUPPORTED     = 'OBULLO:VALIDATOR:IBAN:NOTSUPPORTED';
     const SEPANOTSUPPORTED = 'OBULLO:VALIDATOR:IBAN:SEPANOTSUPPORTED';
@@ -115,6 +116,79 @@ class Iban extends AbstractRule
     );
 
     /**
+     * Call next
+     * 
+     * @param Field    $field object
+     * @param Callable $next  object
+     * 
+     * @return object
+     */
+    public function __invoke(Field $field, Callable $next)
+    {
+        $value  = $field->getValue();
+
+        $countryCode  = $field->getRule()->getParam(0, '');
+        $allowNonSepa = $field->getRule()->getParam(1, true);
+
+        if (empty($countryCode)) {
+            $field->setError(self::NOTSUPPORTED);
+            return false;
+        }
+        $countryCode = strtoupper($countryCode);
+        $this->setCountryCode($countryCode);
+        $this->setAllowNonSepa($allowNonSepa);
+
+        if (! is_string($value)) {
+            $field->setError(self::FALSEFORMAT);
+            return false;
+        }
+        $value = str_replace(' ', '', strtoupper($value));
+        $field->setValue($value);
+
+        $countryCode = $this->getCountryCode();
+
+        if ($countryCode === null) {
+            $countryCode = substr($value, 0, 2);
+        }
+        if (! array_key_exists($countryCode, static::$ibanRegex)) {
+            $field->setValue($countryCode);
+            $field->setError(self::NOTSUPPORTED);
+            return false;
+        }
+        if (! $this->allowNonSepa && ! in_array($countryCode, static::$sepaCountries)) {
+            $field->setValue($countryCode);
+            $field->setError(self::SEPANOTSUPPORTED);
+            return false;
+        }
+
+        if (! preg_match('/^' . static::$ibanRegex[$countryCode] . '$/', $value)) {
+            $field->setError(self::FALSEFORMAT);
+            return false;
+        }
+        $format = substr($value, 4) . substr($value, 0, 4);
+        $format = str_replace(
+            array('A',  'B',  'C',  'D',  'E',  'F',  'G',  'H',  'I',  'J',  'K',  'L',  'M',
+                  'N',  'O',  'P',  'Q',  'R',  'S',  'T',  'U',  'V',  'W',  'X',  'Y',  'Z'),
+            array('10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22',
+                  '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35'),
+            $format
+        );
+        $temp = intval(substr($format, 0, 1));
+        $len  = strlen($format);
+
+        for ($x = 1; $x < $len; ++$x) {
+            $temp *= 10;
+            $temp += intval(substr($format, $x, 1));
+            $temp %= 97;
+        }
+        if ($temp != 1) {
+            $field->setError(self::CHECKFAILED);
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Returns the optional country code by ISO 3166-1
      *
      * @return string|null
@@ -168,86 +242,5 @@ class Iban extends AbstractRule
     {
         $this->allowNonSepa = (bool) $allowNonSepa;
         return $this;
-    }
-
-    /**
-     * Returns true if field $value is a valid IBAN
-     * 
-     * @return boolean
-     */
-    public function isValid()
-    {
-        $field  = $this->getField();
-        $value  = $field->getValue();
-        $params = $field->getParams();
-
-        $countryCode  = '';
-        $allowNonSepa = true;
-
-        if ($params) {
-            $countryCode = $params[0];
-        }
-        if (isset($params[1])) {
-            $allowNonSepa = (bool)$params[1];
-        }
-        if (empty($countryCode)) {
-            $field->setError(self::NOTSUPPORTED);
-            return false;
-        }
-        $countryCode = strtoupper($countryCode);
-
-        $this->setCountryCode($countryCode);
-        $this->setAllowNonSepa($allowNonSepa);
-
-        if (! is_string($value)) {
-            $field->setError(self::FALSEFORMAT);
-            return false;
-        }
-        $value = str_replace(' ', '', strtoupper($value));
-        $field->setValue($value);
-
-        $countryCode = $this->getCountryCode();
-
-        if ($countryCode === null) {
-            $countryCode = substr($value, 0, 2);
-        }
-        if (! array_key_exists($countryCode, static::$ibanRegex)) {
-            $field->setValue($countryCode);
-            $field->setError(self::NOTSUPPORTED);
-            return false;
-        }
-        if (! $this->allowNonSepa && ! in_array($countryCode, static::$sepaCountries)) {
-            $field->setValue($countryCode);
-            $field->setError(self::SEPANOTSUPPORTED);
-            return false;
-        }
-
-        if (! preg_match('/^' . static::$ibanRegex[$countryCode] . '$/', $value)) {
-            $field->setError(self::FALSEFORMAT);
-            return false;
-        }
-        $format = substr($value, 4) . substr($value, 0, 4);
-        $format = str_replace(
-            array('A',  'B',  'C',  'D',  'E',  'F',  'G',  'H',  'I',  'J',  'K',  'L',  'M',
-                  'N',  'O',  'P',  'Q',  'R',  'S',  'T',  'U',  'V',  'W',  'X',  'Y',  'Z'),
-            array('10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22',
-                  '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35'),
-            $format
-        );
-
-        $temp = intval(substr($format, 0, 1));
-        $len  = strlen($format);
-
-        for ($x = 1; $x < $len; ++$x) {
-            $temp *= 10;
-            $temp += intval(substr($format, $x, 1));
-            $temp %= 97;
-        }
-
-        if ($temp != 1) {
-            $field->setError(self::CHECKFAILED);
-            return false;
-        }
-        return true;
     }
 }

@@ -4,7 +4,6 @@ namespace Obullo\Cache\Handler;
 
 use RuntimeException;
 use Obullo\Cache\CacheInterface;
-use Obullo\Config\ConfigInterface;
 
 /**
  * Apc Caching Class
@@ -18,12 +17,9 @@ class Apc implements CacheInterface
 
     /**
      * Constructor
-     * 
-     * @param object $config \Obullo\Config\ConfigInterface
      */
-    public function __construct(ConfigInterface $config)
+    public function __construct()
     {
-        $config = null;
         if (! extension_loaded('apc') || ini_get('apc.enabled') != '1') {
             throw new RuntimeException(
                 sprintf(

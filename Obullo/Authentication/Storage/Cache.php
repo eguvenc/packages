@@ -3,7 +3,7 @@
 namespace Obullo\Authentication\Storage;
 
 use Obullo\Session\SessionInterface as Session;
-use Obullo\Container\ServiceProviderInterface as Provider;
+use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
 
 /**
  * Cache Storage
@@ -21,11 +21,11 @@ class Cache extends AbstractStorage implements StorageInterface
     /**
      * Constructor
      * 
-     * @param object $session  session
      * @param object $provider provider
+     * @param object $session  session
      * @param array  $params   parameters
      */
-    public function __construct(Session $session, Provider $provider, array $params) 
+    public function __construct(ServiceProvider $provider, Session $session, array $params) 
     {
         $this->params = $params;
         $this->cacheKey = (string)$params['cache.key'];
@@ -43,10 +43,10 @@ class Cache extends AbstractStorage implements StorageInterface
      */
     public function connect($provider)
     {
-        $this->cache = $provider->get(
+        $this->cache = $provider->shared(
             [
-                'driver' => $this->params['cache']['provider']['params']['driver'],
-                'connection' => $this->params['cache']['provider']['params']['connection']
+                'driver' => $this->params['cache']['provider']['driver'],
+                'connection' => $this->params['cache']['provider']['connection']
             ]
         );
         return true;

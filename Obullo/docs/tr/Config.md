@@ -42,7 +42,7 @@ Konfigürasyon sınıfı uygulamaya çalışmaya başladığında yüklenir ve h
 #### Metotlara Erişim
 
 ```php
-$this->c['config']->method();
+$this->config->method();
 ```
 
 <a name="loading-config-files"></a>
@@ -52,19 +52,26 @@ $this->c['config']->method();
 Bir konfigürasyon dosyası config sınıfı içerisindeki <kbd>load()</kbd> metodu ile yüklenir.
 
 ```php
-$this->c['config']->load('database');
+$this->config->load('database');
 ```
 
 Yukarıda verilen örnekte çevre ortamını "local" ayarlandığını varsayarsak <kbd>database.php</kbd> dosyası <kbd>config/env/local/</kbd> klasöründen çağrılır. Bir konfigürasyon dosyası bir kez yüklendiğinde ona config sınıfı ile her yerden ulaşabilmek mümkündür.
 
 ```php
-echo $this->c['config']['database']['connections']['db']['host'];  // Çıktı localhost
+echo $this->config['database']['connections']['db']['host'];  // Çıktı localhost
 ```
 
 Bununla beraber config sınıfı içerisindeki load metodu yüklenen dosyanın konfigürasyonuna geri döner.
 
 ```php
-echo $this->c['config']->load('database')['connections']['db']['host'];   // Çıktı localhost
+echo $this->config->load('database')['connections']['db']['host'];   // Çıktı localhost
+```
+
+
+#### Klasörler
+
+```php
+$this->config->load('providers::redis');
 ```
 
 <a name="accessing-config-variables"></a>
@@ -74,7 +81,7 @@ echo $this->c['config']->load('database')['connections']['db']['host'];   // Ç�
 Bir konfigürasyon dizisine erişim dizi erişimi ( Array Access ) yöntemi ile gerçekleşir. Bu yöntem konfigürasyon sekmelerine aşağıdaki biçiminde erişmemizi sağlayarak konfigürasyonlara erişimi kolaylaştırır. Array Access yöntemi ile ilgili daha fazla bilgiye Php dökümentasyonu <a href="http://php.net/manual/tr/class.arrayaccess.php" target="_blank">http://php.net/manual/tr/class.arrayaccess.php</a> sayfasından ulaşabilirsiniz.
 
 ```php
-$this->c['config']['item']['subitem'];
+$this->config['item']['subitem'];
 ```
 <a name="writing-config-files"></a>
 
@@ -83,10 +90,10 @@ $this->c['config']['item']['subitem'];
 Config sınıfı içerisindeki write metodu <kbd>config/env.$env/</kbd> klasörü içerisindeki config dosyalarınıza yeni konfigürasyon verileri kaydetmenizi sağlar. Takip eden örnekte <kbd>config/env/local/domain.php</kbd> domain konfigürasyon dosyasındaki <b>maintenance</b> değerini güncelliyoruz.
 
 ```php
-$newArray = $this->c['config']['domain'];
+$newArray = $this->config['domain'];
 $newArray['root']['maintenance'] = 'down';  // Yeni değerleri atayalım
 
-$this->c['config']->write('domain.php', $newArray);
+$this->config->write('domain.php', $newArray);
 ```
 
 Şimdi domain.php dosyanız aşağıdaki gibi güncellenmiş olmalı.
@@ -114,10 +121,10 @@ return array(
 Yukarıdaki örnek <kbd>config/env.$env/</kbd> klasörü altındaki dosyalara yazma işlemi yapar. Eğer env klasörü dışında olan yani paylaşımlı bir konfigürasyon dosyasına yazma işlemi gerçekleştimek istiyorsak <b>"../"</b> dizinden çıkma karakteri kullanarak kaydetme işlemini gerçekleştirmemiz gerekir.
 
 ```php
-$newArray = $this->c['config']->load('agents');
+$newArray = $this->config->load('agents');
 $newArray['platforms']['pc']['test'] = 'Merhaba yeni platform';  // Yeni değerleri atayalım
 
-$this->c['config']->write('../agents.php', $newArray);
+$this->config->write('../agents.php', $newArray);
 ```
 
 Şimdi <kbd>.config/agents.php</kbd> dosyasına bir gözatın.
@@ -180,7 +187,7 @@ root@localhost: hostname   // localhost.ubuntu
 Uygulamanıza ait çevre ortamı aşağıdaki metola elde edilir.
 
 ```
-echo $this->c['app']->env();  // local
+echo $this->app->getEnv();  // local
 ```
 
 >**Not:** Local ortamda çalışırken her geliştiricinin kendine ait bilgisayar ismini <b>app/environments.php</b> dosyası <b>local</b> dizisi içerisine bir defalığına eklemesi gereklidir, prodüksiyon veya test gibi ortamlarda çalışmaya hazırlık için sunucu isimlerini yine bu konfigürasyon dosyasındaki prodüksiyon ve test dizileri altına tanımlamanız yeterli olacaktır. 
@@ -198,7 +205,7 @@ We could not detect your application environment, please correct your app/enviro
 Geçerli ortam değişkenine geri döner.
 
 ```php
-echo $c['app']->env();  // Çıktı  local
+echo $this->container->get('app')->getEnv();  // local  // Çıktı  local
 ```
 
 <a name="environment-variables"></a>
@@ -405,24 +412,3 @@ Yüklü olan bir konfigürasyona dinamik olarak yeni değerler atar.
 ##### $this->config->write(string $filename, array $data);
 
 <kbd>config/</kbd> klasöründeki konfigürasyon dosyalarına veri yazmayı sağlar.
-
-
-#### EnvVariable Sınıfı Referansı
-
-------
-
-##### $c['var']['x'];
-
-Bir konfigürasyon dosyası içerisinde çevre ortamına duyarlı bir değişkene ulaşmayı sağlar.
-
-##### $c['var']['x.default'];
-
-Bir konfigürasyon dosyası içerisinde çevre ortamına duyarlı bir değişkenin değeri yoksa varsayılan olarak girilen ("default") değerin atanmasını sağlar.
-
-##### $c['var']['x.null'];
-
-Bir konfigürasyon dosyası içerisinde çevre ortamına duyarlı bir değişkenin değeri yoksa varsayılan olarak <b>"null"</b> boş değeri atanmasını sağlar.
-
-##### $c['var']['x.default.required']; yada $c['var']['x.required'];
-
-Bir konfigürasyon dosyası içerisinde çevre ortamına duyarlı bir değişkenin değeri yoksa uygulamanın durarak genel hata vermesini sağlar.

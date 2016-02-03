@@ -46,13 +46,13 @@ class Session implements SessionInterface
     /**
      * Constructor
      * 
-     * @param object $config   config
      * @param object $provider \Obullo\Service\ServiceProviderInterface
+     * @param object $config   config
      * @param object $request  \Psr\Http\Message\RequestInterface
      * @param object $logger   \Obullo\Log\LoggerInterface
      * @param array  $params   service parameters
      */
-    public function __construct(Config $config, ServiceProvider $provider, Request $request, Logger $logger, array $params) 
+    public function __construct(ServiceProvider $provider, Config $config, Request $request, Logger $logger, array $params) 
     {
         $this->config = $config;
         $this->params = $params;
@@ -67,20 +67,6 @@ class Session implements SessionInterface
         $this->logger->debug('Session Class Initialized');
 
         register_shutdown_function(array($this, 'close'));
-    }
-
-    /**
-     * Set service parameters using class methods
-     * 
-     * @param array $params service params
-     * 
-     * @return void
-     */
-    public function setParameters(array $params)
-    {
-        foreach ($params as $method => $arg) {
-            $this->{$method}($arg);
-        }
     }
 
     /**

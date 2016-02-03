@@ -47,7 +47,19 @@ abstract class AbstractServiceProvider extends LeagueAbstractServiceProvider imp
     }
 
     /**
-     * Returns to connection id
+     * Creates connection id using class name & key values
+     * 
+     * @param string $key string
+     * 
+     * @return string
+     */
+    public function getConnectionKey($key)
+    {
+        return get_class($this).'_'.$key;
+    }
+
+    /**
+     * Creates "Unique" connection id using serialized parameters
      * 
      * @param string $string serialized parameters
      * 
@@ -56,7 +68,7 @@ abstract class AbstractServiceProvider extends LeagueAbstractServiceProvider imp
     public function getConnectionId($string)
     {
         $prefix = get_class($this);
-        $connid = $prefix.sprintf("%u", crc32(serialize($string)));
+        $connid = $prefix.'_'.sprintf("%u", crc32(serialize($string)));
         $this->connections[$prefix][] = $connid;
         return $connid;
     }
@@ -67,7 +79,8 @@ abstract class AbstractServiceProvider extends LeagueAbstractServiceProvider imp
      */
     public function getConnections()
     {
-        return $this->connections[$this->connPrefix];
+        $prefix = get_class($this);
+        return $this->connections[$prefix];
     }
 
 }

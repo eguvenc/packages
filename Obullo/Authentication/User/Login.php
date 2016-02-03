@@ -4,8 +4,7 @@ namespace Obullo\Authentication\User;
 
 use Auth\Identities\AuthorizedUser;
 use Obullo\Authentication\AuthResult;
-
-use Obullo\Container\ContainerInterface as Container;
+use Interop\Container\ContainerInterface as Container;
 use Obullo\Authentication\Storage\StorageInterface as Storage;
 
 use Event\LoginEvent;
@@ -24,7 +23,7 @@ class Login
      * 
      * @var object
      */
-    protected $c;
+    protected $container;
 
     /**
      * Constructor
@@ -35,8 +34,8 @@ class Login
      */
     public function __construct(Container $container, Storage $storage, array $params)
     {
-        $this->c = $container;
         $this->params = $params;
+        $this->container = $container;
         $this->storage = $storage;
     }
 
@@ -84,7 +83,7 @@ class Login
     {
         $name = $this->params['login']['rememberMe']['cookie']['name'];
 
-        $cookies = $this->getContainer()->get('request')->getCookieParams();
+        $cookies = $this->container->get('request')->getCookieParams();
 
         return isset($cookies[$name]) ? $cookies[$name] : false;
     }
@@ -98,7 +97,7 @@ class Login
     public function ignoreRecaller()
     {
         if ($this->hasRememberMe()) {
-            $this->getContainer()->get('session')->set('Auth/IgnoreRecaller', 1);
+            $this->container->get('session')->set('Auth/IgnoreRecaller', 1);
         }
     }
 
@@ -111,8 +110,8 @@ class Login
      */
     public function formatCredentials(array $credentials)
     {   
-        $i = $this->getContainer()->get('auth.params')['db.identifier'];
-        $p = $this->getContainer()->get('auth.params')['db.password'];
+        $i = $this->container->get('user.params')['db.identifier'];
+        $p = $this->container->get('user.params')['db.password'];
 
         if (isset($credentials[$i]) && isset($credentials[$p])) {
             
@@ -136,24 +135,22 @@ class Login
      */
     protected function createResults(array $credentials)
     {
-        $container = $this->getContainer();
-
         /**
          * Login Query
          * 
          * @var object
          */
-        $authResult = $container->get('auth.adapter')->login($credentials);
+        $authResult = $this->container->get('auth.adapter')->login($credentials);
 
         /**
          * Generate User Identity
          */
-        $this->containet->get('auth.identity')->initialize();
+        $this->container->get('auth.identity')->initialize();
 
         /**
          * Create event
          */
-        $event = new LoginEvent($container);
+        $event = new LoginEvent($this->container);
 
         /**
          * Event variables
@@ -188,7 +185,7 @@ class Login
     {        
         $credentials = $this->formatCredentials($credentials);
 
-        return $this->c['auth.adapter']->authenticate($credentials, false);
+        return $this->container->get('auth.adapter')->authenticate($credentials, false);
     }
 
     /**
@@ -203,7 +200,7 @@ class Login
      */
     public function validateCredentials(AuthorizedUser $user, array $credentials)
     {
-        $password = $this->c['auth.params']['db.password'];
+        $password = $this->container->get('user.params')['db.password'];
         $plain = $credentials[$password];
 
         return password_verify($plain, $user->getPassword());

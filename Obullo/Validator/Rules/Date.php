@@ -2,6 +2,7 @@
 
 namespace Obullo\Validator\Rules;
 
+use DateTime;
 use Obullo\Validator\FieldInterface as Field;
 
 /**
@@ -22,18 +23,18 @@ class Date
     public $format = 'Y-m-d';
 
     /**
-     * Date check
+     * Call next
      * 
-     * @param string $value string
+     * @param Field    $field object
+     * @param Callable $next  object
      * 
-     * @return bool
-     */    
-    public function isValid($value)
+     * @return objec
+     */
+    public function __invoke(Field $field, Callable $next)
     {
-        if ($params = $this->getField()->getParams()) {
-            $this->format = $params[0];
-        }
-        return (! $this->convertToDateTime($value)) ? false : true ;
+        $this->format = (string)$field->getRule()->getParam(0, 'Y-m-d');
+        
+        return (! $this->convertToDateTime($field->getValue())) ? false : $next($field);
     }
 
      /**
@@ -45,11 +46,11 @@ class Date
      */
     protected function convertToDateTime($value)
     {
-        if ($value instanceof \DateTime) {
+        if ($value instanceof DateTime) {
             return $value;
         }
         $type = gettype($value);
-        if (!in_array($type, array('string', 'integer'))) {
+        if (! in_array($type, array('string', 'integer'))) {
             return false;
         }
         $convertMethod = 'convert' . ucfirst($type);
@@ -77,11 +78,12 @@ class Date
      */
     protected function convertString($value)
     {
-        $date = \DateTime::createFromFormat($this->format, $value);
+        $date = DateTime::createFromFormat($this->format, $value);
 
         // Invalid dates can show up as warnings (ie. "2007-02-99")
         // and still return a DateTime object.
-        $errors = \DateTime::getLastErrors();
+        $errors = DateTime::getLastErrors();
+        
         if ($errors['warning_count'] > 0) {
             return false;
         }

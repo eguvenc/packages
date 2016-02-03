@@ -25,39 +25,37 @@ class Next implements ImmutableValidatorAwareInterface
      */
     public function __invoke(FieldInterface $field)
     {
-        $rule = $field->getNextRule();
+        $rule = $field->getRule();
+        $ruleName = $rule->getNext();
 
-        if (! empty($rule) && is_string($rule)) {
+        if (! empty($ruleName) && is_string($ruleName)) {
                               
-            $rule = strtolower($rule);
+            $ruleName = strtolower($ruleName);
 
-            if (strpos($rule, '(') > 0) {
-
-                $matches = RuleParameter::parse($rule);
-                $rule = $matches[0];
-                $field->setParams($matches[1]);
+            if (strpos($ruleName, '(') > 0) {
+                $ruleName = $rule->parse($ruleName);
             }
-            if (substr($rule, 0, 9) == 'callback_') {
+            if (substr($ruleName, 0, 9) == 'callback_') {
 
                 $callbacks = $this->getValidator()->getCallbacks(); // Is the rule has a callback?
 
-                if (! array_key_exists($rule, $callbacks)) {
+                if (! array_key_exists($ruleName, $callbacks)) {
 
                     $error = sprintf(
                         "%s rule is not defined as callback method.",
-                        $rule
+                        $ruleName
                     );
                     $field->setError($error);
                 }
-                $result = $this->callNextClosure($field, $rule, $callbacks);
+                $result = $this->callNextClosure($field, $ruleName, $callbacks);
 
             } else {
 
-                $result = $this->callNextClass($field, $rule);
+                $result = $this->callNextClass($field, $ruleName);
             }
 
             if (false === $result) {
-                $this->getValidator()->dispatchErrors($field, $rule);
+                $this->getValidator()->dispatchErrors($field, $ruleName);
             }
             return $result;
         }
@@ -67,27 +65,27 @@ class Next implements ImmutableValidatorAwareInterface
     /**
      * Run next class
      * 
-     * @param object $field field
-     * @param string $rule  rule
+     * @param object $field    field
+     * @param string $ruleName rule
      * 
      * @return mixed
      */
-    protected function callNextClass(FieldInterface $field, $rule)
+    protected function callNextClass(FieldInterface $field, $ruleName)
     {
-        $Rules = $this->getValidator()->getRules();
+        $ruleNames = $this->getValidator()->getRules();
 
-        if (! array_key_exists($rule, $Rules)) {  // If rule does not exist.
+        if (! array_key_exists($ruleName, $ruleNames)) {  // If rule does not exist.
 
             $error = sprintf(
                 "%s rule is not defined in configuration file.",
-                $rule
+                $ruleName
             );
             $field->setError($error);
             return false;
 
         } else {
 
-            $Class = "\\".trim($Rules[$rule], '\\');
+            $Class = "\\".trim($ruleNames[$ruleName], '\\');
             $nextRule = new $Class;
 
             if ($nextRule instanceof ImmutableContainerAwareInterface || $nextRule instanceof ContainerAwareInterface) {
@@ -101,17 +99,17 @@ class Next implements ImmutableValidatorAwareInterface
      * Run next callback
      * 
      * @param object $field     field
-     * @param string $rule      rule
+     * @param string $ruleName  rule
      * @param array  $callbacks callback stack
      * 
      * @return mixed
      */
-    protected function callNextClosure(FieldInterface $field, $rule, $callbacks)
+    protected function callNextClosure(FieldInterface $field, $ruleName, $callbacks)
     {
         $validator = $this->getValidator();
         
         $next = Closure::bind(
-            $callbacks[$rule],
+            $callbacks[$ruleName],
             $validator,
             get_class($validator)
         );

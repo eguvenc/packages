@@ -6,9 +6,10 @@ use Obullo\Authentication\Token;
 use Obullo\Authentication\Recaller;
 use Auth\Identities\AuthorizedUser;
 
-use Psr\Http\Message\ServerRequestInterface as Request;
+use Obullo\Authentication\IdentityInterface;
 use Obullo\Session\SessionInterface as Session;
-use Obullo\Container\ContainerInterface as Container;
+use Interop\Container\ContainerInterface as Container;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Obullo\Authentication\Storage\StorageInterface as Storage;
 
 /**
@@ -19,13 +20,6 @@ use Obullo\Authentication\Storage\StorageInterface as Storage;
  */
 class Identity extends AuthorizedUser implements IdentityInterface
 {
-    /**
-     * Container
-     * 
-     * @var object
-     */
-    protected $c;
-
     /**
      * Auth configuration params
      * 
@@ -55,6 +49,13 @@ class Identity extends AuthorizedUser implements IdentityInterface
     protected $request;
 
     /**
+     * Container
+     * 
+     * @var object
+     */
+    protected $container;
+
+    /**
      * Keeps unique session login ids to destroy them
      * in destruct method.
      * 
@@ -65,25 +66,25 @@ class Identity extends AuthorizedUser implements IdentityInterface
     /**
      * Constructor
      *
-     * @param object $c       container
-     * @param object $request psr7 request
-     * @param object $session storage
-     * @param object $storage auth storage
-     * @param object $params  auth config parameters
+     * @param object $container container
+     * @param object $request   psr7 request
+     * @param object $session   storage
+     * @param object $storage   auth storage
+     * @param object $params    auth config parameters
      */
-    public function __construct(Container $c, Request $request, Session $session, Storage $storage, array $params)
+    public function __construct(Container $container, Request $request, Session $session, Storage $storage, array $params)
     {
-        $this->c = $c;
         $this->params = $params;
         $this->request = $request;
         $this->session = $session;
         $this->storage = $storage;
+        $this->container = $container;
 
         $this->initialize();
 
         if ($rememberToken = $this->recallerExists()) {   // Remember the user if recaller cookie exists
 
-            $recaller = new Recaller($c, $storage, $c['auth.model'], $this, $params);
+            $recaller = new Recaller($container, $storage, $container->get('auth.model'), $this, $params);
             $recaller->recallUser($rememberToken);
 
             $this->initialize();  // We need initialize again otherwise ignoreRecaller() does not work in Login class.
@@ -169,6 +170,19 @@ class Identity extends AuthorizedUser implements IdentityInterface
     public function isTemporary()
     {
         return $this->__isTemporary;
+    }
+
+    /**
+     * Set expire time
+     * 
+     * @param int    $ttl   expire
+     * @param string $block __temporary or __permanent
+     * 
+     * @return void
+     */
+    public function expire($ttl, $block = '__permanent')
+    {
+        $this->storage->setCredentials($this->getCredentials($block), null, $block, $ttl);
     }
 
     /**
@@ -331,7 +345,7 @@ class Identity extends AuthorizedUser implements IdentityInterface
         if ($this->getRememberMe() == 1) {  // If user checked rememberMe option
 
             $rememberMeCookie = $this->params['login']['rememberMe']['cookie'];
-            $rememberToken    = $this->c['cookie']->get($rememberMeCookie['name'], $rememberMeCookie['prefix']);
+            $rememberToken    = $this->container->get('cookie')->get($rememberMeCookie['name'], $rememberMeCookie['prefix']);
 
             $credentials = [
                 $this->params['db.identifier'] => $this->getIdentifier(),
@@ -352,9 +366,9 @@ class Identity extends AuthorizedUser implements IdentityInterface
      */
     public function refreshRememberToken(array $credentials)
     {
-        $token = Token::getRememberToken($this->c['cookie'], $this->params);
+        $token = Token::getRememberToken($this->container->get('cookie'), $this->params);
 
-        return $this->c['auth.model']->updateRememberToken($token, $credentials); // refresh rememberToken
+        return $this->container->get('auth.model')->updateRememberToken($token, $credentials); // refresh rememberToken
     }
 
     /**
@@ -364,7 +378,7 @@ class Identity extends AuthorizedUser implements IdentityInterface
      */
     public function forgetMe()
     {
-        $this->c['cookie']->delete($this->params['login']['rememberMe']['cookie']);  // Delete rememberMe cookie if exists
+        $this->container->get('cookie')->delete($this->params['login']['rememberMe']['cookie']);  // Delete rememberMe cookie if exists
     }
 
     /**

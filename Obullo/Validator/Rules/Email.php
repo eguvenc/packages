@@ -22,11 +22,8 @@ class Email
      */
     public function __invoke(Field $field, Callable $next)
     {
-        $dnsCheck = false;
-        if ($params = $field->getParams()) {
-            $dnsCheck = (bool)$params[0];
-        }
-        $isValid = (filter_var($field->getValue(), FILTER_VALIDATE_EMAIL)) === false ? false : true;
+        $dnsCheck = (bool)$field->getRule()->getParam(0, false);
+        $isValid  = (filter_var($field->getValue(), FILTER_VALIDATE_EMAIL)) === false ? false : true;
 
         if ($isValid) {
 

@@ -360,7 +360,7 @@ class ServerRequest implements ServerRequestInterface
         $value = isset($get[$key]) ? $get[$key] : false;
         if (is_string($filter)) {
             $inputFilter = new InputFilter;
-            $inputFilter->setContainer($this->c);
+            $inputFilter->setContainer($this->container);
             return $inputFilter->setFilter($filter)->setValue($value);
         }
         return $value;
@@ -385,7 +385,7 @@ class ServerRequest implements ServerRequestInterface
 
         if (is_string($filter)) {
             $inputFilter = new InputFilter;
-            $inputFilter->setContainer($this->c);
+            $inputFilter->setContainer($this->container);
             return $inputFilter->setFilter($filter)->setValue($value);
         }
         return $value;
@@ -412,7 +412,7 @@ class ServerRequest implements ServerRequestInterface
 
         if (is_string($filter)) {
             $inputFilter = new InputFilter;
-            $inputFilter->setContainer($this->c);
+            $inputFilter->setContainer($this->container);
             return $inputFilter->setFilter($filter)->setValue($value);
         }
         return $value;

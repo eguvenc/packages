@@ -2,7 +2,6 @@
 
 namespace Obullo\Validator\Rules;
 
-use Obullo\Captcha\CaptchaInterface;
 use Obullo\Validator\FieldInterface as Field;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -22,31 +21,18 @@ class ReCaptcha implements ImmutableContainerAwareInterface
     /**
      * Call next
      * 
-     * @param Field $next object
+     * @param Field    $field object
+     * @param Callable $next  object
      * 
      * @return object
      */
-    public function __invoke(Field $next)
+    public function __invoke(Field $field, Callable $next)
     {
-        $field = $next;
-        if ($this->isValid($field)) {
-            return $next();
-        }
-        return false;
-    }
+        $container = $this->getContainer();
 
-    /**
-     * Check recaptcha
-     * 
-     * @param object $field field
-     * 
-     * @return bool
-     */    
-    public function isValid(Field $field)
-    {  
-        if ($this->getContainer()->get('request')->isPost()) {
+        if ($container->get('request')->isPost()) {
 
-            $value = $this->getContainer()
+            $value = $container
                 ->get('request')
                 ->post('g-recaptcha-response');
 
@@ -54,7 +40,7 @@ class ReCaptcha implements ImmutableContainerAwareInterface
                 $field->setError('OBULLO:VALIDATOR:CAPTCHA:VALIDATION');
                 return false;
             }
-            return true;
+            return $next($field);
         }
         return false;
     }

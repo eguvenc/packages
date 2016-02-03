@@ -2,30 +2,31 @@
 
 namespace Obullo\Validator\Rules;
 
+use Obullo\Validator\FieldInterface as Field;
+
 /**
  * Exact
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Exact extends AbstractRule
+class Exact
 {
     /**
-     * Exact length
+     * Call next
      * 
-     * @param string $value value
+     * @param Field    $field object
+     * @param Callable $next  object
      * 
-     * @return bool
-     */    
-    public function isValid($value)
-    {   
-        $length = '0';
-        if ($params = $this->getField()->getParams()) {
-            $length = (string)$params[0];
-        }
+     * @return object
+     */
+    public function __invoke(Field $field, Callable $next)
+    {
+        $length = (string)$field->getRule()->getParam(0, '0');
+
         if (! ctype_digit($length)) {
             return false;
         }
-        return (mb_strlen($value) != $length) ? false : true;   
+        return (mb_strlen($field->getValue()) != $length) ? false : $next($field);
     }
 }

@@ -4,7 +4,7 @@ namespace Obullo\Authentication\Model\Pdo;
 
 use Pdo;
 use Auth\Identities\AuthorizedUser;
-use Obullo\Container\ServiceProviderInterface as Provider;
+use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
 use Obullo\Authentication\Model\UserInterface;
 
 /**
@@ -26,10 +26,10 @@ class User implements UserInterface
      /**
      * Constructor
      * 
-     * @param object $provider \Obullo\Service\ServiceProviderInterface
+     * @param object $provider \Obullo\Container\ServiceProvider\ServiceProviderInterface
      * @param object $params   Auth configuration & service configuration parameters
      */
-    public function __construct(Provider $provider, array $params)
+    public function __construct(ServiceProvider $provider, array $params)
     {
         $this->tablename           = $params['db.tablename'];
         $this->columnId            = $params['db.id'];
@@ -48,11 +48,11 @@ class User implements UserInterface
      * 
      * @return void
      */
-    public function connect(Provider $provider, array $params)
+    public function connect(ServiceProvider $provider, array $params)
     {
-        $this->db = $provider->get(
+        $this->db = $provider->shared(
             [
-                'connection' => $params['db.provider']['params']['connection']
+                'connection' => $params['db.provider']['connection']
             ]
         );
         $this->select($params);

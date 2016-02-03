@@ -2,23 +2,29 @@
 
 namespace Obullo\Validator\Rules;
 
+use Obullo\Validator\FieldInterface as Field;
+
 /**
  * IsJson
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class IsJson extends AbstractRule
+class IsJson
 {
     /**
-     * Is Json
+     * Call next
      * 
-     * @param string $value string
+     * @param Field    $field object
+     * @param Callable $next  object
      * 
-     * @return bool
-     */    
-    public function isValid($value)
+     * @return object
+     */
+    public function __invoke(Field $field, Callable $next)
     {
-        return ( ! is_object(json_decode($value))) ? false : true;
+        if (! is_object(json_decode($field->getValue()))) {
+            return false;
+        }
+        return $next($field);
     }
 }

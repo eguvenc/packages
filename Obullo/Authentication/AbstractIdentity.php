@@ -1,6 +1,6 @@
 <?php
 
-namespace Obullo\Authentication\Identity;
+namespace Obullo\Authentication;
 
 /**
  * Abstract Identity
@@ -50,7 +50,7 @@ abstract class AbstractIdentity
      */
     public function getColumnIdentifier()
     {
-        return $this->c['auth.params']['db.identifier'];
+        return $this->container->get('user.params')['db.identifier'];
     }
 
     /**
@@ -60,7 +60,7 @@ abstract class AbstractIdentity
      */
     public function getColumnPassword()
     {
-        return $this->c['auth.params']['db.password'];
+        return $this->container->get('user.params')['db.password'];
     }
 
     /**

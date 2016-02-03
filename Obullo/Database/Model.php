@@ -2,6 +2,8 @@
 
 namespace Obullo\Database;
 
+use Obullo\Http\Controller;
+
 /**
  * Model Class ( Default Model )
  * 
@@ -15,24 +17,15 @@ class Model
      * 
      * @var object
      */
-    private $__container;
-    
+    protected $container;
+
     /**
-     * Controller loader
+     * Container
      * 
-     * @param string $key class name
-     * 
-     * @return void
+     * @return object
      */
-    public function __get($key)
+    public function getContainer()
     {
-        if ($this->__container == null) {
-            global $c;
-            $this->__container = &$c;
-        }
-        if ($key == 'c') {
-            return $this->__container;
-        }
-        return $this->__container[$key];
+        return Controller::$instance->getContainer();
     }
 }

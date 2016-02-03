@@ -23,6 +23,13 @@ class Recaller
     protected $model;
 
     /**
+     * Container
+     * 
+     * @var object
+     */
+    protected $container;
+
+    /**
      * Storage
      * 
      * @var object
@@ -61,11 +68,11 @@ class Recaller
      */
     public function __construct(Container $container, Storage $storage, UserModel $model, Identity $identity, array $params)
     {
-        $this->c = $container;
         $this->model = $model;
         $this->params = $params;
         $this->storage = $storage;
         $this->identity = $identity;
+        $this->container = $container;
 
         $this->columnIdentifier = $params['db.identifier'];
         $this->columnRememberToken = $params['db.rememberToken'];
@@ -96,8 +103,8 @@ class Recaller
             '__rememberToken' => $resultRowArray[$this->columnRememberToken]
         ];
         $this->identity->setCredentials($credentials);
-
-        $this->c['auth.adapter']->generateUser($credentials, $resultRowArray);  // Generate authenticated user without validation
+        
+        $this->container->get('auth.adapter')->generateUser($credentials, $resultRowArray);  // Generate authenticated user without validation
 
         $this->removeInactiveSessions(); // Kill all inactive sessions of current user
     }
@@ -110,6 +117,7 @@ class Recaller
     protected function removeInactiveSessions()
     {
         $sessions = $this->storage->getUserSessions();
+
         if (sizeof($sessions) == 0) {
             return;
         }

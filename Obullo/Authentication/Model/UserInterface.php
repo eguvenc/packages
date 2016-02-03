@@ -2,7 +2,7 @@
 
 namespace Obullo\Authentication\Model;
 
-use Obullo\Container\ServiceProviderInterface as Provider;
+use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
 
 /**
  * User Provider Interface
@@ -18,7 +18,7 @@ interface UserInterface
      * @param object $provider ServiceProviderInterface
      * @param object $params   Auth configuration & service configuration parameters
      */
-    public function __construct(Provider $provider, array $params);
+    public function __construct(ServiceProvider $provider, array $params);
 
     /**
      * Execute sql query

@@ -84,7 +84,7 @@ class Reminder
         if ($this->session->exists()) {
             
             // If session exists
-            // we need regenerate id to send a new cookie.
+            // we need regenerate id & set cookie.
 
             $this->session->regenerateId($deleteOldSession, $lifetime);
         }

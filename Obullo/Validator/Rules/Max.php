@@ -22,10 +22,8 @@ class Max
      */
     public function __invoke(Field $field, Callable $next)
     {
-        $length = '0';
-        if ($params = $field->getParams()) {
-            $length = (string)$params[0];
-        }
+        $length = (string)$field->getRule()->getParam(0, '0');
+        
         if (mb_strlen($field->getValue()) > $length) {
             return false;
         }

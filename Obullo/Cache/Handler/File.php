@@ -25,10 +25,15 @@ class File implements CacheInterface
     /**
      * Constructor
      *
-     * @param string $path resource path
+     * @param array $options options
      */
-    public function __construct($path = '/resources/data/cache/')
+    public function __construct($options = array())
     {
+        if (! empty($options['path'])) {
+            $path = $options['path'];
+        } else {
+            $path = '/resources/data/cache/';
+        }
         $this->filePath = ltrim($path, '/');
 
         if (strpos($this->filePath, 'resources') === 0) {

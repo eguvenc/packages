@@ -37,27 +37,18 @@ interface FieldInterface
     public function getName();
 
     /**
+     * Returns to rule
+     * 
+     * @return object
+     */
+    public function getRule();
+
+    /**
      * Returns to field label
      * 
      * @return string
      */
     public function getLabel();
-    
-    /**
-     * Returns to field parameters
-     * 
-     * @return array
-     */
-    public function getParams();
-    
-    /**
-     * Set rule params
-     * 
-     * @param array $params rule params
-     *
-     * @return void
-     */
-    public function setParams(array $params);
 
     /**
      * Sets field error

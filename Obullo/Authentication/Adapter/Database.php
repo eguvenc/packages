@@ -7,7 +7,7 @@ use Obullo\Authentication\Token;
 use Obullo\Authentication\AuthResult;
 
 use Obullo\Session\SessionInterface as Session;
-use Obullo\Container\ContainerInterface as Container;
+use Interop\Container\ContainerInterface as Container;
 use Obullo\Authentication\Storage\StorageInterface as Storage;
 
 /**
@@ -18,13 +18,6 @@ use Obullo\Authentication\Storage\StorageInterface as Storage;
  */
 class Database extends AbstractAdapter
 {
-    /**
-     * Container
-     * 
-     * @var object
-     */
-    protected $c;
-
     /**
      * Parameters
      * 
@@ -45,6 +38,13 @@ class Database extends AbstractAdapter
      * @var object
      */
     protected $storage;
+
+    /**
+     * Container
+     * 
+     * @var object
+     */
+    protected $container;
 
     /**
      * Result messages
@@ -105,10 +105,10 @@ class Database extends AbstractAdapter
      */
     public function __construct(Container $container, Session $session, Storage $storage, array $params)
     {
-        $this->c = $container;
         $this->params = $params;
         $this->storage = $storage;
         $this->session = $session;
+        $this->container = $container;
         
         // ! WARNING : If we inject identity object here, recaller does not work
         // we get closure parameter error.
@@ -129,7 +129,8 @@ class Database extends AbstractAdapter
         $savedIdentifier = $this->storage->getUserId();
         $identifier = $credentials[$this->columnIdentifier];
 
-        if ($this->c['auth.identity']->guest() || $savedIdentifier != $identifier) {
+        if ($this->container->get('auth.identity')->guest() || $savedIdentifier != $identifier) {
+
             $this->storage->setIdentifier($identifier); // Set current identifier to storage
         }
         $this->results = array(
@@ -179,7 +180,7 @@ class Database extends AbstractAdapter
         /**
          * If cached identity does not exist in memory do SQL query
          */
-        $this->resultRowArray = ($storageResult === false) ? $this->c['auth.model']->query($credentials) : $storageResult;
+        $this->resultRowArray = ($storageResult === false) ? $this->container->get('auth.model')->query($credentials) : $storageResult;
 
         if (is_array($this->resultRowArray) && isset($this->resultRowArray[$this->columnIdentifier])) {
 
@@ -187,7 +188,7 @@ class Database extends AbstractAdapter
             $hash  = $this->resultRowArray[$this->columnPassword];
 
             if ($passwordNeedsRehash = $this->verifyPassword($plain, $hash)) {  // In here hash may cause performance bottleneck depending to passwordNeedHash "cost" value
-                                                                                // default is 6 for best performance.
+                                                                                // default is 6 for best performance. Set 10-12 for max security.
                 if ($login) {  // If login process allowed.
                     $this->generateUser($credentials, $this->resultRowArray, $passwordNeedsRehash);
                 }
@@ -227,8 +228,8 @@ class Database extends AbstractAdapter
             $this->regenerateSessionId(true); // Delete old session after regenerate !
         }
         if ($rememberMe) {  // If user choosed remember feature
-            $token = Token::getRememberToken($this->c['cookie'], $this->params);
-            $this->c['auth.model']->updateRememberToken($token, $credentials); // refresh rememberToken
+            $token = Token::getRememberToken($this->container->get('cookie'), $this->params);
+            $this->container->get('auth.model')->updateRememberToken($token, $credentials); // refresh rememberToken
         }
         if ($this->storage->isEmpty('__temporary')) {
             $this->storage->createPermanent($attributes);

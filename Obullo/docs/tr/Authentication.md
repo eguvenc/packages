@@ -735,6 +735,10 @@ Kullanıcının yetkisi olmayan kullanıcı yani ziyaretçi olup olmadığını 
 
 Kimliğin önbellekte olup olmadığını kotrol eder. Varsa <kbd>true</kbd> yoksa <kbd>false</kbd>değerine döner.
 
+##### $this->user->identity->expire($ttl, $block = '__permanent');
+
+Kullanıcı kimliğini girilen süreye göre geçtikten sonra yok olmasını sağlar.
+
 ##### $this->user->identity->makeTemporary();
 
 Başarılı giriş yapmış kullanıcıya ait kimliği konfigurasyon dosyasından belirlenmiş sona erme ( expire ) süresine göre geçici hale getirir. Süre sona erdiğinde kimlik hafıza deposundan silinir.
@@ -767,7 +771,7 @@ Oturumu kapatır ve __isAuthenticated anahtarı önbellekte <kbd>0</kbd> değeri
 
 Beni hatırla çerezinin bütünüyle tarayıcıdan siler.
 
-##### $this->user->identity->refreshRememberToken(\Obullo\Authentication\Model\UserInterface $model, array $credentials);
+##### $this->user->identity->refreshRememberToken(array $credentials);
 
 Beni hatırla çerezini yenileyerek veritabanı ve çerezlere kaydeder.
 

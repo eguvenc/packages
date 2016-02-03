@@ -5,7 +5,7 @@ namespace Obullo\Flash;
 use Obullo\Session\SessionInterface;
 use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Config\ConfigInterface as Config;
-use Obullo\Container\ContainerInterface as Container;
+use Interop\Container\ContainerInterface as Container;
 
 /**
  * Flash Session
@@ -42,6 +42,13 @@ class Session
     protected $session;
 
     /**
+     * Container
+     * 
+     * @var object
+     */
+    protected $container;
+
+    /**
      * Notice keys
      * 
      * @var array
@@ -59,15 +66,15 @@ class Session
      * Constructor
      *
      * @param object $container \Obullo\Container\ContainerInterface
-     * @param object $config    \Obullo\Config\ConfigInterface
-     * @param object $logger    \Obullo\Log\LoggerInterface
      * @param object $session   \Obullo\Session\SessionInterface
+     * @param object $logger    \Obullo\Log\LoggerInterface
+     * @param array  $params    service parameters
      */
-    public function __construct(Container $container, Config $config, Logger $logger, SessionInterface $session) 
+    public function __construct(Container $container, SessionInterface $session, Logger $logger, array $params) 
     {
-        $this->c = $container;
+        $this->container = $container;
         $this->session = $session;
-        $this->notification = $config->load('flash')['notification'];
+        $this->notification = $params['notification'];
 
         $this->flashdataSweep();  // Delete old flashdata (from last request)
         $this->flashdataMark();   // Marks all new flashdata as old (data will be deleted before next request)
@@ -271,15 +278,15 @@ class Session
     }
 
     /**
-     * Return to requested container object
+     * Container proxy
      * 
-     * @param string $cid class id
+     * @param string $key class name
      * 
      * @return object
      */
-    public function __get($cid)
+    public function __get($key)
     {
-        return $this->c[$cid];
+        return $this->container->get($key);
     }
 
 }

@@ -8,7 +8,7 @@ use RuntimeException;
 use SimpleXMLElement;
 use Obullo\Queue\Failed\StorageInterface;
 use Obullo\Config\ConfigInterface as Config;
-use Obullo\Container\ServiceProviderInterface as Provider;
+use Obullo\Container\SerivceProvider\ServiceProviderInterface as ServiceProvider;
 
 /**
  * FailedJob Database Handler
@@ -39,7 +39,7 @@ class Database implements StorageInterface
      * @param object $provider \Obullo\Service\ServiceProviderInterface
      * @param object $params   service parameters
      */
-    public function __construct(Config $config, Provider $provider, array $params)
+    public function __construct(Config $config, ServiceProvider $provider, array $params)
     {
         $database   = $config->load('providers::database');
         $connection = $params['failedJob']['provider']['params']['connection'];

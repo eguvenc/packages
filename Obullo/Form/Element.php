@@ -2,11 +2,11 @@
 
 namespace Obullo\Form;
 
-use Psr\Http\Message\ServerRequestInterface as Request;
-
 use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Config\ConfigInterface as Config;
-use Obullo\Container\ContainerInterface as Container;
+use Interop\Container\ContainerInterface as Container;
+
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
  * Element Class
@@ -69,18 +69,20 @@ class Element
         if ($attributes == '') {
             $attributes = 'method="post"';
         }
-        $action = ( strpos($action, '://') === false) ? $this->container['url']->siteUrl($action) : $action;
+        $action = ( strpos($action, '://') === false) ? $this->container->get('url')->getBaseUrl($action) : $action;
         $form  = '<form action="'.$action.'"';
         $form .= $this->attributesToString($attributes, true);
         $form .= '>';
 
-        $csrf = $this->config->load('providers/csrf')['params'];
+        $csrf = $this->config->load('providers::csrf')['params'];
+
         $form = str_replace(array('"method=\'get\'"', "method=\'GET\'"), 'method="get"', $form);
 
         // Add CSRF field if enabled, but leave it out for GET requests and requests to external websites
 
         if ($csrf['protection'] && ! stripos($form, 'method="get"')) {
-            $hidden[$this->container['csrf']->getTokenName()] = $this->container['csrf']->getToken();
+
+            $hidden[$this->container->get('csrf')->getTokenName()] = $this->container->get('csrf')->getToken();
         }
         if (is_array($hidden) && count($hidden) > 0) {
             $form .= $this->hidden($hidden, '');
@@ -137,7 +139,7 @@ class Element
             $content = $data['content'];
             unset($data['content']); // content is not an attribute
         }
-        return "<button ".$this->parseFormAttributes($data, $defaults).$extra.">".$this->container['translator'][$content]."</button>";
+        return "<button ".$this->parseFormAttributes($data, $defaults).$extra.">".$this->container->get('translator')[$content]."</button>";
     }
     
     /**
@@ -156,7 +158,9 @@ class Element
             $value = $this->getRowValue($checked, $data); 
         }
         $defaults = array('type' => 'checkbox', 'name' => (( ! is_array($data)) ? $data : ''), 'value' => $value);
+
         if (is_array($data) && array_key_exists('checked', $data)) {
+
             $checked = $data['checked'];
             if ($checked == false) {
                 unset($data['checked']);
@@ -170,6 +174,7 @@ class Element
             unset($defaults['checked']);
         }
         $type = 'checkbox';
+
         if (isset($data['type']) && $data['type'] == 'radio') {
             $type = 'radio';
         }
@@ -211,8 +216,11 @@ class Element
         }
         $multiple  = (sizeof($selected) > 1 && strpos($extra, 'multiple') === false) ? ' multiple="multiple"' : '';
         $selectTag = '<select name="'.$name.'"'.$extra.$multiple.">\n";
+
         foreach ($options as $key => $val) {
+
             $key = (string) $key;
+
             if (is_array($val)) {
                 $selectTag .= '<optgroup label="'.$key.'">'."\n";
                 foreach ($val as $optgroup_key => $optgroup_val) {
@@ -281,6 +289,7 @@ class Element
     public function hidden($name, $value = '', $attributes = '', $recursing = false)
     {
         static $hiddenTag;
+
         if (is_object($value)) {    // $_POST & Db value
             $value = $this->getRowValue($value, $name); 
         }
@@ -319,7 +328,9 @@ class Element
             $value = $this->getRowValue($value, $data); 
         }
         $defaults = array('type' => 'text', 'name' => (( ! is_array($data)) ? $data : ''), 'value' => $value);
+
         $inputElement = "<input " . $this->parseFormAttributes($data, $defaults) . $extra . " />";
+
         if (strpos($inputElement, 'type="text"') > 0) {
             return $inputElement;
         }
@@ -338,7 +349,8 @@ class Element
     public function label($label_text = '', $id = '', $attributes = "")
     {
         $label = '<label';
-        $label_text = $this->container['translator'][$label_text];
+        $label_text = $this->container->get('translator')[$label_text];
+
         if (empty($id)) {
             $id = mb_strtolower($label_text);
         }
@@ -387,6 +399,7 @@ class Element
     public function prep($str = '', $field = '')
     {
         static $preppedFields = array();
+
         if (is_array($str)) {   // If the field name is an array we do this recursively
             foreach ($str as $key => $val) {
                 $str[$key] = $this->prep($val);
@@ -453,7 +466,7 @@ class Element
      */
     public function submit($data = '', $value = '', $extra = '')
     {
-        $defaults = array('type' => 'submit', 'name' => (( ! is_array($data)) ? $data : ''), 'value' => $this->container['translator'][$value]);
+        $defaults = array('type' => 'submit', 'name' => (( ! is_array($data)) ? $data : ''), 'value' => $this->container->get('translator')[$value]);
 
         return '<input ' . $this->parseFormAttributes($data, $defaults) . $extra . ' />';
     }
@@ -520,7 +533,9 @@ class Element
     public function parseFormAttributes($attributes, $default)
     {
         if (is_array($attributes)) {
+
             foreach ($default as $key => $val) {
+
                 if (isset($attributes[$key])) {
                     $default[$key] = $attributes[$key];
                     unset($attributes[$key]);
@@ -532,6 +547,7 @@ class Element
         }
         $att = '';
         foreach ($default as $key => $val) {
+
             if ($key == 'value') {
                 $val = $this->prep($val, $default['name']);
             }
@@ -553,6 +569,7 @@ class Element
         if (is_string($attributes) && strlen($attributes) > 0) {
 
             $attributes = str_replace('\'', '"', $attributes); // convert to double quotes.
+
             if (strpos($attributes, 'method=') === false) {
                 $attributes.= ' method="post"';
             }
@@ -582,7 +599,7 @@ class Element
     }
     
     /**
-     * Get $_REQUEST value from $_POST data or database $row using valid db field comparison.
+     * Get $_POST data or database $row using valid db field comparison.
      * 
      * @param object $row   database object row
      * @param string $field field
@@ -594,10 +611,11 @@ class Element
         if (is_array($field)) {
             $field = $field['name'];
         }
-        $request = $this->request->getParameters();
-        $value   = (isset($request[$field])) ? $this->container['form']->getValue($field) : '';
+        $post = $this->request->getParsedBody();
 
-        if (! isset($request[$field])) { // If POST data not available use Database $row
+        $value   = (isset($post[$field])) ? $this->container->get('form')->getValue($field) : '';
+
+        if (! isset($post[$field])) { // If POST data not available use Database $row
 
             if (is_object($row) && isset($row->{$field})) { // If field available in database $row Object
 

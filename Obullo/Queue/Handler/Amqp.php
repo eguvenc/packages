@@ -10,9 +10,8 @@ use AMQPException;
 use AMQPConnection;
 use RuntimeException;
 use Obullo\Queue\QueueInterface;
-use Obullo\Config\ConfigInterface as Config;
 use Obullo\Queue\JobHandler\AmqpJob;
-use Obullo\Container\ServiceProviderInterface as Provider;
+use Obullo\Container\SerivceProvider\ServiceProviderInterface as ServiceProvider;
 
 /**
  * Info
@@ -51,16 +50,22 @@ class Amqp implements QueueInterface
     protected $defaultQueueName;
 
     /**
+     * Service parameters
+     * 
+     * @var array
+     */
+    protected $params = array();
+
+    /**
      * Constructor
-     *
-     * @param object $config   \Obullo\Config\ConfigInterface
-     * @param object $provider \Obullo\Service\Provider\ServiceProviderInterface 
+     * 
+     * @param object $provider \Obullo\Container\ServiceProvider\ServiceProviderInterface 
      * @param array  $params   provider parameters
      */
-    public function __construct(Config $config, Provider $provider, array $params)
+    public function __construct(SerivceProvider $provider, array $params)
     {
-        $this->config = $config->load('queue')['amqp'];
-        $this->AMQPconnection = $provider->get($params);
+        $this->params = $params;
+        $this->AMQPconnection = $provider->shared($params['provider']);
         
         $this->channel = new AMQPChannel($this->AMQPconnection);
         $this->defaultQueueName = 'default';
@@ -78,8 +83,8 @@ class Amqp implements QueueInterface
         // available types AMQP_EX_TYPE_DIRECT, AMQP_EX_TYPE_FANOUT, AMQP_EX_TYPE_HEADER or AMQP_EX_TYPE_TOPIC,
         // available flags AMQP_DURABLE, AMQP_PASSIVE
 
-        $type = constant('AMQP_EX_TYPE_'.strtoupper($this->config['exchange']['type']));
-        $flag = constant('AMQP_'.strtoupper($this->config['exchange']['flag']));
+        $type = constant('AMQP_EX_TYPE_'.strtoupper($this->params['exchange']['type']));
+        $flag = constant('AMQP_'.strtoupper($this->params['exchange']['flag']));
 
         $this->exchange = new AMQPExchange($this->channel);
         $this->exchange->setName($name);
@@ -106,6 +111,7 @@ class Amqp implements QueueInterface
     {
         $this->declareExchange($job);
         $queue = $this->declareQueue($route); // Get queue
+
         return $this->publishJob($queue, $job, $data, $options);
     }
 
@@ -127,6 +133,7 @@ class Amqp implements QueueInterface
     {
         $this->declareExchange($job);
         $queue = $this->declareDelayedQueue($route, (int)$delay); // Get queue
+
         return $this->publishJob($queue, $job, $data, $options);
     }
 
@@ -227,6 +234,7 @@ class Amqp implements QueueInterface
         $queue->declareQueue();
         $queue->bind($this->exchange->getName(), $name);
         $queue->declareQueue();
+
         return $queue;
     }
 
@@ -243,6 +251,7 @@ class Amqp implements QueueInterface
         $q = new AMQPQueue($channel);
         $q->setName($queue);
         $q->delete();
+
         return $this;
     }
 

@@ -40,40 +40,23 @@ class Field implements FieldInterface, ImmutableValidatorAwareInterface, Immutab
     protected $value;
 
     /**
-     * Rules
+     * Rule object
      * 
-     * @var array
+     * @var object
      */
-    protected $rules = array();
-
-    /**
-     * Rule parameters
-     * 
-     * @var array
-     */
-    protected $params = array();
+    protected $rule;
 
     /**
      * Constructor
      * 
-     * @param array $row field     data
+     * @param array $row field data
      */
     public function __construct($row)
     {
         $this->name  = $row['field'];
         $this->label = $row['label'];
         $this->value = $row['postdata'];
-        $this->rules = $row['rules'];
-    }
-
-    /**
-     * Call next rule
-     * 
-     * @return void
-     */
-    public function getNextRule()
-    {
-        return array_shift($this->rules);
+        $this->rule  = new Rule($row['rules']);
     }
     
     /**
@@ -107,25 +90,13 @@ class Field implements FieldInterface, ImmutableValidatorAwareInterface, Immutab
     }
 
     /**
-     * Returns to field parameters
+     * Returns to rule object
      * 
-     * @return array|boolean
+     * @return object
      */
-    public function getParams()
+    public function getRule()
     {
-        return isset($this->params[0]) ? $this->params : false;
-    }
-
-    /**
-     * Set field rule params e.g. min(5)|max(500)
-     * 
-     * @param array $params rule params
-     *
-     * @return void
-     */
-    public function setParams(array $params)
-    {
-        $this->params = $params;
+        return $this->rule;
     }
 
     /**

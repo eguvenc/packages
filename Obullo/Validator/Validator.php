@@ -270,7 +270,7 @@ class Validator implements ValidatorInterface
     {        
         $fieldName = $field->getName();
         $label     = $field->getLabel();
-        $params    = $field->getParams();
+        $param     = $field->getRule()->getParam(0, '');
 
         if (! isset($this->errorArray[$rule])) {
             $RULE = strtoupper($rule);
@@ -278,7 +278,6 @@ class Validator implements ValidatorInterface
         } else {
             $line = $this->errorArray[$rule];
         }
-        $param = (isset($params[0])) ? $params[0] : '';
 
         // Is the parameter we are inserting into the error message the name                                                                                  
         // of another field ?  If so we need to grab its "field label"
@@ -328,7 +327,6 @@ class Validator implements ValidatorInterface
         $value = (string)$error;
         $value = ($this->translator->has($value)) ? $this->translator[$value] : $value;
         $this->formErrors[] = $value;
-        $this->logger->debug($value);
     }
 
     /**
