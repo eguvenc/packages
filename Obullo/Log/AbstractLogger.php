@@ -102,8 +102,6 @@ abstract class AbstractLogger
      */
     public function registerHandler($priority, $name)
     {
-        var_dump($name);
-
         $this->registeredHandlers[$name] = array('priority' => $priority);
         $this->track[] = array('name' => $name);
         return $this;

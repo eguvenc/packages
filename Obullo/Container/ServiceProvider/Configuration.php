@@ -2,6 +2,8 @@
 
 namespace Obullo\Container\ServiceProvider;
 
+use League\Container\Argument\RawArgument;
+
 /**
  * Service provider configuration
  * 
@@ -48,6 +50,22 @@ class Configuration
     public function getMethods()
     {
         if (isset($this->params['methods'])) {
+
+            foreach ($this->params['methods'] as $key => $method) {
+                
+                foreach ($method['argument'] as $k => $v) {
+
+                    if (is_string($v)) {
+                        
+                        if (substr($v, 0, 1) !== '@') {
+                            $method['argument'][$k] = new RawArgument($v);
+                        } else {
+                            $method['argument'][$k] = ltrim($v, '@');
+                        }
+                    }
+                }
+                $this->params['methods'][$key] = $method;
+            }
             return $this->params['methods'];
         }
         return false;

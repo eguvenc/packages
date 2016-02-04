@@ -8,7 +8,7 @@ namespace Obullo\Authentication;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-abstract class AbstractIdentity
+abstract class AbstractIdentity implements IdentityInterface
 {
     /**
      * Credentials
@@ -18,19 +18,29 @@ abstract class AbstractIdentity
     protected $attributes = array();
 
     /**
-     * Get the identifier column (value/input)
+     * Get the identifier column value
      *
      * @return mixed
      */
-    abstract function getIdentifier();
+    public function getIdentifier()
+    {
+        $id = $this->getColumnIdentifier();
+
+        return $this->attributes[$id];
+    }
 
     /**
-     * Get the identifier password (value/input)
+     * Get the password column value
      *
      * @return mixed
      */
-    abstract function getPassword();
+    public function getPassword()
+    {
+        $password = $this->getColumnPassword();
 
+        return $this->attributes[$password];
+    }
+    
     /**
      * Set credentials
      * 

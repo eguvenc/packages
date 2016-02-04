@@ -57,9 +57,6 @@ Proje kök dizininde aşağıdaki <kbd>composer.json</kbd> dosyasını oluşturu
         ]
     },
     "require": {
-        "psr/http-message": "^1.0",
-        "ircmaxell/password-compat": "^1.0",
-        "league/event": "^2.1",
         "obullo/obullo": "dev-master"
     }
 }
@@ -137,7 +134,7 @@ Zend tarafından sağlanan gelişmiş bir katman çözümüdür.Konfigürasyon i
 | Choose your middleware app
 |--------------------------------------------------------------------------
 */
-$app = new Obullo\Http\Zend\Stratigility\MiddlewarePipe($c);
+$app = new Obullo\Http\Zend\Stratigility\MiddlewarePipe($container);
 /*
 |--------------------------------------------------------------------------
 | Create your http server

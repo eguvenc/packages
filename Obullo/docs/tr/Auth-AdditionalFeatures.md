@@ -13,7 +13,6 @@ Auth paketinde yetki doğrulama onayı ve aktivite verilerini kaydetme gibi baz�
             <li><a href="#temporary-identity-example">Geçici Oturum Açma Örneği</a></li>
         </ul>
     </li>
-    <li><a href="#saving-user-activity-data">Kullanıcı Aktivite Verilerini Kaydetmek</a></li>
 </ul>
 
 <a name="authentication-verify"></a>
@@ -99,37 +98,3 @@ Yukarıdaki kod bloğuna login kontrolör içerisine entegre edip çalıştırd�
         Login.php
         Confirm_Code.php
 ```
-<a name="saving-user-activity-data"></a>
-
-### Kullanıcı Aktivite Verilerini Kaydetmek
-
-Kullanıcı aktivite sınıfı yetkilendirilmiş kullancılara ait meta verilerini kaydeder. Son aktivite zamanı ve diğer eklemek istediğiniz harici veriler bu sınıf aracılığıyla activity key içerisinde tutulur. Her sayfa yenilenmesinde bu veriler güncellenir.
-
-```php
-$this->user->activity->set('sid', $this->session->get('session_id'));
-$this->user->activity->set('date', time());
-
-// __activity a:3:{s:3:"sid";s:26:"f0usdabogp203n5df4srf9qrg1";s:4:"date";i:1413539421;}
-```
-
-#### Activity Sınıfı Referansı
-
-------
-
->Aktivite verileri, son aktivite zamanı gibi anlık değişen kullanıcı verilerini önbellekte tutabilmeyi sağlayan sınıftır.
-
-##### $this->user->activity->set($key, $val);
-
-Aktivite dizinine bir anahtar ve değerini ekler.
-
-##### $this->user->activity->get($key);
-
-Aktivite dizininde anahtarla eşleşen değere geri döner.
-
-##### $this->user->activity->remove($key);
-
-Daha önce set edilen değeri temizler.
-
-##### $this->user->activity->destroy();
-
-Tüm aktivite verilerini önbellekten temizler.

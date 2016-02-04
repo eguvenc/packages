@@ -15,11 +15,11 @@ class Worker extends Controller
     public function run()
     {
         $worker = new QueueWorker(
-            $this->c['app'],
-            $this->c['config'],
-            $this->c['queue'],
-            $this->c['request']->getUri(),
-            $this->c['logger']
+            $this->container->get('app'),
+            $this->container->get('config'),
+            $this->container->get('queue'),
+            $this->container->get('request')->getUri(),
+            $this->container->get('logger')
         );
         $worker->init();
         $worker->pop();

@@ -52,7 +52,7 @@ class Database implements StorageInterface
                 )
             );
         }
-        $this->db = $provider->get($params['failedJob']['provider']['params']);
+        $this->db = $provider->shared($params['failedJob']['provider']['params']);
         $this->tablename = $params['failedJob']['table'];
     }
 

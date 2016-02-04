@@ -1,6 +1,6 @@
 <?php
 
-namespace Obullo\Container\ServiceProvider;
+namespace Obullo\Container\ServiceProvider\Connector;
 
 use Obullo\Database\Doctrine\DBAL\QueryBuilder;
 use Obullo\Container\ServiceProvider\AbstractServiceProvider;

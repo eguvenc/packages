@@ -3,7 +3,6 @@
 namespace Obullo\Authentication\Model\Pdo;
 
 use Pdo;
-use Auth\Identities\AuthorizedUser;
 use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
 use Obullo\Authentication\Model\UserInterface;
 

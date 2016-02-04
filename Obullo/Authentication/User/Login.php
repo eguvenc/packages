@@ -2,7 +2,6 @@
 
 namespace Obullo\Authentication\User;
 
-use Auth\Identities\AuthorizedUser;
 use Obullo\Authentication\AuthResult;
 use Interop\Container\ContainerInterface as Container;
 use Obullo\Authentication\Storage\StorageInterface as Storage;
@@ -187,25 +186,7 @@ class Login
 
         return $this->container->get('auth.adapter')->authenticate($credentials, false);
     }
-
-    /**
-     * Public function
-     * 
-     * Validate a user against the given credentials.
-     *
-     * @param object $user        user identity
-     * @param array  $credentials user credentials
-     * 
-     * @return bool
-     */
-    public function validateCredentials(AuthorizedUser $user, array $credentials)
-    {
-        $password = $this->container->get('user.params')['db.password'];
-        $plain = $credentials[$password];
-
-        return password_verify($plain, $user->getPassword());
-    }
-
+    
     /**
      * Returns to all sessions of valid user
      *

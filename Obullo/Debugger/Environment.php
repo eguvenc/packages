@@ -6,7 +6,6 @@ use RuntimeException;
 use Obullo\Session\SessionInterface as Session;
 use Psr\Http\Message\RequestInterface as Request;
 
-
 /**
  * Debugger environment tab
  * 

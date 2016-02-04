@@ -6,7 +6,7 @@ use Obullo\Authentication\Token;
 use Obullo\Authentication\Recaller;
 use Auth\Identities\AuthorizedUser;
 
-use Obullo\Authentication\IdentityInterface;
+use Obullo\Authentication\AbstractIdentity;
 use Obullo\Session\SessionInterface as Session;
 use Interop\Container\ContainerInterface as Container;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -18,7 +18,7 @@ use Obullo\Authentication\Storage\StorageInterface as Storage;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Identity extends AuthorizedUser implements IdentityInterface
+class Identity extends AbstractIdentity
 {
     /**
      * Auth configuration params
@@ -379,6 +379,23 @@ class Identity extends AuthorizedUser implements IdentityInterface
     public function forgetMe()
     {
         $this->container->get('cookie')->delete($this->params['login']['rememberMe']['cookie']);  // Delete rememberMe cookie if exists
+    }
+
+    /**
+     * Public function
+     * 
+     * Validate a user against the given credentials.
+     * 
+     * @param array $credentials user credentials
+     * 
+     * @return bool
+     */
+    public function validate(array $credentials)
+    {
+        $password = $this->params['db.password'];
+        $plain    = $credentials[$password];
+
+        return password_verify($plain, $this->getPassword());
     }
 
     /**

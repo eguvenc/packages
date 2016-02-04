@@ -1,6 +1,6 @@
 <?php
 
-namespace Obullo\Container\ServiceProvider;
+namespace Obullo\Container\ServiceProvider\Connector;
 
 use RuntimeException;
 use UnexpectedValueException;

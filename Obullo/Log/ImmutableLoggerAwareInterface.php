@@ -2,7 +2,7 @@
 
 namespace Obullo\Container;
 
-use Psr\Log\LoggerInterface as Logger;
+use Obullo\Log\LoggerInterface as Logger;
 
 /**
  * Inject parameters

@@ -1,6 +1,6 @@
 <?php
 
-namespace Obullo\Container\ServiceProvider;
+namespace Obullo\Container\ServiceProvider\Connector;
 
 use RuntimeException;
 use UnexpectedValueException;
@@ -8,15 +8,22 @@ use Interop\Container\ContainerInterface as Container;
 use Obullo\Container\ServiceProvider\AbstractServiceProvider;
 
 /**
- * Memcached Connector
+ * Redis Connector
  * 
  * @copyright 2009-2015 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Memcached extends AbstractServiceProvider
+class Redis extends AbstractServiceProvider
 {
     /**
-     * Memcached config array
+     * Redis extension
+     * 
+     * @var object
+     */
+    protected $redis;
+
+    /**
+     * Redis config array
      * 
      * @var array
      */
@@ -30,11 +37,11 @@ class Memcached extends AbstractServiceProvider
     protected $container;
 
     /**
-     * Memcached extension
-     * 
-     * @var object
+     * Default connection items in redis config
+     *  
+     * @var array
      */
-    protected $memcached;
+    protected $defaultConnection = array();
 
     /**
      * Constructor
@@ -46,12 +53,13 @@ class Memcached extends AbstractServiceProvider
      */
     public function __construct(Container $container, array $params)
     {
-        $this->params = $params;
+        $this->params = $params; 
         $this->container = $container;
+        $this->defaultConnection = $this->params['connections'][key($this->params['connections'])];
 
-        if (! extension_loaded('memcached')) {
+        if (! extension_loaded('redis')) {
             throw new RuntimeException(
-                'The memcached extension has not been installed or enabled.'
+                'The redis extension has not been installed or enabled.'
             );
         }
         $this->register();
@@ -78,9 +86,9 @@ class Memcached extends AbstractServiceProvider
     }
 
     /**
-     * Creates Memcached connections
+     * Creates Redis connections
      * 
-     * @param array $val connection array
+     * @param array $val connection values
      * 
      * @return object
      */
@@ -88,26 +96,27 @@ class Memcached extends AbstractServiceProvider
     {
         if (empty($val['host']) || empty($val['port'])) {
             throw new RuntimeException(
-                'Check your memcached configuration, "host" or "port" key seems empty.'
+                'Check your redis configuration, "host" or "port" key seems empty.'
             );
         }
-        if ($val['options']['persistent'] && ! empty($val['options']['pool'])) {
-            $this->memcached = new \Memcached($val['options']['pool']);
+        $this->redis = new \Redis;
+        $timeout = (empty($val['options']['timeout'])) ? 0 : $val['options']['timeout'];
+
+        if (isset($val['options']['persistent']) && $val['options']['persistent']) {
+            $this->redis->pconnect($val['host'], $val['port'], $timeout, null, $val['options']['attempt']);
         } else {
-            $this->memcached = new \Memcached;
+            $this->redis->connect($val['host'], $val['port'], $timeout);
         }
-        if (! $this->memcached->addServer($val['host'], $val['port'], $val['weight'])) {
-            throw new RuntimeException(
-                sprintf(
-                    "Memcached connection error could not connect to host: %s.",
-                    $val['host']
-                )
-            );
+        if (! empty($this->defaultConnection['options']['auth'])) {         // Do we need reauth for slaves ?
+
+            $auth = $this->redis->auth($this->defaultConnection['options']['auth']);
+
+            if (! $auth) {
+                throw new RuntimeException("Redis authentication error, wrong password.");
+            }
         }
         $this->setOptions($val['options']);
-        $this->memcached->setOption(\Memcached::OPT_CONNECT_TIMEOUT, $val['options']['timeout']);
-
-        return $this->memcached;
+        return $this->redis;
     }
 
     /**
@@ -120,66 +129,25 @@ class Memcached extends AbstractServiceProvider
     protected function setOptions($options = array())
     {
         $prefix = $this->getValue($options, 'prefix');
+        $database = $this->getValue($options, 'database');
         $serializer = $this->getValue($options, 'serializer');
 
+        if ($database) {
+            $this->redis->select($database);
+        }
         if ($serializer == 'php') {
-            $this->memcached->setOption(\Memcached::OPT_SERIALIZER, \Memcached::SERIALIZER_PHP);
+            $this->redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_PHP);
         }
         if ($serializer == 'igbinary') {
-            $this->enableIgbinary();
-        }
-        if ($serializer == 'json') {
-            $this->enableJson();
+            $this->redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_IGBINARY);
         }
         if ($prefix) {
-            $this->memcached->setOption(\Memcached::OPT_PREFIX_KEY, $prefix);
+            $this->redis->setOption(\Redis::OPT_PREFIX, $prefix);
         }
     }
 
     /**
-     * Check igbinary is enabled and if yes set serializer
-     * 
-     * @return void
-     */
-    protected function enableIgbinary()
-    {
-        if (! extension_loaded('igbinary')) {
-            throw new RuntimeException("Php igbinary extension not enabled on your server.");
-        }
-        if (! \Memcached::HAVE_IGBINARY) {
-            throw new RuntimeException(
-                sprintf(
-                    "Memcached igbinary support not enabled on your server.<pre>%s</pre>",
-                    "Check memcached is configured with --enable-memcached-igbinary option."
-                )
-            );
-        }
-        $this->memcached->setOption(\Memcached::OPT_SERIALIZER, \Memcached::SERIALIZER_IGBINARY);
-    }
-
-    /**
-     * Check json is enabled and if yes set serializer
-     * 
-     * @return void
-     */
-    protected function enableJson()
-    {
-        if (! extension_loaded('json')) {
-            throw new RuntimeException("Php json extension not enabled on your server.");
-        }
-        if (! \Memcached::HAVE_JSON) {
-            throw new RuntimeException(
-                sprintf(
-                    "Memcached json support not enabled on your server.<pre>%s</pre>",
-                    "Check memcached is configured with --enable-memcached-json option."
-                )
-            );
-        }
-        $this->memcached->setOption(\Memcached::OPT_SERIALIZER, \Memcached::SERIALIZER_JSON);
-    }
-
-    /**
-     * Get memcached config options
+     * Get redis config options
      * 
      * @param array  $options parameters
      * @param string $item    key
@@ -198,26 +166,26 @@ class Memcached extends AbstractServiceProvider
     }
 
     /**
-     * Retrieve shared Memcached connection instance from connection pool
+     * Retrieve shared Redis connection instance from connection pool
      *
      * @param array $params provider parameters
      * 
-     * @return object Memcached
+     * @return object Redis
      */
     public function shared($params = array())
     {
         if (empty($params['connection'])) {
             throw new RuntimeException(
                 sprintf(
-                    "Memcached provider requires connection parameter. <pre>%s</pre>",
-                    "\$container->get('memcached')->shared(['connection' => 'default']);"
+                    "Redis provider requires connection parameter. <pre>%s</pre>",
+                    "\$container->get('redis')->shared(['connection' => 'default']);"
                 )
             );
         }
         if (! isset($this->params['connections'][$params['connection']])) {
             throw new UnexpectedValueException(
                 sprintf(
-                    'Connection key %s doest not exist in your memcached configuration.',
+                    'Connection key %s does not exist in your redis configuration.',
                     $params['connection']
                 )
             );
@@ -228,13 +196,13 @@ class Memcached extends AbstractServiceProvider
     }
 
     /**
-     * Create a new Memcached connection
+     * Create a new Redis connection
      * 
      * If you don't want to add it to config file and you want to create new one.
      * 
      * @param array $params connection parameters
      * 
-     * @return object Memcached client
+     * @return object Redis client
      */
     public function factory($params = array())
     {
@@ -262,7 +230,7 @@ class Memcached extends AbstractServiceProvider
             $key = $this->getConnectionKey($key);
 
             if ($this->container->hasShared($key, true)) {
-                $this->container->get($key)->quit();
+                $this->container->get($key)->close();
             }
         }
     }

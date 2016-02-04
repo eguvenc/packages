@@ -45,7 +45,7 @@ class Module extends Controller
             return;
         }
         if (! is_dir($moduleFolder)) {
-            echo Console::fail("Module #$module does not exist in Obullo/Task/Modules folder.");
+            echo Console::fail("Module #$module does not exist in Application/Modules folder.");
             return;
         }
         if (! is_writable(MODULES)) {
@@ -55,16 +55,13 @@ class Module extends Controller
         if (is_dir($moduleFolder.'/controllers')) {
             $this->recursiveCopy($moduleFolder. '/controllers', MODULES .$module);
         }
-        if (is_dir($moduleFolder.'/config')) {
-            $this->recursiveCopy($moduleFolder. '/config', CONFIG .$module);
-        }
         if (is_dir($moduleFolder.'/tasks')) {
             $this->recursiveCopy($moduleFolder. '/tasks', TASKS, false);
         }
-        $serviceFile = CONFIG .$this->container->get('app')->getEnv().'/service/' .strtolower($module).'.php';
+        $serviceFile = CONFIG .$this->container->get('app')->getEnv().'/providers/' .strtolower($module).'.php';
 
-        if (is_dir($moduleFolder.'/service')) {
-            copy($moduleFolder.'/service/'.strtolower($module).'.php', $serviceFile);
+        if (is_dir($moduleFolder.'/providers')) {
+            copy($moduleFolder.'/providers/'.strtolower($module).'.php', $serviceFile);
             chmod($serviceFile, 0777);
         }
         echo Console::success("New module #$module added successfully.");
@@ -89,12 +86,8 @@ class Module extends Controller
         }
         $moduleFolder = OBULLO .'Application/Modules/'. $module;
 
-        if (! is_dir(MODULES .$module)) {
-            echo Console::fail("Module #$module already removed from .modules/ folder.");
-            return;
-        }
         if (! is_dir($moduleFolder)) {
-            echo Console::fail("Module #$module does not exist in Obullo/Task/Modules folder.");
+            echo Console::fail("Module #$module does not exist in Application/Modules folder.");
             return;
         }
         if (! is_writable(MODULES)) {
@@ -103,20 +96,14 @@ class Module extends Controller
         }
         if (is_dir($moduleFolder .'/controllers') && is_dir(MODULES .$module)) {
             $this->recursiveRemove(MODULES .$module);
+            echo Console::success("Module #$module removed successfully.");
         }
-        if (is_dir($moduleFolder. '/config') && is_dir(CONFIG .$module)) {
-            $this->recursiveRemove(CONFIG .$module);
-        }
-        if (is_dir($moduleFolder. '/tasks') && is_file(MODULES .'tasks/' .ucfirst($module).'.php')) {
-            unlink(MODULES .'tasks/' .ucfirst($module).'.php');
-        }
+        $serviceFile = CONFIG .$this->container->get('app')->getEnv().'/providers/' .strtolower($module).'.php';
 
-        $serviceFile = CONFIG .$this->container->get('app')->getEnv().'/service/' .strtolower($module).'.php';
-
-        if (is_dir($moduleFolder .'/service') && is_file($serviceFile)) {
+        if (is_dir($moduleFolder .'/providers') && is_file($serviceFile)) {
             unlink($serviceFile);
+            echo Console::success("Module #$module config removed successfully.");
         }
-        echo Console::success("Module #$module removed successfully.");
     }
 
     /**

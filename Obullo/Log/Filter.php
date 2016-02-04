@@ -5,6 +5,7 @@ namespace Obullo\Log;
 use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Container\ParamsAwareInterface;
 use League\Container\ImmutableContainerAwareInterface;
+use League\Container\ContainerAwareInterface;
 
 /**
  * Log filter handler
@@ -32,7 +33,7 @@ class Filter
 
             $filter = new $Class;  // Resolve components
 
-            if ($filter instanceof ImmutableContainerAwareInterface) {
+            if ($filter instanceof ImmutableContainerAwareInterface || $filter instanceof ContainerAwareInterface) {
                 global $container;
                 $filter->setContainer($container);
             }

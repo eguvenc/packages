@@ -1,23 +1,20 @@
 <?php
 
-namespace Obullo\Container\ServiceProvider;
+namespace Obullo\Container\ServiceProvider\Connector;
 
 use RuntimeException;
 use UnexpectedValueException;
-use Doctrine\DBAL\Configuration;
-use Doctrine\DBAL\DriverManager;
-
-use Obullo\Database\Doctrine\DBAL\SQLLogger;
+use Obullo\Database\SQLLogger;
 use Obullo\Container\ServiceProvider\AbstractServiceProvider;
 use Interop\Container\ContainerInterface as Container;
 
 /**
- * Doctrine DBAL Connection Provider
+ * Database Service Connection Provider
  * 
  * @copyright 2009-2015 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class DoctrineDBAL extends AbstractServiceProvider
+class Database extends AbstractServiceProvider
 {
     /**
      * Database config array
@@ -34,7 +31,7 @@ class DoctrineDBAL extends AbstractServiceProvider
     protected $container;
 
     /**
-     * Doctrin adapter class
+     * Database adapter class
      * 
      * @var string
      */
@@ -50,14 +47,14 @@ class DoctrineDBAL extends AbstractServiceProvider
      */
     public function __construct(Container $container, array $params)
     {
-        $this->params = $params;
         $this->container = $container;
-        $this->adapterClass = '\Obullo\Doctrine\DBAL\Adapter';
+        $this->params    = $params;
+        $this->adapterClass = '\Obullo\Database\Pdo\Adapter';
         $this->register();
     }
 
     /**
-     * Register all connections as shared services ( It should be run one time )
+     * Register all connections as shared services ( run once )
      * 
      * @return void
      */
@@ -83,20 +80,14 @@ class DoctrineDBAL extends AbstractServiceProvider
      */
     protected function createConnection(array $params)
     {
-        $dsnString = 'driver='.strstr($params['dsn'], ':', true).';'.ltrim(strstr($params['dsn'], ':'), ':');
-        parse_str(str_replace(';', '&', $dsnString), $formattedParams);
-        $params = array_merge($formattedParams, $params);
-
-        $config = isset($params['config']) ? $params['config'] : new Configuration;
-        $eventManager = isset($params['eventManager']) ? $params['eventManager'] : null;
+        $params['dsn'] = str_replace('pdo_', '', $params['dsn']);
+        $Class = '\\Obullo\Database\Pdo\Drivers\\'.ucfirst(strstr($params['dsn'], ':', true));
 
         if ($this->params['sql']['log']) {
-
-            $config->setSQLLogger(new SQLLogger($this->container->get('logger')));
+            $params['logger'] = new SQLLogger($this->container->get('logger'));
         }
-        $params['wrapperClass'] = '\Obullo\Database\Doctrine\DBAL\Adapter';
+        return new $Class($params);
 
-        return DriverManager::getConnection($params, $config, $eventManager);
     }
 
     /**
@@ -109,9 +100,9 @@ class DoctrineDBAL extends AbstractServiceProvider
     public function shared($params = array())
     {
         if (! isset($params['connection'])) {
-            $params['connection'] = array_keys($this->config['connections'])[0];  //  Set default connection
+            $params['connection'] = array_keys($this->params['connections'])[0];  //  Set default connection
         }
-        if (! isset($this->config['connections'][$params['connection']])) {
+        if (! isset($this->params['connections'][$params['connection']])) {
             throw new UnexpectedValueException(
                 sprintf(
                     'Connection key %s does not exist in your database.php config file.',
