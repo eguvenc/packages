@@ -21,6 +21,8 @@ Opsiyonel olarak gümrükten pasaport ile geçiş gibi kimlik onaylama sistemi i
 
 Kullanıcı başarılı olarak giriş yaptıktan sonra kimliği kalıcı olarak ( varsayılan 3600 saniye ) önbelleklenir. Eğer kullanıcı onay adımından geçirilmek isteniyorsa kalıcı kimlikler <kbd>$this->user->identity->makeTemporary()</kbd> metodu ile geçici hale ( varsayılan 300 saniye ) getirilir. Geçici olan bir kimlik 300 saniye içerisinde kendiliğinden yokolur. Belirtilen süreler konfigürasyon dosyasından ayarlanabilir.
 
+![Authentication](images/auth-flowchart.png?raw=true "Authentication")
+
 <a name="temporary-identity"></a>
 
 #### Geçiçi Kimlikler

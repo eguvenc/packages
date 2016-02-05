@@ -32,10 +32,8 @@ Yetki doğrulama paketi yetki adaptörleri ile birlikte çeşitli ortak senaryol
     <li>
         <a href="#login">Oturum Açma</a>
         <ul>
-            <li><a href="#login-attempt">Oturum Açma Denemesi</a></li>
-            <li><a href="#login-example">Oturum Açma Örneği</a></li>
             <li><a href="#login-results">Oturum Açma Sonuçları</a></li>
-            <li><a href="#login-error-results">Oturum Açma Sonuçları Hata Tablosu</a></li>
+            <li><a href="#login-error-results">Hata Tablosu</a></li>
         </ul>
     </li>
 
@@ -102,9 +100,9 @@ Yetki doğrulama paketine ait konfigürasyon <kbd>app/$env/providers/user.php</k
 
 #### Adaptörler
 
-Yetki doğrulama adaptörleri uygulamaya esneklik kazandıran sorgulama arabirimleridir, yetki doğrulamanın bir veritabanı ile mi yoksa farklı bir protokol üzerinden mi yapılacağını belirleyen sınıflardır. Varsayılan arabirim türü <kbd>Database</kbd> (RDBMS or NoSQL) dir.
+Yetki doğrulama adaptörleri uygulamaya esneklik kazandıran sorgulama arabirimleridir, yetki doğrulamanın bir veritabanı ile mi yoksa farklı bir protokol üzerinden mi yapılacağını belirleyen sınıflardır. Varsayılan arabirim türü <kbd>Database</kbd> dir. ( RDBMS veya NoSQL türündeki veritabanları için ortak kullanılır ).
 
-Farklı adaptörlerin çok farklı seçenekler ve davranışları olması muhtemeldir , ama bazı temel şeyler kimlik doğrulama adaptörleri arasında ortaktır. Örneğin, kimlik doğrulama hizmeti sorgularını gerçekleştirmek ve sorgulardan dönen sonuçlar yetki doğrulama adaptörleri için ortak kullanılır.
+Farklı adaptörlerin farklı seçenekler ve davranışları olması muhtemeldir , ama bazı temel şeyler kimlik doğrulama adaptörleri arasında ortaktır. Örneğin, kimlik doğrulama hizmeti sorgularını gerçekleştirmek ve sorgulardan dönen sonuçlar yetki doğrulama adaptörleri için ortak kullanılır.
 
 <a name="storages"></a>
 
@@ -203,7 +201,7 @@ return array(
 )
 ```
 
-**db.adapter :** Yetki doğrulama adaptörleri yetki doğrulama servisinde <kbd>Database</kbd> (RDBMS or NoSQL) veya <kbd>dosya-tabanlı</kbd> gibi farklı türde kimlik doğrulama biçimleri olarak kullanılırlar.
+**db.adapter :** Yetki doğrulama adaptörleri yetki doğrulama servisinde <kbd>Database</kbd> (RDBMS veya NoSQL) veya farklı türdeki kimlik doğrulama biçimleri için kullanılırlar.
 
 **db.model :** Model sınıfı yetki doğrulama sınıfına ait veritabanı işlemlerini içerir. Bu sınıfa genişleyerek bu sınıfı özelleştirebilirsiniz bunun için aşağıda veritabanı sorgularını özelleştirmek başlığına bakınız.
 
@@ -221,7 +219,7 @@ Yetki doğrulama paketi sınıflarına erişim
 $container->addServiceProvider('Obullo\Container\ServiceProvider\User');
 ```
 
-yukarıda gösterilen servis sağlayıcısı ile olur. <kbd>User</kbd> servisi yetki doğrulama servisine ait olan <kbd>Login</kbd>, <kbd>Identity</kbd> ve <kbd>Activity</kbd> gibi sınıfları kontrol eder, böylece paket içerisinde kullanılan tüm sınıflara tek bir servis üzerinden erişim sağlanmış olur.
+yukarıda gösterilen servis sağlayıcısı ile olur. <kbd>User</kbd> servisi yetki doğrulama servisine ait olan <kbd>Login</kbd>, <kbd>Identity</kbd> ve <kbd>Storage</kbd> gibi sınıfları kontrol eder, böylece paket içerisinde kullanılan tüm sınıflara tek bir servis üzerinden erişim sağlanmış olur.
 
 ```php
 $container->get('user')->class->method();
@@ -247,22 +245,16 @@ $this->user->model->method();
 Servis konfigürasyon dosyası içinde tanımlı konfigürasyon değerlerine döner.
 
 ```php
-echo $this->container->get('user.params')('db.identifier');   // Çıktı username
-echo $this->container->get('user.params')('db.password');     // Çıktı password
-echo $this->container->get('user.params')('cache.key');       // Çıktı Auth
+echo $this->container->get('user.params')['db.identifier'];   // Çıktı username
+echo $this->container->get('user.params')['db.password'];     // Çıktı password
+echo $this->container->get('user.params')['cache']['key'];       // Çıktı Auth
 ```
 
 <a name="login"></a>
 
 ### Oturum Açma
 
-Oturum açma işlemi bir uygulamanın en kritik bölümlerinden biridir. Bir oturum açma işleminde oturum açma / kapatma, mevcut kullanıcı oturumları almak gibi işlemleri login sınıfı, oturum açma sonuçlarını ise AuthResult sınıfı kontrol eder.
-
-<a name="login-attempt"></a>
-
-#### Oturum Açma Denemesi
-
-Bir kullanıcıya oturum açma girişimi login sınıfı attempt metodu üzerinden gerçekleşir bu metot çalıştıktan sonra oturum açma sonuçlarını kontrol eden <kbd>AuthResult</kbd> nesnesi elde edilmiş olur.
+Oturum açma girişimi login sınıfı <kbd>attempt</kbd> metodu üzerinden gerçekleşir bu metot çalıştıktan sonra oturum açma sonuçlarını kontrol eden <kbd>AuthResult</kbd> nesnesi elde edilmiş olur.
 
 ```php
 $auhtResult = $this->user->login->attempt(
