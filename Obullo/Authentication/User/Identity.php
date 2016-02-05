@@ -121,7 +121,7 @@ class Identity extends AbstractIdentity
      */
     public function check()
     {        
-        if (isset($this->__isAuthenticated) && $this->__isAuthenticated == 1) {
+        if ($this->get('__isAuthenticated') == 1) {
             return true;
         }
         return false;
@@ -171,7 +171,7 @@ class Identity extends AbstractIdentity
      */
     public function isTemporary()
     {
-        return $this->__isTemporary;
+        return $this->get('__isTemporary');
     }
 
     /**
@@ -195,7 +195,7 @@ class Identity extends AbstractIdentity
      */
     protected function isExpired()
     {
-        if (isset($this->attributes['__expire']) && $this->attributes['__expire'] < time()) {
+        if ($this->get('__expire') < time()) {
             return true;
         }
         return false;
@@ -228,7 +228,7 @@ class Identity extends AbstractIdentity
      */
     public function isVerified()
     {
-        if (isset($this->__isVerified) && $this->__isVerified == 1) {
+        if ($this->get('__isVerified') == 1) {
             return true;
         }
         return false;
@@ -241,7 +241,7 @@ class Identity extends AbstractIdentity
      */
     public function exists()
     {
-        if (isset($this->__isAuthenticated)) {
+        if ($this->get('__isAuthenticated') !== false) {
             return true;
         }
         return false;
@@ -254,7 +254,7 @@ class Identity extends AbstractIdentity
      */
     public function getTime()
     {
-        return isset($this->__time) ? $this->__time : null;
+        return $this->get('__time');
     }
 
     /**
@@ -277,7 +277,7 @@ class Identity extends AbstractIdentity
      */
     public function getPasswordNeedsReHash()
     {
-        return isset($this->__passwordNeedsRehash) ? $this->__passwordNeedsReHash['hash'] : false;
+        return $this->has('__passwordNeedsRehash') ? $this->get('__passwordNeedsReHash')['hash'] : false;
     }
 
     /**
@@ -287,7 +287,7 @@ class Identity extends AbstractIdentity
      */
     public function getRememberMe()
     {
-        return isset($this->__rememberMe) ? $this->__rememberMe : 0;
+        return $this->has('__rememberMe') ? $this->get('__rememberMe') : 0;
     }
 
     /**
@@ -297,7 +297,7 @@ class Identity extends AbstractIdentity
      */
     public function getRememberToken()
     {
-        return isset($this->__rememberToken) ? $this->__rememberToken : false;
+        return $this->has('__rememberToken') ? $this->get('__rememberToken') : false;
     }
 
     /**

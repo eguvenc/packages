@@ -1,5 +1,5 @@
 
-## Database Sorgularını Özelleştirmek
+## Veritabanı Sorgularını Özelleştirmek
 
 Yetki doğrulama paketi kullanıcıya ait database fonksiyonlarını servis içerisinden <kbd>Obullo\Authentication\Model\Database</kbd> sınıfından çağırır. Eğer mevcut database sorgularında değişlik yapmak istiyorsanız bu sınıfa genişlemek için önce auth konfigürasyon dosyasından <kbd>db.model</kbd> anahtarını <kbd>\Auth\Model\Database</kbd> olarak değiştirin.
 

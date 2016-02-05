@@ -53,7 +53,7 @@ Yetki doğrulama paketi yetki adaptörleri ile birlikte çeşitli ortak senaryol
 
     <li><a href="#login-reference">Login Sınıfı Referansı</a></li>
     <li><a href="#authResult-reference">AuthResult Sınıfı Referansı</a></li>
-    <li><a href="#middleware">Auth Katmanları</a></li>
+    <li><a href="#middlewares">Auth Katmanları</a></li>
     <li><a href="#database-model">Veritabanı Sorgularını Özelleştirmek</a></li>
     <li><a href="#additional-features">Ek Özellikler</a></li>
     <li><a href="#login-event">Oturum Açma Olayı</a></li>
@@ -346,7 +346,7 @@ class Identity extends AuthIdentity
     
      public function getCountry()
      {
-        return $this->attributes['user_country'];
+        return $this->get('user_country');
      }
 
 }
@@ -395,7 +395,7 @@ Array
         </tr>
         <tr>
             <td>__isTemporary</td>
-            <td>Eğer yetki doğrulama onayı için <kbd>$this->user->identity->makeTemporary()</kbd> metodu login attempt metodu sonrasında kullanılmışsa bu anahtar <kbd>1</kbd> aksi durumda <kbd>0</kbd> değerini içerir. Eğer yetki doğrulama onayı kullanıyorsanız kullanıcıyı kendi onay yönteminiz ile onayladıktan sonra <kbd>$this->user->identity->makePermanent()</kbd> metodunu kullanarak doğrulanan kullanıcı yetkisini kalıcı hale getirmeniz gerekir.</td>
+            <td>Yetki doğrulama onay özelliği için kullanılır. Bknz <a href="#additional-features">Ek Özellikler</a>.</td>
         </tr>
         <tr>
             <td>__isVerified</td>
@@ -407,7 +407,11 @@ Array
         </tr>
         <tr>
             <td>__time</td>
-            <td>Kimliğin ilk oluşturulma zamanıdır. Microtime olarak oluşturulur ve unix time formatında kaydedilir.</td>
+            <td>Kimliğin ilk oluşturulma zamanıdır. Unix microtime(true) formatında kaydedilir.</td>
+        </tr>
+        <tr>
+            <td>__expire</td>
+            <td><kbd>$this->user->identity->expire()</kbd> metodu tarafından kimliğin belirli bir süre sonra yok olmasını sağlamak için kullanılır.</td>
         </tr>
 
     </tbody>
@@ -421,15 +425,11 @@ Array
 
 ##### $this->user->identity->check();
 
-Kullanıcının yetkisinin olup olmadığını kontrol eder. Yetkili ise <kbd>true</kbd> değilse <kbd>false</kbd> değerine döner.
+Kullanıcı yetki doğrulamadan geçmiş ise <kbd>true</kbd> aksi durumda <kbd>false</kbd> değerine döner.
 
 ##### $this->user->identity->guest();
 
-Kullanıcının yetkisi olmayan kullanıcı yani ziyaretçi olup olmadığını kontrol eder. Ziyaretçi ise <kbd>true</kbd> değilse <kbd>false</kbd> değerine döner.
-
-##### $this->user->identity->exists();
-
-Kimliğin önbellekte olup olmadığını kotrol eder. Varsa <kbd>true</kbd> yoksa <kbd>false</kbd>değerine döner.
+Kullanıcının yetkisi doğrulanmamış kullanıcı, yani bir ziyaretçi olup olmadığını kontrol eder. Ziyaretçi ise <kbd>true</kbd> değilse <kbd>false</kbd> değerine döner.
 
 ##### $this->user->identity->expire($ttl);
 
@@ -437,15 +437,15 @@ Kullanıcı kimliğinin girilen süre göre geçtikten sonra yok olmasını sağ
 
 ##### $this->user->identity->makeTemporary();
 
-Başarılı giriş yapmış kullanıcıya ait kimliği konfigurasyon dosyasından belirlenmiş sona erme ( expire ) süresine göre geçici hale getirir. Süre sona erdiğinde kimlik hafıza deposundan silinir.
+Başarılı giriş yapmış bir kullanıcıya ait kalıcı kimliği konfigurasyon dosyasından belirlenmiş sona erme süresine göre geçici hale getirir. Süre sona erdiğinde kimlik hafıza deposundan silinir.
 
 ##### $this->user->identity->makePermanent();
 
-Başarılı giriş yapmış kullanıcıya ait geçici kimliği konfigurasyon dosyasından belirlenmiş kalıcı süreye ( lifetime ) göre kalıcı hale getirir. Süre sona erdiğinde veritabanına tekrar sql sorgusu yapılarak kimlik tekrar hafızaya yazılır.
+Başarılı giriş yapmış kullanıcıya ait geçici kimliği konfigurasyon dosyasından belirlenmiş kalıcı süreye göre kalıcı hale getirir. Süre sona erdiğinde veritabanına tekrar sql sorgusu yapılarak kimlik tekrar hafızaya yazılır.
 
 ##### $this->user->identity->isVerified();
 
-Onaya tabi olan yetki doğrulamada başarılı oturum açma işleminden sonra kullanıcının onaylanıp onaylanmadığını gösterir. Kullanıcı onaylı ise <kbd>1</kbd> değerine değilse <kbd>0</kbd> değerine döner.
+Yetki doğrulama onay özelliğinde başarılı oturum açma işleminden sonra kullanıcının onaylanıp onaylanmadığını gösterir. Kullanıcı onaylı ise <kbd>1</kbd> değerine değilse <kbd>0</kbd> değerine döner. Bknz. [Auth-AdditionalFeatures.md](Auth-AdditionalFeatures.md)
 
 ##### $this->user->identity->isTemporary();
 
@@ -457,7 +457,7 @@ Geçici olarak oluşturulmuş kimlik bilgilerini güncellemenize olanak tanır.
 
 ##### $this->user->identity->logout();
 
-Oturumu kapatır ve __isAuthenticated anahtarı önbellekte <kbd>0</kbd> değeri ile günceller. Bu method önbellekteki kullanıcı kimliğini bütünü ile silmez sadece kullanıcıyı oturumu kapattı olarak kaydeder.
+Önbellekteki <kbd>__isAuthenticated</kbd> anahtarını <kbd>0</kbd> değeri ile güncelleyerek oturumu kapatır. Bu method önbellekteki kullanıcı kimliğini bütünü ile silmez sadece kullanıcıyı oturumu kapattı olarak kaydeder. Önbellekleme sayesinde 3600 saniye içerisinde kullanıcı bir daha sisteme giriş yaptığında <kbd>__isAuthenticated</kbd> değeri 1 olarak güncellenir ve veritabanı sorgusunun önüne geçilmiş olur.
 
 ##### $this->user->identity->destroy();
 
@@ -482,13 +482,21 @@ Yetkilili kullanıcı kimliğine sahip kullanıcı bilgilerini dışarıdan gele
 
 ------
 
+##### $this->user->identity->has($key);
+
+Kimlik dizisinde girilen anahtarın varolup olmadığını kontrol eder.
+
+##### $this->user->identity->get($key);
+
+Kimlik dizisinden girilen anahtara ait değere geri döner.
+
 ##### $this->user->identity->getIdentifier();
 
-Kullanıcın tekil tanımlayıcı sına geri döner. Tanımlayıcı genellikle kullanıcı adı yada id değeridir.
+Kullanıcın tekil tanımlayıcısına geri döner. Tanımlayıcı genellikle kullanıcı adı yada kullanıcı id değeridir.
 
 ##### $this->user->identity->getPassword();
 
-Kullanıcın hash edilmiş şifresine geri döner.
+Kullanıcının hash edilmiş şifresine geri döner.
 
 ##### $this->user->identity->getRememberMe();
 
@@ -496,11 +504,11 @@ Eğer kullanıcı beni hatırla özelliğini kullanıyorsa <kbd>1</kbd> değerin
 
 ##### $this->user->identity->getTime();
 
-Kimliğin ilk yaratılma zamanını verir. ( Php Unix microtime ).
+Kimliğin ilk yaratılma zamanını verir. ( Unix microtime ).
 
 ##### $this->user->identity->getRememberMe();
 
-Kullanıcı beni hatırla özelliğini kullandı ise <kbd>1</kbd> değerine kullanmadı ise <kbd>0</kbd> değerine döner.
+Kullanıcı beni hatırla özelliğini kullandı ise <kbd>1</kbd> değerine, kullanmadı ise <kbd>0</kbd> değerine döner.
 
 ##### $this->user->identity->getPasswordNeedsReHash();
 
@@ -514,17 +522,17 @@ Beni hatırla çerezine döner.
 
 Kullanıcının tüm kimlik değerlerine bir dizi içerisinde geri döner.
 
-<a name="identity-set-methods"></a>
+<a name="identity-store-methods"></a>
 
 #### Identity "Set" Metotları
 
 ------
 
-##### $this->user->identity->variable = 'value'
+##### $this->user->identity->set($key, $value);
 
 Kimlik dizisine yeni bir değer ekler.
 
-##### unset($this->user->identity->variable)
+##### $this->user->identity->remove($key);
 
 Kimlik dizisinde varolan değeri siler.
 
@@ -540,7 +548,7 @@ Bu fonksiyon kullanıcı oturumunu açmayı dener ve AuthResult nesnesine döner
 
 ##### $this->user->login->validate(array $credentials);
 
-Guest kimliği bilgilerine doğrulama işlemi yapar.Bilgiler doğruysa true değerine yanlış ise false değerine döner.
+Guest kimliği bilgilerine doğrulama işlemi yapar. Bilgiler doğruysa true değerine yanlış ise false değerine döner.
 
 ##### $this->user->login->getUserSessions();
 

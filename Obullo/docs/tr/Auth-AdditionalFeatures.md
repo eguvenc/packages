@@ -64,4 +64,4 @@ Bir geçici kimliği kalıcı hale dönüştürmek için,
 $this->user->identity->makePermanent();
 ```
 
-metodu kullanılır. Kalıcı kimliğe sahip olan kullanıcı artık sisteme giriş yapabilir. Kalıcı olan kimlikler önbelleklenirler. Böylece önbelleklenen kimlik tekrar oturum açıldığında database sorgusuna gidilmeden elde edilmiş olur. Kalıcı kimliğin önbelleklenme süresi konfigürasyon dosyasından ayarlanabilir. Eğer geçici kimlik oluşturma fonksiyonu kullanılmamışsa sistem her kimliği varsayılan olarak <kbd>kalıcı</kbd> olarak kaydeder.
+metodu kullanılır. Kalıcı kimliğe sahip olan kullanıcı artık sisteme giriş yapabilir. Kalıcı olan kimlikler önbelleklenirler. Böylece önbelleklenen kimlik tekrar oturum açıldığında veritabanı sorgusuna gidilmeden elde edilmiş olur. Kalıcı kimliğin önbelleklenme süresi konfigürasyon dosyasından ayarlanabilir. Eğer geçici kimlik oluşturma fonksiyonu kullanılmamışsa sistem her kimliği varsayılan olarak <kbd>kalıcı</kbd> olarak kaydeder.

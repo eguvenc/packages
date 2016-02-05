@@ -26,7 +26,7 @@ abstract class AbstractIdentity implements IdentityInterface
     {
         $id = $this->getColumnIdentifier();
 
-        return $this->attributes[$id];
+        return $this->get($id);
     }
 
     /**
@@ -38,7 +38,7 @@ abstract class AbstractIdentity implements IdentityInterface
     {
         $password = $this->getColumnPassword();
 
-        return $this->attributes[$password];
+        return $this->get($password);
     }
     
     /**
@@ -80,7 +80,7 @@ abstract class AbstractIdentity implements IdentityInterface
      */
     public function getRememberMe() 
     {
-        return $this->__rememberMe;
+        return $this->get('__rememberMe');
     }
     
     /**
@@ -94,55 +94,55 @@ abstract class AbstractIdentity implements IdentityInterface
     }
 
     /**
-     * Dynamically access the user's attributes.
+     * Get a value from identity data.
      *
      * @param string $key key
      * 
      * @return mixed
      */
-    public function __get($key)
+    public function get($key)
     {
         return isset($this->attributes[$key]) ? $this->attributes[$key] : false;
     }
 
     /**
-     * Dynamically set the user's attributes.
+     * Set a value to identity data.
      *
      * @param string $key key
      * @param string $val value
      * 
      * @return mixed
      */
-    public function __set($key, $val)
+    public function set($key, $val)
     {
-        if ($this->__isAuthenticated == 1) {     // Check user has auth
+        if ($this->get('__isAuthenticated') == 1) {     // Check user has auth
             $this->storage->update($key, $val);  // then accept update operation
         }
         return $this->attributes[$key] = $val;
     }
 
     /**
-     * Dynamically check if a value is set on the user.
+     * Check if a value is exists on the identity data.
      *
      * @param string $key key
      * 
      * @return bool
      */
-    public function __isset($key)
+    public function has($key)
     {
         return isset($this->attributes[$key]);
     }
 
     /**
-     * Dynamically unset a value on the user.
+     * Remove a value from identity data.
      *
      * @param string $key key
      * 
      * @return void
      */
-    public function __unset($key)
+    public function remove($key)
     {
-        if ($this->__isAuthenticated == 1) {
+        if ($this->get('__isAuthenticated') == 1) {
             $this->storage->remove($key);
         }
         unset($this->attributes[$key]);
