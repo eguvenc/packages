@@ -2,26 +2,26 @@
 
 namespace Obullo\Authentication\Model;
 
-use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
+use Interop\Container\ContainerInterface as Container;
 
 /**
- * User Provider Interface
+ * Model Interface
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-interface UserInterface
+interface ModelInterface
 {
      /**
      * Constructor
      * 
-     * @param object $provider ServiceProviderInterface
-     * @param object $params   Auth configuration & service configuration parameters
+     * @param object $container container
+     * @param object $params    Auth configuration & service configuration parameters
      */
-    public function __construct(ServiceProvider $provider, array $params);
+    public function __construct(Container $container, array $params);
 
     /**
-     * Execute sql query
+     * Execute query
      *
      * @param array $credentials user credentials
      * 
@@ -30,7 +30,7 @@ interface UserInterface
     public function query(array $credentials);
     
     /**
-     * Recalled user sql query using remember cookie
+     * Recalled user query using remember cookie
      * 
      * @param string $token rememberMe token
      * 

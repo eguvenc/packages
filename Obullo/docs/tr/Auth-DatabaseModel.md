@@ -1,95 +1,58 @@
 
 ## Database Sorgularını Özelleştirmek
 
-O2 yetki doğrulama paketi kullanıcıya ait database fonksiyonlarını servis içerisinden <kbd>Obullo\Authentication\Model\User</kbd> sınıfından çağırmaktadır. Eğer mevcut database sorgularında değişlik yapmak istiyorsanız bu sınıfa genişlemek için önce auth konfigürasyon dosyasından db.model anahtarını <kbd>\Auth\Model\User</kbd> olarak değiştirmeniz gerekmektedir.
+Yetki doğrulama paketi kullanıcıya ait database fonksiyonlarını servis içerisinden <kbd>Obullo\Authentication\Model\Database</kbd> sınıfından çağırır. Eğer mevcut database sorgularında değişlik yapmak istiyorsanız bu sınıfa genişlemek için önce auth konfigürasyon dosyasından <kbd>db.model</kbd> anahtarını <kbd>\Auth\Model\Database</kbd> olarak değiştirin.
 
-Daha sonra <kdb>app/classes/Auth/Model</kbd> klasörünü içerisine <b>User.php</b> dosyasını yaratarak aşağıdaki gibi User model sınıfı içerisinden <kbd>Obullo\Authentication\Model\User</kbd> sınıfına genişlemeniz gerekmektedir. Bunu yaparken <b>UserInterface</b> içerisindeki yazım kurallarına bir göz atın.
+```php
+return array(
+    
+    'params' => [
 
-Aşağıda O2 yetki doğrulama paketi içerisindeki <kbd>\Obullo\Authentication\Model\UserInterface</kbd> sınıfı görülüyor.
+        'db.adapter' => 'Obullo\Authentication\Adapter\Database',
+        'db.model' => 'Auth\Model\Database',
+        'db.provider' => [
+            'connection' => 'default'
+        ],
+        .
+)
+```
+
+Sonraki adımda <kbd>Database.php</kbd> dosyasını yaratarak aşağıdaki gibi <kbd>Obullo\Authentication\Model\Database</kbd> sınıfına genişlemeniz önerilir. Bu sınıf <kbd>\Obullo\Authentication\Model\ModelInterface</kbd> sınıfını metotlarını baz alır.
 
 ```php
 namespace Obullo\Authentication\Model;
 
-use Auth\Identities\GenericUser;
-use Obullo\Container\ContainerInterface as Container;
-use Obullo\Container\ServiceProviderInterface as Provider;
-
-interface UserInterface
+interface ModelInterface
 {
-    public function __construct(Container $c, Provider $provider);
-    public function execQuery(GenericUser $user);
-    public function execRecallerQuery($token);
-    public function updateRememberToken($token, GenericUser $user);
+    public function __construct(Container $container, array $params);
+    public function query(array $credentials);
+    public function recallerQuery($token);
+    public function updateRememberToken($token, array $credentials);
 }
 ```
 
-Önce User.php service dosyasından <b>db.model</b> anahtarını <kbd>\Auth\Model\User</kbd> olarak değiştirin.
 
-```php
-class User implements ServiceInterface
-{
-    public function register(ContainerInterface $c)
-    {
-        $c['user'] = function () use ($c) {
-
-            $parameters = [
-                'cache.key' => 'Auth',
-                'db.adapter'=> '\Obullo\Authentication\Adapter\Database',
-                'db.model'  => '\Obullo\Authentication\Model\Pdo\User',       // User model, you can replace it with your own.
-                'db.provider' => [
-                    'name' => 'database',
-                    'params' => [
-                        'connection' => 'default'
-                    ]
-                ],
-                'db.tablename' => 'users',
-                'db.id' => 'id',
-                'db.identifier' => 'username',
-                'db.password' => 'password',
-                'db.rememberToken' => 'remember_token',
-                'db.select' => [
-                    'date',
-                ]
-            ];
-            $manager = new AuthManager($c);
-            $manager->setParameters($parameters);
-
-            return $manager;
-        };
-    }
-}
-
-```
-Yukarıda gösterilen auth servis konfigürasyonundaki <b>db.model</b> anahtarını <kbd>\Auth\Model\User</kbd> olarak güncellediyseniz, aşağıda sizin için bir model örneği yaptık bu örneği değiştererek ihtiyaçlarınıza göre kullanabilirsiniz. Bunun için <kbd>Obullo\Authentication\Model\User</kbd> sınıfına bakın ve ezmek ( override ) istediğiniz method yada değişkenleri sınıfınız içerisine dahil edin.
+Aşağıda sizin için bir model örneği yaptık bu örneği değiştererek ihtiyaçlarınıza göre kullanabilirsiniz. Bunun için <kbd>Obullo\Authentication\Model\Database</kbd> sınıfına bakın ve ezmek ( override ) istediğiniz method yada değişkenleri sınıfınız içerisine dahil edin.
 
 ```php
 namespace Auth\Model;
 
-use Auth\Identities\GenericUser;
-use Auth\Identities\AuthorizedUser;
-use Obullo\Authentication\Model\UserInterface;
-use Obullo\Authentication\Model\User as AuthModel;
+use Obullo\Authentication\Model\ModelInterface;
+use Obullo\Authentication\Model\Database as AuthModel;
 
-class User extends AuthModel implements UserInterface
+class Database extends AuthModel
 {
-    /**
-     * Execute sql query
-     *
-     * @param object $user GenericUser object to get user's identifier
-     * 
-     * @return mixed boolean|array
-     */
-    public function execQuery(GenericUser $user)
+    public function query(array $credentials)
     {
         return $this->db->prepare(sprintf(
             'SELECT * FROM %s WHERE %s = ?', $this->tablename, $this->columnIdentifier
         ))
-            ->bindValue(1, $user->getIdentifier(), PDO::PARAM_STR)
+            ->bindValue(1, $credentials[$this->columnIdentifier], PDO::PARAM_STR)
             ->execute()
             ->rowArray();
     }
 
 }
 
-/* Location: .app/classes/Auth/Model/User.php */
+/* Location: .app/classes/Auth/Model/Database.php */
 ```

@@ -14,9 +14,9 @@ Yetki doğrulama paketi yetki adaptörleri ile birlikte çeşitli ortak senaryol
             <li>
                 <a href="#storages">Hazıfa Depoları</a>
                 <ul>    
-                    <li><a href="#null-storage">Null</a> ( Session )</li>
+                    <li><a href="#session-storage">Session</a></li>
                     <li><a href="#redis-storage">Redis Veritabanı</a></li>
-                    <li><a href="#cache-storage">Cache</a> ( File, Apc, Memcache, Memcached, Redis )</li>
+                    <li><a href="#cache-storage">Cache Sürücüleri</a> ( Memcache, Memcached )</li>
                 </ul>
             </li>
         </ul>
@@ -112,24 +112,20 @@ Farklı adaptörlerin çok farklı seçenekler ve davranışları olması muhtem
 
 Hazıfa deposu yetki doğrulama esnasında kullanıcı kimliğini ön belleğe alır ve tekrar tekrar oturum açıldığında database ile bağlantı kurmayarak uygulamanın performans kaybetmesini önler. Yetki doğrulama şu anda depolama için sadece <kbd>Redis</kbd> veritabanı ve <kbd>Cache</kbd> sürücüsünü desteklemektedir.
 
-<a name="null-storage"></a>
+<a name="session-storage"></a>
 
-##### Null ( Session )
+##### Session
 
-Null sınıfı varsayılan depodur ve depo olarak <kbd>cache</kbd> sınıfı yerine <kbd>session</kbd> paketini kullanır. Deponun aktif olması için auth konfigürasyon dosyasından cache deposunun Null olarak ayarlanması gerekir.
+Session sınıfı varsayılan depodur ve depo olarak <kbd>cache</kbd> sürücüleri yerine <kbd>session</kbd> paketini kullanır.
 
 ```php
 'cache' => array(
 
-    'storage' => '\Obullo\Authentication\Storage\Null',
-    'provider' => array(
-        'driver' => null,
-        'connection' => 'second'
-    ),
+    'storage' => '\Obullo\Authentication\Storage\Session',
 )
 ```
 
-Null hafıza deposu kullanıldığında geçici kimlik oluşturma ve sadece bir aygıttan tekil oturum açtırma gibi gelişmiş işlevler çalışmaz.
+Session hafıza deposu kullanıldığında önbellekleme, geçici kimlik oluşturma ve sadece bir aygıttan tekil oturum açtırma gibi gelişmiş işlevler çalışmaz.
 
 <a name="redis-storage"></a>
 
@@ -145,30 +141,22 @@ Varsayılan hafıza deposu <kbd>providers/user.php</kbd> konfigürasyonundan de�
 'cache' => array(
 
     'storage' => '\Obullo\Authentication\Storage\Redis',
-    'provider' => array(
-        'driver' => 'redis',
-        'connection' => 'second'
-    ),
 )
 ```
 <a name="cache-storage"></a>
 
-##### Cache ( File, Apc, Memcache, Memcached, Redis )
+##### Cache Sürücüleri ( Memcache, Memcached )
 
-Eğer cache sürücülerini kullanmak istiyorsanız <kbd>providers/user.php</kbd> konfigürasyon dosyasından ayarları aşağıdaki gibi değiştirmeniz yeterli olacaktır.
+Eğer cache sürücülerini kullanmak istiyorsanız <kbd>providers/user.php</kbd> konfigürasyon dosyasından ayarları sürücü adı ile değiştirmeniz yeterli olacaktır.
 
 ```php
 'cache' => array(
 
-    'storage' => '\Obullo\Authentication\Storage\Cache',   // Storage driver uses cache package
-    'provider' => array(
-        'driver' => 'memcached',
-        'connection' => 'default'
-    ),
+    'storage' => '\Obullo\Authentication\Storage\Memcached',
 )
 ```
 
-Yukarıda görüldüğü gibi provider ayarlarından driver sekmesini sürücü ismi ile değiştirmeyi unutmamalısınız. Redis dışında bir çözüm kullanıyorsanız yazmış olduğunuz kendi hafıza depolama sınfınızı provider driver anahtarına girmelisiniz.
+Bu çözümler dışında başka bir çözüm kullanıyorsanız yazmış olduğunuz kendi hafıza depolama sınfını storage anahtarına girebilirsiniz.
 
 <a name="running"></a>
 
@@ -205,20 +193,12 @@ return array(
     'params' => [
 
         'cache.key' => 'Auth',
-        'db.adapter'=> '\Obullo\Authentication\Adapter\Database',
-        'db.model'  => '\Obullo\Authentication\Model\Pdo\User',
+        'db.adapter'=> 'Obullo\Authentication\Adapter\Database',
+        'db.model'  => 'Obullo\Authentication\Model\Database',
         'db.provider' => [
-            'name' => 'database',
             'connection' => 'default'
         ],
         'db.tablename' => 'users',
-        'db.id' => 'id',
-        'db.identifier' => 'username',
-        'db.password' => 'password',
-        'db.rememberToken' => 'remember_token',
-        'db.select' => [
-            'date',
-        ],
         .
 )
 ```
@@ -227,9 +207,7 @@ return array(
 
 **db.model :** Model sınıfı yetki doğrulama sınıfına ait veritabanı işlemlerini içerir. Bu sınıfa genişleyerek bu sınıfı özelleştirebilirsiniz bunun için aşağıda veritabanı sorgularını özelleştirmek başlığına bakınız.
 
-**db.provider.name :** Veritabanı servis sağlayıcınızın ismidir. Veritabanı işlemlerinin hangi servis sağlayıcısının kullanması gerektiğini tanımlar.
-
-**db.provider.params.connection:** Veritabanı servis sağlayıcısının hangi bağlantıyı seçmesi gerektiğini tanımlar.
+**db.provider.connection:** Veritabanı servis sağlayıcısının hangi bağlantıyı seçmesi gerektiğini tanımlar.
 
 **db.tablename:** Veritabanı işlemleri için tablo ismini belirlemenize olanak sağlar. Bu konfigürasyon veritabanı işlemlerinde kullanılır.
 
@@ -344,23 +322,8 @@ if ($auhtResult->isValid()) {
         </tr>
         <tr>
             <td>-3</td>
-            <td>AuthResult::FAILURE_UNCATEGORIZED</td>
-            <td>Kategorize edilemeyen bir hata oluştuğu anlamına gelir.</td>
-        </tr>
-        <tr>
-            <td>-4</td>
-            <td>AuthResult::TEMPORARY_AUTH_HAS_BEEN_CREATED</td>
+            <td>AuthResult::TEMPORARY_AUTH</td>
             <td>Geçici kimlik bilgilerinin oluşturulduğuna dair bir bilgidir.</td>
-        </tr>
-        <tr>
-            <td>-5</td>
-            <td>AuthResult::FAILURE_UNVERIFIED</td>
-            <td>Yetki doğrulama onayı aktif iken geçici kimlik bilgilerin henüz doğrulanmadığını gösterir.</td>
-        </tr>
-        <tr>
-            <td>-6</td>
-            <td>AuthResult::WARNING_ALREADY_LOGIN</td>
-            <td>Kullanıcı kimliğinin zaten doğrunlanmış olduğunu gösterir.</td>
         </tr>
         <tr>
             <td>1</td>
@@ -375,7 +338,7 @@ if ($auhtResult->isValid()) {
 
 ### Kimlik Sınıfı
 
-Yetkilinedirilmiş kimliği yönetebilmek için <kbd>app/classes/Auth</kbd> içerisindeki kimlik sınıfı kullanılır. Bu klasör içerisindeki Identity sınıfı <kbd>Obullo/Authentication/User/Identity</kbd> auth paketine genişler ve aşağıdaki gibidir.
+Yetkilendirilmiş kimliği yönetebilmek için <kbd>app/classes/Auth</kbd> içerisindeki kimlik sınıfı kullanılır. Bu klasör içerisindeki Identity sınıfı <kbd>Obullo/Authentication/User/Identity</kbd> auth paketine genişler ve aşağıdaki gibidir.
 
 ```php
 namespace Auth;
@@ -404,7 +367,6 @@ print_r($this->user->identity->getArray());
 ```
 
 Çıktı
-
 
 ```php
 /*
@@ -477,9 +439,9 @@ Kullanıcının yetkisi olmayan kullanıcı yani ziyaretçi olup olmadığını 
 
 Kimliğin önbellekte olup olmadığını kotrol eder. Varsa <kbd>true</kbd> yoksa <kbd>false</kbd>değerine döner.
 
-##### $this->user->identity->expire($ttl, $block = '__permanent');
+##### $this->user->identity->expire($ttl);
 
-Kullanıcı kimliğini girilen süreye göre geçtikten sonra yok olmasını sağlar.
+Kullanıcı kimliğinin girilen süre göre geçtikten sonra yok olmasını sağlar.
 
 ##### $this->user->identity->makeTemporary();
 
@@ -516,6 +478,11 @@ Beni hatırla çerezinin bütünüyle tarayıcıdan siler.
 ##### $this->user->identity->refreshRememberToken(array $credentials);
 
 Beni hatırla çerezini yenileyerek veritabanı ve çerezlere kaydeder.
+
+##### $this->user->identity->validate(array $credentials);
+
+Yetkilili kullanıcı kimliğine sahip kullanıcı bilgilerini dışarıdan gelen yeni bilgiler ile karşılaştırarak doğrulama yapar.
+
 
 <a name="identity-get-methods"></a>
 
@@ -568,15 +535,6 @@ Kimlik dizisine yeni bir değer ekler.
 ##### unset($this->user->identity->variable)
 
 Kimlik dizisinde varolan değeri siler.
-
-##### $this->user->identity->setArray(array $attributes)
-
-Tüm kullanıcı kimliği dizisinin üzerine girilen diziyi yazar.
-
-##### $this->user->identity->validate(array $credentials);
-
-Yetkilili kullanıcı kimliğine sahip kullanıcı bilgilerini dışarıdan gelen yeni bilgiler ile karşılaştırarak doğrulama yapar.
-
 
 <a name="login-reference"></a>
 
@@ -640,7 +598,7 @@ Login denemesinden sonra geçerli veritabanı sorgu sonucu yada önbellek verile
 
 Auth katmanları uygulamanız içerisinde <kbd>app/classes/Http/Middlewares/</kbd> klasörü altında bulunan <kbd>Auth.php</kbd> ve <kbd>Guest.php</kbd> dosyalarıdır. Auth dosyası uygulamaya giriş yapmış olan kullanıcıları kontrol ederken Guest katmanı ise uygulamaya giriş yetkisi olmayan kullanıcıları kontrol eder. Auth ve Guest katmanlarının çalışabilmesi için route yapınızda middleware anahtarına ilgili modül için birkez tutturulmaları gerekir.
 
-Auth katmanları hakkında daha fazla bilgi için [Middleware-Auth.md](Middleware-Auth.md) dökümentasyonunu inceleyebilirsiniz.
+Auth katmanları hakkında daha fazla bilgi için [Auth Middleware](https://github.com/obullo/http-middlewares/blob/master/docs/tr/Auth.md) dökümentasyonunu inceleyebilirsiniz.
 
 <a name="database-model"></a>
 

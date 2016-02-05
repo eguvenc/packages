@@ -2,7 +2,6 @@
 
 namespace Obullo\Authentication\Adapter;
 
-use Auth\Identities\GenericUser;
 use Obullo\Authentication\Token;
 use Obullo\Authentication\AuthResult;
 
@@ -264,7 +263,7 @@ class Database extends AbstractAdapter
     protected function validateResultSet()
     {
         if (! $this->storage->isEmpty('__temporary')) {
-            $this->results['code'] = AuthResult::TEMPORARY_AUTH_HAS_BEEN_CREATED;
+            $this->results['code'] = AuthResult::TEMPORARY_AUTH;
             $this->results['messages'][] = 'Temporary auth has been created.';
             return $this->createResult();
         }
@@ -290,7 +289,7 @@ class Database extends AbstractAdapter
             $this->results['messages'][] = 'Supplied credential is invalid.';
             return $this->createResult();
         }
-        if (isset($this->resultRowArray[1]) && $this->resultRowArray[1][$this->columnIdentifier]) {
+        if (isset($this->resultRowArray[1][$this->columnIdentifier])) {
             $this->results['code'] = AuthResult::FAILURE_IDENTITY_AMBIGUOUS;
             $this->results['messages'][] = 'More than one record matches the supplied identity.';
             return $this->createResult();

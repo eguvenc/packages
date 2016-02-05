@@ -131,15 +131,18 @@ abstract class AbstractNull
     }
 
     /**
-     * Set random auth session id to sessions
+     * Create login id
      * 
      * @return string
      */
     public function setLoginId()
     {
-        $agentStr = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
+        $server = $this->request->getServerParams();
+
+        $agentStr  = isset($server['HTTP_USER_AGENT']) ? $server['HTTP_USER_AGENT'] : null;
         $userAgent = substr($agentStr, 0, 50);  // First 50 characters of the user agent
         $id = hash('adler32', trim($userAgent));
+
         $this->session->set($this->getCacheKey().'/LoginId', $id);
         return $id;
     }

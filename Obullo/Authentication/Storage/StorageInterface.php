@@ -3,7 +3,8 @@
 namespace Obullo\Authentication\Storage;
 
 use Obullo\Session\SessionInterface as Session;
-use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
+use Interop\Container\ContainerInterface as Container;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
  * Storage Interface
@@ -16,11 +17,12 @@ interface StorageInterface
     /**
      * Constructor
      * 
-     * @param object $provider provider
-     * @param object $session  session
-     * @param array  $params   parameters
+     * @param object $container $container
+     * @param object $request   $request
+     * @param object $session   session
+     * @param array  $params    parameters
      */
-    public function __construct(ServiceProvider $provider, Session $session, array $params);
+    public function __construct(Container $container, Request $request, Session $session, array $params);
 
     /**
      * Returns true if temporary credentials "not" exists

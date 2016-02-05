@@ -43,7 +43,7 @@ $container->share('middleware', 'Obullo\Application\MiddlewareStack')->withArgum
 /**
  * Create Server Request
  */
-$request = \Obullo\Http\ServerRequestFactory::fromGlobals(
+$request = Obullo\Http\ServerRequestFactory::fromGlobals(
     $_SERVER,
     $_GET,
     $_POST,
@@ -53,25 +53,9 @@ $request = \Obullo\Http\ServerRequestFactory::fromGlobals(
 $request->setContainer($container);
 
 /**
- * Share Server Request
+ * Register core components
  */
-$container->share(
-    'request',
-    $request
-);
-
-/**
- * Register app providers
- */
-require APP .'providers.php';
-
-/**
- * Register router
- */
-$container->share('router', 'Obullo\Router\Router')
-    ->withArgument($container)
-    ->withArgument($container->get('request'))
-    ->withArgument($container->get('logger'));
+$container->share('request', $request);
 
 /**
  * Initialize to application

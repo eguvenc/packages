@@ -19,13 +19,8 @@ Yetki doğrulama paketine ait konfigürasyon <kbd>app/$env/providers/user.php</k
         </tr>
         <tr>
             <td>cache[storage]</td>
-            <td>Hazıfa deposu yetki doğrulama esnasında kullanıcı kimliğini ön belleğe alır ve tekrar tekrar oturum açıldığında database ile bağlantı kurmayarak uygulamanın performans kaybetmesini önler.Varsayılan depo Redis tir.</td>
+            <td>Hazıfa deposu yetki doğrulama esnasında kullanıcı kimliğini ön belleğe alır ve tekrar tekrar oturum açıldığında database ile bağlantı kurmayarak uygulamanın performans kaybetmesini önler.</td>
         </tr>
-        <tr>
-            <td>cache[provider][driver]</td>
-            <td>Hazıfa deposu içerisinde kullanılan servis sağlayıcısının hangi servis sağlayıcısına bağlanacağını belirler. Varsayılan değer <kbd>redis</kbd> değeridir.</td>
-        </tr>
-
         <tr>
             <td>cache[provider][connection]</td>
             <td>Hazıfa deposu içerisinde kullanılan servis sağlayıcısının hangi bağlantıyı kullanacağını belirler.</td>

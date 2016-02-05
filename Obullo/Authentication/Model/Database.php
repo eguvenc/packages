@@ -1,18 +1,18 @@
 <?php
 
-namespace Obullo\Authentication\Model\Pdo;
+namespace Obullo\Authentication\Model;
 
 use Pdo;
-use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
-use Obullo\Authentication\Model\UserInterface;
+use Obullo\Authentication\Model\ModelInterface;
+use Interop\Container\ContainerInterface as Container;
 
 /**
- * User Model
+ * Database Model
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class User implements UserInterface
+class Database implements ModelInterface
 {
     protected $db;                     // Database object
     protected $select;                 // Selected fields
@@ -25,10 +25,10 @@ class User implements UserInterface
      /**
      * Constructor
      * 
-     * @param object $provider \Obullo\Container\ServiceProvider\ServiceProviderInterface
-     * @param object $params   Auth configuration & service configuration parameters
+     * @param object $container container
+     * @param object $params    Auth configuration & service configuration parameters
      */
-    public function __construct(ServiceProvider $provider, array $params)
+    public function __construct(Container $container, array $params)
     {
         $this->tablename           = $params['db.tablename'];
         $this->columnId            = $params['db.id'];
@@ -36,22 +36,22 @@ class User implements UserInterface
         $this->columnPassword      = $params['db.password'];
         $this->columnRememberToken = $params['db.rememberToken'];  // RememberMe token column name
 
-        $this->connect($provider, $params);
+        $this->connect($container, $params);
     }
 
     /**
      * Set database provider connection variable ( We don't open the db connection in here ) 
      * 
-     * @param object $provider service provider object
-     * @param array  $params   parameters
+     * @param object $container container
+     * @param array  $params    service parameters
      * 
      * @return void
      */
-    public function connect(ServiceProvider $provider, array $params)
+    public function connect(Container $container, array $params)
     {
-        $this->db = $provider->shared(
+        $this->db = $container->get('database')->shared(
             [
-                'connection' => $params['db.provider']['connection']
+                'connection' => 'default'
             ]
         );
         $this->select($params);

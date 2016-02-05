@@ -4,7 +4,6 @@ namespace Obullo\Authentication\User;
 
 use Obullo\Authentication\Token;
 use Obullo\Authentication\Recaller;
-use Auth\Identities\AuthorizedUser;
 
 use Obullo\Authentication\AbstractIdentity;
 use Obullo\Session\SessionInterface as Session;
@@ -105,6 +104,9 @@ class Identity extends AbstractIdentity
         if ($this->attributes = $this->storage->getCredentials('__permanent')) {
             $this->__isTemporary = 0;                   // Refresh memory key expiration time
             $this->setCredentials($this->attributes);
+            if ($this->isExpired()) {
+                $this->destroy();
+            }
             return;
         }
         $this->attributes = $this->storage->getCredentials('__temporary');
@@ -173,16 +175,30 @@ class Identity extends AbstractIdentity
     }
 
     /**
-     * Set expire time
+     * Set time to live
      * 
-     * @param int    $ttl   expire
-     * @param string $block __temporary or __permanent
+     * @param int $ttl expire
      * 
      * @return void
      */
-    public function expire($ttl, $block = '__permanent')
+    public function expire($ttl)
     {
-        $this->storage->setCredentials($this->getCredentials($block), null, $block, $ttl);
+        $data = $this->storage->getCredentials('__permanent');
+        $data['__expire'] = time() + $ttl;
+        $this->storage->setCredentials($data, null, '__permanent');
+    }
+
+    /**
+     * Check identity is expired
+     * 
+     * @return boolean
+     */
+    protected function isExpired()
+    {
+        if (isset($this->attributes['__expire']) && $this->attributes['__expire'] < time()) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -314,12 +330,14 @@ class Identity extends AbstractIdentity
     /**
      * Logout User and destroy cached identity data
      *
+     * @param string $block block
+     * 
      * @return void
      */
-    public function destroy()
+    public function destroy($block = '__permanent')
     {
         $this->updateRememberToken();
-        $this->storage->deleteCredentials('__permanent');
+        $this->storage->deleteCredentials($block);
     }
 
     /**

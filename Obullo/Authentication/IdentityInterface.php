@@ -66,12 +66,11 @@ interface IdentityInterface
     /**
      * Set expire time
      * 
-     * @param int    $ttl   expire
-     * @param string $block __temporary or __permanent
+     * @param int $ttl expire
      * 
      * @return void
      */
-    public function expire($ttl, $block = '__permanent');
+    public function expire($ttl);
 
     /**
      * Move permanent identity to temporary block

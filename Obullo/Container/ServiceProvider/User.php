@@ -39,7 +39,8 @@ class User extends AbstractServiceProvider
             ->withArgument($container);
 
         $container->share('auth.storage', $params['cache']['storage'])
-            ->withArgument($container->get('cache'))
+            ->withArgument($container)
+            ->withArgument($container->get('request'))
             ->withArgument($container->get('session'))
             ->withArgument($params);
 
@@ -55,11 +56,11 @@ class User extends AbstractServiceProvider
             ->withArgument($container->get('auth.storage'))
             ->withArgument($params);
 
-        $container->share('auth.model', 'Obullo\Authentication\Model\Pdo\User')
-            ->withArgument($container->get('database'))
+        $container->share('auth.model', $params['db.model'])
+            ->withArgument($container)
             ->withArgument($params);
 
-        $container->share('auth.adapter', 'Obullo\Authentication\Adapter\Database')
+        $container->share('auth.adapter', $params['db.adapter'])
             ->withArgument($container)
             ->withArgument($container->get('session'))
             ->withArgument($container->get('auth.storage'))

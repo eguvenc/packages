@@ -22,7 +22,18 @@ use Obullo\Application\MiddlewareStackInterface as Middleware;
  */
 class Http extends Application
 {
+    /**
+     * Dispatch error
+     * 
+     * @var boolean
+     */
     protected $error;
+
+    /**
+     * Current controller
+     * 
+     * @var object
+     */
     protected $controller;
 
     /**
@@ -36,13 +47,20 @@ class Http extends Application
         $app = $container->get('app');
 
         include APP .'errors.php';
-        
-        $this->registerErrorHandlers();
-            
-        $router = $container->get('router');
-        $middleware = $container->get('middleware');
 
+        $this->registerErrorHandlers();
+
+        include APP .'providers.php';
+
+        $container->share('router', 'Obullo\Router\Router')
+            ->withArgument($container)
+            ->withArgument($container->get('request'))
+            ->withArgument($container->get('logger'));
+            
+        $middleware = $container->get('middleware');
         include APP .'middlewares.php';
+
+        $router = $container->get('router');
         include APP .'routes.php';
 
         $this->boot($router, $middleware);
@@ -62,7 +80,6 @@ class Http extends Application
 
         include MODULES .$router->getModule('/').$router->getDirectory('/').$router->getClass().'.php';
         $className = '\\'.$router->getNamespace().$router->getClass();
-
         $method = $router->getMethod();
 
         if (! class_exists($className, false)) {

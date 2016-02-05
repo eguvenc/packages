@@ -45,8 +45,3 @@ $container->share('config', 'Obullo\Config\Config')->withArgument($container);
 $container->share('app', 'Obullo\Application\Cli')->withArgument($container);
 $container->share('request', 'Obullo\Cli\NullRequest');
 $container->share('response', 'Obullo\Cli\NullResponse');
-
-/**
- * Register app providers
- */
-require APP .'providers.php';

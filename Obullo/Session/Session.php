@@ -4,8 +4,8 @@ namespace Obullo\Session;
 
 use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Config\ConfigInterface as Config;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
-use Psr\Http\Message\RequestInterface as Request;
 
 /**
  * Session Class

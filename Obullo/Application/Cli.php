@@ -24,8 +24,10 @@ class Cli extends Application
 
         $this->registerErrorHandlers();
 
-        $logger     = $container->get('logger');
-        $request    = $container->get('request');
+        include APP .'providers.php';
+
+        $logger  = $container->get('logger');
+        $request = $container->get('request');
 
         $container->share('router', 'Obullo\Cli\Router')
             ->withArgument($request->getUri())
@@ -41,7 +43,6 @@ class Cli extends Application
                 $logger->shutdown();
             }
         );
-
     }
 
     /**

@@ -2,43 +2,47 @@
 
 namespace Obullo\Authentication\Storage;
 
-use Obullo\Session\SessionInterface as Session;
-use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
+use Obullo\Session\SessionInterface;
+use Interop\Container\ContainerInterface as Container;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
- * Null Storage
+ * Session storage
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Null extends AbstractNull implements StorageInterface
+class Session extends AbstractNull implements StorageInterface
 {
     protected $params;          // Config parameters
     protected $cacheKey;        // Cache key
+    protected $request;         // Request class
     protected $session;         // Session class
 
     /**
      * Constructor
      * 
-     * @param object $provider provider
-     * @param object $session  session
-     * @param array  $params   parameters
+     * @param object $container $container
+     * @param object $request   server request
+     * @param object $session   session
+     * @param array  $params    parameters
      */
-    public function __construct(ServiceProvider $provider, Session $session, array $params)
+    public function __construct(Container $container, Request $request, Session $session, array $params) 
     {
-        $provider = $params = null;
-        $this->cacheKey = (string)$params['cache.key'];
+        $container = null;
+        $this->request = $request;
+        $this->cacheKey = (string)$params['cache']['key'];
         $this->session = $session;
     }
 
     /**
      * Connect to cache provider
      * 
-     * @return boolean
+     * @return void
      */
     public function connect()
     {
-        return true;
+        return;
     }
 
     /**

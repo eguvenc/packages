@@ -3,10 +3,11 @@
 namespace Obullo\Authentication\Storage;
 
 use Obullo\Session\SessionInterface as Session;
-use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
+use Interop\Container\ContainerInterface as Container;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
- * Redis Storage
+ * Redis storage
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
@@ -16,40 +17,43 @@ class Redis extends AbstractStorage implements StorageInterface
     protected $params;          // Config parameters
     protected $cache;           // Cache class
     protected $cacheKey;        // Cache key
+    protected $request;         // Request class
     protected $session;         // Session class
 
     /**
      * Constructor
      * 
-     * @param object $provider provider
-     * @param object $session  session
-     * @param array  $params   parameters
+     * @param object $container $container
+     * @param object $request   $request
+     * @param object $session   session
+     * @param array  $params    parameters
      */
-    public function __construct(ServiceProvider $provider, Session $session, array $params)
+    public function __construct(Container $container, Request $request, Session $session, array $params) 
     {
         $this->params = $params;
-        $this->cacheKey = (string)$params['cache.key'];
+        $this->request = $request;
+        $this->cacheKey = (string)$params['cache']['key'];
         $this->session = $session;
 
-        $this->connect($provider);
+        $this->connect($container, $params);
     }
 
     /**
      * Connect to cache provider
      * 
-     * @param object $provider service provider
+     * @param object $container container
+     * @param object $params    service parameters
      * 
-     * @return boolean
+     * @return void
      */
-    public function connect($provider)
+    public function connect(Container $container, array $params)
     {
-        $this->cache = $provider->shared(
+        $this->cache = $container->get('cache')->shared(
             [
-                'driver' => $this->params['cache']['provider']['driver'],
-                'connection' => $this->params['cache']['provider']['connection']
+                'driver' => 'redis',
+                'connection' => $params['cache']['provider']['connection']
             ]
         );
-        return true;
     }
 
     /**

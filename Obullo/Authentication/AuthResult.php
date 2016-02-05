@@ -26,24 +26,9 @@ class AuthResult
     const FAILURE_CREDENTIAL_INVALID = -2;
 
     /**
-     * Failure due to uncategorized reasons.
-     */
-    const FAILURE_UNCATEGORIZED = -3;
-
-    /**
      * Temporary auth has been created
      */
-    const TEMPORARY_AUTH_HAS_BEEN_CREATED = -4;
-
-    /**
-     * Temporary auth ( Unverified user )
-     */
-    const FAILURE_UNVERIFIED = -5;
-
-    /**
-     * Warning already logged in.
-     */
-    const WARNING_ALREADY_LOGIN = -6;
+    const TEMPORARY_AUTH = -3;
 
     /**
      * Authentication success.
