@@ -65,7 +65,7 @@ Yetki doğrulama paketi yetki adaptörleri ile birlikte çeşitli ortak senaryol
 
 ### Özellikler
 
-Obullo yetki doğrulama; 
+Yetki doğrulama,
 
 * Hafıza depoları, ( Storages ) 
 * Adaptörler,
