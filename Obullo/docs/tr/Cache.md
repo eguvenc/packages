@@ -38,11 +38,11 @@ Cache servisi sık kullanılan önbellekleme türleri için basit ve ortak bir a
 <li>
     <a href="#drivers">Sürücüler</a>
     <ul>
+        <li><a href="#redis">Redis</a></li>
+        <li><a href="#memcached">Memcached</a></li>
         <li><a href="#file">File</a></li>
         <li><a href="#file">Apc</a></li>
         <li><a href="#memcache">Memcache</a></li>
-        <li><a href="#memcached">Memcached</a></li>
-        <li><a href="#redis">Redis</a></li>
     </ul>
 </li>
 
@@ -200,6 +200,18 @@ Bellek içerisindeki tüm anahtarları ve değerlerini yokeder.
 
 Şu anki sürümde aşağıdaki sürücüler desteklenmektedir.
 
+<a name="redis"></a>
+
+#### Redis
+
+Redis sürücüsü kurulum konfigürasyon ve sınıf referansı için [Cache-Redis.md](Cache-Redis.md) dosyasını okuyunuz.
+
+<a name="memcached"></a>
+
+#### Memcached
+
+Memcached sürücüsü kurulum konfigürasyon ve sınıf referansı için [Cache-Memcached.md](Cache-Memcached.md) dosyasını okuyunuz.
+
 <a name="file"></a>
 
 #### File
@@ -217,15 +229,3 @@ PECL eklentisi ile kurulum gerektirir ortak arayüz metotlarını kullanarak sun
 #### Memcache
 
 Php eklentisi ile kurulum gerektirir ortak arayüz metotlarını kullanarak sunucu önbelleğine kayıt yapar. Kurulum ve sunucu gereksinimleri için <a href="http://php.net/manual/tr/book.memcache.php">http://php.net/manual/tr/book.memcache.php</a> adresini ziyaret ediniz.
-
-<a name="memcached"></a>
-
-#### Memcached
-
-Memcached sürücüsü kurulum konfigürasyon ve sınıf referansı için [Cache-Memcached.md](Cache-Memcached.md) dosyasını okuyunuz.
-
-<a name="redis"></a>
-
-#### Redis
-
-Redis sürücüsü kurulum konfigürasyon ve sınıf referansı için [Cache-Redis.md](Cache-Redis.md) dosyasını okuyunuz.
