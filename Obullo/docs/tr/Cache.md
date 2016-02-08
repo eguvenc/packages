@@ -1,31 +1,35 @@
 
-## Cache Sınıfı
+## Cache Servisi
 
-Cache paketi çeşitli önbellekleme ( cache ) türleri için birleşik bir arayüz sağlar. Cache paket konfigürasyonu ortam tabanlı konfigürasyon dosyası <kbd>config/$env/cache/</kbd> dosyasından yönetilir.
+Cache servisi sık kullanılan önbellekleme türleri için basit ve ortak bir arayüz sağlar.
 
 <ul>
 
 <li>
     <a href="#configuration">Konfigürasyon</a>
     <ul>
-        <li><a href="#service-configuration">Servis Konfigürasyonu</a></li>
-        <li><a href="#service-setup">Servis Kurulumu</a></li>
+        <li><a href="#service-provider">Servis Sağlayıcısı</a> ( CacheFactory )</li>
     </ul>
 </li>
 
 <li>
-    <a href="#running">Çalıştırma</a>
+    <a href="#running">Servis</a>
     <ul>
-        <li><a href="#loading-service">Servisi Yüklemek</a></li>
         <li><a href="#cache-drivers">Önbellek Sürücüleri</a></li>
         <li>
             <a href="#interface">Ortak Arayüz Metotları</a>
             <ul>
+                <li><a href="#common-has">$this->cache->has()</a></li>
                 <li><a href="#common-set">$this->cache->set()</a></li>
+                <li><a href="#common-setItems">$this->cache->setItems()</a></li>
                 <li><a href="#common-get">$this->cache->get()</a></li>
-                <li><a href="#common-delete">$this->cache->delete()</a></li>
+                <li><a href="#common-remove">$this->cache->remove()</a></li>
+                <li><a href="#common-removeItems">$this->cache->removeItems()</a></li>
                 <li><a href="#common-replace">$this->cache->replace()</a></li>
-                <li><a href="#common-exists">$this->cache->exists()</a></li>
+                <li><a href="#common-replaceItems">$this->cache->replaceItems()</a></li>
+                <li><a href="#common-setSerializer">$this->cache->setSerializer()</a></li>
+                <li><a href="#common-getSerializer">$this->cache->getSerializer()</a></li>
+                <li><a href="#common-flushAll">$this->cache->flushAll()</a></li>
             </ul>
         </li>
     </ul>
@@ -48,84 +52,46 @@ Cache paketi çeşitli önbellekleme ( cache ) türleri için birleşik bir aray
 
 ### Konfigürasyon
 
-Cache sınıfı konfigürasyonu <kbd>config/$env/cache/$driver.php</kbd> dosyasından konfigüre edilir. Örneğin local ortam ve memcached sürücüsü için <kbd>config/local/cache/memcached.php</kbd> dosyasını konfigüre etmeniz gerekir.
+Cache sınıfı konfigürasyonu <kbd>providers/$sürücü.php</kbd> dosyasından konfigüre edilir. Örneğin memcached sürücüsü için <kbd>providers/memcached.php</kbd> dosyasını konfigüre etmeniz gerekir.
 
-<a name="service-configuration"></a>
+<a name="service-provider"></a>
 
-#### Servis Konfigürasyonu
-
-Servisler uygulama içerisinde parametreleri değişmez olan ve tüm kütüphaneler tarafından ortak ( paylaşımlı ) kullanılan sınıflardır. Kimi durumlarda servisler kolay yönetilebilmek için bağımsız olan bir servis sağlayıcısına ihtiyaç duyarlar.
-
-Cache servisi uygulama içerisinde bazı yerlerde paylaşımlı olarak bazı yerlerde de parametre değişikliği gerektirdiği ( paylaşımsız yada bağımsız ) kullanıldığı için kimi zaman farklı ihtiyaçlara cevap veremez.
-
-Bir örnek vermek gerekirse uygulamada servis olarak kurduğunuz cache kütüphanesi her zaman <b>serializer</b> parametresi ile kullanılmaya konfigüre edilmiştir ve değiştirilemez. Fakat bazı yerlerde <b>"none"</b> parametresini kullanmanız gerekir bu durumda servis sağlayıcı imdadımıza yetişir ve <b>"none"</b> parametresini kullanmanıza imkan sağlar. Böylece cache kütüphanesi yeni bir nesne oluşturarak servis sağlayıcısının diğer cache servisi ile karışmasını önler.
-
-Default bağlantısına ait aşağıdaki birinci örnekte servis sağlayıcı konfigürasyon dosyasında serializer tipi <kbd>none</kbd> olarak ayarlanmış olan <kbd>default</kbd> bağlantısına bağlanır.
-
-```php
-$this->c['app']->provider('cache')->get(['driver' => 'redis', 'connection' => 'default']);
-```
-
-Second bağlantısına ait aşağıdaki ikinci örnekte servis sağlayıcı konfigürasyon dosyasında serializer tipi <kbd>php</kbd> olarak ayarlanmış olan <kbd>second</kbd> bağlantısına bağlanır.
-
-```php
-$this->c['app']->provider('cache')->get(['driver' => 'redis', 'connection' => 'second']);
-```
-
-Uygulamada cache servisi yüklendiğinde servis içerisinde <kbd>CacheManager</kbd> sınıfı getProvider metodu ile tanımlı olan servis sağlayıcısına bağlanır.
-
-<a name="service-setup"></a>
-
-#### Servis Kurulumu
+#### Servis Sağlayıcısı
 
 Servis kurulumu için tek yapmanız gereken kullanmak istediğiniz servis sağlayıcısının parametrelerini servis konfigürasyonuna girmek, aşağıdaki örnekte <kbd>default</kbd> bağlantısı seçilmiştir.
 
 ```php
-namespace Service;
-
-use Obullo\Cache\CacheManager;
-use Obullo\Container\ServiceInterface;
-use Obullo\Container\ContainerInterface;
-
-class Cache implements ServiceInterface
-{
-    public function register(ContainerInterface $c)
-    {
-        $c['cache'] = function () use ($c) {
-            
-            $parameters = [
-                'provider' => [
-                    'name' => 'cache',
-                    'params' => [
-                        'driver' => 'redis',
-                        'connection' => 'default'
-                    ]
-                ]
-            ];
-            $manager = new CacheManager($c);
-            $manager->setParameters($parameters);
-            return $manager->getProvider();
-        };
-    }
-}
-/* Location: .classes/Service/Cache.php */
+$this->container->get('cacheFactory')->shared(
+    [
+        'driver' => 'redis'
+        'connection' => 'default'
+    ]
+);
 ```
 
 <a name="running"></a>
 
-### Çalıştırma
+### Servis
 
-------
-
-<a name="loading-service"></a>
-
-#### Servisi Yüklemek
-
-Cache servisi aracılığı ile cache metotlarına aşğıdaki gibi erişilebilir.
+Cache servisi aracılığı ile cache metotlarına aşağıdaki gibi erişilebilir.
 
 ```php
 $this->container->get('cache')->metod();
 ```
+
+Cache servisi için varsayılan sürücü türü <kbd>app/classes/ServiceProvider/Cache</kbd> servisinden belirlenir.
+
+```php
+$container->share(
+    'cache',
+    $container->get('redis')->shared(
+        [
+            'connection' => 'default'
+        ]
+    )
+);
+```
+
 <a name="cache-drivers"></a>
 
 #### Önbellek Sürcüleri
@@ -138,61 +104,99 @@ Bu sürüm için varolan cache sürücüleri aşağıdaki gibidir:
 * Memcached
 * Redis
 
-Sürücü seçimi yapılırken küçük harfler kullanılmalıdır. Örnek : redis. Her bir önbellek türünün konfigürasyonuna <kbd>config/cache/$sürücü.php</kbd> adıyla ulaşılabilir.
+Sürücü seçimi yapılırken küçük harfler kullanılmalıdır.
 
 <a name="interface"></a>
 
 #### Ortak Arayüz Metotları
 
-Cache sürücüleri handler interface arayüzünü kullanırlar. Handler interface size cache servisinde hangi metotların ortak kullanıldığı gösterir ve eğer yeni bir sürücü yazacaksınız sizi bu metotları sınıfınıza dahil etmeye zorlar. Cache sürücüsü ortak metotları aşağıdaki gibidir.
+Cache sürücüleri CacheInterface arayüzünü kullanırlar. Bu arayüz size cache servisinde hangi metotların ortak kullanıldığı gösterir ve eğer yeni bir sürücü yazacaksınız sizi bu metotları sınıfınıza dahil etmeye zorlar.
 
 ```php
 interface CacheInterface
 {
-    public function connect();
-    public function exists($key);
-    public function set($key, $data = 60, $ttl = 60);
+    public function has($key);
+    public function set($key, $data, $ttl = 60);
+    public function setItems(array $data, $ttl = 60);
     public function get($key);
-    public function replace($key, $data = 60, $ttl = 60);
-    public function delete($key);
+    public function replace($key, $data, $ttl = 60);
+    public function replaceItems(array $data, $ttl = 60);
+    public function remove($key);
+    public function removeItems(array $keys);
+    public function flushAll();
 }
 ```
 
+<a name="common-has"></a>
+
+##### $this->cache->has(string $key);
+
+Eğer girilen anahtar önbellekte mevcut ise <kbd>true</kbd> değerine aksi durumda <kbd>false</kbd> değerine döner.
+
 <a name="common-set"></a>
+
+##### $this->cache->set(string $key, $value, $ttl = 60);
+
+Önbellek deposuna veri kaydeder. Birinci parametre anahtar, ikici parametre değer, üçüncü parametre ise anahtara ait verinin yok olma süresidir. Üçüncü parametrenin varsayılan değeri <kbd>60</kbd> saniyedir. Eğer üçüncü parametreyi <kbd>0</kbd> olarak girerseniz önbelleğe kaydettiğiniz anahtar kalıcı olur.
+
+<a name="common-setItems"></a>
+
+##### $this->cache->setItems(array $data, $ttl = 60);
+
+Önbellek deposuna girilen dizi türünü ayrıştırarak kaydeder. 
+
 <a name="common-get"></a>
-<a name="common-delete"></a>
-<a name="common-replace"></a>
-<a name="common-exists"></a>
-
-##### $this->cache->set(mixed $key, $value, $ttl = 60);
-
-Önbellek deposuna veri kaydeder. Birinci parametre anahtar, ikici parametre değer, üçüncü parametre ise anahtara ait verinin yok olma süresidir. Üçüncü parametrenin varsayılan değeri 60 saniyedir. Eğer üçüncü parametreyi "0" olarak girerseniz önbelleğe kaydetiğiniz anahtar siz silmedikçe silinmeyecektir. Yani kalıcı olacaktır.
 
 ##### $this->cache->get(string $key);
 
 Önbellek deposundan veri okur.
 
-##### $this->cache->set(array $key, $ttl = 60);
+<a name="common-remove"></a>
 
-Eğer ilk parametreye bir dizi gönderirseniz ikinci parametreyi artık sona erme süresi olarak kullanabilirsiniz.
-
-##### $this->cache->delete(string $key);
+##### $this->cache->remove(string $key);
 
 Anahtarı ve bu anahtara kaydedilen değeri bütünüyle siler.
 
-##### $this->cache->replace(mixed $key, $value, $ttl = 60);
+<a name="common-removeItems"></a>
+
+##### $this->cache->removeItems(array $keys);
+
+Dizi türünde girilen anahtarların tümünü siler.
+
+<a name="common-replace"></a>
+
+##### $this->cache->replace(string $key, $value, $ttl = 60);
 
 Varsayılan anahtara ait değeri yeni değer ile günceller.
 
-##### $this->cache->exists(string $key);
+<a name="common-replaceItems"></a>
 
-Eğer girilen anahtar önbellekte mevcut ise <b>true</b> değerine aksi durumda <b>false</b> değerine döner.
+##### $this->cache->replaceItems(array $data, $ttl = 60);
+
+Dizi türünde girilen yeni değerleri günceller.
+
+<a name="common-setSerializer"></a>
+
+##### $this->cache->setSerializer($serializer = null);
+
+Varsa sürücünüzün desteklediği serileştirici türünü seçer.
+
+<a name="common-getSerializer"></a>
+
+##### $this->cache->getSerializer();
+
+Geçerli serileştirici türüne geri döner.
+
+<a name="common-flushAll"></a>
+
+##### $this->cache->flushAll()
+
+Bellek içerisindeki tüm anahtarları ve değerlerini yokeder.
+
 
 <a name="drivers"></a>
 
 ### Sürücüler
-
-------
 
 Şu anki sürümde aşağıdaki sürücüler desteklenmektedir.
 

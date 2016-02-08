@@ -54,8 +54,9 @@ class Flush
             $hashString .= str_replace('"', '', json_encode($data)); // Remove quotes to fix equality problem
         }
         $KEY = $this->generateId($hashString);
-        if ($this->cache->exists($KEY)) {
-            return $this->cache->delete($KEY);
+
+        if ($this->cache->has($KEY)) {
+            return $this->cache->remove($KEY);
         }
         return false;
     }

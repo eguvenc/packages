@@ -47,7 +47,7 @@ abstract class AbstractCache extends AbstractStorage implements StorageInterface
      */
     public function isEmpty($block = '__permanent')
     {
-        $exists = $this->cache->exists($this->getBlock($block));
+        $exists = $this->cache->has($this->getBlock($block));
         return ($exists) ? false : true;
     }
 
@@ -137,7 +137,7 @@ abstract class AbstractCache extends AbstractStorage implements StorageInterface
 
         $credentials = $this->cache->get($this->getBlock($block)); // Destroy auth block if its empty
         if (empty($credentials)) {
-            $this->cache->delete($this->getBlock($block));
+            $this->cache->remove($this->getBlock($block));
         }
     }
 

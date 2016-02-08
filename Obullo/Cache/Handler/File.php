@@ -70,6 +70,18 @@ class File implements CacheInterface
     }
 
     /**
+     * Sets serializer
+     * 
+     * @param string $serializer type
+     *
+     * @return void
+     */
+    public function setSerializer($serializer = 'php')
+    {
+        return $serializer = null;
+    }
+
+    /**
      * Get cache data.
      * 
      * @param string $key cache key
@@ -98,7 +110,7 @@ class File implements CacheInterface
      * 
      * @return boolean true or false
      */
-    public function exists($key)
+    public function has($key)
     {
         if ($this->get($key) == false) {
             return false;
@@ -115,71 +127,33 @@ class File implements CacheInterface
      * 
      * @return boolean
      */
-    public function replace($key, $data = 60, $ttl = 60)
+    public function replace($key, $data, $ttl = 60)
     {
-        if (! is_array($key)) {
-            $this->delete($key);
-            $contents = array(
-                'time' => time(),
-                'ttl'  => $ttl,
-                'data' => $data
-            );
-            $fileName = $this->filePath . $key;
-            if ($this->writeData($fileName, $contents)) {
-                return true;
-            }
-            return false;
-        }
-        return $this->setArray($key, $data);
-    }
+        $this->remove($key);
 
-    /**
-     * Set Array
-     * 
-     * @param array $data data
-     * @param int   $ttl  expiration
-     *
-     * @return void
-     */
-    public function setArray($data, $ttl)
-    {
-        if (is_array($data)) {
-            foreach ($data as $k => $v) {
-                $contents = array(
-                    'time' => time(),
-                    'ttl'  => $ttl,
-                    'data' => $v
-                );
-                $fileName = $this->filePath . $k;
-                $write    = $this->writeData($fileName, $contents);
-            }
-            if (! $write) {
-                return false;
-            }
+        $contents = array(
+            'time' => time(),
+            'ttl'  => $ttl,
+            'data' => $data
+        );
+        $fileName = $this->filePath . $key;
+        if ($this->writeData($fileName, $contents)) {
             return true;
         }
         return false;
     }
-
+    
     /**
-     * Write data
-     *
-     * @param string $fileName file name
-     * @param array  $contents contents
+     * Replace data
      * 
-     * @return boolean true or false
+     * @param array   $data key - value
+     * @param integer $ttl  ttl
+     * 
+     * @return boolean
      */
-    public function writeData($fileName, $contents)
+    public function replaceItems(array $data, $ttl = 60)
     {
-        if (! $fp = fopen($fileName, 'wb')) {
-            return false;
-        }
-        $serializeData = serialize($contents);
-        flock($fp, LOCK_EX);
-        fwrite($fp, $serializeData);
-        flock($fp, LOCK_UN);
-        fclose($fp);
-        return true;
+        return $this->setArray($data, $ttl);
     }
 
     /**
@@ -191,21 +165,31 @@ class File implements CacheInterface
      * 
      * @return boolean
      */
-    public function set($key, $data = 60, $ttl = 60)
+    public function set($key, $data, $ttl = 60)
     {
-        if (! is_array($key)) {
-            $contents = array(
-                'time' => time(),
-                'ttl'  => $ttl,
-                'data' => $data
-            );
-            $fileName = $this->filePath . $key;
-            if ($this->writeData($fileName, $contents)) {
-                return true;
-            }
-            return false;
+        $contents = array(
+            'time' => time(),
+            'ttl'  => $ttl,
+            'data' => $data
+        );
+        $fileName = $this->filePath . $key;
+        if ($this->writeData($fileName, $contents)) {
+            return true;
         }
-        return $this->setArray($key, $data);
+        return false;
+    }
+
+    /**
+     * Set items
+     * 
+     * @param array   $data data
+     * @param integer $ttl  ttl
+     *
+     * @return boolean
+     */
+    public function setItems(array $data, $ttl = 60)
+    {
+        return $this->setArray($data, $ttl);
     }
 
     /**
@@ -215,12 +199,27 @@ class File implements CacheInterface
      * 
      * @return boolean
      */
-    public function delete($key)
+    public function remove($key)
     {
         if (file_exists($this->filePath . $key)) {
             return unlink($this->filePath . $key);
         }
         return false;
+    }
+
+    /**
+     * Remove specified keys.
+     * 
+     * @param array $keys keys
+     * 
+     * @return void
+     */
+    public function removeItems(array $keys)
+    {
+        foreach ($keys as $key) {
+            $this->remove($key);
+        }
+        return;
     }
 
     /**
@@ -247,6 +246,7 @@ class File implements CacheInterface
     public function getAllData()
     {
         $dh = opendir($this->filePath);
+
         while (false !== ($fileName = readdir($dh))) {
             if (substr($fileName, 0, 1) !== '.') {
                 $temp = file_get_contents($this->filePath . $fileName);
@@ -312,6 +312,52 @@ class File implements CacheInterface
             );
         }
         return false;
+    }
+
+    /**
+     * Set Array
+     * 
+     * @param array $data data
+     * @param int   $ttl  expiration
+     *
+     * @return void
+     */
+    protected function setArray(array $data, $ttl)
+    {
+        foreach ($data as $k => $v) {
+            $contents = array(
+                'time' => time(),
+                'ttl'  => $ttl,
+                'data' => $v
+            );
+            $fileName = $this->filePath . $k;
+            $write    = $this->writeData($fileName, $contents);
+        }
+        if (! $write) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Write data
+     *
+     * @param string $fileName file name
+     * @param array  $contents contents
+     * 
+     * @return boolean true or false
+     */
+    protected function writeData($fileName, $contents)
+    {
+        if (! $fp = fopen($fileName, 'wb')) {
+            return false;
+        }
+        $serializeData = serialize($contents);
+        flock($fp, LOCK_EX);
+        fwrite($fp, $serializeData);
+        flock($fp, LOCK_UN);
+        fclose($fp);
+        return true;
     }
 
     /**

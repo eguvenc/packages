@@ -145,6 +145,7 @@ class Memcache implements CacheInterface
     public function get($key)
     {
         $value = $this->memcache->get($key, false);
+        
         if (is_array($value) && isset($value[0])) {
             $value = $value[0];
         }
@@ -158,28 +159,9 @@ class Memcache implements CacheInterface
      * 
      * @return boolean true or false
      */
-    public function exists($key)
+    public function has($key)
     {
         if ($this->memcache->get($key, false)) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Set Array
-     * 
-     * @param array $data cache data
-     * @param int   $ttl  expiration time
-     * 
-     * @return void
-     */
-    public function setArray($data, $ttl = 60)
-    {
-        if (is_array($data)) {
-            foreach ($data as $k => $v) {
-                $this->memcache->set($k, $v, 0, $ttl);
-            }
             return true;
         }
         return false;
@@ -196,10 +178,20 @@ class Memcache implements CacheInterface
      */
     public function set($key, $data = 60, $ttl = 60)
     {
-        if (! is_array($key)) {
-            return $this->memcache->set($key, array($data, time(), $ttl), 0, $ttl);
-        }
-        return $this->setArray($key, $data);
+        return $this->memcache->set($key, array($data, time(), $ttl), 0, $ttl);
+    }
+
+    /**
+     * Set items
+     * 
+     * @param array   $data data
+     * @param integer $ttl  ttl
+     *
+     * @return boolean
+     */
+    public function setItems(array $data, $ttl = 60)
+    {
+        return $this->setArray($data, $ttl);
     }
 
     /**
@@ -209,9 +201,24 @@ class Memcache implements CacheInterface
      * 
      * @return boolean
      */
-    public function delete($key)
+    public function remove($key)
     {
         return $this->memcache->delete($key);
+    }
+
+    /**
+     * Remove specified keys.
+     * 
+     * @param array $keys keys
+     * 
+     * @return void
+     */
+    public function removeItems(array $keys)
+    {
+        foreach ($keys as $key) {
+            $this->remove($key);
+        }
+        return;
     }
 
     /**
@@ -223,22 +230,22 @@ class Memcache implements CacheInterface
      * 
      * @return boolean
      */
-    public function replace($key, $data = 60, $ttl = 60)
+    public function replace($key, $data, $ttl = 60)
     {
-        if (! is_array($key)) {
-            $this->memcache->replace($key, array($data, time(), $ttl), 0, $ttl);
-        }
-        return $this->setArray($key, $data);
+        return $this->memcache->replace($key, array($data, time(), $ttl), 0, $ttl);   
     }
 
     /**
-     * Remove all keys and data from the cache.
+     * Replace data
+     * 
+     * @param array   $data key - value
+     * @param integer $ttl  ttl
      * 
      * @return boolean
      */
-    public function flushAll()
+    public function replaceItems(array $data, $ttl = 60)
     {
-        return $this->memcache->flush();
+        return $this->setArray($data, $ttl);
     }
 
     /**
@@ -273,6 +280,25 @@ class Memcache implements CacheInterface
     }
 
     /**
+     * Set Array
+     * 
+     * @param array $data cache data
+     * @param int   $ttl  expiration time
+     * 
+     * @return void
+     */
+    protected function setArray($data, $ttl = 60)
+    {
+        if (is_array($data)) {
+            foreach ($data as $k => $v) {
+                $this->memcache->set($k, $v, 0, $ttl);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Close the connection
      * 
      * @return void
@@ -281,6 +307,16 @@ class Memcache implements CacheInterface
     {
         $this->memcache->close();
         return;
+    }
+
+    /**
+     * Remove all keys and data from the cache.
+     * 
+     * @return boolean
+     */
+    public function flushAll()
+    {
+        return $this->memcache->flush();
     }
 
 }

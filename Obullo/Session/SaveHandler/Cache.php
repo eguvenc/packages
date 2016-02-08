@@ -122,7 +122,7 @@ class Cache implements SaveHandlerInterface
      */
     public function destroy($id)
     {
-        $result = $this->storage->delete($this->key.$id);
+        $result = $this->storage->remove($this->key.$id);
         return $result ? true : false;
     }
 

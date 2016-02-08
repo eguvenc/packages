@@ -45,12 +45,23 @@ View sınıfına ait servis sağlayıcısı <kbd>app/providers.php</kbd> dosyas�
 $container->share('view', 'Obullo\View\View')
     ->withArgument($container)
     ->withArgument($container->get('logger'))
-    ->withArgument($config->getParams())
+    ->withArgument(
+        [
+            'engine' => 'Obullo\View\Plates\Plates',
+        ]
+    )
+    ->withMethodCall(
+        'addFolder',
+        [
+            'views',
+            MODULES .'views/view/'
+        ]
+    )
     ->withMethodCall(
         'addFolder',
         [
             'templates',
-            TEMPLATES
+            RESOURCES.'/templates/'
         ]
     );
 ```
@@ -175,7 +186,7 @@ $this->view->withData(
 
 ### Katmanlar
 
-> Obullo çerçevesinde katman paketi sayesinde view dosyaları kontrolör dosyaları içerisinden zincirleme olarak içe içe çağırılabilir. Bu da her view dosyasına ait bir kontrolör dosyasının yaratılabileceği anlamına gelir. Bknz. [Layer.md](Layer.md)
+> Çerçeve içerisinde katman paketi sayesinde view dosyaları kontrolör dosyaları içerisinden zincirleme olarak içe içe çağırılabilir. Bu da her view dosyasına ait bir kontrolör dosyasının yaratılabileceği anlamına gelir. Bknz. [Layer.md](Layer.md)
 
 ![Layers](images/layer-ui-components.png?raw=true "")
 

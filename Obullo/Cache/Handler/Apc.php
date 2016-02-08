@@ -40,6 +40,18 @@ class Apc implements CacheInterface
     }
 
     /**
+     * Sets serializer
+     * 
+     * @param string $serializer type
+     *
+     * @return void
+     */
+    public function setSerializer($serializer = 'php')
+    {
+        return $serializer = null;
+    }
+
+    /**
      * Get cache data.
      * 
      * @param string $key cache key
@@ -62,28 +74,9 @@ class Apc implements CacheInterface
      * 
      * @return boolean true or false
      */
-    public function exists($key)
+    public function has($key)
     {
         return apc_exists($key);
-    }
-
-    /**
-     * Set array
-     * 
-     * @param array $data cache data.
-     * @param int   $ttl  expiration time.
-     * 
-     * @return boolean
-     */
-    public function setArray($data, $ttl)
-    {
-        if (is_array($data)) {
-            foreach ($data as $k => $v) {
-                $this->set($k, $v, $ttl);
-            }
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -95,12 +88,22 @@ class Apc implements CacheInterface
      * 
      * @return array
      */
-    public function set($key, $data = 60, $ttl = 60) 
+    public function set($key, $data, $ttl = 60) 
     {
-        if (! is_array($key)) {
-            return apc_store($key, array($data, time(), $ttl), $ttl);
-        }
-        return $this->setArray($key, $data);
+        return apc_store($key, array($data, time(), $ttl), $ttl);
+    }
+
+    /**
+     * Set items
+     * 
+     * @param array   $data data
+     * @param integer $ttl  ttl
+     *
+     * @return boolean
+     */
+    public function setItems(array $data, $ttl = 60)
+    {
+        return $this->setArray($data, $ttl);
     }
 
     /**
@@ -110,9 +113,24 @@ class Apc implements CacheInterface
      * 
      * @return boolean
      */
-    public function delete($key)
+    public function remove($key)
     {
         return apc_delete($key);
+    }
+
+    /**
+     * Remove specified keys.
+     * 
+     * @param array $keys keys
+     * 
+     * @return boolean
+     */
+    public function removeItems(array $keys)
+    {
+        foreach ($keys as $key) {
+            $this->remove($key);
+        }
+        return;
     }
 
     /**
@@ -124,25 +142,23 @@ class Apc implements CacheInterface
      * 
      * @return boolean
      */
-    public function replace($key, $data = 60, $ttl = 60) 
+    public function replace($key, $data, $ttl = 60) 
     {
-        if (! is_array($key)) {
-            $this->delete($key);
-            return apc_store($key, array($data, time(), $ttl), $ttl);
-        }
-        return $this->setArray($key, $data);
+        $this->remove($key);
+        return apc_store($key, array($data, time(), $ttl), $ttl);
     }
 
-    /**
-     * Clean all data
+     /**
+     * Replace data
      * 
-     * @param string $type clean type
+     * @param array   $data key - value
+     * @param integer $ttl  ttl
      * 
-     * @return object
+     * @return boolean
      */
-    public function flushAll($type = 'user')
+    public function replacteItems(array $data, $ttl = 60)
     {
-        return apc_clear_cache($type);
+        return $this->setArray($data, $ttl);
     }
 
     /**
@@ -183,6 +199,25 @@ class Apc implements CacheInterface
     }
 
     /**
+     * Set array
+     * 
+     * @param array $data cache data.
+     * @param int   $ttl  expiration time.
+     * 
+     * @return boolean
+     */
+    protected function setArray($data, $ttl)
+    {
+        if (is_array($data)) {
+            foreach ($data as $k => $v) {
+                $this->set($k, $v, $ttl);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Connect
      * 
      * @return void
@@ -201,4 +236,15 @@ class Apc implements CacheInterface
     {
         return;
     }
+
+    /**
+     * Clean all data
+     * 
+     * @return object
+     */
+    public function flushAll()
+    {
+        return apc_clear_cache('user');
+    }
+
 }

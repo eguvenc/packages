@@ -1,87 +1,56 @@
 
 ## Memcached Sürücüsü
 
-Memcached sürücüsü sunucunuza php extension olarak kurulmayı gerektirir. Ubuntu ve benzer linux sistemleri altında memcached kurulumuna dair <b>warmup</b> adı verilen dökümentasyon topluluğunun hazırladığı <a href="https://github.com/obullo/warmup/tree/master/Memcached" target="_blank">bu belgeden</a> yararlanabilirsiniz.
+Memcached sürücüsü sunucunuzda php extension olarak kurulmayı gerektirir. Ubuntu ve benzer linux sistemleri altında memcached kurulumu için <a href="https://github.com/obullo/warmup/tree/master/Memcached" target="_blank">bu belgeden</a> yararlanabilirsiniz.
 
 <ul>
 <li> 
   <a href="#memcached-configuration">Konfigürasyon</a>
     <ul>
-        <li><a href="#memcached-nodes">Çoklu Sunucular</a></li>
-        <li><a href="#memcached-service">Servis Kurulumu</a></li>
         <li><a href="#memcached-service-provider">Servis Sağlayıcısı</a></li>
         <li><a href="#memcached-service-provider-connections">Servis Sağlayıcısı Bağlantıları</a></li>
-        <li>
-            <a href="#memcached-reference">Memcached Referansı</a>
-            <ul>
-                <li><a href="#memcached-setSerializer">$this->cache->setSerializer()</a></li>
-                <li><a href="#memcached-setSerializer">$this->cache->setSerializer()</a></li>
-                <li><a href="#memcached-getSerializer">$this->cache->getSerializer()</a></li>
-                <li><a href="#memcached-setOption">$this->cache->setOption()</a></li>
-                <li><a href="#memcached-getOption">$this->cache->getOption()</a></li>
-                <li><a href="#memcached-set">$this->cache->set()</a></li>
-                <li><a href="#memcached-get">$this->cache->get()</a></li>
-                <li><a href="#memcached-getAllKeys">$this->cache->getAllKeys()</a></li>
-                <li><a href="#memcached-getAllData">$this->cache->getAllData()</a></li>
-                <li><a href="#memcached-getMetaData">$this->cache->getMetaData()</a></li>
-                <li><a href="#memcached-exists">$this->cache->exists()</a></li>
-                <li><a href="#memcached-replace">$this->cache->replace()</a></li>
-                <li><a href="#memcached-delete">$this->cache->delete()</a></li>
-                <li><a href="#memcached-flushAll">$this->cache->flushAll()</a></li>
-                <li><a href="#memcached-info">$this->cache->info()</a></li>
-            </ul>
-        </li>
+        <li><a href="#memcached-service">Servis</a></li>
     </ul>
 </li>
+
+<li>
+    <a href="#memcached-reference">Memcached Referansı</a>
+    <ul>
+        <li><a href="#memcached-has">$this->cache->has()</a></li>
+        <li><a href="#memcached-set">$this->cache->set()</a></li>
+        <li><a href="#memcached-setItems">$this->cache->setItems()</a></li>
+        <li><a href="#memcached-get">$this->cache->get()</a></li>
+        <li><a href="#memcached-replace">$this->cache->replace()</a></li>
+        <li><a href="#memcached-replaceItems">$this->cache->replaceItems()</a></li>
+        <li><a href="#memcached-remove">$this->cache->remove()</a></li>
+        <li><a href="#memcached-removeItems">$this->cache->removeItems()</a></li>
+        <li><a href="#memcached-setSerializer">$this->cache->setSerializer()</a></li>
+        <li><a href="#memcached-getSerializer">$this->cache->getSerializer()</a></li>
+        <li><a href="#memcached-flushAll">$this->cache->flushAll()</a></li>
+    </ul>
+</li>
+
+<li><a href="#helper-methods">Yardımcı Fonksiyonlar</a></li>
 </ul>
 
 <a name="memcached-configuration"></a>
 
 ### Konfigürasyon
 
-Memcached sürücüsü bağlantı ayarlarınızı <kbd>config/env.$env/cache/memcached.php</kbd> dosyasında tanımlamanız gerekir.
-
-<a name="memcached-nodes"></a>
-
-#### Çoklu Sunucular ( Nodes )
-
-Birden fazla memcached sunucunuz varsa konfigürasyon dosyasındaki diğer sunucu adreslerini aşağıdaki gibi nodes dizisi içerisine girmeniz gerekir.
+<kbd>app/providers.php</kbd> dosyasında servis sağlayıcıların tanımlı olduğundan emin olun.
 
 ```php
-  'connections' => 
-  [
-      'default' => [ .. ],
-      'nodes' => [
-          [
-              'host' => '10.0.0.168',
-              'port' => 11211,
-              'weight' => 1
-          ],
-          [
-              'host' => '10.0.0.169',
-              'port' => 11211,
-              'weight' => 2
-          ]
-
-      ]
-  ],
+$container->addServiceProvider('ServiceProvider\Connector\Memcached');
+$container->addServiceProvider('ServiceProvider\Connector\CacheFactory');
 ```
 
-<a name="memcached-service"></a>
-
-#### Servis Kurulumu
-
-Eğer uygulama içerisinde cache servisinin memcached kullanmasını istiyorsanız <kbd>app/Classes/Service/Cache.php</kbd> dosyasındaki <b>driver</b> anahtarını <b>memcached</b> olarak değiştirin.
-
-```php
-$this->container->get('cache')->shared(['driver' => 'memcached', 'connection' => 'default']);
-```
+Memcached sürücüsü bağlantı ayarlarınızı <kbd>providers/memcached.php</kbd> dosyasında tanımlamanız gerekir.
 
 <a name="memcached-service-provider"></a>
 
 #### Servis Sağlayıcısı
 
-Cache kütüphanesi bağımsız olarak kullanılmak istendiği durumlarda servis sağlayıcısından direkt olarak çağrılabilir. Servis sağlayıcı yüklendiği zaman kütüphaneyi bir değişkene atayıp yarattığınız bağlantıya ait metotlara ulaşabilirsiniz.
+Cache servis sağlayıcısı önbellekleme için ortak bir arayüz sağlar.
 
 ```php
 $this->cache = $this->container->get('cache')->shared(
@@ -97,7 +66,7 @@ $this->cache->method();
 
 #### Servis Sağlayıcısı Bağlantıları
 
-Servis sağlayıcısı <b>connection</b> anahtarındaki bağlantı değerini önceden <kbd>config/$env/cache</kbd> klasöründe tanımlı olan <b>$sürücü.php</b> dosyası connections dizisi içerisinden alır. Aşağıda memcached sürücüsü <b>default</b> bağlantısına ait bir örnek görülüyor.
+Servis sağlayıcısı <kbd>connection</kbd> anahtarındaki bağlantı değerlerini <kbd>providers/memcached.php</kbd> içerisinden alır.
 
 ```php
 
@@ -117,80 +86,133 @@ return array(
 );
 ```
 
+<a name="memcached-service"></a>
+
+#### Servis
+
+Cache servisi aracılığı ile cache metotlarına aşağıdaki gibi erişilebilir.
+
+```php
+$this->container->get('cache')->metod();
+```
+
+Cache servisi için varsayılan sürücü türü <kbd>app/classes/ServiceProvider/Cache</kbd> servisinden belirlenir.
+
+```php
+$container->share(
+    'cache',
+    $container->get('memcached')->shared(
+        [
+            'connection' => 'default'
+        ]
+    )
+);
+```
+
 <a name="memcached-reference"></a>
-<a name="memcached-setSerializer"></a>
-<a name="memcached-getSerializer"></a>
-<a name="memcached-setOption"></a>
-<a name="memcached-getOption"></a>
-<a name="memcached-set"></a>
-<a name="memcached-get"></a>
-<a name="memcached-getAllKeys"></a>
-<a name="memcached-getAllData"></a>
-<a name="memcached-getMetaData"></a>
-<a name="memcached-exists"></a>
-<a name="memcached-replace"></a>
-<a name="memcached-delete"></a>
-<a name="memcached-flushAll"></a>
-<a name="memcached-info"></a>
 
 #### Memcached Referansı
 
-------
+Bu sınıf içerisinde tanımlı olmayan metotlar __call metodu ile php <kbd>Memcached</kbd> sınıfından çağrılırlar.
 
-> Bu sınıf içerisinde tanımlı olmayan metotlar __call metodu ile php Memcached sınıfından çağrılırlar.
 
-##### $this->cache->setSerializer($serializer = 'php');
+<a name="memcached-has"></a>
 
-Geçerli serileştirici türünü seçer. Serileştirici tipleri : <b>php</b>, <b>igbinary</b> ve <b>json</b> dır.
+##### $this->cache->has(string $key)
 
-##### $this->cache->getSerializer();
+Bir anahtarın var olup olmadığını kontrol eder. Anahtar mevcut ise <kbd>true</kbd> değilse <kbd>false</kbd> değerinde döner.
 
-Geçerli serileştirici türünü geri döner. Serileştirici tipleri : <b>php</b>, <b>igbinary</b> ve <b>json</b> dır.
+<a name="memcached-set"></a>
 
-##### $this->cache->setOption($option = 'OPT_SERIALIZER', $value = 'SERIALIZER_PHP');
-
-Memcached için bir opsiyon tanımlar. Birer sabit olan opsiyonlar parametrelerden string olarak kabul edilir. Sabitler ( Constants ) hakkında daha detaylı bilgi için <a href="http://www.php.net/manual/en/memcached.constants.php">Memcached Sabitleri</a> ne bir gözatın.
-
-##### $this->cache->getOption($option = 'OPT_SERIALIZER');
-
-Daha önceden set edilmiş opsiyonun değerine döner. Opsiyon sabitleri parametreden string olarak kabul edilir. Daha detaylı bilgi için <a href="http://www.php.net/manual/en/memcached.constants.php">Memcached Sabitleri</a> ne bir gözatın.
-
-##### $this->cache->set(mixed $key, mixed $data, int $ttl = 60);
+##### $this->cache->set(string $key, mixed $data, int $ttl = 60);
 
 Girilen anahtara veri kaydeder, son parametre sona erme süresine "0" girilirse veri siz silinceye kadar yok olmaz. Eğer ilk parametreye bir dizi gönderirseniz ikinci parametreyi artık sona erme süresi olarak kullanabilirsiniz.
 
+<a name="memcached-setItems"></a>
+
+##### $this->cache->setItems(array $data, $ttl = 60);
+
+Önbellek deposuna girilen dizi türünü ayrıştırarak kaydeder.
+
+<a name="memcached-get"></a>
+
 ##### $this->cache->get(string $key);
 
-Anahtara atanmış değere geri döner. Anahtar mevcut değilse <b>false</b> değerine döner. Anahtar bir dizi de olabilir.
+Anahtara atanmış değere geri döner. Anahtar mevcut değilse <kbd>false</kbd> değerine döner. Anahtar bir dizi de olabilir.
+
+<a name="memcached-replace"></a>
+
+##### $this->cache->replace(string $key, $value, $ttl = 60);
+
+Varsayılan anahtara ait değeri yeni değer ile günceller.
+
+<a name="memcached-replaceItems"></a>
+
+##### $this->cache->replaceItems(array $data, $ttl = 60);
+
+Dizi türünde girilen yeni değerleri günceller.
+
+<a name="memcached-remove"></a>
+
+##### $this->cache->remove(string $key);
+
+Girilen anahtarı önbellekten siler.
+
+<a name="memcached-removeItems"></a>
+
+##### $this->cache->removeItems(array $keys);
+
+Dizi türünde girilen anahtarların tümünü siler.
+
+<a name="memcached-setSerializer"></a>
+
+##### $this->cache->setSerializer($serializer = 'php');
+
+Geçerli serileştirici türünü seçer. Serileştirici tipleri : <kbd>php</kbd>, <kbd>igbinary</kbd> ve <kbd>json</kbd> dır.
+
+<a name="memcached-getSerializer"></a>
+
+##### $this->cache->getSerializer();
+
+Geçerli serileştirici türüne geri döner.
+
+<a name="memcached-flushAll"></a>
+
+##### $this->cache->flushAll()
+
+Geçerli veritabanından tüm anahtarları siler.
+
+<a name="helper-methods"></a>
+
+### Yardımcı Fonksiyonlar
+
+<a name="memcached-setOption"></a>
+
+##### $this->cache->setOption($option = 'OPT_SERIALIZER', $value = 'SERIALIZER_PHP');
+
+Memcached için bir opsiyon tanımlar. Birer sabit olan opsiyonlar parametrelerden string olarak kabul edilir. Sabitler hakkında daha detaylı bilgi için <a href="http://www.php.net/
+manual/en/memcached.constants.php">bu adrese</a> bir gözatın.
+
+<a name="memcached-getOption"></a>
+
+##### $this->cache->getOption($option = 'OPT_SERIALIZER');
+
+Geçerli opsiyon değerine döner. Opsiyon sabitleri hakkında detaylı bilgi için <a href="http://www.php.net/manual/en/memcached.constants.php">bu adrese</a> bir gözatın.
+
+<a name="memcached-getAllKeys"></a>
 
 ##### $this->cache->getAllKeys();
 
 Kayıtlı tüm anahtarlara geri döner.
 
+<a name="memcached-getAllData"></a>
+
 ##### $this->cache->getAllData();
 
 Kayıtı tüm verilere geri döner.
 
+<a name="memcached-getMetaData"></a>
+
 ##### $this->cache->getMetaData(string $key);
 
 Girilen anahtarın meta verisine geri döner.
-
-##### $this->cache->exists(string $key);
-
-Girilen anahtar eğer mevcut ise <b>true</b> değilse <b>false</b> değerine döner.
-
-##### $this->cache->replace(string|array $key);
-
-Girilen anahtar değerini günceller.
-
-##### $this->cache->delete(string $key);
-
-Girilen anahtarı önbellekten siler.
-
-##### $this->cache->flushAll(int $expiration = 1);
-
-Sunucudaki tüm anahatarları belirtilen süre içerisinde siler.
-
-##### $this->cache->info();
-
-Sunucuda yüklü yazılım hakkında bilgiler verir.

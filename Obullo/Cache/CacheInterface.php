@@ -11,20 +11,13 @@ namespace Obullo\Cache;
 interface CacheInterface
 {
     /**
-     * Connection the cache..
-     * 
-     * @return boolean
-     */
-    public function connect();
-
-    /**
      * Verify if the specified key exists.
      * 
      * @param string $key cache key.
      * 
      * @return boolean true or false
      */
-    public function exists($key);
+    public function has($key);
 
     /**
      * Set cache data.
@@ -35,7 +28,17 @@ interface CacheInterface
      * 
      * @return boolean
      */
-    public function set($key, $data = 60, $ttl = 60);
+    public function set($key, $data, $ttl = 60);
+
+    /**
+     * Set keys
+     * 
+     * @param array   $data key - value
+     * @param integer $ttl  ttl
+     *
+     * @return boolean
+     */
+    public function setItems(array $data, $ttl = 60);
 
     /**
      * Get cache data.
@@ -55,7 +58,17 @@ interface CacheInterface
      * 
      * @return boolean
      */
-    public function replace($key, $data = 60, $ttl = 60);
+    public function replace($key, $data, $ttl = 60);
+
+    /**
+     * Replace data
+     * 
+     * @param array   $data key - value
+     * @param integer $ttl  ttl
+     * 
+     * @return boolean
+     */
+    public function replaceItems(array $data, $ttl = 60);
 
     /**
      * Remove specified keys.
@@ -64,6 +77,22 @@ interface CacheInterface
      * 
      * @return boolean
      */
-    public function delete($key);
+    public function remove($key);
+
+    /**
+     * Remove specified keys.
+     * 
+     * @param array $keys keys
+     * 
+     * @return void
+     */
+    public function removeItems(array $keys);
+
+    /**
+     * Flushes all data from cache.
+     * 
+     * @return bool
+     */
+    public function flushAll()
 
 }

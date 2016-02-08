@@ -185,7 +185,7 @@ class Redis implements CacheInterface
      * 
      * @return boolean true or false
      */
-    public function exists($key)
+    public function has($key)
     {
         return $this->redis->exists($key);
     }
@@ -347,25 +347,6 @@ class Redis implements CacheInterface
     }
 
     /**
-     * Set Array
-     * 
-     * @param array $data cache data.
-     * @param int   $ttl  expiration time.
-     * 
-     * @return boolean
-     */
-    public function setArray($data, $ttl)
-    {
-        if (is_array($data)) {
-            foreach ($data as $k => $v) {
-                $this->redis->set($k, $v, $ttl);
-            }
-            return $this;
-        }
-        return false;
-    }
-
-    /**
      * Set cache data.
      * 
      * @param mix $key  cache key or data.
@@ -374,12 +355,22 @@ class Redis implements CacheInterface
      * 
      * @return boolean
      */
-    public function set($key, $data = 60, $ttl = 60) // If empty $ttl default timeout unlimited
+    public function set($key, $data, $ttl = 60) // If empty $ttl default timeout unlimited
     {
-        if (! is_array($key)) {
-            return $this->redis->set($key, $data, $ttl);
-        }
-        return $this->setArray($key, $data);
+        return $this->redis->set($key, $data, $ttl);
+    }
+
+    /**
+     * Set items
+     * 
+     * @param array   $data data
+     * @param integer $ttl  ttl
+     *
+     * @return boolean
+     */
+    public function setItems(array $data, $ttl = 60)
+    {
+        return $this->setArray($data, $ttl);
     }
 
     /**
@@ -389,9 +380,24 @@ class Redis implements CacheInterface
      * 
      * @return boolean
      */
-    public function delete($key)
+    public function remove($key)
     {
         return $this->redis->delete($key);
+    }
+
+    /**
+     * Remove specified keys.
+     * 
+     * @param array $keys key - value
+     * 
+     * @return void
+     */
+    public function removeItems(array $keys)
+    {
+        foreach ($keys as $key) {
+            $this->remove($key);
+        }
+        return;
     }
 
     /**
@@ -403,12 +409,38 @@ class Redis implements CacheInterface
      * 
      * @return boolean
      */
-    public function replace($key, $data = 60, $ttl = 60)
+    public function replace($key, $data, $ttl = 60)
     {
-        if (! is_array($key)) {
-            return $this->redis->set($key, $data, $ttl);
+        return $this->redis->set($key, $data, $ttl);
+    }
+
+    /**
+     * Replace keys
+     * 
+     * @param array   $data key - value
+     * @param integer $ttl  ttl
+     * 
+     * @return boolean
+     */
+    public function replaceItems(array $data, $ttl)
+    {
+        return $this->setArray($data, $ttl);
+    }
+
+    /**
+     * Set Array
+     * 
+     * @param array $data cache data.
+     * @param int   $ttl  expiration time.
+     * 
+     * @return boolean
+     */
+    protected function setArray(array $data, $ttl)
+    {
+        foreach ($data as $k => $v) {
+            $this->redis->set($k, $v, $ttl);
         }
-        return $this->setArray($key, $data);
+        return true;
     }
 
     /**

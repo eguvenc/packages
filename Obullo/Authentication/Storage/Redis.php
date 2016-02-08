@@ -65,7 +65,7 @@ class Redis extends AbstractStorage implements StorageInterface
      */
     public function isEmpty($block = '__permanent')
     {
-        $exists = $this->cache->exists($this->getBlock($block));
+        $exists = $this->cache->has($this->getBlock($block));
         return ($exists) ? false : true;
     }
 
@@ -136,7 +136,7 @@ class Redis extends AbstractStorage implements StorageInterface
      */
     public function deleteCredentials($block = '__temporary')
     {
-        return $this->cache->delete($this->getBlock($block));
+        return $this->cache->remove($this->getBlock($block));
     }
 
     /**
