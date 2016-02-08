@@ -32,7 +32,6 @@ Yetki doğrulama paketi yetki adaptörleri ile birlikte çeşitli ortak senaryol
     <li>
         <a href="#login">Oturum Açma</a>
         <ul>
-            <li><a href="#login-results">Oturum Açma Sonuçları</a></li>
             <li><a href="#login-error-results">Hata Tablosu</a></li>
         </ul>
     </li>
@@ -162,10 +161,11 @@ Bu çözümler dışında başka bir çözüm kullanıyorsanız yazmış olduğu
 
 Mysql benzeri ilişkili bir database kullanıyorsanız aşağıdaki sql kodunu çalıştırarak demo için bir tablo yaratın.
 
+```php
+CREATE DATABASE IF NOT EXISTS test;
+```
+
 ```sql
---
--- Table structure for table `users`
---
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(100) NOT NULL,
@@ -175,22 +175,23 @@ CREATE TABLE IF NOT EXISTS `users` (
   KEY `username` (`username`),
   KEY `remember_token` (`remember_token`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+```
 
---
--- Dumping data for table `users`
---
+Aşağıdaki sql kodunu veritabanınızda çalıştırın. Test kullanıcı adı <kbd>user@example.com</kbd> ve şifre <kbd>123456</kbd> dır. 
+
+
+```sql
 INSERT INTO `users` (`id`, `username`, `password`, `remember_token`) VALUES 
 (1, 'user@example.com', '$2y$06$6k9aYbbOiVnqgvksFR4zXO.kNBTXFt3cl8xhvZLWj4Qi/IpkYXeP.', '');
 ```
 
-Yukarıdaki sql kodu için kullanıcı adı <kbd>user@example.com</kbd> ve şifre <kbd>123456</kbd> dır. Yetki doğrulama <kbd>User</kbd> servisi üzerinden yönetilir <kbd>providers/user.php</kbd> konfigürasyon dosyasını açarak servisi konfigüre edebilirsiniz.
+<kbd>User</kbd> servisi <kbd>providers/user.php</kbd> konfigürasyon dosyasını açarak servisi konfigüre edebilirsiniz.
 
 ```php
 return array(
     
     'params' => [
 
-        'cache.key' => 'Auth',
         'db.adapter'=> 'Obullo\Authentication\Adapter\Database',
         'db.model'  => 'Obullo\Authentication\Model\Database',
         'db.provider' => [
@@ -449,7 +450,7 @@ Yetki doğrulama onay özelliğinde başarılı oturum açma işleminden sonra k
 
 ##### $this->user->identity->isTemporary();
 
-Kullanıcının kimliğinin geçici olup olmadığını gösterir. <kbd>1</kbd> yada </kbd>0</kbd> değerine döner.
+Kullanıcı kimliğinin geçici olup olmadığını gösterir, geçici ise <kbd>1</kbd> aksi durumda <kbd>0</kbd> değerine döner.
 
 ##### $this->user->identity->updateTemporary(string $key, mixed $val);
 
@@ -457,7 +458,7 @@ Geçici olarak oluşturulmuş kimlik bilgilerini güncellemenize olanak tanır.
 
 ##### $this->user->identity->logout();
 
-Önbellekteki <kbd>__isAuthenticated</kbd> anahtarını <kbd>0</kbd> değeri ile güncelleyerek oturumu kapatır. Bu method önbellekteki kullanıcı kimliğini bütünü ile silmez sadece kullanıcıyı oturumu kapattı olarak kaydeder. Önbellekleme sayesinde 3600 saniye içerisinde kullanıcı bir daha sisteme giriş yaptığında <kbd>__isAuthenticated</kbd> değeri 1 olarak güncellenir ve veritabanı sorgusunun önüne geçilmiş olur.
+Önbellekteki <kbd>isAuthenticated</kbd> anahtarını <kbd>0</kbd> değeri ile güncelleyerek oturumu kapatır. Bu method önbellekteki kullanıcı kimliğini bütünü ile silmez sadece kullanıcıyı oturumu kapattı olarak kaydeder. Önbellekleme sayesinde <kbd>3600</kbd> saniye içerisinde kullanıcı bir daha sisteme giriş yaptığında <kbd>isAuthenticated</kbd> değeri <kbd>1</kbd> olarak güncellenir ve veritabanı sorgusunun önüne geçilmiş olur.
 
 ##### $this->user->identity->destroy();
 
@@ -548,7 +549,7 @@ Bu fonksiyon kullanıcı oturumunu açmayı dener ve AuthResult nesnesine döner
 
 ##### $this->user->login->validate(array $credentials);
 
-Guest kimliği bilgilerine doğrulama işlemi yapar. Bilgiler doğruysa true değerine yanlış ise false değerine döner.
+Ziyaretçi olan bir kullanıcının bilgilerine sisteme giriş yaptırmadan doğrulama işlemi yapar. Bilgiler doğruysa true, yanlış ise false değerine döner.
 
 ##### $this->user->login->getUserSessions();
 
@@ -590,7 +591,7 @@ Login denemesinden sonra tüm sonuçları bir dizi içerisinde verir.
 
 ##### $result->getResultRow();
 
-Login denemesinden sonra geçerli veritabanı sorgu sonucu yada önbellek verilerine geri döner.
+Login denemesinden sonra geçerli veritabanı adaptörü sorgu sonucuna yada varsa önbellekte oluşturulmuş sorgu sonucuna geri döner.
 
 <a name="middlewares"></a>
 

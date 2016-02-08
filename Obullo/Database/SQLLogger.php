@@ -94,11 +94,13 @@ class SQLLogger implements SQLLoggerInterface
      */
     public function stopQuery()
     {
+        $time = number_format(microtime(true) - $this->start, 4);
+
         $this->logger->debug(
-            '$_SQL '.$this->queryNumber.' ( Query ):', 
+            '$_SQL '.$this->queryNumber.' :', 
             [
-                'time' => number_format(microtime(true) - $this->start, 4),
-                'output' => $this->format($this->sql)
+                'query' => $this->format($this->sql),
+                'time' => $time
             ],
             ($this->queryNumber * -1)  // priority
         );

@@ -108,15 +108,6 @@ interface IdentityInterface
     public function getTime();
 
     /**
-     * Set all identity attributes
-     *
-     * @param array $attributes identity array
-     *
-     * @return $object identity
-     */
-    public function setArray(array $attributes);
-
-    /**
      * Get all identity attributes
      *
      * @return array

@@ -120,7 +120,7 @@ class Identity extends AbstractIdentity
      * @return boolean
      */
     public function check()
-    {        
+    {      
         if ($this->get('__isAuthenticated') == 1) {
             return true;
         }
@@ -195,7 +195,7 @@ class Identity extends AbstractIdentity
      */
     protected function isExpired()
     {
-        if ($this->get('__expire') < time()) {
+        if ($this->has('__expire') && $this->get('__expire') < time()) {
             return true;
         }
         return false;

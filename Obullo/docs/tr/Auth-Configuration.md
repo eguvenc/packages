@@ -31,7 +31,7 @@ Yetki doğrulama paketine ait konfigürasyon <kbd>app/$env/providers/user.php</k
         </tr>
         <tr>
             <td>cache[block][temporary][lifetime]</td>
-            <td>Opsiyonel olarak gümrükten pasaport ile geçiş gibi kimlik onaylama sistemi isteniyorsa,  oturum açıldıktan sonra kullanıcı kimliği verileri <kbd>$this->user->identity->makeTemporary()</kbd> komutu ile <kbd>temporary</kbd> hafıza bloğuna taşınabilir. Geçici bloğa taşınmış veriler <kbd>300</kbd> saniye sonrasında yok olur. Kimlik onayladı ise <kbd>$this->user->identity->makePermanent()</kbd> komutu ile kimlik kalıcı hale getirilir ve kullanıcı sisteme tam giriş yapmış olur.
+            <td>Opsiyonel olarak gümrükten pasaport ile geçiş gibi kimlik onaylama sistemi isteniyorsa,  oturum açıldıktan sonra kullanıcı kimliği verileri <kbd>$this->user->identity->makeTemporary()</kbd> komutu ile <kbd>temporary</kbd> hafıza bloğuna taşınabilir. Geçici bloğa taşınmış veriler <kbd>300</kbd> saniye sonrasında yok olur. Kimlik onayladı ise <kbd>$this->user->identity->makePermanent()</kbd> komutu ile kimlik kalıcı hale getirilir ve kullanıcı sisteme giriş yapmış olur.
             </td>
         </tr>
         <tr>
