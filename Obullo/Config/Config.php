@@ -81,7 +81,7 @@ class Config implements ConfigInterface
      */
     public function load($filename)
     {
-        $filename = str_replace('::', '/', $filename);  // Folder support e.g. cache::redis 
+        $filename  = self::replaceFolder($filename);
         $container = $this->container; //  Make available $container variable in config files.
 
         if (isset($this->array[$filename])) {   // Is file loaded before ?
@@ -132,10 +132,23 @@ class Config implements ConfigInterface
      */
     public function write($filename, array $data)
     {
+        $filename = self::replaceFolder($filename);
         $fullpath = CONFIG .self::$env. '/';
 
         $writer = new PhpArray;
-        $writer->toFile($fullpath . $filename, $data);
+        $writer->toFile($fullpath . $filename.'.php', $data);
+    }
+
+    /**
+     * Convert "::"" to "/"
+     * 
+     * @param string $filename filename
+     * 
+     * @return string
+     */
+    protected static function replaceFolder($filename)
+    {
+        return str_replace('::', '/', $filename);  // Folder support e.g. cache::redis 
     }
 
     /**

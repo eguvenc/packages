@@ -156,6 +156,7 @@ class Uri implements UriInterface
     public function getPath($nl = true)
     {
         $shortcuts = $this->getShortcuts();
+        
         $cmdString = implode("\n", array_slice($_SERVER['argv'], 1));
         $cmdString = str_replace(
             array_keys($shortcuts),

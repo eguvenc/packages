@@ -49,7 +49,7 @@ class Debugger extends Controller
 
         ob_implicit_flush();   /* Turn on implicit output flushing so we see what we're getting as it comes in. */
 
-        if (false == preg_match('#(ws:\/\/(?<host>(.*)))(:(?<port>\d+))(?<url>.*?)$#i', $this->c['config']['http']['debugger']['socket'], $matches)) {
+        if (false == preg_match('#(ws:\/\/(?<host>(.*)))(:(?<port>\d+))(?<url>.*?)$#i', $this->container->get('config')['http']['debugger']['socket'], $matches)) {
             throw new RuntimeException("Debugger socket connection error, example web socket configuration: ws://127.0.0.1:9000");
         }
         /**
@@ -58,7 +58,7 @@ class Debugger extends Controller
         $newArray = $this->config->load('config');
         $newArray['http']['debugger']['enabled'] = true;
 
-        $this->config->write('config.php', $newArray);
+        $this->config->write('config', $newArray);
 
         $this->connection = $matches;
         $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);   // Create TCP/IP sream socket
@@ -129,6 +129,7 @@ class Debugger extends Controller
             // No need to broadcast
             // $this->readStreamResources($connections);  // Read socket data
         }
+
         socket_close($this->socket);
     }
 

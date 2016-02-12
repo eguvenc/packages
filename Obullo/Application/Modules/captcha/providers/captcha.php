@@ -70,7 +70,7 @@ return array(
     ],
     
     'methods' => [
-        ['name' => 'setMod','argument' => ['secure']],
+        ['name' => 'setBackground','argument' => ['secure']],
         ['name' => 'setPool','argument' => ['alpha']],
         ['name' => 'setChar','argument' => [5]],
         ['name' => 'setFont','argument' => ['NightSkK','AlphaSmoke','Popsf']],

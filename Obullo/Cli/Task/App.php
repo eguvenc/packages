@@ -44,7 +44,7 @@ class App extends Controller
         $newArray = $this->config['maintenance'];
         $newArray[$name]['maintenance'] = 'down';
 
-        $this->config->write('maintenance.php', $newArray);
+        $this->config->write('maintenance', $newArray);
 
         echo Console::fail("Application ".Console::foreground($name, 'red')." down for maintenance.");
     }
@@ -65,7 +65,7 @@ class App extends Controller
         $newArray = $this->config['maintenance'];
         $newArray[$name]['maintenance'] = 'up';
 
-        $this->config->write('maintenance.php', $newArray);
+        $this->config->write('maintenance', $newArray);
 
         echo Console::success("Application ".Console::foreground($name, 'green')." up.");
     }

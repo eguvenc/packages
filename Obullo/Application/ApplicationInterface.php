@@ -90,15 +90,6 @@ interface ApplicationInterface
     public function getExceptions();
 
     /**
-     * Is Cli ?
-     *
-     * Test to see if a request was made from the command line.
-     *
-     * @return bool
-     */
-    public function isCli();
-
-    /**
      * Returns to detected environment
      * 
      * @return string

@@ -1,7 +1,9 @@
 
 ## Captcha Sınıfı
 
-CAPTCHA "Carnegie Mellon School of Computer Science" tarafından geliştirilen bir projedir. Projenin amacı bilgisayar ile insanların davranışlarının ayırt edilmesidir ve daha çok bu ayrımı yapmanın en zor olduğu web ortamında kullanılmaktadır. CAPTCHA projesinin bazı uygulamalarına çoğu web sayfalarında rastlamak mümkündür. Üyelik formlarında rastgele resim gösterilerek formu dolduran kişiden bu resmin üzerinde yazan sözcüğü girmesi istenir. Buradaki basit mantık o resimde insan tarafından okunabilecek ancak bilgisayar programları tarafından okunması zor olan bir sözcük oluşturmaktır. Eğer forma girilen sözcük resimdeki ile aynı değilse ya formu dolduran kişi yanlış yapmıştır ya da formu dolduran bir programdır denebilir.
+CAPTCHA "Carnegie Mellon School of Computer Science" tarafından geliştirilen bir projedir. Projenin amacı bilgisayar ile insanların davranışlarının ayırt edilmesidir ve daha çok bu ayrımı yapmanın en zor olduğu web ortamında kullanılmaktadır. CAPTCHA projesinin bazı uygulamalarına çoğu web sayfalarında rastlamak mümkündür. Üyelik formlarında rastgele resim gösterilerek formu dolduran kişiden bu resmin üzerinde yazan sözcüğü girmesi istenir.
+
+Buradaki basit mantık o resimde insan tarafından okunabilecek ancak bilgisayar programları tarafından okunması zor olan bir sözcük oluşturmaktır. Eğer forma girilen sözcük resimdeki ile aynı değilse ya formu dolduran kişi yanlış yapmıştır ya da formu dolduran bir programdır denebilir.
 
 <ul>
 <li>
@@ -9,17 +11,22 @@ CAPTCHA "Carnegie Mellon School of Computer Science" tarafından geliştirilen b
     <ul>
         <li><a href="#adding-module">Modülü Kurmak</a></li>
         <li><a href="#removing-module">Modülü Kaldırmak</a></li>
-        <li><a href="#configuration">Konfigürasyon</a></li>
-        <li><a href="#service-configuration">Servis Konfigürasyonu</a></li>
+        <li><a href="#service-provider">Servis Sağlayıcısı</a></li>
     </ul>
 </li>
 
 <li>
-    <a href="#running">Çalıştırma ve Seçenekler</a>
+    <a href="#running">Çalıştırma</a>
     <ul>
         <li><a href="#module">Captcha Modülü</a></li>
         <li><a href="#loading-service">Servisi Yüklemek</a></li>
-        <li><a href="#choose-mod">Mod Seçimi</a></li>
+    </ul>
+</li>
+
+<li>
+    <a href="#options">Seçenekler</a>
+    <ul>
+        <li><a href="#choosing-background">Arkaplan Seçimi</a></li>
         <li><a href="#font-options">Font Seçenekleri</a></li>
         <li><a href="#color-options">Renk Seçenekleri</a></li>
         <li><a href="#foreground-color-options">Arkaplan Renk Seçenekleri</a></li>
@@ -30,7 +37,7 @@ CAPTCHA "Carnegie Mellon School of Computer Science" tarafından geliştirilen b
         <li><a href="#char-width">Karakter Genişliği</a></li>
     </ul>
 </li>
-    
+  
 <li>
     <a href="#create-operations">Captcha İşlemleri</a>
     <ul>
@@ -43,24 +50,24 @@ CAPTCHA "Carnegie Mellon School of Computer Science" tarafından geliştirilen b
                 <li><a href="#printRefreshButton">$this->captcha->printRefreshButton()</a></li>
             </ul>
         </li>
-        <li><a href="#validation">Captcha Doğrulama</a></li>
+        <li><a href="#validation">Doğrulama</a></li>
         <li><a href="#validation-with-validator">Validator Sınıfı İle Doğrulama</a></li>
         <li><a href="#results-table">Hata ve Sonuç Kodları Tablosu</a></li>
     </ul>
 </li>
 
-<li><a href="#method-reference">Fonksiyon Referansı</a></li>
+<li><a href="#method-reference">Captcha Sınıfı Referansı</a></li>
 </ul>
 
 <a name="setup"></a>
 
 ### Kurulum
 
-Captcha paketi uygulama içerisinde modül olarak kullanılır ve kurulduğunda modüle ait konfigürasyon dosyaları <kbd>config/captcha</kbd> klasörü altına kopyalanır.
+Captcha paketi uygulama içerisinde modül olarak kullanılır ve kurulduğunda modüle ait <kbd>captcha.php</kbd> konfigürasyon dosyası <kbd>providers/</kbd> klasörü altına kopyalanır.
 
 <a name="adding-module"></a>
 
-#### Modül Kurmak
+#### Modülü Kurmak
 
 ```php
 php task module add captcha
@@ -74,74 +81,21 @@ php task module add captcha
 php task module remove captcha
 ```
 
-<a name="configuration"></a>
+<a name="service-provider"></a>
 
-#### Konfigürasyon
+#### Servis Sağlayıcısı
 
-Konfigürasyon ayarlarını ihtiyaçlarınızı göre aşağıdaki dosyadan ayarlamanız gerekir.
-
-```php
-- app
-- config
-    - captcha
-        image.php
-```
-
-<a name="service-configuration"></a>
-
-#### Servis Konfigürasyonu
-
-Servis dosyası modül eklendiğinde otomatik olarak <kbd>app/classes/Service</kbd> klasörü altına kopyalanır. Servis dosyasındaki captcha özelliklerini ihtiyaçlarınıza göre konfigüre etmeniz gerekebilir.
+<kbd>app/providers.php</kbd> dosyasında servis sağlayıcısının tanımlı olduğundan emin olun.
 
 ```php
-namespace Service;
-
-use Obullo\Captcha\Adapter\Image;
-use Obullo\Container\ServiceInterface;
-use Obullo\Container\ContainerInterface;
-
-class Captcha implements ServiceInterface
-{
-    public function register(Container $c)
-    {
-        $c['captcha'] = function () use ($c) {
-
-            $captcha = new Image($c);            
-            $captcha->setMod('secure');  // set to "cool" for no background
-            $captcha->setPool('alpha');     // "random", "numbers"
-            $captcha->setChar(5);
-            $captcha->setFont(array('NightSkK','Almontew', 'Fordd'));
-            $captcha->setFontSize(20);
-            $captcha->excludeFont(['Fordd']);  // remove font
-            $captcha->setHeight(36);
-            $captcha->setWave(false);
-            $captcha->setColor(['red', 'black']);
-            $captcha->setTrueColor(false);
-            $captcha->setNoiseColor(['red']);
-            return $captcha;
-        };
-    }
-}
-
-/* Location: .app/classes/Service/Captcha.php */
+$container->addServiceProvider('Obullo\Container\ServiceProvider\Captcha');
 ```
 
 <a name="running"></a>
 
-### Çalıştırma ve Seçenekler
+### Çalıştırma
 
-Image Captcha arayüzüne bağlanmak için captcha servisi kullanılır.
-
-<a name="module"></a>
-
-#### Captcha Modülü
-
-Modül yaratıldığına örnek captcha oluşturma dosyaları <kbd>.modules/recaptcha/examples</kbd> dizini altına kopyalanır. Bu kapsamlı örnekleri incelemek için tarayıcınızdan aşğıdaki adresleri ziyaret edin.
-
-```html
-http://myproject/captcha/examples/form
-http://myproject/captcha/examples/ajax
-```
+Captcha modülünü kurduktan sonra Captcha arayüzüne bağlanmak için captcha servisi kullanılır.
 
 <a name="loading-service"></a>
 
@@ -150,17 +104,32 @@ http://myproject/captcha/examples/ajax
 Captcha servisi aracılığı ile captcha metotlarına aşağıdaki gibi erişilebilir.
 
 ```php
-$this->c['captcha']->method();
+$this->container->get('captcha')->method();
 ```
 
-<a name="choosing-mod"></a>
+<a name="module"></a>
 
-#### Mod Seçimi
+#### Captcha Modülü
 
-Image sürücüsü iki tür moda sahiptir: <kbd>secure</kbd> ve <kbd>cool</kbd>. Konfigürasyonda tanımlı varsayılan mod <b>cool</b> modudur. Güvenli mod <b>secure</b> modu imajları kompleks bir arkaplan seçerek oluşturur. Cool modunda ise captcha arkaplan kullanılmadan oluşturulur.
+Captcha modülü ile ilgili kapsamlı örnekleri incelemek için tarayıcınızdan aşağıdaki adresleri ziyaret edin.
+
+```html
+http://myproject/examples/captcha
+http://myproject/examples/captcha/ajax
+```
+
+<a name="options"></a>
+
+### Seçenekler
+
+<a name="choosing-background"></a>
+
+#### Arkaplan Seçimi
+
+Imaj sürücüsü arka plan için iki tür seçeneğe sahiptir: <kbd>secure</kbd> ve <kbd>none</kbd>. Güvenli arkaplan seçildiğinde imajlar kompleks bir arkaplan seçilerek oluşturulur. none seçeneğinde ise captcha imajı arkaplan kullanılmadan oluşturulur.
 
 ```php
-$this->captcha->setMod('secure');
+$this->captcha->setBackground('none');
 ```
 <a name="font-options"></a>
 
@@ -170,40 +139,20 @@ $this->captcha->setMod('secure');
 $this->captcha->setFont(['Arial', 'Tahoma', 'Verdana']);
 ```
 
-Fontlarınız <kbd>.assets/fonts</kbd> dizininden yüklenirler. Bu dizin konfigürasyon dosyasından değiştirilebilir.
-
-```php
-- assets
-	- fonts
-		My_font1.ttf
-		My_font2.ttf
-		My_font3.ttf
-```
-
-Özel fontlar eklemek için setFont metodunu kullanabilirsiniz.
+Fontlarınız <kbd>.resources/fonts</kbd> dizininden yüklenirler. Bu dizin konfigürasyon dosyasından değiştirilebilir. Özel fontlar eklemek için font dizinine fontlarınızı ekleyip setFont() metodunu çalıştırmanız yeterli olur.
 
 ```php
 $this->captcha->setFont([
-                  'AlphaSmoke',         // Default captcha font
-                  'Almontew',        
-				  'My_Font1.ttf',		// Your custom fonts with extension (.ttf etc ..)
-				  'My_Font2.ttf',
-				  'My_Font3.ttf'
+                  'AlphaSmoke',
+                  'Almontew'
 				 ]);
 ```
 
-Gereksiz fontları çıkarmak için excludeFont metodunu kullanabilirsiniz.
-
-```php
-$this->captcha->excludeFont(['AlphaSmoke','Anglican'});
-```
 <a name="color-options"></a>
 
 #### Renk Seçenekleri
 
-Varsayılan renkleri <b>config/captcha.php</b> dosyasından ayarlayabilirsiniz.
-
-Mevcut renkler aşağıdaki gibidir.
+Varsayılan renkleri konfigürasyon dosyasından ayarlayabilirsiniz. Mevcut renkler aşağıdaki gibidir.
 
 <kbd>red</kbd> - <kbd>blue</kbd> - <kbd>green</kbd> - <kbd>black</kbd> - <kbd>yellow</kbd> 
 
@@ -214,9 +163,7 @@ $this->captcha->setColor(['red','black']);
 
 #### Arkaplan Desen Renkleri
 
-Varsayılan renkleri <b>config/captcha.php</b> dosyasından ayarlayabilirsiniz. Birden fazla renk seçildiğinde captcha rastgele bir renk seçilerek yaratılır.
-
-Mevcut renkler aşağıdaki gibidir.
+Varsayılan renkleri konfigürasyon dosyasından ayarlayabilirsiniz. Birden fazla renk seçildiğinde captcha rastgele bir renk seçilerek yaratılır. Mevcut renkler aşağıdaki gibidir.
 
 <kbd>red</kbd> - <kbd>blue</kbd> - <kbd>green</kbd> - <kbd>black</kbd> - <kbd>yellow</kbd> 
 
@@ -227,7 +174,7 @@ $this->captcha->setNoiseColor(['black','cyan']);
 
 #### Imaj Yüksekliği
 
-Eğer imaj <b>yüksekliği</b> bir kez ayarlanır ise imaj genişliği, karakter ve font genişliği değerleri otomatik olarak hesaplanır. Varsayılan değer <kbd>40</kbd> px dir.
+Eğer imaj yüksekliği bir kez ayarlanır ise imaj genişliği, karakter ve font genişliği değerleri otomatik olarak hesaplanır. Varsayılan değer <kbd>40</kbd> px dir.
 
 ```php
 $this->captcha->setHeight(40);
@@ -272,6 +219,10 @@ $this->captcha->setPool('numbers');
 </thead>
 <tbody>
 <tr>
+<td>random</td>
+<td>23456789ABCDEFGHJKLMNPRSTUVWXYZ</td>
+</tr>
+<tr>
 <td>numbers</td>
 <td>23456789</td>
 </tr>
@@ -280,16 +231,10 @@ $this->captcha->setPool('numbers');
 <td>ABCDEFGHJKLMNPRSTUVWXYZ</td>
 </tr>
 <tr>
-<tr>
-<td>random</td>
-<td>23456789ABCDEFGHJKLMNPRSTUVWXYZ</td>
-</tr>
 </tbody>
 </table>
 
-Daha fazla okunabilirlik için <kbd>"1 I 0 O"</kbd> karakterlerini kullanmamanız tavsiye edilir.
-
-Varsayılan değer <kbd>random</kbd> değeridir.
+Daha fazla okunabilirlik için <kbd>"1 I 0 O"</kbd> karakterlerini kullanmamanız tavsiye edilir. Varsayılan değer <kbd>random</kbd> değeridir.
 
 <a name="char-width"></a>
 
@@ -320,13 +265,21 @@ Captcha modülü eklendiğinde captcha modülü altında <kbd>/modules/captcha/C
 ```php
 namespace Captcha;
 
-class Create extends \Controller
+use Obullo\Http\Controller;
+
+class Create extends Controller
 {
     public function index()
     {
-        header('Cache-Control: no-cache, must-revalidate');
-        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-
+        $this->response->newInstance(
+            'php://memory',
+            200,
+            [
+                'Cache-Control' => 'no-cache, must-revalidate',
+                'Expires' => 'Mon, 26 Jul 1997 05:00:00 GMT',
+                'Content-Type' => 'image/png',
+            ]
+        );
         $this->captcha->create();
     }
 }
@@ -336,7 +289,7 @@ class Create extends \Controller
 
 ##### $this->captcha->printJs();
 
-Sayfaya captcha eklemek için aşağıdaki gibi <b>head</b> tagları arasına javascript çıktısını ekrana dökmeniz gerekir.
+Sayfaya captcha eklemek için aşağıdaki gibi <kbd>head</kbd> tagları arasına javascript çıktısını ekrana dökmeniz gerekir.
 
 ```php
 <!DOCTYPE html>
@@ -359,10 +312,23 @@ Formlarınıza captcha eklemek için aşağıdaki gibi captcha çıktısını ek
 
 ```php
 <form method="POST" action="/captcha/examples/form">
-	<?php echo $this->captcha->printHtml() ?>
+    <?php echo $this->captcha->printHtml() ?>
     <input type="submit" value="Send" name="sendForm">
 </form>
 ```
+
+Bu fonksiyon aşağıdaki gibi bir input alanı
+
+```php
+<input name="captcha_answer" placeholder="Security Code" type="text">
+```
+
+ve image elementi oluşturur.
+
+```php
+<img src="/captcha/create/index/" id="captcha_image" class="">
+```
+
 
 <a name="printRefreshButton"></a>
 
@@ -380,12 +346,12 @@ Eğer refresh button özelliğinin etkin olmasını istiyorsanız. Form tagları
 
 <a name="validation"></a>
 
-#### Captcha Doğrulama 
+#### Doğrulama 
 
-Captcha doğrulama için bütün sürücüler için ortak olarak kullanılan CaptchaResult sınıfı kullanılır. Bir captcha kodunun doğru olup olmadığı aşağıdaki gibi isValid() komutu ile anlaşılır.
+Captcha doğrulama için bütün sürücüler için ortak olarak kullanılan <kbd>CaptchaResult</kbd> sınıfı kullanılır. Bir captcha kodunun doğru olup olmadığı aşağıdaki gibi <kbd>isValid()</kbd> komutu ile anlaşılır.
 
 ```php
-if ($this->c['captcha']->result()->isValid()) {
+if ($this->captcha->result()->isValid()) {
 
 	// Doğrulama başarılı
 }
@@ -394,43 +360,24 @@ if ($this->c['captcha']->result()->isValid()) {
 Bir doğrulamadan dönen mesajlar aşağıdaki gibi alınır.
 
 ```php
-print_r($this->c['captcha']->result()->getMessages());
+print_r($this->captcha->result()->getMessages());
 ```
 
 Bir doğrulamaya ait hata kodu alma örneği
 
 
 ```php
-echo $this->c['captcha']->result()->getCode();  // -2  ( Invalid Code )
+echo $this->captcha->result()->getCode();  // -2  ( Invalid Code )
 ```
 
 <a name="validation-with-validator"></a>
 
 #### Validator Sınıfı İle Doğrulama 
 
-Eğer varolan formunuz içerisinde bir captcha doğrulaması yapıyorsanız ve konfigürasyon dosyasından <kbd>validation</kbd> ve <kbd>callback</kbd> anahtarları aktif ise doğrulama için aşağıdaki kodlar haricinde herhangi bir kod yazmanıza gerek kalmaz.
+Eğer varolan formunuz içerisinde <kbd>validator</kbd> sınıfını kullanıyorsanız doğrulama için herhangi bir kod yazmanıza gerek kalmaz ve <kbd>captcha</kbd> doğrulama kuralını kural olarak eklemeniz yeterli olur.
 
 ```php
-namespace Captcha\Examples;
-
-class Form extends \Controller
-{
-    public function index()
-    {
-        if ($this->request->isPost()) {
-
-            if ($this->validator->isValid()) {
-                $this->form->success('Form Validation Success.');
-            }
-        }
-        $this->view->load(
-            'form',
-            [
-                'title' => 'Hello Captcha !'
-            ]
-        );
-    }
-}
+$this->validator->setRules('captcha_answer', 'Captcha', 'required|captcha');
 ```
 
 <a name="results-table"></a>
@@ -476,13 +423,11 @@ class Form extends \Controller
 
 <a name="method-reference"></a>
 
-#### Fonksiyon Referansı
+#### Captcha Sınıfı Referansı
 
-------
+##### $this->captcha->setBackground($bg = 'none');
 
-##### $this->captcha->setMod(string $mod = 'secure');
-
-Captcha modunu ayarlar <kbd>secure</kbd> veya <kbd>cool</kbd> seçilebilir. Cool seçildiğinde arkaplan boşaltılır.
+Captcha arkaplanını seçer <kbd>secure</kbd> veya <kbd>none</kbd> seçilebilir. none seçeneği seçildiğinde arkaplan boşaltılır.
 
 ##### $this->captcha->setNoiseColor(mixed $color = ['red']);
 
@@ -502,11 +447,11 @@ Font genişliği belirler.
 
 ##### $this->captcha->setHeight(integer $height);
 
-Eğer imaj <b>yüksekliği</b> bir kez ayarlanır ise imaj genişliği, karakter ve font genişliği değerleri otomatik olarak hesaplanır.
+Eğer imaj <kbd>yüksekliği</kbd> bir kez ayarlanır ise imaj genişliği, karakter ve font genişliği değerleri otomatik olarak hesaplanır.
 
 ##### $this->captcha->setPool(string $pool);
 
-Karakter havuzunu belirler. Değerler: numbers, random ve alpha dır.
+Karakter havuzunu belirler. Değerler: <kbd>numbers</kbd>, <kbd>random</kbd> ve <kbd>alpha</kbd> dır.
 
 ##### $this->captcha->setChar(integer $char);
 
@@ -542,11 +487,11 @@ Geçerli captcha koduna geri döner.
 
 ##### $this->captcha->create();
 
-Captcha kodunu yaratır. Http başlıkları ile birlikte kullanılması tavsiye edilir.
+Captcha imajını yaratır. Http başlıkları ile birlikte kullanılması gerekir.
 
 ##### $this->captcha->result(string $code = null);
 
-Parametreden gönderilen captcha kodunu doğrulama işlemini başlatarak CaptchaResult nesnesine döner. Eğer bir parametre girilmezse otomatik olarak $this->c['request']->post('capthca_input_ismi'); değeri alınır.
+Parametreden gönderilen captcha kodunu doğrulama işlemini başlatarak <kbd>CaptchaResult</kbd> nesnesine döner. Eğer bir parametre girilmezse otomatik olarak post alanı değerini alınır.
 
 ##### $this->captcha->printJs();
 
@@ -554,7 +499,7 @@ Captcha refresh javascript fonksiyonunu sayfaya yazdırır. Html head tagları a
 
 ##### $this->captcha->printHtml();
 
-Captcha html <b>img</b> tagını yaratır dönen sonuç "echo" ile ekrana yazdırılmalıdır.
+Bir html form için captcha <kbd>input</kbd> alanı ve <kbd>img</kbd> tagını üretir.
 
 ##### $this->captcha->printRefreshButton();
 

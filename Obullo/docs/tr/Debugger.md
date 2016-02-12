@@ -20,7 +20,7 @@ return array(
 )
 ```
 
-Logların okunabilmesi için <kbd>File</kbd> sürücüsünün logger servisinizde <kbd>'registerHandler' => [5, 'file']]</kbd> konfigürasyonu ile aşağıdaki gibi tanımlı olması gerekir.
+Logların okunabilmesi için <kbd>File</kbd> sürücüsünün logger servisinizde tanımlı olması gerekir.
 
 ```php
     'methods' => [

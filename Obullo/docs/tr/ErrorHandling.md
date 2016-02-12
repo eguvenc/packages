@@ -74,9 +74,9 @@ Aşağıdaki örnekte <b>istisnai hatalara</b> dönüştürülmüş <b>doğal ph
 | Php Native Errors
 |--------------------------------------------------------------------------
 */
-$c['app']->error(
+$app->error(
     function (ErrorException $e) use ($c) {
-        $c['logger']->error($e);
+        $logger->error($e);
         return ! $continue = false;   // Whether to continue native errors
     }
 );
@@ -92,9 +92,9 @@ Bu örnekte fonksiyon sonucu <kbd>$continue</kbd> değişkenine döner ve bu de�
 | Logic Exceptions
 |--------------------------------------------------------------------------
 */
-$c['app']->error(
+$app->error(
     function (LogicException $e) use ($c) {
-        $c['logger']->error($e);
+        $logger->error($e);
     }
 );
 ```
@@ -141,9 +141,9 @@ Uygulama hataları varsayılan olarak log sürücülerine kaydedilirler.
 | Database and Other Runtime Exceptions
 |--------------------------------------------------------------------------
 */
-$c['app']->error(
+$app->error(
     function (RuntimeException $e) use ($c) {
-        $c['logger']->error($e);
+        $logger->error($e);
     }
 );
 ```
@@ -152,7 +152,7 @@ Bununla beraber <a href="http://php.net/manual/tr/internals2.opcodes.instanceof.
 
 
 ```php
-$c['app']->error(
+$app->error(
     function (RuntimeException $e) use ($c) {
 
         if ($e instanceof PDOException) {
@@ -164,7 +164,7 @@ $c['app']->error(
                 'System Unavailable'
             );
         }
-        $c['logger']->error($e);
+        $logger->error($e);
     }
 );
 ```
@@ -181,9 +181,9 @@ Aşağıdaki örnekte ise php fatal error türündeki hatalar kontrol altına al
 | Php Fatal Errors
 |--------------------------------------------------------------------------
 */
-$c['app']->fatal(
+$app->fatal(
     function (ErrorException $e) use ($c) {
-        $c['logger']->error($e);
+        $logger->error($e);
     }
 );
 ```
@@ -191,7 +191,7 @@ $c['app']->fatal(
 Fatal error örneğinde ölümcül hata türündeki hatalar fatal metodu ile php <a href="http://php.net/manual/en/function.register-shutdown-function.php" target="_blank">register_shutdown</a> fonksiyonuna gönderilerek kontrol edilirler. Bir ölümcül hata oluşması durumunda isimsiz fonksiyon çalışarak fonksiyon içerisindeki görevleri yerine getirir. Fatal error metodu uygulamanın en alt seviyesinde çalışır.
 
 
-> **Not:** İstisnai hatalardan faklı olarak $c['app']->fatal() metodu errors.php dosyası içerisinde yalnızca <b>bir kere</b> tanımlanabilir.
+> **Not:** İstisnai hatalardan faklı olarak $app->fatal() metodu errors.php dosyası içerisinde yalnızca <b>bir kere</b> tanımlanabilir.
 
 <a name="catching-exceptions-by-manually"></a>
 

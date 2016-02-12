@@ -6,7 +6,6 @@ use DOMDocument;
 use RuntimeException;
 use Obullo\Log\Handler\Debugger;
 use Obullo\Config\ConfigInterface as Config;
-use Psr\Http\Message\RequestInterface as Request;
 use Obullo\Application\ApplicationInterface as Application;
 
 /**
@@ -23,13 +22,6 @@ class Websocket
      * @var object
      */
     protected $app;
-
-    /**
-     * Config
-     * 
-     * @var object
-     */
-    protected $config;
 
     /**
      * Host
@@ -58,6 +50,13 @@ class Websocket
      * @var object
      */
     protected $socket;
+
+    /**
+     * Config
+     * 
+     * @var object
+     */
+    protected $config;
 
     /**
      * App output
@@ -124,8 +123,7 @@ class Websocket
             $this->port
         );
         if ($this->connect == false) {
-            $message = "Debugger enabled but socket server is not running. 
-            Run debug server or disable debugger.";
+            $message = "Debugger seems enabled. Run debug server or disable debugger from your config.";
 
             if ($this->app->request->isAjax()) {
                 $message = strip_tags($message);
@@ -155,7 +153,7 @@ class Websocket
         }
         $handler = new Debugger($this->params);      // Log debug handler
         $this->lines = $handler->write($data);
-
+        
         if ($this->app->request->isAjax()) {
 
             $cookies = $this->app->request->getCookieParams();
@@ -166,7 +164,7 @@ class Websocket
                 setcookie('o_debugger_active_tab', "obulloDebugger-ajax-log", 0, '/'); 
             }
             $this->handshake('Ajax');
-        } elseif ($this->app->isCli()) { 
+        } elseif ($this->app->request->isCli()) { 
             $this->handshake('Cli');
         } else {
             $this->handshake('Http');

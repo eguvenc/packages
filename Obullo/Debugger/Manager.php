@@ -4,7 +4,6 @@ namespace Obullo\Debugger;
 
 use RuntimeException;
 use Obullo\Log\Handler\Raw;
-use Obullo\Container\ContainerInterface;
 
 /**
  * Debugger manager
@@ -43,7 +42,7 @@ class Manager
         global $container;
         $this->container = $container;
         $this->logger = $container->get('logger');
-        $this->config = $container->get('config')->load('providers/logger');
+        $this->config = $container->get('config')->load('providers::logger');
     }
 
     /**

@@ -33,7 +33,6 @@ class Image extends AbstractProvider implements CaptchaInterface
     protected $html = '';         // Captcha html
     protected $config = array();  // Configuration data
     protected $imageId = '';      // Image unique id
-    protected $mods = ['cool', 'secure'];
     protected $yPeriod = 12;      // Wave Y axis
     protected $yAmplitude = 14;   // Wave Y amplitude
     protected $xPeriod = 11;      // Wave X axis
@@ -75,7 +74,7 @@ class Image extends AbstractProvider implements CaptchaInterface
         $this->logger = $logger;
         $this->session = $session;
         $this->translator = $translator;
-        $this->params['mod'] = 'cool';
+        $this->params['background'] = 'none';
         $this->init();
         
         $this->logger->debug('Captcha Class Initialized');
@@ -94,25 +93,17 @@ class Image extends AbstractProvider implements CaptchaInterface
     }
 
     /**
-     * Set captcha mode
+     * Set background type
      * 
-     * Types: "secure" or "cool"
+     * Types: "secure" or "none"
      * 
-     * @param string $mod string
+     * @param string $bg background name
      * 
      * @return object
      */
-    public function setMod($mod)
+    public function setBackground($bg = 'none')
     {
-        if (! $this->isAllowedMod($mod)) {
-            throw new RuntimeException(
-                sprintf(
-                    'Unsupported mod. Available mods are here "%s".',
-                    implode(',', $this->mods)
-                )
-            );
-        }
-        $this->params['mod'] = $mod;
+        $this->params['background'] = $bg;
         return $this;
     }
 
@@ -123,10 +114,22 @@ class Image extends AbstractProvider implements CaptchaInterface
      * 
      * @return void
      */
-    public function setCaptchaId($captchaId)
+    public function setInputId($captchaId)
     {
         $this->params['form']['input']['attributes']['id'] = $captchaId;
         return $this;
+    }
+    
+    /**
+     * Set image unique id
+     * 
+     * @param string $uniqId unique id
+     * 
+     * @return void
+     */
+    protected function setImageId($uniqId)
+    {
+        $this->imageId = $uniqId;
     }
 
     /**
@@ -251,18 +254,6 @@ class Image extends AbstractProvider implements CaptchaInterface
     }
 
     /**
-     * Set image unique id
-     * 
-     * @param string $uniqId unique id
-     * 
-     * @return void
-     */
-    protected function setImageId($uniqId)
-    {
-        $this->imageId = $uniqId;
-    }
-
-    /**
      * Set font
      * 
      * @param mixed $font font name
@@ -276,23 +267,6 @@ class Image extends AbstractProvider implements CaptchaInterface
             $font = array($str => $str);
         }
         $this->fonts = array_keys($font);
-
-        // var_dump($this->fonts);
-
-        // die;
-        return $this;
-    }
-
-    /**
-     * Append font
-     * 
-     * @param string $font font name
-     * 
-     * @return object
-     */
-    public function appendFont($font)
-    {
-        $this->fonts[] = str_replace('.ttf', '', $font); // Remove the .ttf extension.
         return $this;
     }
 
@@ -344,21 +318,6 @@ class Image extends AbstractProvider implements CaptchaInterface
     public function getCode()
     {
         return $this->code;
-    }
-
-    /**
-     * Is permitted mod
-     * 
-     * @param string $mod mod
-     * 
-     * @return boolean
-     */
-    public function isAllowedMod($mod)
-    {
-        if (! in_array(strtolower($mod), $this->mods)) {
-            return false;
-        }
-        return true;
     }
 
     /**
@@ -508,7 +467,7 @@ class Image extends AbstractProvider implements CaptchaInterface
         $randFont = array_rand($fonts);
         $fontPath = $this->defaultFontPath . $fonts[$randFont].'.ttf';
 
-        if ($this->params['mod'] != 'cool') {
+        if ($this->params['background'] != 'none') {
 
             $wHvalue = $this->width / $this->params['image']['height'];
             $wHvalue = $this->params['image']['height'] * $wHvalue;
@@ -540,7 +499,7 @@ class Image extends AbstractProvider implements CaptchaInterface
      */
     protected function imageLine()
     {
-        if ($this->params['mod'] != 'cool') {
+        if ($this->params['background'] != 'none') {
             $wHvalue = $this->width / $this->params['image']['height'];
             $wHvalue = $wHvalue / 2;
             for ($i = 0; $i < $wHvalue; $i++) {

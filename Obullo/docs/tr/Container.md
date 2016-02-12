@@ -1,239 +1,347 @@
 
 ## Konteyner Sınıfı
 
-Obullo Container sınıfı PHP 5.4 ve üzeri sürümler için <kbd>hafif yükte</kbd> ve ortam tabanlı çalışabilen bir bağımlılık enjeksiyon çözümüdür. Uygulamanızda servisler, bileşenler ve servis sağlayıcıları oluşturabilmeyi sağlar.
-
-> **Not:** Uygulamada gördüğünüz bir <b>$c</b> değişkeni her zaman konteyner sınıfını temsil eder.
+Bir konteyner, uygulamanızda servisler ve servis sağlayıcıları oluşturabilmeyi sağlar ve bağımlılık enjeksiyonunu yönetir. Çerçeve içerisinde konteyner paketi olarak <a href="http://thephpleague.com" target="blank">The Php League</a> php grubu tarafından geliştirilen <a href="http://container.thephpleague.com/" target="_blank">League Container</a> sınıfı seçilmiştir.
 
 <ul>
 <li>
-    <a href="#how-it-works">Nasıl Çalışıyor ?</a>
-</li>
-<li>
     <a href="#services">Servisler</a>
     <ul>
-        <li><a href="#service-definition">Servisleri Tanımlamak</a></li>
-        <li><a href="#service-load">Servisleri Yüklemek</a></li>
+        <li><a href="#container-add">$container->add()</a></li>
+        <li><a href="#container-share">$container->shared()</a></li>
+        <li><a href="#container-get">$container->get()</a></li>
+        <li><a href="#container-has">$container->has()</a></li>
+        <li><a href="#container-hasShared">$container->hasShared()</a></li>
+        <li><a href="#container-addServiceProvider">$container->addServiceProvider()</a></li>
     </ul>
 </li>
+
+<li>
+    <a href="#dependency-injection">Bağımlılık Enjeksiyonu</a>
+    <ul>
+        <li><a href="#container-withArgument">$container->withArgument()</a></li>
+        <li><a href="#container-withMethodCall">$container->withMethodCall()</a></li>
+    </ul>
+</li>
+
 <li>
     <a href="#service-providers">Servis Sağlayıcıları</a>
     <ul>
-        <li><a href="#service-provider-definition">Servis Sağlayıcılarını Tanımlamak</a></li>
-        <li><a href="#service-provider-load">Servis Sağlayıcılarını Yüklemek</a></li>
-        <li><a href="#service-providers-list">Mevcut Servis Sağlayıcıları</a></li>
-        <li><a href="#service-providers-custom">Kendi Servis Sağlayıcılarınızı Tanımlamak</a></li>
+        <li><a href="#service-configuration">Servis Konfigurasyonu</a></li>
+        <li><a href="#service-parameters">Servis Parametreleri</a></li>
     </ul>
 </li>
-<li><a href="#application-doc">Uygulama Sınıfı Belgelerine Bir Gözatın</a></li>
-<li><a href="#method-reference">Fonksiyon Referansı</a></li>
+
+<li>
+    <a href="#connectors">Konnektörler</a>
+    <ul>
+        <li><a href="#load-connector">Konnektörü Yüklemek</a></li>
+        <li><a href="#default-connectors">Mevcut Konnektörler</a></li>
+    </ul>
+</li>
+
 </ul>
-
-<a name="how-it-works"></a>
-
-### Nasıl Çalışıyor ?
-
-Konteyner içerisine bir nesne tek tek tanımlabilir.
-
-```php
-$c['myclass'] = function () {
-    return new MyClass;
-}
-```
-
-Tanımlanan sınıflara aşağıdaki gibi ulaşılır.
-
-```php
-$c['myclass'];  // yeni nesne
-$c['myclass'];  // eski nesne
-$c['myclass'];  // eski nesne
-```
-
-Eğer <b>raw()</b> fonksiyonunu kullanırsanız closure() fonksiyonu elde edilir.
-
-```php
-$closure = $this->c->raw('nesne');
-$closure();  //  yeni nesne
-$closure();  //  yeni nesne
-```
 
 <a name="services"></a>
 
 ### Servisler
 
-Servisler uygulama kalitesini arttıran aracı sınıflardır. Bir sınıfın servis haline getirilmesinin nedeni nesneyi konfigürasyon ayarları veya metotları ile birlikte bir dosya içerisinden yükleyerek yazılımınızın esnekliğini arttırmaktır.
+Konteyner içerisine bir servis <kbd>add</kbd> yada <kbd>share</kbd> metotları ile kaydedilir.
 
-<a name="service-definition"></a>
+<a name="container-add"></a>
 
-#### Servisleri Tanımlamak
+#### $container->add()
 
-Servis konfigürasyonları <kbd>app/$env/providers/</kbd> klasörü içerisinde tanımlanırlar ve çevre ortamı değiştiğinde ( local, test, production ) farklı davranışlar sergileyebilirler. Aşağıda session servisine ait konfigürasyon gösteriliyor.
+Eğer servis her bir defa çağırıldığında yeni değişken değerleri ile yaratılmak isteniyorsa <kbd>add</kbd> metodu kullanılır.
 
 ```php
-return array(
-    'params' => [
-        'provider' => [
-            'name' => 'cache',
-            'params' => [
-                'driver' => 'redis',
-                'connection' => 'default'
-            ]
-        ],
-        'storage' => [
-            'key' => 'sessions:',
-            'lifetime' => 3600,
-        ],
-        'cookie' => [..],
-    ],
-    'methods' => [
-        'setParameters' => [
-            'registerSaveHandler' => '\Obullo\Session\SaveHandler\Cache',
-            'setName' => '',
-            'start' => '',
+$container->add('class', 'Namespace/MyClass');
+```
+
+Servis her çağırıldığında yeni nesneye döner.
+
+```php
+$container->get('class');  // yeni nesne
+$container->get('class');  // yeni nesne
+$container->get('class');  // yeni nesne
+```
+
+<a name="container-share"></a>
+
+#### $container->share()
+
+Eğer servis nesnesi paylaşılmak isteniyorsa <kbd>share</kbd> metodu kullanılır.
+
+```php
+$container->share('class', 'Namespace/MyClass');
+```
+
+Share metodu ile eklenen bir servis ilk çağırımdan sonra her bir defa çağırıldığında ilk yaratılan nesneye döner.
+
+```php
+$container->get('class');  // yeni nesne
+$container->get('class');  // eski nesne
+$container->get('class');  // eski nesne
+```
+
+<a name="container-get"></a>
+
+#### $container->get()
+
+Konteyner içerisine kaydedilen bir değere ulaşmayı sağlar. 
+
+```php
+var_dummp($container->get('class'));  // object
+```
+
+Bu değer eğer <kbd>string</kbd> türünde bir değer ise <kbd>RawArgument()</kbd> sınıfı kullanılmalıdır.
+
+```php
+$container->add('foo', new League\Container\Argument\RawArgument('bar'));
+```
+
+Foo adlı değeri aldığınızda <kbd>RawArgument()</kbd> nesnesine geri döner. Nesne içerisinden getValue() metodu ile gerçek foo değerine ulaşılmış olur.
+
+```php
+$container->get('foo')->getValue();  // bar
+```
+
+<a name="container-has"></a>
+
+#### $container->has()
+
+Girilen servis konteyner içerisinde kayıtlı ise <kbd>true</kbd> aksi durumda <kbd>false</kbd> değerine geri döner.
+
+```php
+if ($container->has('cookie')) {
+    
+    // ..
+}
+```
+
+<a name="container-hasShared"></a>
+
+#### $container->hasShared()
+
+Girilen servis adı uygulama içerisinde bir kez çağırılmışsa <kbd>true</kbd> aksi durumda <kbd>false</kbd> değerine geri döner.
+
+```php
+var_dump($container->hasShared('cookie'));   // false
+
+$container->get('cookie');
+
+var_dump($container->hasShared('cookie'));   // true
+```
+
+<a name="container-addServiceProvider"></a>
+
+#### $container->addServiceProvider()
+
+Uygulamanıza <kbd>app/providers.php</kbd> dosyasından servis sağlayıcısı ekler.
+
+```php
+$container->addServiceProvider('Obullo\Container\ServiceProvider\Logger');
+```
+
+<a name="dependency-injection"></a>
+
+### Bağımlılık Enjeksiyonu
+
+Bir servis sınıfına ait bağımlılıklar ( bağımlı diğer nesneler ) harici metotlar yardımı ile enjekte edilir. Bu metotlar aşağıda listelenmiştir.
+
+<a name="container-withArgument"></a>
+
+#### $container->withArgument()
+
+Bir servise ait bağımlılık argümanları bu metot ile enjekte edilir. Her bir bağımlılık için metodun tekrar kullanılması gerekir.
+
+```php
+$container->share('view', 'Obullo\View\View')
+    ->withArgument($container)
+    ->withArgument($container->get('logger'));
+    ->withArgument(
+        [
+            'options' => array()
         ]
-    ]
-);
+    );
 ```
 
-Bir servisin çalışabilmesi için yardımcı bir sınıf üzerinden ( Service Manager ) yapılandırılması ve bu sınıfın <kbd>app/providers.php</kbd> dosyasında aşağıdaki gibi tanımlanması gerekir.
+Bağımlı sınıf aşağıdaki gibi construct metodu içerisinden enjekte edilir.
 
 ```php
-$c['app']->service(
-    [
-        'session' => 'Obullo\Session\SessionManager',
-    ]
-);
-```
-
-Bu tanımlamadan sonra artık <kbd>session</kbd> nesnesine konteyner içerisinden aşağıdaki gibi ulaşılabilir.
-
-```php
-$this->c['session']->method();
-```
-
-Session Manager dosyasının içeriği
-
-```php
-class SessionManager implements ServiceInterface
-{
-    protected $c;
-    public function __construct(Container $container)
+Class View {
+    
+    public function __construct(Container $container, Logger $logger, array $params)
     {
-        $this->c = $container;
-    }
-    public function setParams(array $params)
-    {
-        $this->c['session.params'] = $params;
-    }
-    public function register()
-    {
-        $this->c['session'] = function () {
-
-            $params   = $this->c['session.params'];
-            $provider = $params['provider']['name'];
-
-            return new Session(
-                $this->c[$provider],  // Service Provider
-                $this->c['request'],
-                $this->c['logger'],
-                $params
-            );
-
-        };
+         $this->container = $container;
+         $this->logger = $logger;
+         $this->params = $params;
     }
 }
 ```
 
-Servis yüklendikten sonra servis parametrelerine konteyner içerisinden aşağıdaki gibi her yerden ulaşılabilir.
+<a name="container-withMethodCall"></a>
+
+#### $container->withMethodCall()
+
+Bir servise ait metot çalıştırma bağımlılığı bu metot ile çözülür. Aşağıdaki örnekte view servisi içerisindeki <kbd>addFolder</kbd> metodu çalıştırılarak view nesnesine yeni klasörler ekleniyor.
 
 ```php
-print_r($this->c['session.params']);
+$container->share('view', 'Obullo\View\View')
+    ->withArgument($container)
+    ->withArgument($container->get('logger'))
+    ->withMethodCall(
+        'addFolder',
+        [
+            'templates',
+            RESOURCES.'/templates/'
+        ]
+    );
 ```
 
-<a name="service-load"></a>
 
-#### Servisleri Yüklemek
-
-Konteyner içerisine bir kez kaydedilen bir sınıf uygulama içerisine tekrar tekrar çağrıldığında sınıfa ait değişken değerleri hep aynı kalır.
-
-```php
-$this->c['session'];	 // yeni nesne
-$this->c['session'];	 // eski nesne
-$this->c['session'];	 // eski nesne
-```
-
-Controller sınıfında <b>$c</b> nesnesi bu sınıfa önceden <kbd>$this->c</kbd> olarak kayıtlı geldiğinden Controller sınıfı içerisinde <b>$c</b> değişkeni hep <kbd>$this->c</kbd> olarak kullanılır. 
-
-```php
-$this->c['session'];
-```
-
-Konteyner içerisindeki kütüphaneler Controller içerisinden <kbd>$this->class</kbd> proxy yöntemi ile çağırılır.
-
-```php
-$this->session->method();
-```
-
-Servislerin ve kütüphanelerin Controller sınıfı içerisinde nasıl kullanıldığına dair bir örnek
-
-```php
-namespace Welcome;
-
-class Welcome extends \Controller
-{
-    public function index()
-    {
-    	$this->session->set('test', 'Hello Services !');
-    }
-}
-
-/* Location: .modules/welcome/welcome.php */
-```
+Daha fazla bilgi için <a href="http://container.thephpleague.com/">League Container</a> dökümentasyonuna gözatabilirsiniz.
 
 <a name="service-providers"></a>
 
 ### Servis Sağlayıcıları
 
-Bir servis sağlayıcısı yazımlıcılara uygulamada kullandıkları yinelenen farklı konfigürasyonlara ait parçaları uygulamanın farklı bölümlerinde güvenli bir şekilde tekrar kullanabilmelerine olanak tanır. Bağımsız olarak kullanılabilecekleri gibi bir servis konfigürasyonunun içerisinde de kullanılabilirler.
-
-Uygulamada kullanılan servis sağlayıcısı bir <b>bağlantı yönetimi</b> ile ilgili ise farklı parametreler gönderilerek açılan bağlantıları yönetirler ve her yazılımcının aynı parametreler ile uygulamada birden fazla bağlantı açmasının önüne geçerler.
-
-Bir servis sağlayıcısı sınıfı yanlış yazılmış yada yapılandırılmış ise onu uygulamanızda kullandığınız bölümlerin hepsi yanlış çalışmaya başlar. Bu yüzden servis sağlayıcıları bir uygulama çalışırken en kritik rolü üstlenirler.
-
-<a name="service-provider-definition"></a>
-
-#### Servis Sağlayıcılarını Tanımlamak
-
-Servis sağlayıcılarının <kbd>app/providers.php</kbd> dosyasında tanımlı olmaları gerekir. Tanımlama sıralamasında öncelik önemlidir. Uygulamada ilk yüklenenen servis sağlayıcıları her zaman en üstte tanımlanmalıdır.
+Bir servis sağlayıcısı yazımlıcılara yinelenen parçaları uygulamanın farklı bölümlerinde güvenli bir şekilde tekrar kullanabilmelerine olanak tanır. Her bir servisin çalışabilmesi için <kbd>app/providers.php</kbd> dosyasında servis sağlayıcı olarak tanımlanması gerekir.
 
 ```php
-$c['app']->provider(
-    [
-        'database' => 'Obullo\Service\Provider\DatabaseServiceProvider',
-        'cache' => 'Obullo\Service\Provider\CacheServiceProvider',
-        'redis' => 'Obullo\Service\Provider\RedisServiceProvider',
-        'memcached' => 'Obullo\Service\Provider\MemcachedServiceProvider',
-        'amqp' => 'Obullo\Service\Provider\AmqpServiceProvider',
-    ]
-);
+$container->addServiceProvider('ServiceProvider\Url');
 ```
 
-<a name="service-provider-load"></a>
-
-#### Servis Sağlayıcılarını Yüklemek
-
-Bir servis sağlayıcısı nesnelerde olduğu gibi konteyner içerisinden çağrılarak yüklenir. Aşağıdaki örnekte cache servis sağlayıcısından konfigürasyonda varolan <b>default</b> bağlantı tanımlamasını kullanarak <b>get()</b> metodu ile bir bağlantı getirmesi talep ediliyor.
+Böylece servisler servis sağlayıcılar sayesinde uygulamaya dahil edilirler.
 
 ```php
-$this->cache = $this->c['cache']->get(
+namespace ServiceProvider;
+
+use Obullo\Container\ServiceProvider\AbstractServiceProvider;
+
+class Url extends AbstractServiceProvider
+{
+    protected $provides = [
+        'url'
+    ];
+
+    public function register()
+    {
+        $container = $this->getContainer();
+
+        $container->share('url', 'Obullo\Url\Url')
+            ->withArgument($container)
+            ->withArgument($container->get('logger'))
+            ->withArgument(
+                [
+                    'baseurl'  => '/',
+                    'assets'   => [
+                        'url' => '/',
+                        'folder' => '/assets/',
+                    ]
+                ]
+            );
+    }
+}
+```
+
+<a name="service-configuration"></a>
+
+#### Servis Konfigürasyonu
+
+<kbd>AbstractServiceProvider</kbd> sınıfına genişleyen bir servis sağlayıcısı içerisinden <kbd>$this->getConfiguration()</kbd> metodu ile servise ait konfigürasyon dosyası <kbd>app/$env/providers</kbd> klasöründen yüklenir.
+
+```php
+$config = $this->getConfiguration('logger');
+```
+
+Elde edilen <kbd>$config</kbd> değişkeni <kbd>Obullo/Container/ServiceProvider/Configuration</kbd> nesnesine geri döner. Bu nesneye ait <kbd>$config->getParams()</kbd> metodu konfigürasyon parametrelerini verir.
+
+```php
+print_r($config->getParams());
+
+Array
+(
+    [default] => Array
+        (
+            [channel] => system
+        )
+
+    [priorities] => Array
+        (
+            [emergency] => 7
+            [alert] => 6
+            .
+            .
+        )
+)
+```
+
+<kbd>$config->getMethods()</kbd> metodu ise servise ait konfigürasyondan çalıştırılması gereken metot ve argümanlara geri döner.
+
+```php
+print_r($config->getMethods());
+
+Array
+(
+    [0] => Array
+        (
+            [name] => registerFilter
+            [argument] => Array()
+
+        )
+)
+```
+
+<a name="service-parameters"></a>
+
+#### Servis Parametreleri
+
+Servis konfigürasyonları <kbd>app/$env/providers</kbd> klasörü içerisinde tanımlanırlar ve çevre ortamı değiştiğinde ( local, test, production ) farklı davranışlar sergileyebilirler. <kbd>AbstractServiceProvider</kbd> sınıfı içerisinde <kbd>$this->getConfiguration()</kbd> metodu ile alınan bir servis konfigürasyon otomatik olarak <kbd>$container</kbd> nesnesi içerisinede kopyalanır. Böylece, 
+
+
+```php
+$container->get('servisAdı.params')
+```
+ 
+yöntemi ile bir servise ait parametrelere her yerde ulaşılmış olur.
+
+
+<a name="connectors"></a>
+
+### Konnektörler
+
+Konnektörler bağlantı yönetimi ile ilgili servis sağlayıcılarıdır. Bir konnektör kendisine farklı parametreler gönderilerek açılan bağlantıları yönetir ve her yazılımcının aynı parametreler ile uygulamada birden fazla bağlantı açmasının önüne geçer.
+
+Konnektörlere ait servis sağlayıcılarının <kbd>app/providers.php</kbd> dosyasında tanımlı olmaları gerekir.
+
+```php
+/*
+|--------------------------------------------------------------------------
+| Connectors
+|--------------------------------------------------------------------------
+| Specifies your connection managers.
+*/
+$container->addServiceProvider('ServiceProvider\Connector\Redis');
+$container->addServiceProvider('ServiceProvider\Connector\CacheFactory');
+$container->addServiceProvider('ServiceProvider\Connector\Memcached');
+```
+
+<a name="load-connector"></a>
+
+#### Konnektörü Yüklemek
+
+Bir servis sağlayıcısı nesnelerde olduğu gibi konteyner içerisinden çağrılarak yüklenir. Aşağıdaki örnekte redis servis sağlayıcısından konfigürasyonda varolan <kbd>default</kbd> bağlantı tanımlamasını kullanarak <kbd>shared()</kbd> metodu ile paylaşılan bir bağlantı getirmesi talep ediliyor.
+
+```php
+$redis = $container->get('redis')->get(
     [
-        'driver' => 'redis',
         'connection' => 'default'
     ]
 );
 ```
 
-Servis sağlayıcıları varolan bağlantıları yönetebilmek için aşağıdaki gibi <b>connections</b> anahtarına sahip bir konfigürasyon dosyasına ihtiyaç duyarlar. Aşağıda redis için <b>default</b> bağlantısına ait bir konfigürasyon örneği gösteriliyor.
+Servis sağlayıcıları varolan bağlantıları yönetebilmek için aşağıdaki gibi <kbd>connections</kbd> anahtarına sahip bir konfigürasyon dosyasına ihtiyaç duyarlar. Aşağıda redis için <kbd>default</kbd> bağlantısına ait bir konfigürasyon örneği gösteriliyor.
 
 ```php
 return array(
@@ -269,24 +377,23 @@ return array(
 
 );
 
-/* Location: .app/local/cache/redis.php */
+/* Location: .app/local/providers/redis.php */
 ```
 
-Eğer <b>second</b> bağlantısına ait bir bağlantı isteseydik o zaman servis sağlayıcımızı aşağıdaki gibi çağırmalıydık.
+Eğer <kbd>second</kbd> bağlantısına ait bir bağlantı isteseydik o zaman servis sağlayıcımızı aşağıdaki gibi çağırmalıydık.
 
 ```php
-$this->cache = $this->c['cache']->get(
+$redis2 = $container->get('redis')->shared(
     [
-        'driver' => 'redis',
         'connection' => 'second'
     ]
 );
 ```
 
-Eğer Cache servis sağlayıcısından konfigürasyonda olmayan bir bağlantı talep etseydik aşağıdaki gibi <b>factory()</b> fonksiyonunu kullanmalıydık.
+Eğer redis servis sağlayıcısından konfigürasyonda olmayan bir bağlantı talep etseydik aşağıdaki gibi <kbd>factory()</kbd> fonksiyonunu kullanmalıydık.
 
 ```php
-$this->cache = $this->c['cache']->factory(
+$redis = $container->get('redis')->factory(
     [
         'driver' => 'redis',
         'options' => array(
@@ -306,17 +413,17 @@ $this->cache = $this->c['cache']->factory(
 );
 ```
 
-Servis sağlayıcısı bir kez yüklendikten sonra artık cache metotlarına erişebilirsiniz.
+Servis sağlayıcısı bir kez yüklendikten sonra artık redis metotlarına erişebilirsiniz.
 
 ```php
-$this->cache->method();
+$redis->method();
 ```
 
-<a name="service-providers-list"></a>
+<a name="default-connectors"></a>
 
-#### Mevcut Servis Sağlayıcıları 
+### Mevcut Konnektörler
 
-Mevcut servis sağlayıcıları composer paketi <kbd>vendor/obullo/service-providers</kbd> klasörü altındadır. Aşağıdaki tablo varolan servis sağlayıcılarının bir listesini gösteriyor.
+Aşağıdaki tablo varolan konnektörlerin bir listesini gösteriyor. Konnektörler hakkındaki detaylı dökümentasyon için [Container-Connectors.md](Container-Connectors.md) dosyasına gözatabilirsiniz.
 
 <table>
     <thead>
@@ -327,11 +434,11 @@ Mevcut servis sağlayıcıları composer paketi <kbd>vendor/obullo/service-provi
     </thead>
     <tbody>
         <tr>
-            <td><b>amqp</b></td>
+            <td><a href="Container-Connectos.md">amqp</a></td>
             <td>Uygulamanızdaki queue.php konfigürasyonunu kullanarak AMQP bağlantılarını yönetir.</td>
         </tr>
         <tr>
-            <td><b>cache</b></td>
+            <td><a href="/Container-Connectos.md">cache</a></td>
             <td>Uygulamanızdaki cache.php konfigürasyonunu kullanarak sürücülere göre cache bağlantılarını yönetir.</td>
         </tr>
         <tr>
@@ -360,165 +467,3 @@ Mevcut servis sağlayıcıları composer paketi <kbd>vendor/obullo/service-provi
         </tr>
     </tbody>
 </table>
-
-Yukarıda anlatılan her bir servis sağlayıcısına ait dökümentasyona <a href="https://github.com/obullo/service-providers" target="_blank">Servis Providers Docs</a> bağlantısından erişebilirsiniz. 
-
-<a name="service-providers-custom"></a>
-
-#### Kendi Servis Sağlayıcılarınızı Tanımlamak
-
-Eğer kendi oluşturduğunuz servis sağlayıcınızı çalıştırmak istiyorsanız <kbd>.app/classes/Service/Providers</kbd> klasörü altında aşağıdaki örnekte gösterildiği gibi bir servis sağlayıcı oluşturmalısınız.
-
-```php
-namespace ServiceProviders;
-
-use RuntimeException;
-use Obullo\Container\ContainerInterface as Container;
-use Obullo\Container\AbstractServiceProvider;
-use Obullo\Container\ServiceProviderInterface;
-
-class Cache extends AbstractServiceProvider implements ServiceProviderInterface
-{
-    protected $c;
-
-    public function __construct(Container $container)
-    {
-        $this->c = $container;
-    }
-
-    public function get($params = array())
-    {
-        // ...
-    }
-
-    public function factory($params = array())
-    {
-        // ..
-    }
-}
-```
-
-Get metodu zorunlu diğer metotlar opsiyoneldir.
-
-```php
-interface ServiceProviderInterface
-{
-    public function get($params = array());
-}
-```
-
-Servis sağlayıcısını aşağıdaki gibi <kbd>.app/providers.php</kbd> dosyası içerisine tanımlayın.
-
-```php
-$c['app']->provider(
-    [
-        'cache' => 'Service\Providers\CacheServiceProvider'
-    ]
-);
-```
-
-Artık servis sağlayıcınız uygulama içerisinde çalışmaya hazır.
-
-
-### Bağımlılık Enjeksiyonu
-
-Kendi yarattığınız bir sınıfa bağımlılık listesine eklediğiniz sınıfları enjekte etmek için sınıfı,
-
-```php
-new Namespace/ClassName;
-```
-
-yerine
-
-```php
-$c['dependency']->resolve('Namespace\ClassName');
-```
-
-<kbd>resolve()</kbd> metodu ile çağırın. Eğer <kbd>construct()</kbd> metodu içerisinde girilen değişken isimleri yukarıdaki bağımlılık listenizle uyuşuyorsa aşağıdaki gibi $request,  $logger ve diğer tanımlı olan bileşenleri sınıfınıza enjekte edebilirsiniz.
-
-
-```php
-namespace Example;
-
-use Psr\Http\Message\ServerRequestInterface as Request;
-
-use Obullo\Log\LoggerInterface as Logger;
-use Obullo\Config\ConfigInterface as Config;
-
-class MyClass
-{
-    protected $cookies;
-    protected $config;
-    protected $logger;
-
-    public function __construct(Request $request, Config $config, Logger $logger)
-    {
-        $this->cookies = $request->getCookieParams();
-        $this->config = $config;
-        $this->logger = $logger;
-
-        $this->logger->debug('MyClass Initialized');
-    }
-}
-```
-
-```php
-$myClass = $c['dependency']->resolve('Example\MyClass');
-
-var_dump($myClass); // object
-```
-
-Aşağıdaki gibi son argümanları kullanarak özel parametreler de gönderebilirsiniz.
-
-```php
-class MyClass
-{
-    public function __construct(Request $request, $param1 = '', $param2 = '')
-    {
-        var_dump($param1);
-        var_dump($param2);
-    }
-}
-```
-
-```php
-$myClass = $c['dependency']->resolve('Example\MyClass', 1, 2);
-
-// int(1)
-// int(2)
-```
-
-<a name="application-doc"></a>
-
-### Uygulama Sınıfı Belgelerine Bir Gözatın
-
-Eğer konteyner sınıfını kavradıysanız Obullo çerçevesi hakkında temel olan çoğu şeyi öğrendiniz demektir bununla beraber çerçeveye daha hakim olmak için [Application.md](Application.md) dökümentasyonuna gözatmanız yararlı olabilir.
-
-<a name="method-reference"></a>
-
-#### Fonksiyon Referansı
-
-##### $c['class']
-
-Konteyner içerisinde kayıtlı bir sınıfı getirir.
-
-##### $c->raw(string $class)
-
-Kayıtlı sınıfa isimsiz fonksiyon içerisinde geri döner. İsimsiz fonksiyon çalıştırıldığında yeni bir nesne elde edilmiş olur.
-
-##### $c->has(string $class)
-
-Bir sınıfın uygulamadaki kısa adının konteyner içerisine kayıtlı olup olmadığını kontrol eder. Kayıtlı ise <b>true</b> değilse <b>false</b> değerine geri döner.
-
-##### $c->active(string $class)
-
-Bir sınıfın uygulama içerisinde daha önceden kullanılıp kullanılmadığını kontrol eder. Kullanılmış ise sınıf o seviyede uygulamada yüklüdür ve <b>true</b> aksi durumda <b>false</b> değerine geri döner.
-
-##### $c->keys()
-
-Tanımlı tüm sınıfların anahtar adlarına bir dizi içerisinde geri döner.
-
-##### $c->getServices()
-
-Kayıtlı tüm servislere bir dizi içerisinde geri döner.
-

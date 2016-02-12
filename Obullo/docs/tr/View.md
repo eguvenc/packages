@@ -7,6 +7,7 @@ Bir view dosyası basitçe html başlık ve gövdesinden oluşan bütün bir web
     <li>
         <a href="#loading-class">View Sınıfı</a>
         <ul>
+            <li><a href="#engines">Görünüm Motorları</a></li>
             <li><a href="#serviceProvider">Servis Sağlayıcı</a></li>
             <li><a href="#addFolder">$this->view->addFolder()</a></li>
             <li><a href="#load">$this->view->load()</a></li>
@@ -20,7 +21,7 @@ Bir view dosyası basitçe html başlık ve gövdesinden oluşan bütün bir web
         <a href="#layers">Katmanlar</a>
         <ul>
             <li>
-              <a href="#controllers">View Controller</a>
+              <a href="#controllers">View Kontrolör</a>
                 <ul>
                     <li><a href="#layerGet">$this->layer->get()</a></li>
                 </ul>
@@ -34,6 +35,14 @@ Bir view dosyası basitçe html başlık ve gövdesinden oluşan bütün bir web
 ### View Sınıfı
 
 Bir view dosyası bir modüle ait ise modül dizini içerisindeki <kbd>/modules/$moduleName/view</kbd> klasörü içerisinden, bir kontrolöre bağlı bir view dosyası ise <kbd>/modules/views/</kbd> klasöründen çağrılır.
+
+<a name="engines"></a>
+
+#### Görünüm Motorları
+
+View sınıfı görünüm dosyalarını işlemek için harici kütüphaneler kullanır. View sınıfının hangi motoru kullanacağı servis sağlayıcısı üzerinden <kbd>engine</kbd> konfigürasyonu ile belirlenir. Takip eden liste kullanılabilceğiniz motorları gösteriyor.
+
+* <a href="http://platesphp.com/" target="_blank">Plates</a>
 
 <a name="serviceProvider"></a>
 
@@ -186,7 +195,7 @@ $this->view->withData(
 
 ### Katmanlar
 
-> Çerçeve içerisinde katman paketi sayesinde view dosyaları kontrolör dosyaları içerisinden zincirleme olarak içe içe çağırılabilir. Bu da her view dosyasına ait bir kontrolör dosyasının yaratılabileceği anlamına gelir. Bknz. [Layer.md](Layer.md)
+Çerçeve içerisinde katman paketi sayesinde view dosyaları kontrolör dosyaları içerisinden zincirleme olarak içe içe çağırılabilir. Bu da her view dosyasına ait bir kontrolör dosyasının yaratılabileceği anlamına gelir. Bknz. [Layer.md](Layer.md)
 
 ![Layers](images/layer-ui-components.png?raw=true "")
 
@@ -199,19 +208,19 @@ Bu mimariyi kullanmanın faydalarını aşağıdaki gibi sıralayabiliriz.
 
 <a name="controllers"></a>
 
-#### View Controller
+#### View Kontrolör
 
-View kontrolörler <kbd>/modules/views/</kbd> klasörü içerisinde oluşturulan kontrolör dosyalarıdır. Bu dosyalara dışarıdan http yada ajax isteği ile yada içeriden aşağıdaki gibi
+View Kontrolör <kbd>/modules/views/</kbd> klasörü içerisinde oluşturulan kontrolör dosyalarıdır. Bu dosyalara dışarıdan http yada ajax isteği ile, yada içeriden aşağıdaki gibi
 
 ```php
-$output = $this->layer->get('views/$controller');
+$output = $this->layer->get('views/$controllerName');
 ```
 
 metodu ile ulaşılabilmektedir.
 
 <a name="layerGet"></a>
 
-#### $this->layer->get()
+##### $this->layer->get()
 
 Layer get metodu bir kontrolör dosyasını uygulamanız içerisinden GET metodu ile çağırmanızı sağlar. Katmanlar ile aşağıdaki gibi bir navigasyon menü bir view kontrolör aracılığı ile kolayca yaratılabilir.
 

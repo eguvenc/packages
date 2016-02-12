@@ -311,6 +311,7 @@ pre span.string {color: #cc0000;}
 $getDebuggerURl = function ($method = 'index') {
     return '/debugger/debugger/'.$method;
 };
+$refreshUrl = '/debugger/';
 ?>
 <script type="text/javascript">
 /**
@@ -323,7 +324,7 @@ $getDebuggerURl = function ($method = 'index') {
  * @license   http://opensource.org/licenses/MIT MIT license
  */
 var debuggerOff = <?php echo "'".$debuggerOff."'" ?>;
-var debuggerOffMessage = '<span class="error">Debugger seems disabled. Please enable debugger from your config.php.</span>';
+var debuggerOffMessage = '<span class="error">Debug server seems disabled. Run "php task debugger" from your console.</span>';
 var ajax = {
     post : function(url, closure, params){
         xmlHttpRequest(url, closure, params, "POST");
@@ -507,9 +508,18 @@ var base64ActiveSrc = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAHCAY
 var base64DeactiveSrc = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAHCAYAAADnCQYGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MTlBQzFFMTNFOThGMTFFNEI0NEU5NDA3Qzc3OUI4REYiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MTlBQzFFMTRFOThGMTFFNEI0NEU5NDA3Qzc3OUI4REYiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDoxOUFDMUUxMUU5OEYxMUU0QjQ0RTk0MDdDNzc5QjhERiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDoxOUFDMUUxMkU5OEYxMUU0QjQ0RTk0MDdDNzc5QjhERiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pn2CUacAAAC+SURBVHjaYvz//z8DLhATE/MaSPEDcciSJUs2Afl+QPYaIP4I5Ivi0sfEgB8IAjErEKdB+WlQviA+TSxA22OBtDwQfwdiCZArkNgwS9nRaCagvm4g/QKIOaG+gbEfsgCJLCC2IODim0i0CxAzAnEJDrUnQIYuBuJjUNeBwukLEjsVaoA6VAOMBkXEbCB+DXUdDxL7LgswwKfhiahkIMUMxD+hQjD6H1BfOrkR9R6IfwPxLCh/FpT/Hp8mgAADAAPLMt1P18UbAAAAAElFTkSuQmCC";
 
 function connect(){
+    document.getElementById("obulloDebugger-http-log").innerHTML = '';
     document.getElementById("obulloDebuggerSocket").src = base64ActiveSrc;
 }
 function disconnect(){
+    console.log('Connection closed');
+    if (document.getElementById("obulloDebugger-http-log").innerHTML != debuggerOffMessage) {
+        ajax.get(<?php echo "'".$getDebuggerURl('disconnect')."'" ?>, function(html){
+                document.getElementById("obulloDebugger-http-log").innerHTML = debuggerOffMessage;
+                console.log('Debugger server is disabled. Run again.');
+            }
+        );  
+    };
     document.getElementById("obulloDebuggerSocket").src = base64DeactiveSrc;
 }
 function load(refresh){
@@ -566,10 +576,9 @@ function reconnect() {
     if (websocket.readyState == 3) {
         ajax.get(<?php echo "'".$getDebuggerURl('ping')."'" ?>, function(html){
                 if (html == 1) {
-                    window.location = <?php echo "'".$getDebuggerURl()."'" ?>;
+                    window.location = <?php echo "'".$refreshUrl."'" ?>;
                 } else {
                     disconnect();
-                    console.log('Connection closed');
                 }
             }
         );

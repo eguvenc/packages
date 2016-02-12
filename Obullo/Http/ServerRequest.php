@@ -471,6 +471,16 @@ class ServerRequest implements ServerRequestInterface
     }
 
     /**
+     * Detect the request is console
+     * 
+     * @return boolean
+     */
+    public function isCli()
+    {
+        return (PHP_SAPI === 'cli' || defined('STDIN'));
+    }
+
+    /**
      * Detect the request is xmlHttp ( Ajax )
      * 
      * @return boolean

@@ -29,8 +29,6 @@ return array(
         ]
     ],
     'methods' => [
-        'setParameters' => [
-            'setLang' => 'en',
-        ]
+        ['name' => 'setLang', 'argument' => ['en']],
     ]
 );

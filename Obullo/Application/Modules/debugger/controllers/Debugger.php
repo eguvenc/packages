@@ -64,6 +64,32 @@ class Debugger extends Controller
     }
 
     /**
+     * Close server
+     * 
+     * @return int 1 or 0
+     */
+    public function disconnect()
+    {
+        /**
+         * Disable websocket
+         */
+        $newArray = $this->config->load('config');
+
+        if ($newArray['http']['debugger']['enabled'] == true) {
+            $disconnect = 1;
+            $newArray['http']['debugger']['enabled'] = false;
+            $this->config->write('config', $newArray);
+        } else {
+            $disconnect = 0;
+        }
+
+        return $this->response->html(
+            $disconnect,
+            200
+        );
+    }
+
+    /**
      * Clear all log data
      * 
      * @return voide

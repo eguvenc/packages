@@ -67,7 +67,7 @@ class Application implements ApplicationInterface
             }
         }
     }
-
+    
     /**
      * Sets application exception errors
      * 
@@ -174,18 +174,6 @@ class Application implements ApplicationInterface
     public function getExceptions()
     {
         return $this->exceptions;
-    }
-
-    /**
-     * Is Cli ?
-     *
-     * Test to see if a request was made from the command line.
-     *
-     * @return bool
-     */
-    public function isCli()
-    {
-        return (PHP_SAPI === 'cli' || defined('STDIN'));
     }
 
     /**

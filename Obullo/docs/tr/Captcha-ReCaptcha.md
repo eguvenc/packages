@@ -9,8 +9,7 @@ ReCAPTCHA google şirketi tarafından geliştirilen popüler bir captcha servisi
     <ul>
         <li><a href="#adding-module">Modülü Kurmak</a></li>
         <li><a href="#removing-module">Modülü Kaldırmak</a></li>
-        <li><a href="#configuration">Konfigürasyon</a></li>
-        <li><a href="#service-configuration">Servis Konfigürasyonu</a></li>
+        <li><a href="#service-provider">Servis Sağlayıcısı</a></li>
     </ul>
 </li>
 
@@ -37,14 +36,14 @@ ReCAPTCHA google şirketi tarafından geliştirilen popüler bir captcha servisi
     </ul>
 </li>
 
-<li><a href="#method-reference">Fonksiyon Referansı</a></li>
+<li><a href="#method-reference">ReCaptcha Sınıfı Referansı</a></li>
 </ul>
 
 <a name="setup"></a>
 
 ### Kurulum
 
-ReCaptcha modülü kurulduğunda modüle ait konfigürasyon dosyaları <kbd>config/recaptcha</kbd> klasörü altına kopyalanır.
+ReCaptcha paketi uygulama içerisinde modül olarak kullanılır ve kurulduğunda modüle ait <kbd>recaptcha.php</kbd> konfigürasyon dosyası <kbd>providers/</kbd> klasörü altına kopyalanır.
 
 <a name="adding-module"></a>
 
@@ -61,89 +60,31 @@ php task module add recaptcha
 ```php
 php task module remove recaptcha
 ```
-<a name="configuration"></a>
+<a name="service-provider"></a>
 
-#### Konfigürasyon
+#### Servis Sağlayıcısı
 
-Modül yüklendiğinde konfigürasyon dosyaları da <kbd>config/recaptcha</kbd> klasörü altına kopyalanmış olur. Bu dosyadan <b>api.key.site</b> ve <b>api.key.secret</b> anahtarlarını reCaptcha api servisinden almış olduğunuz bilgiler ile doldurmanız  gerekir.
-
-```php
-return array(
-    
-    'locale' => [
-        'lang' => 'en'                                             // Captcha language
-    ],
-    'api' => [
-        'key' => [
-            'site' => '6LcWtwUTAAAAACzJjC2NVhHipNPzCtjKa5tiE6tM',  // Api public site key
-            'secret' => '6LcWtwUTAAAAAEwwpWdoBMT7dJcAPlborJ-QyW6C',// Api secret key
-        ]
-    ],
-    'user' => [                                                    // Optional
-        'autoSendIp' => false                                      // The end user's ip address.
-    ],
-    'form' => [                                                    // Captcha input configuration.
-        'input' => [
-            'attributes' => [
-                'name' => 'recaptcha-validation',                  // Hidden input for validator
-                'id' => 'recaptcha-validation',
-                'type' => 'text',
-                'value' => 1,
-                'style' => 'display:none;',
-            ]
-        ],
-        'validation' => [
-            'enabled' => true,      // Whether to use validator package
-            'callback' => true,     // Whether to build validator callback_captcha function
-        ]
-    ]
-);
-
-/* End of file recaptcha.php */
-/* Location: .config/captcha/recaptcha.php */
-```
-
-<a name="service-configuration"></a>
-
-#### Servis Konfigürasyonu
-
-Servis dosyası modül eklendiğinde otomatik olarak <kbd>app/classes/Service</kbd> klasörü altına kopyalanır. Servis dosyasındaki reCaptcha özelliklerini ihtiyaçlarınıza göre konfigüre etmeniz gerekebilir.
+<kbd>app/providers.php</kbd> dosyasında servis sağlayıcısının tanımlı olduğundan emin olun.
 
 ```php
-namespace Service;
-
-use Obullo\Container\ServiceInterface;
-use Obullo\Container\ContainerInterface;
-use Obullo\Captcha\Adapter\ReCaptcha as ReCaptchaClass;
-
-class Recaptcha implements ServiceInterface
-{
-    public function register(ContainerInterface $c)
-    {
-        $c['recaptcha'] = function () use ($c) {
-            $captcha = new ReCaptchaClass($c);            
-            $captcha->setLang('en');
-            return $captcha;
-        };
-    }
-}
+$container->addServiceProvider('Obullo\Container\ServiceProvider\ReCaptcha');
 ```
 
 <a name="running"></a>
 
 ### Çalıştırma
 
-Recaptcha uygulama programı arayüzüne bağlanmak için recaptcha servisi kullanılır.
+ReCaptcha modülünü kurduktan sonra ReCaptcha arayüzüne bağlanmak için recaptcha servisi kullanılır.
 
 <a name="module"></a>
 
 #### ReCaptcha Modülü
 
-Modül yaratıldığına örnek recaptcha oluşturma dosyaları <kbd>.modules/recaptcha/examples</kbd> dizini altına kopyalanır. Bu kapsamlı örnekleri incelemek için tarayıcınızdan aşğıdaki adresleri ziyaret edin.
+ReCaptcha modülü ile ilgili kapsamlı örnekleri incelemek için tarayıcınızdan aşağıdaki adresleri ziyaret edin.
 
 ```html
-http://myproject/recaptcha/examples/form
-http://myproject/recaptcha/examples/ajax
+http://myproject/examples/recaptcha
+http://myproject/examples/recaptcha/ajax
 ```
 
 <a name="loading-service"></a>
@@ -153,7 +94,7 @@ http://myproject/recaptcha/examples/ajax
 ReCaptcha servisi aracılığı ile recaptcha metotlarına aşağıdaki gibi erişilebilir.
 
 ```php
-$this->c['recaptcha']->method();
+$this->container->get('recaptcha')->method();
 ```
 
 <a name="create-operations"></a>
@@ -209,54 +150,31 @@ ReCaptcha doğrulama için bütün sürücüler için ortak olarak kullanılan C
 Bir doğrulamadan dönen mesajlar aşağıdaki gibi alınır.
 
 ```php
-print_r($this->c['recaptcha']->result()->getMessages());
+print_r($this->recaptcha->result()->getMessages());
 ```
 
 Bir doğrulamaya ait hata kodu alma örneği
 
 
 ```php
-echo $this->c['recaptcha']->result()->getCode();  // -2  ( Invalid Code )
+echo $this->recaptcha->result()->getCode();  // -2  ( Invalid Code )
 ```
 
 <a name="validation-with-validator"></a>
 
 #### Validator Sınıfı İle Doğrulama 
 
-Eğer varolan formunuz içerisinde bir recaptcha doğrulaması yapıyorsanız ve konfigürasyon dosyasından <kbd>validation</kbd> ve <kbd>callback</kbd> anahtarları aktif ise doğrulama için aşağıdaki kodlar haricinde herhangi bir kod yazmanıza gerek kalmaz.
+Eğer varolan formunuz içerisinde <kbd>validator</kbd> sınıfını kullanıyorsanız doğrulama için herhangi bir kod yazmanıza gerek kalmaz ve <kbd>recaptcha</kbd> doğrulama kuralını kural olarak eklemeniz yeterli olur.
 
 ```php
-namespace ReCaptcha\Examples;
-
-class Form extends \Controller
-{
-    public function index()
-    {
-        if ($this->request->isPost()) {
-
-            $this->recaptcha->init();
-
-            if ($this->validator->isValid()) {
-                $this->form->success('Form Validation Success.');
-            }
-        }
-        $this->view->load(
-            'form',
-            [
-                'title' => 'Hello Captcha !'
-            ]
-        );
-    }
-}
+$this->validator->setRules('recaptcha', 'Captcha', 'recaptcha');
 ```
 
 <a name="method-reference"></a>
 
-#### Fonskiyon Referansı
+#### ReCaptcha Sınıfı Referansı
 
-------
-
->**Not:** ReCaptcha hakkında ayrıntılı resmi dökümentasyona bu linkten <a href="https://developers.google.com/recaptcha/docs/display" target="_blank">https://developers.google.com/recaptcha/docs/display</a> ulaşabilirsiniz. 
+ReCaptcha servisi dökümentasyona <a href="https://developers.google.com/recaptcha/docs/display" target="_blank">bu bağlantıdan</a> ulaşabilirsiniz. 
 
 ##### $this->recaptcha->setLang(string $lang);
 
@@ -296,8 +214,8 @@ Tanımlanmış secret key konfigürasyonunu verir.
 
 ##### $this->recaptcha->getLang();
 
-Servise tanımlı dili verir.
+Tanımlanmış olan dili verir.
 
 ##### $this->recaptcha->getInputName();
 
-Validator sınıfın çalışabilmesi framework tarafından oluşturulan recaptcha elemetinin ismini verir.
+Validator sınıfının çalışabilmesi oluşturulan recaptcha elemetinin ismini verir.

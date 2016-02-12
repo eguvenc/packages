@@ -7,8 +7,8 @@ use Obullo\Captcha\AbstractProvider;
 use Obullo\Captcha\CaptchaInterface;
 
 use Obullo\Log\LoggerInterface as Logger;
-use Obullo\Translation\TranslatorInterface as Translator;
 use Psr\Http\Message\RequestInterface as Request;
+use Obullo\Translation\TranslatorInterface as Translator;
 
 /**
  * Google ReCaptcha
@@ -110,22 +110,6 @@ class ReCaptcha extends AbstractProvider implements CaptchaInterface
         );
         $this->init();
         $this->logger->debug('ReCaptcha Class Initialized');
-    }
-
-    /**
-     * Set captcha parameters
-     * 
-     * @param array $params parameters
-     *
-     * @return $this
-     */
-    public function setParameters($params = array())
-    {
-        if (count($params) > 0) {
-            foreach ($params as $method => $arg) {
-                $this->{$method}($arg);
-            }
-        }
     }
 
     /**

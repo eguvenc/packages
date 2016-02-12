@@ -50,10 +50,10 @@ Redis sürücüsü bağlantı ayarlarınızı <kbd>providers/redis.php</kbd> dos
 
 #### Servis Sağlayıcısı
 
-Cache servis sağlayıcısı önbellekleme için ortak bir arayüz sağlar.
+CacheFactory servis sağlayıcısı önbellekleme için ortak bir arayüz sağlar.
 
 ```php
-$this->cache = $this->container->get('cache')->shared(
+$this->cache = $this->container->get('cacheFactory')->shared(
       [
         'driver' => 'redis', 
         'connection' => 'default'
@@ -95,13 +95,13 @@ return array(
 
 #### Servis
 
-Cache servisi aracılığı ile cache metotlarına aşağıdaki gibi erişilebilir.
+CacheFactory servisi aracılığı ile cache metotlarına aşağıdaki gibi erişilebilir.
 
 ```php
-$this->container->get('cache')->metod();
+$this->container->get('cacheFactory')->metod();
 ```
 
-Cache servisi için varsayılan sürücü türü <kbd>app/classes/ServiceProvider/Cache</kbd> servisinden belirlenir.
+Varsayılan sürücü türü <kbd>app/classes/ServiceProvider/CacheFactory</kbd> servisinden belirlenir.
 
 ```php
 $container->share(

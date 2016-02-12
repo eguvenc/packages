@@ -70,7 +70,7 @@ class Hello implements MiddlewareInterface
 Sonra katmanı <kbd>app/middlewares.php</kbd> dosyası içerisinde tanımlayın.
 
 ```php
-$c['middleware']->register(
+$middleware->register(
     [
         'Hello' => 'Http\Middlewares\Hello',
     ]
@@ -80,7 +80,7 @@ $c['middleware']->register(
 Ve son olarak bu evrensel katmanı uygulamaya dahil edin.
 
 ```php
-$c['middleware']->add(
+$middleware->add(
     [
         'Router',
         'Hello'
@@ -109,7 +109,7 @@ Uygulamanıza katmanlar ekleyip çıkarabilmenin 3 yöntemi vardır.
 Eğer bir katmanı <kbd>app/middlewares.php</kbd> dosyası add() metodu içerisine eklerseniz katman, evrensel olarak uygulamanın bütününde çalışmaya başlar.
 
 ```php
-$c['middleware']->add(
+$middleware->add(
     [
         'Router',
         'Hello'
@@ -124,7 +124,7 @@ $c['middleware']->add(
 Eğer katmanların sadece belirli url adreslerinde çalışmasını istiyorsanız <kbd>app/routes.php</kbd> dosyasında bir route grubu oluşturup katmanları bu gruba atamanız gerekir.
 
 ```php
-$c['router']->group(
+$router->group(
     [
         'name' => 'AuthorizedUsers',
         'middleware' => array('Auth', 'Guest')
@@ -141,7 +141,7 @@ Bir route grubuna atanan katmanların çalışabilmesi için yukarıdaki gibi <k
 
 
 ```php
-$c['router']->match(['post'], 'order/pay')->middleware('XssClean');
+$router->match(['post'], 'order/pay')->middleware('XssClean');
 ```
 
 Yukarıdaki gibi <kbd>middleware()</kbd> metodu ile de tek bir route kuralı için katman atamak mümkündür.

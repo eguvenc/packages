@@ -66,7 +66,7 @@ class Task
             $output = preg_replace(array('/\033\[36m/', '/\033\[31m/', '/\033\[0m/'), array('', '', ''), shell_exec($shell)); // Clean cli color codes
             if ($this->exist) {
                 $this->logger->debug(
-                    'Cli task request',
+                    'Cli request',
                     array(
                         'command' => $shell,
                         'output' => $output
