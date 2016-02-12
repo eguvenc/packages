@@ -36,7 +36,7 @@ Bir konteyner, uygulamanızda servisler ve servis sağlayıcıları oluşturabil
     <a href="#connectors">Konnektörler</a>
     <ul>
         <li><a href="#load-connector">Konnektörü Yüklemek</a></li>
-        <li><a href="#default-connectors">Mevcut Konnektörler</a></li>
+        <li><a href="#default-connectors">Konnektör Listesi</a></li>
     </ul>
 </li>
 
@@ -313,14 +313,13 @@ yöntemi ile bir servise ait parametrelere her yerde ulaşılmış olur.
 
 Konnektörler bağlantı yönetimi ile ilgili servis sağlayıcılarıdır. Bir konnektör kendisine farklı parametreler gönderilerek açılan bağlantıları yönetir ve her yazılımcının aynı parametreler ile uygulamada birden fazla bağlantı açmasının önüne geçer.
 
-Konnektörlere ait servis sağlayıcılarının <kbd>app/providers.php</kbd> dosyasında tanımlı olmaları gerekir.
+Kullanmak istediğiniz konnektöre ait servis sağlayıcılarının <kbd>app/providers.php</kbd> dosyasında tanımlı olmaları gerekir.
 
 ```php
 /*
 |--------------------------------------------------------------------------
 | Connectors
 |--------------------------------------------------------------------------
-| Specifies your connection managers.
 */
 $container->addServiceProvider('ServiceProvider\Connector\Redis');
 $container->addServiceProvider('ServiceProvider\Connector\CacheFactory');
@@ -421,49 +420,59 @@ $redis->method();
 
 <a name="default-connectors"></a>
 
-### Mevcut Konnektörler
+### Konnektör Listesi
 
-Aşağıdaki tablo varolan konnektörlerin bir listesini gösteriyor. Konnektörler hakkındaki detaylı dökümentasyon için [Container-Connectors.md](Container-Connectors.md) dosyasına gözatabilirsiniz.
+Aşağıdaki tablo varolan konnektörlerin bir listesini gösteriyor.
 
 <table>
     <thead>
         <tr>
-            <th>Sağlayıcı</th>
+            <th>Konnektör</th>
             <th>Açıklama</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td><a href="Container-Connectos.md">amqp</a></td>
-            <td>Uygulamanızdaki queue.php konfigürasyonunu kullanarak AMQP bağlantılarını yönetir.</td>
+            <td><a href="Container-Connectors.md#amqp">amqp</a></td>
+            <td>Uygulamanızdaki <kbd>providers/queue.php</kbd> konfigürasyonunu kullanarak <a href="http://php.net/manual/pl/book.amqp.php" target="_blank">AMQP</a> bağlantılarını yönetir.</td>
         </tr>
         <tr>
-            <td><a href="/Container-Connectos.md">cache</a></td>
-            <td>Uygulamanızdaki cache.php konfigürasyonunu kullanarak sürücülere göre cache bağlantılarını yönetir.</td>
+            <td><a href="Container-Connectors.md#amqp">amqpLib</a></td>
+            <td>Uygulamanızdaki <kbd>providers/queue.php</kbd> konfigürasyonunu kullanarak <a href="https://github.com/php-amqplib/php-amqplib" target="_blank">AMQPLib</a> (videlalvaro/php-amqplib) bağlantılarını yönetir.</td>
         </tr>
         <tr>
-            <td><b>database</b></td>
-            <td>Uygulamanızdaki database.php konfigürasyonunu kullanarak seçilen database sürücüsüne göre ilişkili database (RBDMS) nesnelerini yönetir.</td>
+            <td><a href="Container-Connectors.md#cacheFactory">cacheFactory</a></td>
+            <td>Uygulamanızdaki <kbd>providers/$sürücü.php</kbd> konfigürasyonunu kullanarak sürücülere göre cache bağlantılarını yönetir.</td>
         </tr>
         <tr>
-            <td><b>qb</b></td>
-            <td>Uygulamanızdaki database servis sağlayıcısını kullanarak QueryBuilder nesnesini oluşturur.</td>
+            <td><a href="Container-Connectors.md#database">database</a></td>
+            <td>Uygulamanızdaki <kbd>providers/database.php</kbd> konfigürasyonunu kullanarak seçilen database sürücüsüne göre <a href="http://php.net/manual/en/book.pdo.php" target="_blank">PDO</a> veritabanı bağlantılarını yönetir.</td>
         </tr>
         <tr>
-            <td><b>memcached</b></td>
-            <td>Uygulamanızdaki cache/memcached.php konfigürasyonunu kullanarak memcached bağlantılarını yönetmenize yardımcı olur.</td>
+            <td><a href="Container-Connectors.md#doctrineDbal">doctrineDBAL</a></td>
+            <td>Uygulamanızdaki <kbd>providers/database.php</kbd> konfigürasyonunu kullanarak seçilen database sürücüsüne göre <a href="http://www.doctrine-project.org/projects/dbal.html" target="_blank">DoctrineDBAL</a> PDO veritabanı bağlantılarını yönetir.</td>
         </tr>
         <tr>
-            <td><b>mongo</b></td>
-            <td>Uygulamanızdaki mongo.php konfigürasyonunu kullanarak mongo db bağlantılarını yönetir.</td>
+            <td><a href="Container-Connectors.md#qb">qb</a></td>
+            <td>Uygulamanızdaki database servis sağlayıcısını kullanarak Doctrine QueryBuilder nesnesini oluşturur.</td>
         </tr>
         <tr>
-            <td><b>pdo</b></td>
-            <td>Uygulamanızdaki database.php konfigürasyonunu kullanarak pdo bağlantılarını yönetmenize yardımcı olur.</td>
+            <td><a href="Container-Connectors.md#memcached">memcached</a></td>
+            <td>Uygulamanızdaki <kbd>providers/memcached.php</kbd> konfigürasyonunu kullanarak <a href="http://php.net/manual/en/book.memcached.php" target="_blank">Memcached</a>  bağlantılarını yönetmenize yardımcı olur.</td>
         </tr>
         <tr>
-            <td><b>redis</b></td>
-            <td>Uygulamanızdaki cache/redis.php konfigürasyonunu kullanarak redis bağlantılarını yönetmenize yardımcı olur.</td>
+            <td><a href="Container-Connectors.md#memcache">memcache</a></td>
+            <td>Uygulamanızdaki <kbd>providers/memcache.php</kbd> konfigürasyonunu kullanarak <a href="http://php.net/manual/en/book.memcache.php" target="_blank">Memcache</a> bağlantılarını yönetmenize yardımcı olur.</td>
+        </tr>
+        <tr>
+            <td><a href="Container-Connectors.md#mongo">mongo</a></td>
+            <td>Uygulamanızdaki <kbd>providers/mongo.php</kbd> konfigürasyonunu kullanarak <a href="http://php.net/manual/en/book.mongo.php" target="_blank">MongoDb</a> veritabanı bağlantılarını yönetir.</td>
+        </tr>
+        <tr>
+            <td><a href="Container-Connectors.md#redis">redis</a></td>
+            <td>Uygulamanızdaki <kbd>providers/redis.php</kbd> konfigürasyonunu kullanarak <a href="http://redis.io/" target="_blank">Redis</a> veritabanı bağlantılarını yönetmenize yardımcı olur.</td>
         </tr>
     </tbody>
 </table>
+
+ Konnektörler hakkındaki detaylı dökümentasyon için [Container-Connectors.md](Container-Connectors.md) dosyasına gözatabilirsiniz.

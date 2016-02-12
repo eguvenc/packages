@@ -1,6 +1,35 @@
 
+### Konnektörler
 
-#### AMQP ( PECL )
+Konnektörler bağlantı yönetimi ile ilgili servis sağlayıcılarıdır. Bir konnektör kendisine farklı parametreler gönderilerek açılan bağlantıları yönetir ve her yazılımcının aynı parametreler ile uygulamada birden fazla bağlantı açmasının önüne geçer.Kullanmak istediğiniz konnektöre ait servis sağlayıcıların <kbd>app/providers.php</kbd> dosyasında tanımlı olmaları gerekir.
+
+```php
+/*
+|--------------------------------------------------------------------------
+| Connectors
+|--------------------------------------------------------------------------
+*/
+$container->addServiceProvider('ServiceProvider\Connector\Redis');
+$container->addServiceProvider('ServiceProvider\Connector\CacheFactory');
+$container->addServiceProvider('ServiceProvider\Connector\Memcached');
+```
+
+<ul>
+    <li><a href="#amqp">Amqp</a> ( PECL )</li>
+    <li><a href="#amqpLib">AmqpLib</a> ( videlalvaro/php-amqplib )</li>
+    <li><a href="#cacheFactory">CacheFactory</a></li>
+    <li><a href="#database">Database</a></li>
+    <li><a href="#doctrineDbal">DoctrineDBAL</a></li>
+    <li><a href="#qb">Doctrine Query Builder</a></li>
+    <li><a href="#memcached">Memcached</a></li>
+    <li><a href="#memcache">Memcache</a></li>
+    <li><a href="#mongo">Mongo</a></li>
+    <li><a href="#redis">Redis</a></li>
+</ul>
+
+<a name="amqp"></a>
+
+#### Amqp ( PECL )
 
 Php <a href="http://php.net/manual/pl/book.amqp.php" target="_blank">AMQP</a> genişlemesi için yazılmış servis sağlayıcısıdır. Uygulamanızdaki <kbd>queue.php</kbd> konfigürasyonunu kullanarak AMQP bağlantılarını yönetir.
 
@@ -30,10 +59,11 @@ $AMQPConnection = $container->get('amqp')->factory(
     ]
 );
 ```
+<a name="amqpLib"></a>
 
-#### AMQPLib (videlalvaro/php-amqplib)
+#### AmqpLib ( videlalvaro/php-amqplib )
 
-Composer <a href="https://github.com/videlalvaro/php-amqplib">Php AMQPLib</a> kütüphanesi için yazılmış servis sağlayıcısıdır. 
+Composer <a href="https://github.com/videlalvaro/php-amqplib">AMQPLib</a> kütüphanesi için yazılmış servis sağlayıcısıdır. 
 
 ```php
 // $container->share('amqp', 'Obullo\Container\ServiceProvider\Connector\Amqp')
@@ -84,6 +114,7 @@ $ch->close();
 
 Daha fazla örnek için <a href="https://github.com/videlalvaro/php-amqplib" target="_blank">https://github.com/videlalvaro/php-amqplib</a> <kbd>demo</kbd> sekmesini ziyaret edin.
 
+<a name="cacheFactory"></a>
 
 #### CacheFactory
 
@@ -139,6 +170,8 @@ $cache = $container->get('cacheFactory')->shared(
     ]
 );
 ```
+
+<a name="database"></a>
 
 #### Database
 
@@ -199,6 +232,8 @@ PostgreSQL
 pgsql:host=127.0.0.1;port=5432;dbname=anydb
 ```
 
+<a name="doctrineDbal"></a>
+
 #### DoctrineDBAL
 
 <a href="http://www.doctrine-project.org/projects/dbal.html" target="_blank">DoctrineDBAL</a> veritabanı şema yönetimi gibi birçok özelliği destekleyen güçlü bir <a href="http://php.net/manual/en/book.pdo.php" target="_blank">PDO</a> arayüzüdür. En popüler veritabanı türleri için ortak bir arayüz sağlar. Eğer DoctrineDBAL servis sağlayıcısını kullanmak istiyorsanız,
@@ -223,6 +258,8 @@ $container->share('database', 'Obullo\Container\ServiceProvider\Connector\Doctri
 
 Böylece <kbd>DoctrineDBAL</kbd> servis sağlayıcısına geçtiğinizde veritabanı metotlarınızı değiştirmek zorunda kalmazsınız.
 
+<a name="qb"></a>
+
 #### Doctrine Query Builder
 
 Uygulamanızdaki database servis sağlayıcısını kullanarak QueryBuilder nesnesini oluşturur. Doctrine Query Builder için oluşturulmuş servis sağlayıcısıdır. Eğer sorgu oluşturucuyu kullanmak istiyorsanız <kbd>app/providers.php</kbd> dosyasından <kbd>QueryBuilder</kbd> servis sağlayıcınızı aktif edin.
@@ -232,6 +269,8 @@ $container->addServiceProvider('Obullo\Container\ServiceProvider\QueryBuilder');
 ```
 
 Sorgu oluşturucunun uygulama içerisinde nasıl kullanıldığına dair detaylı bilgiyi [Database-DoctrineQueryBuilder.md](Database-DoctrineQueryBuilder.md) dosyasından elde edebilirsiniz.
+
+<a name="memcached"></a>
 
 #### Memcached
 
@@ -268,6 +307,8 @@ $memcached = $container->get('memcached')->factory(
 );
 ```
 
+<a name="memcache"></a>
+
 #### Memcache
 
 Php <a href="http://php.net/manual/en/book.memcache.php" target="_blank">Memcache</a> genişlemesi için oluşturulmuş servis sağlayıcısıdır. Uygulamanızdaki <kbd>providers/memcache.php</kbd> konfigürasyonunu kullanarak memcache bağlantılarını yönetmenize yardımcı olur.
@@ -292,6 +333,8 @@ $memcached = $container->get('memcache')->factory(
     ]
 );
 ```
+
+<a name="mongo"></a>
 
 #### Mongo
 
@@ -327,6 +370,8 @@ $mongo = $container->get('mongo')->factory(
 ```
 
 Uygulamanızdaki database.php konfigürasyonunu kullanarak pdo bağlantılarını yönetmenize yardımcı olur.
+
+<a name="redis"></a>
 
 #### Redis
 
