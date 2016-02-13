@@ -3,59 +3,55 @@
 
 Çerez, herhangi bir internet sitesi tarafından son kullanıcının bilgisayarına bırakılan bir tür tanımlama dosyasıdır. Çerez dosyalarında oturum bilgileri ve benzeri veriler saklanır. Çerez kullanan bir siteyi ziyaret ettiğinizde, bu site tarayıcınıza bir ya da birden fazla çerez bırakma konusunda talep gönderebilir.
 
-> **Not:** Bir çereze kayıt edilebilecek maksimum veri 4KB tır.
-
 <ul>
-    <li><a href="#methods">Metotlara Erişim</a></li>
     <li>
         <a href="#setcookie">Bir Çereze Veri Kaydetmek</a>
         <ul>
-            <li><a href="#arrays">Array Yöntemi</a></li>
             <li><a href="#method-chaining">Zincirleme Method Yöntemi</a></li>
+            <li><a href="#arrays">Array Yöntemi</a></li>
         </ul>
     </li>
-    <li><a href="#parameters">Parametre Açıklamaları</a></li>
     <li><a href="#readcookie">Bir Çerez Verisini Okumak</a></li>
     <li><a href="#removecookie">Bir Çerezi Silmek</a></li>
-    <li><a href="#method-reference">Fonksiyon Referansı</a></li>
+    <li><a href="#parameters">Parametre Açıklamaları</a></li>
+    <li><a href="#method-reference">Cookie Sınıfı Referansı</a></li>
 </ul>
 
-<a name="methods"></a>
-
-#### Metotlara Erişim
-
-```php
-$this->c['cookie']->method();
-```
+Bir çereze kayıt edilebilecek maksimum veri 4KB tır.
 
 <a name="setcookie"></a>
 
 #### Bir Çereze Veri Kaydetmek
 
-Çerez sınıfını kullandığınızda bir çereze iki tür yöntemle veri kaydedebilirsiniz. Birinci yöntem array türü ile kayıt ikinci yöntem ise parametre göndererek kaydetmektir.
+Çerez sınıfını kullandığınızda bir çereze iki tür yöntemle veri kaydedebilirsiniz.
 
 <a name="method-chaining"></a>
 
 ##### Zincirleme Method Yöntemi
 
 ```php
-$this->cookie->expire(0)->set('name', 'value'); 
+$this->cookie
+    ->expire(0)
+    ->set('name', 'value'); 
 ```
 
-Bu yöntemi kullanarak konfigürasyon dosyasından gelen varsayılan değerleri devre dışı bırakarak girilen değerleri çereze kaydedebilirsiniz. Yukarıdaki örnekte çereze ait domain, path gibi bilgilerin girilmediği görülüyor bu ve bunun gibi sağlanmayan diğer bilgiler <kbd>config/$env/config.php</kbd> konfigürasyon dosyasından okunarak varsayılan değerler olarak kabul edilirler.
-
-Zincirleme method yöntemine tam bir örnek:
+Bu yöntemi kullanarak konfigürasyon dosyasından gelen varsayılan değerleri devre dışı bırakarak girilen değerleri çereze kaydedebilirsiniz. Çereze ait domain, path gibi sağlanmayan diğer bilgiler <kbd>config.php</kbd> konfigürasyon dosyasından okunur.
 
 ```php
-$this->cookie->name('hello')->value('world')->expire(86400)->domain('')->path('/')->set(); 
+$this->cookie
+    ->name('hello')
+    ->value('world')
+    ->expire(86400)
+    ->domain('')
+    ->path('/')
+    ->set(); 
 ```
+
 <a name="arrays"></a>
 
-##### Array ile Kayıt Yöntemi
+##### Array Yöntemi
 
-Bu yöntemde kayıt set metodu içerisine array türünden parametre gönderilerek yapılır.
-
-Yukarıdaki örnekte çereze ait domain, path gibi bilgilerin girilmediği görülüyor bu ve bunun gibi sağlanmayan diğer bilgiler <kbd>config/env.$env/config.php</kbd> konfigürasyon dosyasından okunur. Eğer konfigürasyon dosyasını ezerek bir çerez kaydetmek istiyorak aşağıdaki gibi tüm parametreleri göndermelisiniz.
+Eğer konfigürasyon dosyasını ezerek bir çerez kaydetmek istiyorak aşağıdaki gibi tüm parametreleri göndermeliyiz.
 
 ```php
 $cookie = array(
@@ -70,6 +66,52 @@ $cookie = array(
                );
 
 $this->cookie->set($cookie); 
+```
+
+<a name="readcookie"></a>
+
+#### Bir Çerez Verisini Okumak
+
+Bir çerezi okumak için get metodu kullanılır.
+
+```php
+if ($value = $this->cookie->get('name')) {
+	echo $value;
+}
+```
+
+Eğer çereze kayıtlı bir değer yoksa fonksiyon <kbd>false</kbd> değerine döner. Eğer çerezler için önceden konfigürasyondan bir önad ( prefix ) belirlenmişse get metodu içerisinden çerezin önadı kullanılarak çerez verileri okunur. Eğer sadece belirli çerezlerde özel bir önad kullanılmışsa bu durumda aşağıdaki gibi ikinci parametereden önadı göndermeniz gerekir.
+
+```php
+if ($value = $this->cookie->get('name', 'prefix')) {
+	echo $value;
+}
+```
+<a name="removecookie"></a>
+
+#### Bir Çerezi Silmek
+
+Bir çerezi silmek için çerez ismi girmeniz yeterlidir.
+
+```php
+$this->cookie->delete("name");
+```
+Bu fonksiyon <kbd>$this->cookie->set()</kbd> fonksiyonunu kullanır sadece içeriden <kbd>expire()</kbd> metodunu kullanarak sona erme süresini <kbd>-1</kbd> olarak gönderir.
+
+```php
+$this->cookie->delete($name = "name", $prefix = null)
+```
+
+Domain ve path metotları ile bir örnek.
+
+```php
+$this->cookie->domain('my.subdomain.com')->path('/')->delete("name");
+```
+
+Veya
+
+```php
+$this->cookie->name('name')->prefix('prf_')->domain('my.subdomain.com')->path('/')->delete();
 ```
 
 <a name="parameters"></a>
@@ -94,11 +136,11 @@ $this->cookie->set($cookie);
         </tr>
         <tr>
             <td>expire</td>
-            <td>Son erme süresi ( expire ) parametresi saniye türünden girilir ve girilen saniye değeri şu anki zaman üzerine eklenir. Şu anki zaman otomatik olarak eklendiğinden bu süreyi kendiniz eklememeniz gerekir. Eğer sona erme süresi girilmez ise konfigürasyon dosyasındaki değer varsayılan olarak kabul edilir. Eğer sona erme süresi <b>0</b> olarak girilirse çerez tarayıcı kapandığında kendiliğinden yok olur.</td>
+            <td>Son erme süresi ( expire ) parametresi saniye türünden girilir ve girilen saniye değeri şu anki zaman üzerine eklenir. Şu anki zaman otomatik olarak eklendiğinden bu süreyi kendiniz eklememeniz gerekir. Eğer sona erme süresi girilmez ise konfigürasyon dosyasındaki değer varsayılan olarak kabul edilir. Eğer sona erme süresi <kbd>0</kbd> olarak girilirse çerez tarayıcı kapandığında kendiliğinden yok olur.</td>
         </tr>
         <tr>
             <td>domain</td>
-            <td>Çerezin geçerli olacağı alan adıdır. Site-wide çerezler ( tüm alt domainlerde geçerli çerezler ) kaydetmek için domain parametresini <b>.your-domain.com</b> gibi girmeniz gereklidir.</td>
+            <td>Çerezin geçerli olacağı alan adıdır. Site-wide çerezler ( tüm alt domainlerde geçerli çerezler ) kaydetmek için domain parametresini <kbd>.your-domain.com</kbd> gibi girmeniz gereklidir.</td>
         </tr>
         <tr>
             <td>path</td>
@@ -106,7 +148,7 @@ $this->cookie->set($cookie);
         </tr>
         <tr>
             <td>secure</td>
-            <td>Eğer çerez güvenli bir <b>https://</b> protokolü üzerinden okunuyorsa bu değerin true olması gerekir. Protokol güvenli olmadığında çereze erişilemez.</td>
+            <td>Eğer çerez güvenli bir <kbd>https://</kbd> protokolü üzerinden okunuyorsa bu değerin true olması gerekir. Protokol güvenli olmadığında çereze erişilemez.</td>
         </tr>
         <tr>
             <td>httpOnly</td>
@@ -114,62 +156,14 @@ $this->cookie->set($cookie);
         </tr>
         <tr>
             <td>prefix</td>
-            <td>Önad ihtiyaç olursa sadece çerezlerinizin diğer çerezler ile karışmasını engellemek için kullanılır. Bir değer girilmezse varsayılan değer konfigürasyon dosyasından okunur.</td>
+            <td>Sadece çerezlerinizin diğer çerezler ile karışmasını engellemek için kullanılır. Bir değer girilmezse varsayılan değer konfigürasyon dosyasından okunur.</td>
         </tr>
         </tbody>
 </table>
 
-<a name="readcookie"></a>
-
-#### Bir Çerez Verisini Okumak
-
-Bir çerezi okumak için get metodu kullanılır.
-
-```php
-if ($value = $this->cookie->get('name')) {
-	echo $value;
-}
-```
-
-Eğer çereze kayıtlı bir değer yoksa fonksiyon <b>false</b> değerine döner. Eğer çerezler için önceden konfigürasyondan bir önad ( prefix ) belirlenmişse get metodu içerisinden çerezin önadı kullanılarak çerez verileri okunur. Eğer sadece belirli çerezlerde özel bir önad kullanılmışsa bu durumda aşağıdaki gibi ikinci parametereden önadı göndermeniz gerekir.
-
-```php
-if ($value = $this->cookie->get('name', 'prefix')) {
-	echo $value;
-}
-```
-<a name="removecookie"></a>
-
-#### Bir Çerezi Silmek
-
-Bir çerezi silmek için çerez ismi girmeniz yeterlidir.
-
-```php
-$this->cookie->delete("name");
-```
-Bu fonksiyon <kbd>$this->cookie->set()</kbd> fonksiyonunu kullanır sadece içeriden <b>expire()</b> metodunu kullanarak sona erme süresini <b>-1</b> olarak gönderir.
-
-```php
-$this->cookie->delete($name = "name", $prefix = null)
-```
-
-Domain ve path metotları ile bir örnek.
-
-```php
-$this->cookie->domain('my.subdomain.com')->path('/')->delete("name");
-```
-
-Veya
-
-```php
-$this->cookie->name('name')->prefix('prf_')->domain('my.subdomain.com')->path('/')->delete();
-```
-
 <a name="method-reference"></a>
 
-#### Fonksiyon Referansı
-
--------
+#### Cookie Sınıfı Referansı
 
 ##### $this->cookie->name(string $name);
 
@@ -209,7 +203,7 @@ Gönderilen parametrelere göre bir çereze veri kaydeder. En son çalıştırı
 
 ##### $this->cookie->get(string $name, string $prefix = '');
 
-Kayıtlı bir çerezi okur eğer çerez mevcut değilese <b>false</b> değerine döner. Konfigürasyonda yada parametrede bir önad belirtilmişse çerez bu önad kullanılarak okunur. Parametreden bir değer gönderilirse konfigürasyon dosyasındaki varsayılan değer pas geçilir.
+Kayıtlı bir çerezi okur eğer çerez mevcut değilese <kbd>false</kbd> değerine döner. Konfigürasyonda yada parametrede bir önad belirtilmişse çerez bu önad kullanılarak okunur. Parametreden bir değer gönderilirse konfigürasyon dosyasındaki varsayılan değer pas geçilir.
 
 ##### $this->cookie->delete(string $name, string $prefix = '');
 
