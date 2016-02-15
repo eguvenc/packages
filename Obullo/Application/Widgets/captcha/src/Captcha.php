@@ -2,7 +2,7 @@
 
 namespace Obullo\Container\ServiceProvider;
 
-class QueryBuilder extends AbstractServiceProvider
+class Captcha extends AbstractServiceProvider
 {
     /**
      * The provides array is a way to let the container
@@ -14,7 +14,7 @@ class QueryBuilder extends AbstractServiceProvider
      * @var array
      */
     protected $provides = [
-        'qb'
+        'captcha'
     ];
 
     /**
@@ -28,8 +28,22 @@ class QueryBuilder extends AbstractServiceProvider
     public function register()
     {
         $container = $this->getContainer();
+        $config    = $this->getConfiguration('captcha');
 
-        $container->share('qb', 'Obullo\Container\ServiceProvider\Connector\DoctrineQueryBuilder')
-            ->withArgument($container);
+        $captcha = $container->share('captcha', 'Obullo\Captcha\Provider\Image')
+            ->withArgument($container->get('url'))
+            ->withArgument($container->get('request'))
+            ->withArgument($container->get('session'))
+            ->withArgument($container->get('translator'))
+            ->withArgument($container->get('logger'))
+            ->withArgument($config->getParams());
+
+        foreach ($config->getMethods() as $method) {
+            
+            $captcha->withMethodCall(
+                $method['name'],
+                $method['argument']
+            );
+        }
     }
 }

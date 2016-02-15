@@ -1,5 +1,5 @@
 
-## Şifre Sınıfı
+## Şifre Fonksiyonu
 
 Şifre sınıfı uygulamanıza kaydettiğiniz kullanıcılar için Bcrypt algoritması ile güvenli şifreler üretir.
 

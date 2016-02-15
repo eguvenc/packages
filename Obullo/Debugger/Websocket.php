@@ -123,7 +123,7 @@ class Websocket
             $this->port
         );
         if ($this->connect == false) {
-            $message = "Debugger seems enabled. Run debug server or disable debugger from your config.";
+            $message = "Debugger seems enabled. Run debug server or disable it from your config.";
 
             if ($this->app->request->isAjax()) {
                 $message = strip_tags($message);

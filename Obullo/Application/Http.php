@@ -58,9 +58,11 @@ class Http extends Application
             ->withArgument($container->get('logger'));
             
         $middleware = $container->get('middleware');
+
         include APP .'middlewares.php';
 
         $router = $container->get('router');
+
         include APP .'routes.php';
 
         $this->boot($router, $middleware);
@@ -136,7 +138,9 @@ class Http extends Application
                 }
             }
         }
-        if ($this->container->get('config')['http']['debugger']['enabled']) {  // Boot debugger
+        $config = $this->container->get('config');
+
+        if (isset($config['http']['debugger']) && $config['http']['debugger']['enabled']) {  // Boot debugger
             $middleware->add('Debugger');
         }
         $this->inject($middleware);

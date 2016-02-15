@@ -122,7 +122,7 @@ class Adapter
      *
      * @return array
      */
-    public function drivers()
+    public function getDrivers()
     {
         return $this->drivers;
     }
@@ -146,7 +146,7 @@ class Adapter
      * 
      * @return object of pdo
      */
-    public function connection()
+    public function getConnection()
     {
         return $this->conn;
     }
@@ -158,7 +158,7 @@ class Adapter
      * 
      * @return object
      */
-    public function stmt()
+    public function getStmt()
     {
         return $this->stmt;
     }
@@ -337,7 +337,7 @@ class Adapter
      * 
      * @return object PDO::Statement
      */
-    public function insertId($name = null)
+    public function lastInsertId($name = null)
     {
         return $this->conn->lastInsertId($name);
     }

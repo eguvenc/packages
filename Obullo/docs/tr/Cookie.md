@@ -13,6 +13,7 @@
     </li>
     <li><a href="#readcookie">Bir Çerez Verisini Okumak</a></li>
     <li><a href="#removecookie">Bir Çerezi Silmek</a></li>
+    <li><a href="#prefix">Çerez Ön Ekleri</a></li>
     <li><a href="#parameters">Parametre Açıklamaları</a></li>
     <li><a href="#method-reference">Cookie Sınıfı Referansı</a></li>
 </ul>
@@ -35,7 +36,7 @@ $this->cookie
     ->set('name', 'value'); 
 ```
 
-Bu yöntemi kullanarak konfigürasyon dosyasından gelen varsayılan değerleri devre dışı bırakarak girilen değerleri çereze kaydedebilirsiniz. Çereze ait domain, path gibi sağlanmayan diğer bilgiler <kbd>config.php</kbd> konfigürasyon dosyasından okunur.
+Bu yöntemi kullanarak konfigürasyon dosyasından gelen varsayılan değerleri devre dışı bırakarak girilen değerleri çereze kaydedebilirsiniz. Çereze ait domain, path ve diğer girilmeyen bilgiler <kbd>config.php</kbd> konfigürasyon dosyasından okunur.
 
 ```php
 $this->cookie
@@ -80,13 +81,20 @@ if ($value = $this->cookie->get('name')) {
 }
 ```
 
-Eğer çereze kayıtlı bir değer yoksa fonksiyon <kbd>false</kbd> değerine döner. Eğer çerezler için önceden konfigürasyondan bir önad ( prefix ) belirlenmişse get metodu içerisinden çerezin önadı kullanılarak çerez verileri okunur. Eğer sadece belirli çerezlerde özel bir önad kullanılmışsa bu durumda aşağıdaki gibi ikinci parametereden önadı göndermeniz gerekir.
+Eğer çereze kayıtlı bir değer yoksa fonksiyon <kbd>false</kbd> değerine döner. 
+
+<a name="prefix"></a>
+
+#### Çerez Ön Ekleri
+
+Eğer çerezler için önceden konfigürasyondan bir ön ek belirlenmişse tüm çerez işlemleri bu ön ek gözönüne alınarak yapılır. Eğer konfigürasyonda olmayan özel ön ekler kullanılıyorsa bu durumda ikinci parametereden ön ek girilmelidir.
 
 ```php
 if ($value = $this->cookie->get('name', 'prefix')) {
 	echo $value;
 }
 ```
+
 <a name="removecookie"></a>
 
 #### Bir Çerezi Silmek
@@ -96,7 +104,8 @@ Bir çerezi silmek için çerez ismi girmeniz yeterlidir.
 ```php
 $this->cookie->delete("name");
 ```
-Bu fonksiyon <kbd>$this->cookie->set()</kbd> fonksiyonunu kullanır sadece içeriden <kbd>expire()</kbd> metodunu kullanarak sona erme süresini <kbd>-1</kbd> olarak gönderir.
+
+İkinci parametre, varsayılan konfigürasyondan farklı bir ön ek kullanıbilmeniz için ayrılmıştır.
 
 ```php
 $this->cookie->delete($name = "name", $prefix = null)
@@ -136,7 +145,7 @@ $this->cookie->name('name')->prefix('prf_')->domain('my.subdomain.com')->path('/
         </tr>
         <tr>
             <td>expire</td>
-            <td>Son erme süresi ( expire ) parametresi saniye türünden girilir ve girilen saniye değeri şu anki zaman üzerine eklenir. Şu anki zaman otomatik olarak eklendiğinden bu süreyi kendiniz eklememeniz gerekir. Eğer sona erme süresi girilmez ise konfigürasyon dosyasındaki değer varsayılan olarak kabul edilir. Eğer sona erme süresi <kbd>0</kbd> olarak girilirse çerez tarayıcı kapandığında kendiliğinden yok olur.</td>
+            <td>Son erme süresi saniye türünden girilir ve girilen değer şu anki zaman üzerine eklenir. Eğer sona erme süresi girilmez ise konfigürasyon dosyasındaki değer varsayılan olarak kabul edilir. Eğer sona erme süresi <kbd>0</kbd> dan küçük olarak girilirse çerez tarayıcı kapandığında kendiliğinden yok olur.</td>
         </tr>
         <tr>
             <td>domain</td>
@@ -164,6 +173,7 @@ $this->cookie->name('name')->prefix('prf_')->domain('my.subdomain.com')->path('/
 <a name="method-reference"></a>
 
 #### Cookie Sınıfı Referansı
+     
 
 ##### $this->cookie->name(string $name);
 
@@ -195,7 +205,7 @@ Kaydedilmek üzere olan bir çereze ait httpOnly parametresini tanımlar.
 
 ##### $this->cookie->prefix(string $prefix = '');
 
-Kaydedilmek üzere olan bir çereze ait bir önad tanımlar.
+Kaydedilmek üzere olan bir çereze ait bir ön ek tanımlar.
 
 ##### $this->cookie->set(mixed $name, string $value);
 
@@ -203,7 +213,7 @@ Gönderilen parametrelere göre bir çereze veri kaydeder. En son çalıştırı
 
 ##### $this->cookie->get(string $name, string $prefix = '');
 
-Kayıtlı bir çerezi okur eğer çerez mevcut değilese <kbd>false</kbd> değerine döner. Konfigürasyonda yada parametrede bir önad belirtilmişse çerez bu önad kullanılarak okunur. Parametreden bir değer gönderilirse konfigürasyon dosyasındaki varsayılan değer pas geçilir.
+Kayıtlı bir çerezi okur eğer çerez mevcut değilese <kbd>false</kbd> değerine döner. Konfigürasyonda yada parametrede bir ön ek belirtilmişse çerez bu ön ek kullanılarak okunur. Parametreden bir ön ek gönderilirse konfigürasyon dosyasındaki varsayılan değer pas geçilir.
 
 ##### $this->cookie->delete(string $name, string $prefix = '');
 
@@ -211,7 +221,7 @@ Gönderilen parametrelere göre bir çerezi tarayıcıdan siler.
 
 ##### $this->cookie->getHeaders();
 
-Kuyruğa gönderilmiş çerezlerin raw değerilerine array formatında geri döner.
+Kuyruğa gönderilmiş çerezlerin raw değerilerine bir dizi içerisinde geri döner.
 
 ##### $this->cookie->getId();
 
