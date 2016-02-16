@@ -21,21 +21,13 @@ http://github.com/obullo/http-middlewares/
 
 ### Linux / Mac
 
-#### Modül Kurulumu
+#### Http Modülü
 
-Aşağıdaki komutu konsoldan çalıştırın.
-
-```php
-php task module add debugger
-```
-
-Modülü kaldırmak için <kbd>remove</kbd> komutunu kullanın.
+Aşağıdaki kaynaktan <kbd>Debugger.php</kbd> dosyasını uygulamanızın <kbd>app/modules/Debugger/</kbd> dizinine kopyalayın.
 
 ```php
-php task module remove debugger
+http://github.com/obullo/http-modules/
 ```
-
-İşlem bittiğinde debugger modülüne ait dosyalar <kbd>modules/debugger</kbd>  ve <kbd>modules/tasks</kbd> klasörleri altına kopyalanırlar.
 
 #### Çalıştırma
 

@@ -7,8 +7,6 @@ ReCAPTCHA google şirketi tarafından geliştirilen popüler bir captcha servisi
 <li>
     <a href="#setup">Kurulum</a>
     <ul>
-        <li><a href="#adding-module">Modülü Kurmak</a></li>
-        <li><a href="#removing-module">Modülü Kaldırmak</a></li>
         <li><a href="#service-provider">Servis Sağlayıcısı</a></li>
     </ul>
 </li>
@@ -43,23 +41,8 @@ ReCAPTCHA google şirketi tarafından geliştirilen popüler bir captcha servisi
 
 ### Kurulum
 
-ReCaptcha paketi uygulama içerisinde modül olarak kullanılır ve kurulduğunda modüle ait <kbd>recaptcha.php</kbd> konfigürasyon dosyası <kbd>providers/</kbd> klasörü altına kopyalanır.
+Eğer <kbd>recaptcha.php</kbd> konfigürasyon dosyası <kbd>providers/</kbd> klasörü altında mevcut ise bu dosyayı konfigüre etmeniz gerekir
 
-<a name="adding-module"></a>
-
-#### Modülü Kurmak
-
-```php
-php task module add recaptcha
-```
-
-<a name="removing-module"></a>
-
-#### Modülü Kaldırmak
-
-```php
-php task module remove recaptcha
-```
 <a name="service-provider"></a>
 
 #### Servis Sağlayıcısı

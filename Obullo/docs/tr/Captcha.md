@@ -9,8 +9,6 @@ Buradaki basit mantık o resimde insan tarafından okunabilecek ancak bilgisayar
 <li>
     <a href="#setup">Kurulum</a>
     <ul>
-        <li><a href="#adding-module">Modülü Kurmak</a></li>
-        <li><a href="#removing-module">Modülü Kaldırmak</a></li>
         <li><a href="#service-provider">Servis Sağlayıcısı</a></li>
     </ul>
 </li>
@@ -63,22 +61,16 @@ Buradaki basit mantık o resimde insan tarafından okunabilecek ancak bilgisayar
 
 ### Kurulum
 
-Captcha paketi uygulama içerisinde modül olarak kullanılır ve kurulduğunda modüle ait <kbd>captcha.php</kbd> konfigürasyon dosyası <kbd>providers/</kbd> klasörü altına kopyalanır.
-
-<a name="adding-module"></a>
-
-#### Modülü Kurmak
-
-```php
-php task module add captcha
-```
+Captcha paketi konfigürasyon dosyası <kbd>providers/</kbd> klasöründen konfigüre edilir.
 
 <a name="removing-module"></a>
 
-#### Modülü Kaldırmak
+#### Http Modülünü Kurmak
+
+Aşağıdaki kaynaktan <kbd>Create.php</kbd> dosyasını uygulamanızın <kbd>app/modules/Captcha/</kbd> dizinine kopyalayın.
 
 ```php
-php task module remove captcha
+http://github.com/obullo/http-modules/
 ```
 
 <a name="service-provider"></a>
