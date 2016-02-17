@@ -162,7 +162,7 @@ class MiddlewareStack implements MiddlewareStackInterface
      * 
      * @param string $name middleware key
      * 
-     * @return void
+     * @return object of middleware class
      */
     protected function queueMiddleware($name)
     {

@@ -48,7 +48,7 @@ class Redis extends AbstractStorage implements StorageInterface
      */
     public function connect(Container $container, array $params)
     {
-        $this->cache = $container->get('cache')->shared(
+        $this->cache = $container->get('cacheFactory')->shared(
             [
                 'driver' => 'redis',
                 'connection' => $params['cache']['provider']['connection']

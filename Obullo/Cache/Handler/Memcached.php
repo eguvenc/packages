@@ -269,7 +269,7 @@ class Memcached implements CacheInterface
     {
         return $this->memcached->replace($key, $data, time() + $ttl);
     }
-
+    
     /**
      * Replace keys
      * 
@@ -278,7 +278,7 @@ class Memcached implements CacheInterface
      * 
      * @return boolean
      */
-    public function replaceItems(array $data, $ttl)
+    public function replaceItems(array $data, $ttl = 60)
     {
         return $this->setArray($data, $ttl);
     }

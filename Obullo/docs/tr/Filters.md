@@ -39,16 +39,18 @@ Obullo da filtreleme iki ayrı sınıf ile yapılır doğrulama filtresi için <
 
 ### Is Sınıfı
 
-------
-
 Is sınıfı php filter_var() fonksiyonlarını kullanarak belirli data tipleri üzerinde doğrulama kontrolü sağlar. Filtreleme özellikleri gönderilen çeşitli parametreler ile değiştirilebilir.
 
 #### Metotlara Erişim
 
--------
+```php
+$container->get('is')->method();
+```
+
+kontrolör içinden,
 
 ```php
-$this->c['is']->method();
+$this->is->method();
 ```
 
 <a name="is-int"></a>
@@ -97,22 +99,6 @@ $this->is->int(0285, false, 1, 300, 'octal');  // Çıktı 2
     </tbody>
 </table>
 
-
-###### Request Sınıfı İle Birlikte Kullanmak
-
-```php
-if ($id = $this->request->post('id', 'is')->int()) {
-	echo $id;
-}
-```
-Eğer parametre kullanmak istiyorsanız int() fonksiyonun ilk parametresini atlayarak diğer parametreleri girin.
-
-```php
-if ($id = $this->request->post('id', 'is')->int(false, 0, 1000)) {
-	echo $id;
-}
-```
-
 <a name="is-float"></a>
 
 ##### $this->is->float($value, $default = false);
@@ -133,7 +119,9 @@ $this->is->float(10, null);  // Çıktı null
 ###### Request Sınıfı İle Birlikte Kullanmak
 
 ```php
-if ($price = $this->request->post('price', 'is')->float()) {
+$price = $this->request->post('price');
+
+if ($price = $this->is->float($price)) {
 	echo $price;
 }
 ```
@@ -181,7 +169,9 @@ $this->is->email(user.example.com, null);  // Çıktı null
 ###### Request Sınıfı İle Birlikte Kullanmak
 
 ```php
-if ($this->request->post('email', 'is')->email()) {
+$email = $this->request->post('email');
+
+if ($this->is->email($email)) {
 
 }
 ```
@@ -323,7 +313,9 @@ Seçenekler
 ###### Request Sınıfı İle Birlikte Kullanmak
 
 ```php
-if ($this->request->post('url_adress', 'is')->url('host|query')) {
+$url = $this->request->post('url_adress');
+
+if ($this->is->url($url, false, 'host|query')) {
 
 }
 ```

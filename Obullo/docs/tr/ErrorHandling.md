@@ -51,7 +51,16 @@ public function handleError($level, $message, $file = '', $line = 0)
 
 <kbd>production</kbd> çevre ortamı haricindeki tüm çevre ortamları için hata mesajları, hata ayıklama için ekrana yazdırılır. Aşağıda Http İstekleri için oluşmuş örnek bir hata çıktısı görüyorsunuz.
 
-![Http Errors](images/error-debug.png?raw=true "Http Errors")
+```php
+NOTICE
+Undefined variable: a
+Details
+Type: ErrorException
+Code: 8
+File: APP/modules/Welcome.php
+Line: 14
+debug_backtrace (15)
+```
 
 İstisnai hatalar içinse bu durum kontrol edilebilir, bunun için <a href="#error-middleware">Http Error</a> katmanına bakınız.
 
@@ -250,4 +259,4 @@ Uygulama içinde kulanılan hata metotlarına ait hata şablonlarını ihtiyaçl
 resources/templates/errors/
 ```
 
-klasöründeki dosyaları özelleştirmeniz gerekir.
+klasöründeki dosyalara gözatın.

@@ -22,7 +22,7 @@ class Memcache extends AbstractCache
      */
     public function connect(Container $container, array $params)
     {
-        $this->cache = $container->get('cache')->shared(
+        $this->cache = $container->get('cacheFactory')->shared(
             [
                 'driver' => 'memcache',
                 'connection' => $params['cache']['provider']['connection']
