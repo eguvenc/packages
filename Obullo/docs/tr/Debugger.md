@@ -31,13 +31,13 @@ http://github.com/obullo/http-modules/
 
 #### Çalıştırma
 
-Debugger ın çalışabilmesi için debug task dosyasını debugger sunucusu olarak arka planda çalıştırmanız gerekir. Bunun için konsolunuza aşağıdaki komutu girin.
+Debugger sunucusunu konsoldan çalıştırın. 
 
 ```php
 php task debugger
 ```
 
-Debugger sayfası ziyaret edildiğinde javascript kodu istemci olarak websocket sunucusuna bağlanır. Şimdi tarayıcınıza gidip yeni bir pencere açın ve debugger sayfasını ziyaret edin.
+Şimdi tarayıcınızdan yeni bir pencere açın ve debugger sayfasını ziyaret edin. Debugger sayfası ziyaret edildiğinde tarayıcınız istemci olarak websocket sunucusuna bağlanır. 
 
 ```php
 http://mylocalproject/debugger
@@ -51,31 +51,20 @@ Websocket bağlantısı bazı tarayıcılarda kendiliğinden kopabilir panel üz
 
 ### Windows
 
-#### Modül Kurulumu
+#### Http Modülü
 
-Bu örnekte Xampp Programı baz alınmıştır. Aşağıdaki komutu konsoldan çalıştırın.
 
-```php
-C:\xampp\php\php.exe -f "C:\xampp\htdocs\myproject\task" module add debugger
-```
+#### Çalıştırma
 
-Modülü kaldırmak için <kbd>remove</kbd> komutunu kullanın.
-
-```php
-C:\xampp\php\php.exe -f "C:\xampp\htdocs\myproject\task" module remove debugger
-```
-
-İşlem bittiğinde debugger modülüne ait dosyalar <kbd>modules/debugger</kbd>  ve <kbd>modules/tasks</kbd> klasörleri altına kopyalanırlar.
-
-#### Sunucuyu Çalıştırma
-
-Debugger ın çalışabilmesi için debug task dosyasını debugger sunucusu olarak arka planda çalıştırmanız gerekir. Bunun için konsolunuza aşağıdaki komutu girin.
+Debugger sunucusunu konsoldan çalıştırın. 
 
 ```php
 C:\xampp\php\php.exe -f "C:\xampp\htdocs\myproject\task" debugger
 ```
 
-Debugger sayfası ziyaret edildiğinde javascript kodu istemci olarak websocket sunucusuna bağlanır. Şimdi tarayıcınıza gidip yeni bir pencere açın ve debugger sayfasını ziyaret edin.
+* Bu uzun komutu sürekli yazamayacağınızdan onun için masaüstüne bir <kbd>kısayol</kbd> oluşturup onu debugger adıyla kaydedin.
+
+Şimdi tarayıcınızdan yeni bir pencere açın ve debugger sayfasını ziyaret edin. Debugger sayfası ziyaret edildiğinde tarayıcınız istemci olarak websocket sunucusuna bağlanır. 
 
 ```php
 http://mylocalproject/debugger
@@ -95,17 +84,12 @@ Debugger penceresi açıksa debugger sunucusu kapatıldığında websocket istek
 Debugger seems enabled. Run debug server or disable it from your config.
 ```
 
-<kbd>app/local/config.php</kbd> dosyasından debugger modülü websocket bağlantısını pasif etmeniz gerekir.
+<kbd>app/local/debugger.php</kbd> dosyasından websocket bağlantısını pasif etmeniz gerekir.
 
 ```php
 return array(
 
-    'http' => [
-        'debugger' => [
-            'enabled' => true,
-            'socket' => 'ws://127.0.0.1:9000'
-        ]
-    ],
-    
+    'enabled' => false,
+    'socket' => 'ws://127.0.0.1:9000'
 )
 ```

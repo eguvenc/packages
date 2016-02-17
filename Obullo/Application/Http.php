@@ -47,7 +47,7 @@ class Http extends Application
         $app = $container->get('app');
 
         include APP .'errors.php';
-
+        
         $this->registerErrorHandlers();
 
         include APP .'providers.php';
