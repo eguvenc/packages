@@ -29,7 +29,7 @@ class QueryBuilder extends AbstractServiceProvider
     {
         $container = $this->getContainer();
 
-        $container->share('qb', 'Obullo\Container\ServiceProvider\DoctrineQueryBuilder')
+        $container->share('qb', 'Obullo\Container\ServiceProvider\Connector\DoctrineQueryBuilder')
             ->withArgument($container);
     }
 }

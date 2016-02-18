@@ -28,4 +28,21 @@ class Model
     {
         return Controller::$instance->getContainer();
     }
+
+    /**
+     * Returns to service object
+     * 
+     * @param string $key 
+     * 
+     * @return object
+     */
+    public function __get($key)
+    {
+        $return = $this->getContainer()->{$key};
+
+        if (is_object($return)) {
+            return $return;
+        }
+        return;
+    }
 }

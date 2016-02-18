@@ -36,8 +36,9 @@ $traceID = md5($e->getFile().$e->getLine().$e->getCode().$e->getMessage());
 <div id="debug">
 <div id="exceptionContent">
 <?php
-$config = include APP. 'local/config.php';
-if ($config['http']['debugger']['enabled'] == false) {  // disable backtrace if websocket enabled otherwise we get memory error.
+$debugger = include APP. 'local/debugger.php';
+
+if ($debugger['enabled'] == false) {  // disable backtrace if websocket enabled otherwise we get memory error.
     $debugTraces = $getTrace($e);
     echo '<h1><a href="javascript:void(0);" onclick="TraceToggle(\''.$traceID.'\')">debug_backtrace ('.sizeof($debugTraces).')</a></h1>';
 }

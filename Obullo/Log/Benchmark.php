@@ -45,7 +45,7 @@ class Benchmark
         if (function_exists('memory_get_usage') && ($usage = memory_get_usage()) != '') {
             $usage = round($usage/1024/1024, 2). ' MB';
         }
-        if ($config['http']['debugger']['enabled']) {  // Exclude debugger cost from benchmark results.
+        if (isset($config['debugger']['enabled']) && $config['debugger']['enabled']) {  // Exclude debugger cost from benchmark results.
             $end = $end - 0.0003;
         }
         $extra['time']   = number_format($end, 4);

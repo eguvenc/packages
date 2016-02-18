@@ -66,6 +66,23 @@ class MiddlewareStack implements MiddlewareStackInterface
     }
 
     /**
+     * Initialize global middlewares
+     * 
+     * @param array $names middlewares
+     * 
+     * @return void
+     */
+    public function init(array $names)
+    {
+        array_push($names, "App");  // Add application middleware
+                                    // it must be at the end otherwise parsedBody
+                                    // middleware does not work.
+        foreach ($names as $key) {
+            $this->queueMiddleware($key);
+        }
+    }
+
+    /**
      * Check given middleware is registered
      * 
      * @param string $name middleware
@@ -89,19 +106,7 @@ class MiddlewareStack implements MiddlewareStackInterface
      */
     public function add($name)
     {
-        if (is_string($name)) {
-            return $this->queueMiddleware($name);
-        } elseif (is_array($name)) { 
-
-            array_push($name, "App");  // Add application middleware
-                                       // it must be at the end otherwise parsedBody
-                                       // middleware does not work.
-
-            foreach ($name as $key) {
-                $this->queueMiddleware($key);
-            }
-        }
-        return $this;
+        return $this->queueMiddleware($name);
     }
 
     /**
@@ -157,7 +162,7 @@ class MiddlewareStack implements MiddlewareStackInterface
      * 
      * @param string $name middleware key
      * 
-     * @return object mixed
+     * @return object of middleware class
      */
     protected function queueMiddleware($name)
     {
@@ -165,7 +170,6 @@ class MiddlewareStack implements MiddlewareStackInterface
         $this->validateMiddleware($name);
         $Class = $this->registered[$name];
         $this->names[$name] = $this->count;
-
         return $this->queue[$this->count] = new $Class;  // Store middlewares
     }
 

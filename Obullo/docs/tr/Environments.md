@@ -10,7 +10,7 @@ Uygulamanız <kbd>local</kbd>, <kbd>test</kbd>, <kbd>production</kbd> veya yeni 
 Çevre ortamı <kbd>app/environments.php</kbd> dosyasında oluşturulan sunucu isimlerinin mevcut sunucu ismi ile karşılaştırılması sonucu elde edilir. 
 
 ```php
-return array(
+return $environments = array(
 
     'local' => [
         'john-desktop',
@@ -62,7 +62,7 @@ metodu ile ulaşılır. Varsayılan ortam türleri aşağıda listelenmiştir.
 
 #### Ortama Bağlı Konfigürasyonlar
 
-Konfigürasyon paketi geçerli ortam klasöründeki konfigürasyonlara ait değişen anahtarları <kbd>local</kbd> ortam anahtarlarıyla eşleşirse değiştirir aksi durumda olduğu gibi bırakır.Prodüksiyon ortamı üzerinden örnek verecek olursak bu konfigürasyonu yaratmak için değişen anahtar değerlerini ilgili dosyaya girmeniz yeterli olur. Mesala prodüksiyon ortamı içerisine aşağıdaki gibi bir <kbd>config.php</kbd> dosyası oluşturalım,
+Konfigürasyon paketi geçerli ortam klasöründeki konfigürasyonlara ait değişen anahtarları <kbd>local</kbd> ortam anahtarlarıyla eşleşirse değiştirir aksi durumda olduğu gibi bırakır. Prodüksiyon ortamı üzerinden örnek verecek olursak bu konfigürasyonu yaratmak için değişen anahtar değerlerini ilgili dosyaya girmeniz yeterli olur. Mesala prodüksiyon ortamı içerisine aşağıdaki gibi bir <kbd>config.php</kbd> dosyası oluşturalım,
 
 ```php
 - app
@@ -77,7 +77,7 @@ Konfigürasyon paketi geçerli ortam klasöründeki konfigürasyonlara ait deği
             database.php
 ```
 
-Aşağıdaki örnekte sadece dosya içerisindeki değişime uğrayan anahtarlar gözüküyor. Uygulama çalıştığında bu anahtarlar <kbd>local</kbd> ortam anahtarları ile birleştirilirler.
+Takip eden örnekte <kbd>production/config.php</kbd> konfigürasyonunda <kbd>sadece</kbd> dosya içerisindeki <kbd>değişime uğrayan</kbd> anahtarlar gözüküyor. Uygulama çalıştığında bu anahtarlar <kbd>local</kbd> ortam anahtarları ile birleştirilirler.
 
 ```php
 return array(

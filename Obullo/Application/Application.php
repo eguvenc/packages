@@ -225,10 +225,7 @@ class Application implements ApplicationInterface
     }
 
     /**
-     * Returns 
-     *
-     * This function similar with Codeigniter getInstance(); 
-     * instead of getInstance()->class->method() we use $this->c['app']->class->method();
+     * Container & controller proxy
      * 
      * @param string $key application object
      * 
@@ -236,9 +233,9 @@ class Application implements ApplicationInterface
      */
     public function __get($key)
     {
-        $cid = 'app.'.$key;
-        if ($this->container->has($cid) ) {
-            return $this->container->get($cid);
+        $appCid = 'app.'.$key;
+        if ($this->container->has($appCid) ) {
+            return $this->container->get($appCid);
         }
         if (class_exists('Controller', false) && Controller::$instance != null) {
             return Controller::$instance->{$key};

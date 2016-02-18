@@ -5,8 +5,7 @@ namespace Obullo\Debugger;
 use DOMDocument;
 use RuntimeException;
 use Obullo\Log\Handler\Debugger;
-use Obullo\Config\ConfigInterface as Config;
-use Obullo\Application\ApplicationInterface as Application;
+use Interop\Container\ContainerInterface as Container;
 
 /**
  * Debugger websocket 
@@ -16,13 +15,6 @@ use Obullo\Application\ApplicationInterface as Application;
  */
 class Websocket
 {
-    /**
-     * Application
-     * 
-     * @var object
-     */
-    protected $app;
-
     /**
      * Host
      * 
@@ -52,13 +44,6 @@ class Websocket
     protected $socket;
 
     /**
-     * Config
-     * 
-     * @var object
-     */
-    protected $config;
-
-    /**
      * App output
      * 
      * @var string
@@ -73,6 +58,13 @@ class Websocket
     protected $connect;
 
     /**
+     * Container
+     * 
+     * @var object
+     */
+    protected $container;
+
+    /**
      * Current uriString
      * 
      * @var object
@@ -82,20 +74,19 @@ class Websocket
     /**
      * Constructor
      * 
-     * @param Application $app    app
-     * @param Config      $config config
-     * @param array       $params params
+     * @param container $container app
+     * @param array     $config    config
+     * @param array     $params    logger params
      */
-    public function __construct(Application $app, Config $config, array $params)
+    public function __construct(Container $container, array $config, array $params)
     {
-        $this->app = $app;
-        $this->config = $config;
         $this->params = $params;
-        $this->uriString = $app->request->getUri()->getPath();
+        $this->container = $container;
+        $this->uriString = $container->get('app')->request->getUri()->getPath();
 
         if (false == preg_match(
             '#(ws:\/\/(?<host>(.*)))(:(?<port>\d+))(?<url>.*?)$#i', 
-            $config['http']['debugger']['socket'], 
+            $config['socket'], 
             $matches
         )) {
             throw new RuntimeException(
@@ -123,9 +114,9 @@ class Websocket
             $this->port
         );
         if ($this->connect == false) {
-            $message = "Debugger seems enabled. Run debug server or disable debugger from your config.";
+            $message = "Debugger seems enabled. Run debug server or disable it from your config.";
 
-            if ($this->app->request->isAjax()) {
+            if ($this->container->get('app')->request->isAjax()) {
                 $message = strip_tags($message);
             }
             throw new RuntimeException($message);
@@ -154,7 +145,7 @@ class Websocket
         $handler = new Debugger($this->params);      // Log debug handler
         $this->lines = $handler->write($data);
         
-        if ($this->app->request->isAjax()) {
+        if ($this->container->get('app')->request->isAjax()) {
 
             $cookies = $this->app->request->getCookieParams();
 
@@ -164,7 +155,7 @@ class Websocket
                 setcookie('o_debugger_active_tab', "obulloDebugger-ajax-log", 0, '/'); 
             }
             $this->handshake('Ajax');
-        } elseif ($this->app->request->isCli()) { 
+        } elseif ($this->container->get('app')->request->isCli()) { 
             $this->handshake('Cli');
         } else {
             $this->handshake('Http');
@@ -191,8 +182,8 @@ class Websocket
     protected function handshake($type = 'Ajax') 
     {
         $env = new Environment(
-            $this->app->request,
-            $this->app->session,
+            $this->container->get('app')->request,
+            $this->container->get('session'),
             $this->getOutput()
         );
         $base64EnvData = base64_encode($env->printHtml());

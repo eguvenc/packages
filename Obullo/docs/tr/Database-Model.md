@@ -1,20 +1,20 @@
 
 ## Model nedir ?
 
-Modeller veritabanı ile haberleşmeyi sağlayan ve veritabanı fonksiyonları için tasarlanmış php sınıflarıdır. Örnek verecek olursak bir blog uygulaması yaptığımızı düşünelim bu uygulamada yer alan model sınıflarınıza <b>insert, update, delete</b> metotlarını ve veritabanı <b>get</b> metotları koymanız beklenir. Model sınıfı size uygulamada ayrı bir katman sağlar ve veritabanı kodlarınızı bu katmanda geliştirmeniz kodlarınızın sürekliliğine, esnekliğine ve test edilebilirliğine yardımcı olur.
+Modeller veritabanı ile haberleşmeyi sağlayan ve veritabanı fonksiyonları için tasarlanmış php sınıflarıdır. Örnek verecek olursak bir blog uygulaması yaptığımızı düşünelim bu uygulamada yer alan model sınıflarınıza <kbd>insert, update, delete</kbd> ve  <kbd>get</kbd> metotları koymanız beklenir.Model sınıfı size uygulamada ayrı bir katman sağlar ve veritabanı kodlarınızı bu katmanda geliştirmeniz kodlarınızın sürekliliğine, esnekliğine ve test edilebilirliğine yardımcı olur.
 
-Uygulamanızda model katmanı kullandığınızda <b>sorgu önbellekme</b>, <b>testler</b>, <b>veritabanı kodlarının bakımı</b> gibi problemler kolaylıkla çözülür.
+Uygulamanızda model katmanı kullandığınızda <kbd>sorgu önbellekme</kbd>, <kbd>testler</kbd>, <kbd>veritabanı kodlarının bakımı</kbd> gibi problemler kolaylıkla çözülür.
 
 ### Modelleri Yüklemek
 
 ```php
-$this->modelBar = new \Model\Foo\Bar;
-$this->modelBar->method();
+$this->model = new \Model\Foo\Bar;
+$this->model->method();
 ```
 
 ### Model Klasörü Yaratmak
 
-Obullo model sınıflarını <b>app/classes/Model</b> klasöründen yükler. Aşağıdaki örnek, modellerin nasıl kullanılabileceği hakkında size bir fikir verebilir.
+Model sınıfları <kbd>app/classes/Model</kbd> klasöründen çağırılır. Aşağıdaki örnek, modellerin nasıl kullanılabileceği hakkında size bir fikir verebilir.
 
 ```php
 + app
@@ -23,9 +23,9 @@ Obullo model sınıflarını <b>app/classes/Model</b> klasöründen yükler. Aş
 		  Entry.php
 ```
 
-Önce classes klasörü altında Model adında bir klasörünüz yoksa bu isimde bir klasör yaratın ve içerisine aşağıdaki gibi <b>Entry.php</b> adında bir dosya oluşturun. Model sınıflarını yaratırken aynı sınıf yapılarında olduğu gibi dosya adı ve klasör adları büyük harfle yazılmalıdır.
+Önce <kbd>classes</kbd> klasörü altında Model adında bir klasörünüz yoksa bu isimde bir klasör yaratın ve içerisine aşağıdaki gibi <kbd>Entry.php</kbd> adında bir dosya oluşturun. Model sınıflarını yaratırken aynı sınıf yapılarında olduğu gibi dosya adı ve klasör adları büyük harfle yazılmalıdır.
 
-Lütfen aşağıdaki örneğe göz gezdirmeden önce ona ait sql kodunu veritabanınızda çalıştırın.
+Aşağıda sizin için bir örnek yaptık ve bu örneğe ait sql kodu aşağıdaki gibi.
 
 ```php
 --
@@ -47,45 +47,30 @@ CREATE TABLE IF NOT EXISTS `entries` (
 ```php
 namespace Model;
 
-class Entry extends \Obullo\Database\Model
+use Obullo\Database\Model;
+
+class Entry extends Model
 {
     public $title;
     public $content;
     public $date;
 
-    /**
-     * Get one entry
-     *
-     * @param integer $id user id
-     * 
-     * @return array
-     */
     public function findOne($id = 1)
     {
         return $this->db->prepare("SELECT * FROM entries WHERE id = ?")
             ->bindParam(1, $id, \PDO::PARAM_INT)
-            ->execute()->rowArray();
+            ->execute()
+            ->rowArray();
     }
 
-    /**
-     * Get all entries
-     *
-     * @param integer $limit number
-     * 
-     * @return array
-     */
     public function findAll($limit = 10)
     {
         return $this->db->prepare("SELECT * FROM users LIMIT ?")
             ->bindParam(1, $limit, \PDO::PARAM_INT)
-            ->execute()->resultArray();
+            ->execute()
+            ->resultArray();
     }
 
-    /**
-     * Insert entry
-     * 
-     * @return void
-     */
     public function insert()
     {
         return $this->db->insert(
@@ -103,13 +88,6 @@ class Entry extends \Obullo\Database\Model
         );
     }
 
-    /**
-     * Update entry ( Example transaction )
-     * 
-     * @param integer $id id
-     * 
-     * @return void
-     */
     public function update($id)
     {
         return $this->db->transactional(
@@ -134,84 +112,52 @@ class Entry extends \Obullo\Database\Model
         );
     }
 
-    /**
-     * Delete entry
-     * 
-     * @param integer $id id
-     * 
-     * @return void
-     */
     public function delete($id)
     {
-        return $this->db->delete('entries', ['id' => $id], ['id' => \PDO::PARAM_INT]);
-    }
-
-    /**
-     * Loader
-     * 
-     * @return void
-     */
-    public function load()
-    {
-        $this->c['db'];
-    }
-
-}
-
-/* Location: .model/Entry.php */
-```
-
-Yukarıdaki örnekteki uygulamaya özgü <b>findAll()</b> ve <b>findOne()</b> metotları veritabanından <b>okuma</b> işlemleri yaparken diğer metotlar veritabanına <b>yazma</b> işlemi yaparlar. Eğer veritabanına veri kaybı olmadan ( transactions ) yazma işlemleri yapmak istiyorsak kodlarımızı aşağıdaki gibi <b>transaction()</b> metodu içerisinde kullanmamız gerekir.
-
-```php
-namespace Model;
-
-class Entry extends \Obullo\Database\Model
-{
-    /**
-     * Insert entry
-     * 
-     * @return void
-     */
-    public function insert()
-    {
-        $data = [
-                    'title' => $this->title, 
-                    'content' => $this->content,
-                    'date' => $this->date
-        ];
-
         return $this->db->transactional(
-            function () use ($data) {
-
-                return $this->db->insert(
-                    'entries', 
-                    $data, 
-                    [
-                        'title' => \PDO::PARAM_STR,
-                        'content' => \PDO::PARAM_STR,
-                        'date' => \PDO::PARAM_INT,
-                    ]
-                );
+            function () use ($id)
+            {
+                return $this->db->delete('entries', ['id' => $id], ['id' => \PDO::PARAM_INT]);
             }
         );
     }
 
 }
+
+/* Location: .app/classes/Model/Entry.php */
 ```
 
-Transaction metodu, içerisine konulan isimsiz fonksiyonları çalıştırır ve çalışma aşamasında <b>commit</b> işlemi başarılı ise işlemi veritabanına kaydeder. Kaydetme işlemi başarılı olduğunda metot içerisindeki isimsiz fonksiyonun sonucuna geri dönülür aksi durumda uygulama bir <b>PDOException</b> hatası fırlatır ve hata mesajı görüntülenirken yapılan yazma işlemleri içeriden <b>rollBack</b> metodu ile geri alınır. Eğer veritabanına kaydettiğiniz veriler kritik düzeyde önemli veriler ise veri kaybı olmadan kayıt işlemleri için mutlaka yazma işlemlerinde transaction metodu kullanmanız tavsiye edilir.
+Yukarıdaki örnekteki uygulamaya özgü <kbd>findAll()</kbd> ve <kbd>findOne()</kbd> metotları veritabanından <kbd>okuma</kbd> işlemleri yaparken diğer metotlar veritabanına <kbd>yazma</kbd> işlemi yaparlar. Eğer veritabanına veri kaybı olmadan yazma işlemleri yapmak istiyorsak yukarıdaki örneklerde olduğu gibi fonksiyonlarınızı <kbd>transactional()</kbd> metodu içerisinde kullanmamız gerekir.
 
-> **Not:** PDOException ve diğer RuntimeException hataları <b>app/errors.php</b> dosyasından kontrol edilirler.
+```php
+$result = $this->db->transactional(
+    function () use ($data) {
 
+        return $this->db->insert(
+            'entries', 
+            $data
+        );
+    }
+);
 
-Şimdi de entry modelini kontrolör sınıfı içerisinde nasıl kullanacağımıza dair bir örnek yapalım.
+if ( ! $result) {          
+    echo 'Veri kaydetme başarısız. Lütfen tekrar deneyin';
+} else {
+    echo 'Veri başarı ile kaydedildi. Etkilenen satır sayısı '.$result;
+}
+```
+
+Transaction metodu, içerisine konulan isimsiz fonksiyonları çalıştırır ve çalışma aşamasında <kbd>commit</kbd> işlemi başarılı ise işlemler veritabanına işlenir. İşlem başarılı olduğunda metot içerisindeki isimsiz fonksiyonun sonucuna geri dönülür aksi durumda uygulama bir <kbd>PDOException</kbd> hatası fırlatır ve hata mesajı görüntülenirken yapılan yazma işlemleri içeriden <kbd>rollBack</kbd> metodu ile geri alınır. Eğer veritabanına kaydettiğiniz veriler kritik düzeyde önemli veriler ise yazma işlemlerinde veri kaybı olmaması için transaction metodu kullanmanız tavsiye edilir. PDOException ve diğer RuntimeException hataları <kbd>app/errors.php</kbd> dosyasından kontrol edilirler.
+
+Aşağıda entry modelinin kontrolör sınıfı içerisinde nasıl kullanılacağına dair bir örnek gösteriliyor.
 
 
 ```php
 namespace Welcome;
 
-class Welcome extends \Controller
+use Obullo\Http\Controller;
+
+class Welcome extends Controller
 {
     public function load()
     {
@@ -221,6 +167,7 @@ class Welcome extends \Controller
     public function index()
     {
     	$rowArray = $this->entry->findOne(1);
+
 		print_r($rowArray);
     }
 
@@ -239,9 +186,8 @@ class Welcome extends \Controller
         $this->entry->title = 'Update Test';
         $this->entry->content = 'Welcome to my world';
         $this->entry->date = time();
-        $this->entry->update($id);  // Transaction example
-                                    // Globally catch the PDOException Errors using app/errors.php
-                                    // or use try catch
+        $this->entry->update($id);
+
         echo 'Entry updated.';    
     }
 

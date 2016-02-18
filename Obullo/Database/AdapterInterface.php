@@ -24,7 +24,7 @@ interface AdapterInterface
      * 
      * @return object of pdo
      */
-    public function connection();
+    public function getConnection();
 
     /**
      * Set pdo prepare function
@@ -50,7 +50,7 @@ interface AdapterInterface
      * 
      * @return object
      */
-    public function stmt();
+    public function getStmt();
 
     /**
      * Pdo quote with array support
@@ -145,6 +145,6 @@ interface AdapterInterface
      * 
      * @return integer
      */
-    public function insertId();
+    public function lastInsertId();
 
 }

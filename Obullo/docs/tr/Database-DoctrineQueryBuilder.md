@@ -1,18 +1,12 @@
 
 ## Doctrine DBAL Sorgu Oluşturucu ( Query Builder )
 
-Doctrine 2.1 sürüm ile gelen query builder sınıfı eklentisi SQL dili için sorgu oluşturmanızı kolaylaştırır. Sorgu oluşturucu bir SQL ifadesine sql bölümleri ekleyen metotlardan ibarettir. Sorgu oluşturucu ile oluşturulan bir SQL ifadesi bir çıktı olarak alınabilir yada <b>execute</b> metodu ile varolan bağlantı içerisinden sorgu olarak çalıştırılabilir.
+Doctrine 2.1 sürüm ile gelen query builder sınıfı eklentisi SQL dili için sorgu oluşturmanızı kolaylaştırır. Sorgu oluşturucu bir SQL ifadesine sql bölümleri ekleyen metotlardan ibarettir. Sorgu oluşturucu ile oluşturulan bir SQL ifadesi bir çıktı olarak alınabilir yada <kbd>execute</kbd> metodu ile varolan bağlantı içerisinden sorgu olarak çalıştırılabilir.
 
 <ul>
 
-<li>
-    <a href="#configuration">Konfigürasyon</a>
-    <ul>
-        <li><a href="#dependencies">Bağımlılıklar</a></li>
-        <li><a href="#service-provider">Servis Sağlayıcısı</a></li>
-        <li><a href="#methods">Metotlara Erişim</a></li>
-    </ul>
-</li>
+<li><a href="#service-provider">Servis Sağlayıcısı</a></li>
+<li><a href="#methods">Metotlara Erişim</a></li>
 
 <li>
     <a href="#security">Güvenlik</a>
@@ -89,68 +83,41 @@ Doctrine 2.1 sürüm ile gelen query builder sınıfı eklentisi SQL dili için 
 
 </ul>
 
-<a name="configuration"></a>
-<a name="dependencies"></a>
-
-### Konfigürasyon
-
-Konfigürasyon için <b>DoctrineDBALServiceProvider</b> ve <b>DoctrineQueryBuilderServiceProvider</b> adlı servis sağlayıcıların yapılandırılması gerekir.
-
-#### Bağımlılıklar
-
-Sorgu oluşturucu <b>DoctrineDBALServiceProvider</b> servis sağlayıcısı olmadan çalışamaz. Eğer servis sağlayıcısı tanımlı değilse <kbd>app/providers.php</kbd> dosyasındaki database anahtarına aşağıdaki gibi tanımlamanız gerekir.
-
-```php
-$c['app']->provider(
-    [
-        'logger' => 'Obullo\Service\Provider\LoggerServiceProvider',
-        // 'database' => 'Obullo\Service\Provider\DatabaseServiceProvider',
-       	'database' => 'Obullo\Service\Provider\DoctrineDBALServiceProvider',
-    ]
-);
-
-/* Location: .app/providers.php */
-```
-
-Böylelikle mevcut database servis sağlayıcısını doctrine dbal servis sağlayıcısı ile değiştirmiş olduk. Bu değişiklikten sonra varolan veritabanı fonksiyonlarınızda herhangi bir değişikliğe gitmenize gerek kalmaz.
-
 <a name="service-provider"></a>
 
-#### Servis Sağlayıcısı
+### Servis Sağlayıcısı
 
-Sorgu oluşturucu <b>DoctrineQueryBuilderServiceProvider</b> isimli servis sağlayıcısı üzerinden çalışır. Servis sağlayıcı database servis sağlayıcısına bağlanarak önceden tanımlı olan bağlantı adına ilişkin veriler ile sorgu oluşturucuya ait veritabanı bağlantısını kurar. 
-
-Eğer servis sağlayıcısı tanımlı değilse <kbd>app/providers.php</kbd> dosyasına aşağıdaki gibi <b>this->db</b> anahtarına tanımlamanız önerilir.
+Konfigürasyon için <kbd>ServiceProvider\Database</kbd> ve <kbd>ServiceProvider\QueryBuilder</kbd> adlı servis sağlayıcıların yapılandırılması gerekir.
 
 ```php
-$c['app']->provider(
-    [
-        'logger' => 'Obullo\Service\Provider\LoggerServiceProvider',
-        // 'database' => 'Obullo\Service\Provider\DatabaseServiceProvider',
-       	'database' => 'Obullo\Service\Provider\DoctrineDBALServiceProvider',
-        'this->db' => 'Obullo\Service\Provider\DoctrineQueryBuilderServiceProvider',
-    ]
-);
+$container->addServiceProvider('ServiceProvider\QueryBuilder');
+$container->addServiceProvider('ServiceProvider\Connector\Database');
+```
 
-/* Location: .app/providers.php */
+Database servis sağlayıcısı içerisinden veritabanı adaptörünüzü DoctrineDBAL olarak değiştirin.
+
+```php
+$container->share('database', 'Obullo\Container\ServiceProvider\Connector\DoctrineDBAL')
+    ->withArgument($container)
+    ->withArgument($config->getParams());
 ```
 
 <a name="methods"></a>
 
-#### Metotlara Erişim 
+### Metotlara Erişim 
 
-Servis sağlayıcısı yapılandırmasından sonra sorgu oluşturucuyu servis sağlayıcısı üzerinden bağlantı parametereleri göndererek oluşturabilirsiniz. Gönderilen bağlantı parametreleri <b>this->db</b> servis sağlayıcısı üzerinden <b>database</b> servis sağlayıcısına gönderilirler.
+Servis sağlayıcısı yapılandırmasından sonra sorgu oluşturucuyu servis sağlayıcısı üzerinden bağlantı parametereleri göndererek oluşturabilirsiniz.
 
 Sınıfı servis sağlayıcısı ile bir kez oluşturduktan sonra istediğiniz değişkene atayabilirsiniz.
 
 ```php
-$this->db = $this->c['database']->get(['connection' => 'default']);
+$this->db = $container->get('qb')->shared(['connection' => 'default']);
 ```
 
 Eğer parametre gönderilmezse database servis sağlayıcısı varsayılan olarak default bağlantısına bağlanacaktır.
 
 ```php
-$this->db = $this->c['database']->get();
+$this->db = $container->get('qb')->shared();
 
 $row = $this->db
     ->select('id', 'name')
@@ -159,20 +126,21 @@ $row = $this->db
 ```
 
 <a name="security"></a>
-<a name="sql-injection"></a>
 
 ### Güvenlik
 
 Veri tabanı operasyonlarında güvenli sorgular oluşturmak herhangi bir saldırı riskini önler. Veritabanı operasyonlarında bilinen en tehlikeli saldırı yöntemi <a href="http://tr.wikipedia.org/wiki/SQL_Injection" target="_blank">SQL Enjeksiyonu</a> dur.
 
+<a name="sql-injection"></a>
+
 #### SQL Enjeksiyonunu Önlemek
 
-Sorgu oluşturucunun SQL ataklarını nasıl ve hangi şartlara göre önlediğini anlamak önemlidir. Son kullanıcıdan gelen tüm girdilerin SQL enjeksiyon riski vardır. Sorgu oluşturucu ile güvenli çalışmak için <b>ASLA</b> <kbd>$this->db->setParameter()</kbd> metodu dışındaki metotlara kullanıcı girdilerini göndermeyin. Ve <kbd>$this->db->setParameter($placeholder, $value)</kbd> metodunu kullandığınızda placeholder <b>?</b> veya <b>:name</b> söz dizimlerinden birini metod ile birlikte kullanın.
+Sorgu oluşturucunun SQL ataklarını nasıl ve hangi şartlara göre önlediğini anlamak önemlidir. Son kullanıcıdan gelen tüm girdilerin SQL enjeksiyon riski vardır. Sorgu oluşturucu ile güvenli çalışmak için <b>asla</b> <kbd>setParameter()</kbd> metodu dışındaki metotlara kullanıcı girdilerini göndermeyin. Ve <kbd>setParameter($placeholder, $value)</kbd> metodunu kullandığınızda placeholder <kbd>?</kbd> veya <kbd>:name</kbd> söz dizimlerinden birini metod ile birlikte kullanın.
 
-Aşağıdaki örnekte placeholder <b>?</b> parametre yerleştirme yöntemi ile güvenli bir sorgu oluşturuluyor.
+Aşağıdaki örnekte placeholder <kbd>?</kbd> parametre yerleştirme yöntemi ile güvenli bir sorgu oluşturuluyor.
 
 ```php
-$email = $this->c['request']->get('email', 'clean')->email();
+$email = $this->request->get('email', 'clean')->email();
 
 $row = $this->db
     ->select('id', 'name')
@@ -183,7 +151,7 @@ $row = $this->db
     ->row();
 ```
 
-> **Not:** API tasarımındaki sayısal değerlere ilişkin olarak QueryBuilder uygulama arayüzü PDO arayüzünden farklı olarak <b>1</b> yerine <b>0</b> değeri ile başlar.
+API tasarımındaki sayısal değerlere ilişkin olarak QueryBuilder uygulama arayüzü PDO arayüzünden farklı olarak <kbd>1</kbd> yerine <kbd>0</kbd> değeri ile başlar.
 
 <a name="build-queries"></a>
 <a name="select"></a>
@@ -220,7 +188,7 @@ $this->db
 
 ##### $this->db->get()
 
-Opsiyonel olarak bazı durumlara <kbd>from()</kbd> ve <kbd>execute()</kbd>metotları yerine Obullo adaptörü içerisinde bulunan <kbd>get()</kbd> kısayolunu da kullabilirsiniz.
+Opsiyonel olarak bazı durumlarda <kbd>execute()</kbd> metodu yerine Obullo adaptörü içerisinde bulunan <kbd>get()</kbd> kısayolunu da kullabilirsiniz.
 
 ```php
 $row = $this->db
@@ -255,8 +223,6 @@ $this->db
     ->from('users')
     ->where('email = ?');
 ```
-
-Her bir <kbd>where()</kbd> metodunu çağırıldığında bir önceki çağırılan ifade ile birleşir ve ifadeleri aşağıdaki diğer where metotları ile kombine edebilirsiniz.
 
 <a name="andWhere"></a>
 
@@ -385,7 +351,7 @@ echo $this->db
 // SELECT u.id, u.name, p.number FROM users u LEFT JOIN phonenumbers p ON u.id = p.user_id 
 ```
 
-> **Not:** join(), innerJoin(), leftJoin() ve rightJoin() fonksiyonları için işlevler aynıdır join() metodu innerJoin() metodunun takma adı dır.
+join(), innerJoin(), leftJoin() ve rightJoin() fonksiyonları için işlevler aynıdır join() metodu innerJoin() metodunun takma adı dır.
 
 
 <a name="innerJoin"></a>
@@ -443,13 +409,13 @@ echo $this->db
 // SELECT id, name FROM users ORDER BY username ASC, last_login ASC NULLS FIRST
 ```
 
-> **Not:** Opsiyonel parametre olan $order parametresi herhangi bir güvenlik önlemi içermez, bu parametreye girilen kullanıcı girdileri tehlikeli olabilir bu nedenle bu girdide sadece SQL ifadelerine izin verilmelidir.
+Opsiyonel parametre olan $order parametresi herhangi bir güvenlik önlemi içermez, bu parametreye girilen kullanıcı girdileri tehlikeli olabilir bu nedenle bu girdide sadece SQL ifadelerine izin verilmelidir.
 
 <a name="limit"></a>
 
 #### LIMIT
 
-Yalnızca bir kaç veritabanı LIMIT ifadesini destekler MySQL veritabanı bunların arasındadır fakat Doctrine DBAL arayüzü bu fonsiyonaliteyi tüm veritabanı sürücüleri için destekler. Bu özelliği kullanabilmek için <b>offset($offset)</b> ve <b>limit($limit)</b> metotlarını kullanarak sonuçları sınırlandırmanız gerekir.
+Yalnızca bir kaç veritabanı LIMIT ifadesini destekler MySQL veritabanı bunların arasındadır fakat Doctrine DBAL arayüzü bu fonsiyonaliteyi tüm veritabanı sürücüleri için destekler. Bu özelliği kullanabilmek için <kbd>offset($offset)</kbd> ve <kbd>limit($limit)</kbd> metotlarını kullanarak sonuçları sınırlandırmanız gerekir.
 
 ```php
 echo $this->db
@@ -471,7 +437,7 @@ echo $this->db
 // SELECT id, name FROM users LIMIT 20 OFFSET 10     
 ```
 
-**Not**: Şuanki Doctrine DBAL sürümlerinde limit metodu setMaxResults() offset metodu ise setFirstResutl() olarak çağrılır. Bu fonksiyonlar Obullo içinde de desteklenir fakat  kod yazımını kolaylaştırmak amacıyla Obullo içerisinde bu metotlar limit ve offset olarak adlandırılmıştır.
+Şuanki Doctrine DBAL sürümlerinde limit metodu setMaxResults(), offset metodu ise setFirstResutl() olarak çağrılır. Bu fonksiyonlar kod yazımını kolaylaştırmak amacıyla Obullo içerisinde limit ve offset olarak adlandırılmıştır.
 
 <a name="values"></a>
 
@@ -494,7 +460,7 @@ echo $this->db
 // INSERT INTO users (name, password) VALUES (?, ?)
 ```
 
-values() metodunun bir kere çağrılması daha önceden ardı ardında çağırılan setValue() metodu değerlerini değiştirir.
+values() yerine setValue() metodu kullanılabilir,
 
 ```php
 echo $this->db
@@ -539,7 +505,7 @@ echo $this->db
 // INSERT INTO users () VALUES ()
 ```
 
-Sorgunun çalışabilmesi için <b>execute()</b> metodunun en sonda çağrılması gerekir.
+Sorgunun çalışabilmesi için <kbd>execute()</kbd> metodunun en sonda çağrılması gerekir.
 
 ```php
 echo $this->db->insert('users')
@@ -554,7 +520,7 @@ echo $this->db->insert('users')
 
 #### SET
 
-UPDATE ifadesi için sütün değerleri göndermek zorunludur ve <b>set()</b> fonksiyonu ile gönderilir. İkinci parametre için dikkatli olun bu paramtereye kullanıcı girdileri göndermek güvenli değildir.
+UPDATE ifadesi için sütün değerleri göndermek zorunludur ve bu değerler <kbd>set()</kbd> fonksiyonu ile gönderilir. İkinci parametre için dikkatli olun bu parametreye kullanıcı girdilerini direkt göndermek güvenli değildir.
 
 ```php
 echo $this->db
@@ -570,7 +536,7 @@ echo $this->db
 
 ### Sql Operatörleri
 
-Daha fazla kompleks WHERE, HAVING veya diğer ifadeler için operatörler ile bütün bir sorgu içerisinde sorgu parçaları yaratabilirsiniz. Bunun için sorgu oluşturucuda önce <b>$this->db->expr()</b> metodu ile ifade nesnesini yaratmanız gerekir ve sonra oluşan expression nesnesi üzerinden expression metotlarına ulaşabilirsiniz.
+Daha fazla kompleks WHERE, HAVING veya diğer ifadeler için operatörler ile bütün bir sorgu içerisinde sorgu parçaları yaratabilirsiniz. Bunun için sorgu oluşturucuda önce <kbd>$this->db->expr()</kbd> metodu ile ifade nesnesini yaratmanız gerekir ve sonra oluşan ifade nesnesi üzerinden ilgili metotlara ulaşabilirsiniz.
 
 Genellikle ifade oluşturmak için ilk önce And veya Or operatörleri seçilir. Daha sonra seçilen operatör içerisinde karşılaştırma operatörü belirtilerek sorgu parçaları oluşturulur.
 
@@ -817,7 +783,7 @@ Sql enjeksiyon tehdidini önlemek için girilen kullanıcı girdisindeki tehlike
 
 ### Sorgulara Parametre Yerleştirme ( Query Binding )
 
-Genellikle parametre yerleştirme isimleri ( placeholder names ) bir kesinlik ifade etmezler yani <b>:value</b> yada <b>?</b> şeklindedirler. Eğer tam bir esneklik isteniyorsa aşağıdaki farklı parametre yerleştirme metotlarını sorgularınız içerisinde kullanabilirsiniz.
+Genellikle parametre yerleştirme isimleri ( placeholder names ) bir kesinlik ifade etmezler yani <kbd>:value</kbd> yada <kbd>?</kbd> şeklindedirler. Eğer tam bir esneklik isteniyorsa aşağıdaki farklı parametre yerleştirme metotlarını sorgularınız içerisinde kullanabilirsiniz.
 
 ```php
 $id = 5;

@@ -64,7 +64,7 @@ class Cache extends AbstractServiceProvider
             throw new RuntimeException(
                 sprintf(
                     "Cache provider requires driver and connection parameters. <pre>%s</pre>",
-                    "\$container->get('cache')->shared(['driver' => 'redis', 'connection' => 'default']);"
+                    "\$container->get('cacheFactory')->shared(['driver' => 'redis', 'connection' => 'default']);"
                 )
             );
         }

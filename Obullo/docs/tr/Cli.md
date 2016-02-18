@@ -23,7 +23,6 @@ Konsol arayüzü komut satırından yürütülen işlemler için yardımcı pake
     <ul>
         <li><a href="#log-command">Log</a></li>
         <li><a href="#help-commands">Help</a></li>
-        <li><a href="#module-command">Module</a></li>
         <li><a href="#app-command">App</a></li>
         <li><a href="#debugger-command">Debugger</a></li>
         <li><a href="#queue-command">Queue</a></li>
@@ -271,26 +270,6 @@ Help metodu standart olarak tüm task kontrolör dosyalarında bulunur. Takip ed
 ```php
 php task log help
 ```
-
-<a name="module-command"></a>
-
-#### Module
-
-<kbd>Obullo/Application/Modules</kbd> klasöründeki mevcut bir modülü uygulamanızın <kbd>modules/</kbd> klasörūne kopyalar.
-
-Debugger modülü için örnek bir kurulum.
-
-```php
-php task module add debugger
-```
-
-Debugger modülü için örnek bir kaldırma.
-
-```php
-php task module remove debugger
-```
-
-Modüller hakkında daha geniş bilgi için [Modules.md](Modules.md) dosyasına gözatın.
 
 <a name="app-command"></a>
 

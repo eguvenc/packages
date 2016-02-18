@@ -1,12 +1,14 @@
 
-## Doctrine Veritabanı Katmanı ( DBAL )
+## Veritabanı Sınıfı
 
-Doctrine katmanı standart PDO programlama arayüzü üzerinden benzer arabirimler kullanmak yoluyla gerçek PDO API sürücüleri gibi yerli veya el yapımı API'leri veya özel sürücüleri çalıştırmayı mümkün kılar.
+Veritabanı sınıfı veritabanı bağlantılarını sağlar ve temel veritabanı işlevlerini ( okuma, yazma, silme, kaydetme ) yürütür. Veritabanı operasyonları için <kbd><a href="http://php.net/manual/tr/book.pdo.php" target="_blank">PDO</a></kbd> arayüzünü kullarak sadece ilişkili veritabanı türlerini ( <a href="http://tr.wikipedia.org/wiki/%C4%B0li%C5%9Fkisel_veri_taban%C4%B1_y%C3%B6netim_sistemi">RDBMS</a> ) türündeki veritabanlarını destekler.
 
 <ul>
 <li>
     <a href="#server-requirements">Sunucu Gereksinimleri</a>
     <ul>
+        <li><a href="#unix-requirements">Unix Sunucularda Pdo Kurulumu</a></li>
+        <li><a href="#windows-requirements">Windows Sunucularda Pdo Kurulumu</a></li>
         <li><a href="#supported-databases">Desteklenen Veritabanları</a></li>
     </ul>
 </li>
@@ -16,7 +18,6 @@ Doctrine katmanı standart PDO programlama arayüzü üzerinden benzer arabiriml
     <ul>
         <li><a href="#standart-connection">Standart Bağlantı</a></li>
         <li><a href="#unix-connection">Unix Soket Bağlantısı</a></li>
-        <li><a href="#connection-management">Bağlantı Yönetimi</a></li>
     </ul>
 </li>
 
@@ -29,11 +30,11 @@ Doctrine katmanı standart PDO programlama arayüzü üzerinden benzer arabiriml
     </ul>
 </li>
 
+
 <li>
     <a href="#reading-database">Veritabanından Okumak</a>
     <ul>
         <li><a href="#query">$this->db->query()</a></li>
-        <li><a href="#executeQuery">$this->db->executeQuery()</a></li>
     </ul>
 </li>
 
@@ -49,15 +50,17 @@ Doctrine katmanı standart PDO programlama arayüzü üzerinden benzer arabiriml
     </ul>
 </li>
 
+
 <li>
     <a href="#writing-database">Veritabanına Yazmak</a>
-    <ul>    
-        <li><a href="#insert">$this->db->insert()</a></li>
-        <li><a href="#update">$this->db->update()</a></li>
-        <li><a href="#delete">$this->db->delete()</a></li>
-        <li><a href="#executeUpdate">$this->db->executeUpdate()</a></li>
+    <ul>
+    <li><a href="#exec">$this->db->exec()</a></li>
+    <li><a href="#insert">$this->db->insert()</a></li>
+    <li><a href="#update">$this->db->update()</a></li>
+    <li><a href="#delete">$this->db->delete()</a></li>
     </ul>
 </li>
+
 
 <li>
     <a href="#security">Güvenlik</a>
@@ -67,13 +70,6 @@ Doctrine katmanı standart PDO programlama arayüzü üzerinden benzer arabiriml
         <li><a href="#bindValue">$this->db->bindValue()</a></li>
         <li><a href="#bindParam">$this->db->bindParam()</a></li>
         <li><a href="#execute">$this->db->execute()</a></li>
-        <li><a href="#escape">$this->db->escape()</a></li>
-    </ul>
-</li>
-
-<li>
-    <a href="#escaping-sql-injections">Sql Enjeksiyonundan Kaçış</a>
-    <ul>
         <li><a href="#escape">$this->db->escape()</a></li>
     </ul>
 </li>
@@ -100,9 +96,9 @@ Doctrine katmanı standart PDO programlama arayüzü üzerinden benzer arabiriml
 </li>
 
 <li>
-    <a href="#additionalFeatures">Ek Özellikler</a>
+    <a href="#addons">Eklentiler</a>
     <ul>
-        <li><a href="#queryBuilder">Sorgu Oluşturucu ( Query Builder )</a></li>
+        <li><a href="#doctrine">Doctrine Veritabanı Katmanı</a></li>
     </ul>
 </li>
 
@@ -112,6 +108,40 @@ Doctrine katmanı standart PDO programlama arayüzü üzerinden benzer arabiriml
 
 ### Sunucu Gereksinimleri
 
+<a name='unix-requirements'></a>
+
+#### Unix Sunucularda Pdo Kurulumu
+
+1. PDO sürücüsü PHP 5.1.0'dan itibaren öntanımlı olarak etkindir.
+2. PDO eklentisini bir paylaşımlı eklenti olarak kuruyorsanız, PHP çalıştığı zaman PDO eklentisinin özdevinimli olarak yüklenmesi için php.ini dosyasını buna göre düzenlemeniz gerekir. Ayrıca kullanacağınız veritabanına özgü sürücülerinde dosyada etkin kılınması gerekir. Bunu yaparken bunların pdo.so satırından sonra listelenmesine dikkat etmelisiniz. Çünkü, PDO eklentisinin veritabanlarına özgü eklentiler yüklenmeden önce ilklendirilmesi gerekir. PDO'yu ve veritabanlarına özgü eklentileri duruk olarak derliyorsanız php.ini adımını atlayabilirsiniz.
+
+Paylaşımlı kurulumda php.ini dosyanızda pdo.so aşağıdaki gibi açık olmalı.
+
+```php
+extension=pdo.so
+```
+
+Daha fazla bilgi için bu sayfayı ziyaret edin. <a href="http://php.net/manual/tr/pdo.installation.php">http://php.net/manual/tr/pdo.installation.php</a>
+
+<a name='windows-requirements'></a>
+
+#### Windows Sunucularda Pdo Kurulumu
+
+1. PDO ve belli başlı sürücülerin tamamı, birer paylaşımlı eklenti olarak PHP ile birlikte gelir ve php.ini dosyasında etkin kılınmaları gerekir:
+
+```php
+extension=php_pdo.dll
+```
+
+2. Bu satırın ardına veritabanlarına özgü eklentilerin DLL dosyalarını aşağıdaki gibi ekleyebilir veya dl() ile çalışma anında da yükleyebilirsiniz.
+
+
+```php
+extension=php_pdo_mysql.dll
+```
+
+Bu DLL'lerin hepsinin <a href="http://php.net/manual/tr/ini.core.php#ini.extension-dir" target="_blank">extension_dir</a> yönergesinde belirtilen dizinde bulunması gerektiğini unutmayın.
+
 <a name='supported-databases'></a>
 
 #### Desteklenen Veritabanları
@@ -119,72 +149,28 @@ Doctrine katmanı standart PDO programlama arayüzü üzerinden benzer arabiriml
 <table class="span9">
 <thead>
 <tr>
-<th>Veritabanı</th>
-<th>Bağlantı Adları</th>
-<th>Bağlantı Dizesi</th>
+<th>PDO Bağlantı Adı</th>
+<th>Veritabanı Adı</th>
 </tr>
 </thead>
 <tbody>
-
 <tr>
+<td>pdo_mysql</td>
 <td>MySQL 3.x/4.x/5.x</td>
-<td>pdo_mysql, mysql, mysqli, mysql2 ( Amazon RDS )</td>
-<td>pdo_mysql:host=localhost;port=;dbname=example;charset=UTF-8</td>
 </tr>
-
 <tr>
-<td>Oracle</td>
-<td>pdo_oci, oci8</td>
-<td>pdo_oci:host=localhost;port=4486;dbname=example</td>
-</tr>
-
-<tr>
-<td>Microsoft SQL Server</td>
-<td>pdo_sqlsrv, sqlsrv, mssql</td>
-<td>pdo_sqlsrv:host=localhost;port=;dbname=example</td>
-</tr>
-
-<tr>
+<td>pdo_pgsql</td>
 <td>PostgreSQL</td>
-<td>pdo_pgsql, pgsql, postgres, postgresql</td>
-<td>pdo_pgsql:host=localhost;port=;dbname=example</td>
 </tr>
-
-<tr>
-<td>SAP Sybase SQL Anywhere</td>
-<td>sqlanywhere</td>
-<td>sqlanywhere:host=localhost;port=;dbname=example;persistent=1;</td>
-</tr>
-
-<tr>
-<td>SQLite</td>
-<td>pdo_sqlite, sqlite, sqlite3</td>
-<td>sqlite:dbname=/usr/local/var/db.sqlite</td>
-</tr>
-
-<tr>
-<td>SQLite Memory</td>
-<td>pdo_sqlite, sqlite, sqlite3</td>
-<td>sqlite:dbname=:memory:</td>
-</tr>
-
-<tr>
-<td>Drizzle</td>
-<td>drizzle_pdo_mysql</td>
-<td>drizzle_pdo_mysql:host=localhost;dbname=example;</td>
-</tr>
-
 </tbody>
 </table>
-
-Ekstra bağlantı parametrelerini <a href="http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html">bu linkten</a> elde edebilirsiniz.
-
 
 <a name='database-connection'></a>
 
 ### Veritabanı Bağlantısı
 
 Veritabanı ile bağlantı kurulması veritabanı metotları ( query, execute, transaction .. ) kullanıldığı zaman gerçekleşir. Bu metotların kullanılmadığı yerlerde bağlantı açık değildir ve bir kere açılan bir bağlantı varsa bu bağlantı tekrar açılmaz. Veritabanı sınıfı <kbd>db</kbd> servisi tarafından yönetilir ve <kbd>db</kbd> servisi de bağlantı yönetimi için <kbd>database</kbd> servis sağlayıcısını kullanır.
+
 <a name='standart-connection'></a>
 
 #### Standart Bağlantı
@@ -220,19 +206,12 @@ Veritabanı sınıfını kullanabilmek için servis sağlayıcısının <kbd>app
 $container->addServiceProvider('ServiceProvider\Connector\Database');
 ```
 
-Servis sağlayıcısı içerisideki ilgili satırı aşağıdaki gibi düzenleyin.
-
-```php 
-$container->share('database', 'Obullo\Container\ServiceProvider\Connector\DoctrineDBAL')
-     ->withArgument($container)
-     ->withArgument($config->getParams());
-```
-
 Servis sağlayıcısı var olan bir veritabanı bağlantısını kullanmak yada yeni bir veritabanı bağlantısı açmak görevini üstlenir.
+
 
 <a name='getting-existing-connection'></a>
 
-##### Varolan Bağlantıyı Almak
+#### Varolan Bağlantıyı Almak
 
 Servis sağlayıcısından var olan paylaşımlı bir bağlantıyı almak için aşağıdaki yöntem izlenir.
 
@@ -243,7 +222,7 @@ $db->method();
 
 <a name='creating-new-connection'></a>
 
-##### Yeni Bir Bağlantı Oluşturmak
+#### Yeni Bir Bağlantı Üretmek
 
 Eğer <kbd>db</kbd> servisinin kullandığı veritabanı nesnesi dışında <kbd>tanımsız</kbd> olan yeni bir veritabanı bağlantısına ihtiyaç duyuyorsanız bunun için servis sağlayıcısı <kbd>factory</kbd> metodunu kullanır.
 
@@ -260,7 +239,6 @@ $db = $container->get('database')->factory(
     ]
 );
 ```
-
 
 <a name='service'></a>
 
@@ -291,7 +269,7 @@ $this->db->query(" .. ");
 
 <a name='query'></a>
 
-##### $this->db->query($sql)
+#### $this->db->query()
 
 Bir sql sorgusunu çalıştırır.
 
@@ -299,65 +277,22 @@ Bir sql sorgusunu çalıştırır.
 $users = $this->db->query("SELECT * FROM users")->resultArray();
 ```
 
-<a name='executeQuery'></a>
-
-##### $this->db->executeQuery($query, array $params = array(), $types = array(), QueryCacheProfile $qcp = null )
-
-Hazırlanmış bir sql ifadesine gönderilen parametreleri yerleştirerek sorguyu çalıştırır.
-
-```php
-$this->db->executeQuery('SELECT * FROM user WHERE username = ?', ['eagle'])->row();
-```
-
-Array türündeki paremetrelerin kullanıma bir örnek
-
-```php
-$this->db->executeQuery('SELECT * FROM articles WHERE id IN (?)',
-    array([1, 2, 3, 4, 5, 6]),
-    [\Doctrine\DBAL\Connection::PARAM_INT_ARRAY]
-);
-```
-
-Doctrine için Tanımlı Opsiyonel Array Parametere Türleri
-
-* \Doctrine\DBAL\Connection::PARAM_STR_ARRAY
-* \Doctrine\DBAL\Connection::PARAM_INT_ARRAY
-
-Aynı sorgunun Doctrine\DBAL\Connection::PARAM_INT_ARRAY olmadan kullanımı
-
-```php
-$this->db->executeQuery('SELECT * FROM articles WHERE id IN (?, ?, ?, ?, ?, ?)',
-    array(1, 2, 3, 4, 5, 6),
-    [
-        \PDO::PARAM_INT,
-        \PDO::PARAM_INT,
-        \PDO::PARAM_INT,
-        \PDO::PARAM_INT,
-        \PDO::PARAM_INT,
-        \PDO::PARAM_INT
-    ]
-);
-```
-
 <a name='generating-results'></a>
 
 ### Veritabanından Sonuçlar Getirmek
 
-Veritabanına yapılan sorgudan sonra aşağıdaki metotlardan biri seçilerek sonuçlar elde edilir.
-
 <a name='count'></a>
 
-##### $this->db->count()
+#### $this->db->count()
 
 Son sql sorgusundan etkilenen satır sayısını döndürür.
 
 ```php
 echo $this->db->query("SELECT * FROM users")->count();  // 5
 ```
-
 <a name='row'></a>
 
-##### $this->db->row($default = false)
+#### $this->db->row($default = false)
 
 Son sql sorgusundan dönen tekil sonucu <kbd>nesne</kbd> türünden verir.
 
@@ -379,7 +314,7 @@ stdClass Object
 
 <a name='rowArray'></a>
 
-##### $this->db->rowArray($default = false)
+#### $this->db->rowArray($default = false)
 
 Son sql sorgusundan dönen tekil sonucu <kbd>dizi</kbd> türünden verir.
 
@@ -401,7 +336,7 @@ Array
 
 <a name='result'></a>
 
-##### $this->db->result($default = false)
+#### $this->db->result($default = false)
 
 Son sql sorgusundan dönen tüm sonuçları bir dizi içinde <kbd>nesne</kbd> türünden verir.
 
@@ -433,7 +368,7 @@ Array
 
 <a name='resultArray'></a>
 
-##### $this->db->resultArray($default = false)
+#### $this->db->resultArray($default = false)
 
 Son sql sorgusundan dönen tüm sonuçları <kbd>dizi</kbd> türünden verir.
 
@@ -482,11 +417,21 @@ var_dump($row);  // Çıktı array(0) { }
 
 ### Veritabanına Yazmak
 
-Veritabanına yazma işlemleri aşağıdaki metotlar yardımı ile yapılır. Bir yazma metodu çalıştırıldıktan sonra veri işleme gerçekleşir ve metot etkilenen satır sayısına geri döner ve etkilenen satırları alabilmek ayrıca sütun sayma işlemi yapmaya gerek kalmaz.
+Veritabanına yazma işlemleri <kbd>exec</kbd> metodu ile yapılır. Exec metodu çalıştırıldıktan sonra veri işlemeyi gerçekleştirir ve etkilenen satırlara döner, exec metodu kullanıldığında etkilenen satırları alabilmek ayrıca sütun sayma işlemi yapmaya gerek kalmaz.
+
+<a name='exec'></a>
+
+#### $this->db->exec()
+
+Bir sql sorgusunu çalıştırır ve etkilenen satır sayısına geri döner.
+
+```php
+$count = $this->db->exec("INSERT INTO users (username) VALUES ('user3@example.com')");
+```
 
 <a name='insert'></a>
 
-##### $this->db->insert($table, array $data, array $types = array())
+#### $this->db->insert($table, array $data, array $types = array())
 
 ```php
 $count = $this->db->insert(
@@ -501,7 +446,7 @@ $count = $this->db->insert(
 
 <a name='update'></a>
 
-##### $this->db->update($table, array $data, array $identifier, array $types = array())
+#### $this->db->update($table, array $data, array $identifier, array $types = array())
 
 ```php
 $count = $this->db->update(
@@ -523,7 +468,7 @@ Update operasyonunda eğer veritabanındaki değer gönderilen değer ile <kbd>a
 
 <a name='delete'></a>
 
-##### $this->db->delete($table, array $identifier, array $types = array())
+#### $this->db->delete($table, array $identifier, array $types = array())
 
 ```php
 $count = $this->db->delete('users', ['id' => 18], ['id' => \PDO::PARAM_INT]);
@@ -532,21 +477,7 @@ $count = $this->db->delete('users', ['id' => 18], ['id' => \PDO::PARAM_INT]);
 // DELETE FROM users WHERE id = 18
 ```
 
-<a name='executeUpdate'></a>
-
-##### $this->db->executeUpdate($query, array $params = array(), array $types = array()
-
-Hazırlanmış bir veritabanına yazma sorgusunu (insert, update, delete) gönderilen parametreler ile çalıştırıp etkilenen satır sayısına geri döner.
-
-```php
-$count = $this->db->executeUpdate(
-    'UPDATE user SET username = ? WHERE id = ?',
-    ['neo', 1],
-    [\PDO::PARAM_STR, \PDO::PARAM_INT]
-);
-```
-
-###### Etkilenen Satır Sayısı
+##### Etkilenen Satır Sayısı
 
 Yukarıdaki operasyonların herhangi birinde çıktı ekrana yazdırıldığında etkilenen satır sayısı elde edilir.
 
@@ -557,7 +488,6 @@ var_dump($count);
 ```php
 int(1)
 ```
-
 <a name='security'></a>
 
 ### Güvenlik
@@ -574,7 +504,7 @@ Query binding yöntemini kullandığınızda sql enjeksiyon tehdidine karşı gi
 
 <a name='prepare'></a>
 
-##### $this->db->prepare()
+#### $this->db->prepare()
 
 Çalıştırılmak üzere bir sql deyimi hazırlar ve bir deyim nesnesi olarak döndürür.
 
@@ -584,7 +514,7 @@ $this->db->prepare("SELECT * FROM users")->execute()->resultArray();
 
 <a name='bindValue'></a>
 
-##### $this->db->bindValue($num, $val, $type)
+#### $this->db->bindValue($num, $val, $type)
 
 Bir değeri bir değiştirge ile ilişkilendirir.
 
@@ -600,7 +530,7 @@ Bind value işleminde parametre değerleri tür olarak belirlenir birinci parame
 
 <a name='bindParam'></a>
 
-##### $this->db->bindParam($num, $val, $type, $lenght)
+#### $this->db->bindParam($num, $val, $type, $lenght)
 
 Bir değiştirgeyi belirtilen değişkenle ilişkilendirir. Pdo bindValue() yönteminin tersine değişken gönderimli olarak ilişkilendirilir ve sadece execute() çağrısı sırasında değerlendirmeye alınır.
 
@@ -619,20 +549,25 @@ Değiştirgeler çoğunlukla girdi değiştirgesidir, yani değiştirgeler sadec
 
 <a name='execute'></a>
 
-##### $this->db->execute(array $values)
+#### $this->db->execute(array $values)
 
 Bir hazır deyimi girdiler ile çalıştırır.
 
 ```php
-$result = $this->db->prepare('SELECT name, colour, calories FROM fruit 
-WHERE calories < :calories AND colour = :colour')->execute(
-    [':calories' => 150, ':colour' => 'red']
+$result = $this->db->prepare(
+'SELECT name, colour, calories FROM fruit 
+WHERE calories < :calories AND colour = :colour')
+->execute(
+    [
+        ':calories' => 150,
+        ':colour' => 'red'
+    ]
 );
 ```
 
 <a name='escape'></a>
 
-##### $this->db->escape()
+#### $this->db->escape()
 
 Eğer <kbd>prepare</kbd> özelliğini kullanmıyorsanız sorgu değerlerini <a href="http://tr.wikipedia.org/wiki/SQL_Injection" target="_blank">sql enjeksiyon</a> güvenlik tehdidine karşı bir kaçış fonksiyonu kullanmanız gerekir. Escape fonksiyonu belirli karakterlerden kaçarak sql cümleciği değerlerini güvenli bir şekilde oluşturmanızı sağlar.
 
@@ -699,7 +634,6 @@ try {
 
 Transaction - Commit metotları arasında birden fazla sorgu çalıştırabilirsiniz ve işlem başarılı ise tüm operasyonlar sisteme <kbd>commit</kbd> edilir, başarısız ise <kbd>rollBack</kbd> komutu ile tüm işlemler başa döndürürülerek <kbd>$e</kbd> Exception nesnesi ile başarısız işlem metotlarına ulaşılır.
 
-
 <a name='helper-functions'></a>
 
 ### Yardımcı Fonksiyonlar
@@ -746,13 +680,12 @@ Veritabanına en son eklenen tablo id sinin değerine geri döner.
 
 Veritabanı sürücüsünde sütun adı yada tablo isimleriyle karışan rezerve edilmiş bir isim var ise bu isme kaçış sembolü atayarak isim çakışmalarının önüne geçer.
 
+<a name='doctrine'></a>
 
-<a name='additionalFeatures'></a>
+## Eklentiler
 
-## Ek Özellikler
+Eğer mevcut veritabanı katmanı projeniz için yetmiyorsa çerçeve, kendi veritabanı arayüzü üzerinden bazı popüler veritabanı katmanlarının kurulmasına da izin verir.
 
-<a name='queryBuilder'></a>
+### Doctrine Veritabanı Katmanı
 
-### Sorgu Oluşturucu ( Query Builder )
-
-Sorgu oluşturucu sql sorgularınızı Object Oriented programlama sitilinde kolayca oluşturmanızı sağlayan bir araçtır. Bu sınıfa ait dökümentasyona [Database-DoctrineQueryBuilder.md](Database-DoctrineQueryBuilder.md) dosyasından ulaşılabilir.
+Sık kullanılan veritabanı katmanlarından biri olan  <a href="http://www.doctrine-project.org/" target="_blank">Doctrine DBAL</a> veritabanı katmanını [Database-DoctrineDBAL.md](Database-DoctrineDBAL.md) dökümentasyonundan faydalanarak varolan veritabanı katmanı yerine bir eklenti olarak kurabilirsiniz. Doctrine DBAL ve Query Builder sınıfları için çerçeve içerisinden özel yazılmış adaptörler kod yapınızı bozmadan entegrasyon sağladığı gibi mevcut doctrine yazım yöntemlerini de kolaylaştırır. Veritabanı sonuçları Result sınıfı üzerinden elde edildiğinden veritabanı sorgu sonuçları içinde kodlarınızı değiştirmek zorunda kalmazsınız.

@@ -422,7 +422,7 @@ class Redis implements CacheInterface
      * 
      * @return boolean
      */
-    public function replaceItems(array $data, $ttl)
+    public function replaceItems(array $data, $ttl = 60)
     {
         return $this->setArray($data, $ttl);
     }

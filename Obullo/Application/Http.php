@@ -58,9 +58,11 @@ class Http extends Application
             ->withArgument($container->get('logger'));
             
         $middleware = $container->get('middleware');
+
         include APP .'middlewares.php';
 
         $router = $container->get('router');
+
         include APP .'routes.php';
 
         $this->boot($router, $middleware);
@@ -83,12 +85,9 @@ class Http extends Application
         $method = $router->getMethod();
 
         if (! class_exists($className, false)) {
-
             $router->clear();  // Fix layer errors.
             $this->error = true;
-
         } else {
-
             $this->controller = new $className;
             $this->controller->setContainer($this->container);
 
@@ -115,9 +114,8 @@ class Http extends Application
      */
     protected function bootMiddlewares(Router $router, Middleware $middleware)
     {
-        $request = $this->container->get('request');
-
         $object = null;
+        $request = $this->container->get('request');
         $uriString = $request->getUri()->getPath();
 
         if ($attach = $router->getAttach()) {
@@ -136,7 +134,8 @@ class Http extends Application
                 }
             }
         }
-        if ($this->container->get('config')['http']['debugger']['enabled']) {  // Boot debugger
+        $config = $this->container->get('config');
+        if (isset($config['debugger']) && $config['debugger']['enabled']) {  // Boot debugger
             $middleware->add('Debugger');
         }
         $this->inject($middleware);
@@ -152,9 +151,7 @@ class Http extends Application
     protected function inject(Middleware $middleware)
     {
         foreach ($middleware->getNames() as $name) {
-
             $object = $middleware->get($name);
-            
             if ($object instanceof ImmutableContainerAwareInterface || $object instanceof ContainerAwareInterface) {
                 $object->setContainer($this->getContainer());
             }
@@ -174,11 +171,8 @@ class Http extends Application
     protected function bootAnnotations($method)
     {
         if ($this->container->get('config')['extra']['annotations'] && $this->controller != null) {
-
             $reflector = new ReflectionClass($this->controller);
-
             if ($reflector->hasMethod($method)) {
-
                 $docs = new \Obullo\Application\Annotations\Controller;
                 $docs->setContainer($this->getContainer());
                 $docs->setReflectionClass($reflector);

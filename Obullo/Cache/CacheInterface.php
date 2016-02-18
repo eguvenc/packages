@@ -93,6 +93,6 @@ interface CacheInterface
      * 
      * @return bool
      */
-    public function flushAll()
+    public function flushAll();
 
 }

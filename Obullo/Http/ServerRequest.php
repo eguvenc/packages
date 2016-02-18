@@ -7,7 +7,6 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 
-use Obullo\Filters\InputFilter;
 use League\Container\ContainerAwareTrait;
 use Interop\Container\ContainerInterface as Container;
 
@@ -345,77 +344,54 @@ class ServerRequest implements ServerRequestInterface
     /**
      * GET wrapper
      * 
-     * @param string|null $key    key
-     * @param boolean     $filter name
+     * @param string|null $key key
      * 
      * @return mixed
      */
-    public function get($key = null, $filter = null)
+    public function get($key = null)
     {
         $get = $this->getQueryParams();
 
         if (is_null($key)) {
             return $get;
         }
-        $value = isset($get[$key]) ? $get[$key] : false;
-        if (is_string($filter)) {
-            $inputFilter = new InputFilter;
-            $inputFilter->setContainer($this->container);
-            return $inputFilter->setFilter($filter)->setValue($value);
-        }
-        return $value;
+        return isset($get[$key]) ? $get[$key] : false;
     }
 
     /**
      * POST wrapper
      * 
-     * @param string|null $key    key
-     * @param boolean     $filter name
+     * @param string|null $key key
      * 
      * @return mixed
      */
-    public function post($key = null, $filter = null)
+    public function post($key = null)
     {
         $post = $this->getParsedBody();
 
         if (is_null($key)) {
             return $post;
         }
-        $value = isset($post[$key]) ? $post[$key] : false;
-
-        if (is_string($filter)) {
-            $inputFilter = new InputFilter;
-            $inputFilter->setContainer($this->container);
-            return $inputFilter->setFilter($filter)->setValue($value);
-        }
-        return $value;
+        return isset($post[$key]) ? $post[$key] : false;
     }
 
     /**
      * REQUEST wrapper
      * 
-     * @param string|null $key    key
-     * @param boolean     $filter name
+     * @param string|null $key key
      * 
      * @return mixed
      */
-    public function all($key = null, $filter = null)
+    public function all($key = null)
     {
-        $get = $this->get();
+        $get  = $this->get();
         $post = $this->post();
         $request = array_merge($post, $get);
 
         if (is_null($key)) {
             return $request;
         }
-        $value = isset($request[$key]) ? $request[$key] : false;
-
-        if (is_string($filter)) {
-            $inputFilter = new InputFilter;
-            $inputFilter->setContainer($this->container);
-            return $inputFilter->setFilter($filter)->setValue($value);
-        }
-        return $value;
+        return isset($request[$key]) ? $request[$key] : false;
     }
 
     /**

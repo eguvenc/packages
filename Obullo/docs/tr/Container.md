@@ -428,49 +428,60 @@ Aşağıdaki tablo varolan konnektörlerin bir listesini gösteriyor.
     <thead>
         <tr>
             <th>Konnektör</th>
+            <th>Konfigürasyon</th>
             <th>Açıklama</th>
         </tr>
     </thead>
     <tbody>
         <tr>
             <td><a href="Container-Connectors.md#amqp">amqp</a></td>
-            <td>Uygulamanızdaki <kbd>providers/queue.php</kbd> konfigürasyonunu kullanarak <a href="http://php.net/manual/pl/book.amqp.php" target="_blank">AMQP</a> bağlantılarını yönetir.</td>
+            <td>queue.php</td>
+            <td>Uygulamanızdaki <a href="http://php.net/manual/pl/book.amqp.php" target="_blank">AMQP</a> bağlantılarını yönetir.</td>
         </tr>
         <tr>
             <td><a href="Container-Connectors.md#amqp">amqpLib</a></td>
-            <td>Uygulamanızdaki <kbd>providers/queue.php</kbd> konfigürasyonunu kullanarak <a href="https://github.com/php-amqplib/php-amqplib" target="_blank">AMQPLib</a> (videlalvaro/php-amqplib) bağlantılarını yönetir.</td>
+            <td>queue.php</td>
+            <td>Uygulamanızdaki <a href="https://github.com/php-amqplib/php-amqplib" target="_blank">AMQPLib</a> (videlalvaro/php-amqplib) bağlantılarını yönetir.</td>
         </tr>
         <tr>
             <td><a href="Container-Connectors.md#cacheFactory">cacheFactory</a></td>
-            <td>Uygulamanızdaki <kbd>providers/$sürücü.php</kbd> konfigürasyonunu kullanarak sürücülere göre cache bağlantılarını yönetir.</td>
+            <td>$sürücü.php</td>
+            <td>Uygulamanızdaki sürücülere göre cache bağlantılarını yönetir.</td>
         </tr>
         <tr>
             <td><a href="Container-Connectors.md#database">database</a></td>
-            <td>Uygulamanızdaki <kbd>providers/database.php</kbd> konfigürasyonunu kullanarak seçilen database sürücüsüne göre <a href="http://php.net/manual/en/book.pdo.php" target="_blank">PDO</a> veritabanı bağlantılarını yönetir.</td>
+            <td>database.php</td>
+            <td>Uygulamanızda seçilen database sürücüsüne göre <a href="http://php.net/manual/en/book.pdo.php" target="_blank">PDO</a> veritabanı bağlantılarını yönetir.</td>
         </tr>
         <tr>
             <td><a href="Container-Connectors.md#doctrineDbal">doctrineDBAL</a></td>
-            <td>Uygulamanızdaki <kbd>providers/database.php</kbd> konfigürasyonunu kullanarak seçilen database sürücüsüne göre <a href="http://www.doctrine-project.org/projects/dbal.html" target="_blank">DoctrineDBAL</a> PDO veritabanı bağlantılarını yönetir.</td>
+            <td>database.php</td>
+            <td>Uygulamanızda seçilen database sürücüsüne göre <a href="http://www.doctrine-project.org/projects/dbal.html" target="_blank">DoctrineDBAL</a> PDO veritabanı bağlantılarını yönetir.</td>
         </tr>
         <tr>
             <td><a href="Container-Connectors.md#qb">qb</a></td>
+            <td>database.php</td>
             <td>Uygulamanızdaki database servis sağlayıcısını kullanarak Doctrine QueryBuilder nesnesini oluşturur.</td>
         </tr>
         <tr>
             <td><a href="Container-Connectors.md#memcached">memcached</a></td>
-            <td>Uygulamanızdaki <kbd>providers/memcached.php</kbd> konfigürasyonunu kullanarak <a href="http://php.net/manual/en/book.memcached.php" target="_blank">Memcached</a>  bağlantılarını yönetmenize yardımcı olur.</td>
+            <td>memcached.php</td>
+            <td>Uygulamanızdaki <a href="http://php.net/manual/en/book.memcached.php" target="_blank">Memcached</a>  bağlantılarını yönetmenize yardımcı olur.</td>
         </tr>
         <tr>
             <td><a href="Container-Connectors.md#memcache">memcache</a></td>
-            <td>Uygulamanızdaki <kbd>providers/memcache.php</kbd> konfigürasyonunu kullanarak <a href="http://php.net/manual/en/book.memcache.php" target="_blank">Memcache</a> bağlantılarını yönetmenize yardımcı olur.</td>
+            <td>memcache.php</td>
+            <td>Uygulamanızdaki <a href="http://php.net/manual/en/book.memcache.php" target="_blank">Memcache</a> bağlantılarını yönetmenize yardımcı olur.</td>
         </tr>
         <tr>
             <td><a href="Container-Connectors.md#mongo">mongo</a></td>
-            <td>Uygulamanızdaki <kbd>providers/mongo.php</kbd> konfigürasyonunu kullanarak <a href="http://php.net/manual/en/book.mongo.php" target="_blank">MongoDb</a> veritabanı bağlantılarını yönetir.</td>
+            <td>mongo.php</td>
+            <td>Uygulamanızdaki <a href="http://php.net/manual/en/book.mongo.php" target="_blank">MongoDb</a> veritabanı bağlantılarını yönetir.</td>
         </tr>
         <tr>
             <td><a href="Container-Connectors.md#redis">redis</a></td>
-            <td>Uygulamanızdaki <kbd>providers/redis.php</kbd> konfigürasyonunu kullanarak <a href="http://redis.io/" target="_blank">Redis</a> veritabanı bağlantılarını yönetmenize yardımcı olur.</td>
+            <td>redis.php</td>
+            <td>Uygulamanızdaki <a href="http://redis.io/" target="_blank">Redis</a> veritabanı bağlantılarını yönetir.</td>
         </tr>
     </tbody>
 </table>
