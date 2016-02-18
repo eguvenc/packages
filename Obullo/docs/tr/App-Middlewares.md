@@ -1,7 +1,7 @@
 
 ## Http Katmanları
 
-Http katmanı <a href="http://en.wikipedia.org/wiki/Rack_%28web_server_interface%29">Rack Protokolü</a> nün php ye uyarlanmış bir versiyonudur. Katmanlar uygulamayı etkilemek, analiz etmek, request ve response nesneler ile uygulamanın çalışmasından sonraki veya önceki aşamayı etkilemek için kullanılırlar. Katmanlar <kbd>app/classes/Http</kbd> klasörü içerisinde yeralırlar ve basit php sınıflarıdır. Bir katman route yapısında tutturulabilir yada bağımsız olarak uygulamada evrensel olarak çalışabilir.
+Http katmanı <a href="http://en.wikipedia.org/wiki/Rack_%28web_server_interface%29">Rack Protokolü</a> nün php ye uyarlanmış bir versiyonudur. Katmanlar uygulamayı etkilemek, analiz etmek, request ve response nesneler ile uygulamanın çalışmasından sonraki veya önceki aşamayı etkilemek için kullanılırlar. Katmanlar <kbd>app/classes/Http</kbd> klasörü içerisinde yeralan basit php sınıflarıdır. Bir katman route yapısında tutturulabilir yada uygulamada evrensel olarak çalışabilir. Http katmanları http çözümlemesinden önce <kbd>$request</kbd> yada <kbd>$response</kbd> nesnelerini etkilemek için kullanılırlar.
 
 <ul>
     <li>
@@ -24,7 +24,6 @@ Http katmanı <a href="http://en.wikipedia.org/wiki/Rack_%28web_server_interface
     <li>
         <a href="#features">Özellikler</a>
         <ul>
-            <li><a href="#inject-components">Komponent Enjeksiyonu</a></li>
             <li><a href="#inject-container">Konteyner Enjeksiyonu</a></li>
             <li><a href="#inject-parameters">Parametre Enjeksiyonu</a></li>
             <li><a href="#terminate">Sonlandırma Metodu</a></li>
@@ -183,50 +182,28 @@ Anotasyonlar hakkında daha fazla bilgi için [Annotations.md](Annotations.md) d
 
 Katman sınıfı içerisindeki bazı metotlar uygulamaya özgü özel işlevleri yerine getirir. Bu metotlar aşağıda örneklendirilmiştir.
 
-<a name="inject-components"></a>
-
-#### Komponent Enjeksiyonu
-
-Bir katmana <kbd>app/providers.php</kbd> içerisindeki tanımlı kütüphaneleri enjekte edebilmek için <kbd>__construct()</kbd> metodu içerisinden aşağıdaki gibi kütüphane isimlerinin çağırılması yeterli olur.
-
-```php
-/**
- * Constructor
- * 
- * @param Config     $config     config
- * @param Translator $translator translator
- */
-public function __construct(Config $config, Translator $translator)
-{
-    $this->config = $config->load('translator');
-    $this->translator = $translator;
-}
-```
-
-Yukarıdaki örnek <kbd>Translation</kbd> katmanından alıntıdır.
-
 <a name="inject-container"></a>
 
 #### Konteyner Enjeksiyonu
 
-Bir katmana <kbd>Container</kbd> nesnesini enjekte edebilmek için katmanın <kbd>ContainerAwareInterface</kbd> arayüzüne genişlemesi gerekir.
+Bir katmana <kbd>Container</kbd> nesnesini enjekte edebilebilmesi için katmanın <kbd>ImmutableContainerAwareInterface</kbd> arayüzüne genişlemesi ve <kbd>ImmutableContainerAwareTrait</kbd> özelliğini kullanması gerekir.
 
 ```php
-class App implements MiddlewareInterface, ContainerAwareInterface {}
+class Auth implements MiddlewareInterface, ImmutableContainerAwareInterface
+{
+    use ImmutableContainerAwareTrait;
 ```
 
-Sonra katman sınıfı içerisinde setContainer() metodu ilan edilerek <kbd>$container</kbd> nesnesi elde edilebilir.
+Sonra katman sınıfı içerisinde getContainer() metodu ile <kbd>$container</kbd> nesnesi elde edilebilir.
 
 ```php
-public function setContainer(Container $container = null)
+public function __invoke(Request $request, Response $response, callable $next = null)
 {
-    $this->container = $container;
+    $this->getContainer()->get('class');
 
-    return $this;
+    return $next($request, $response);
 }
 ```
-
-Yukarıdaki örnek <kbd>App</kbd> katmanından alıntıdır.
 
 <a name="inject-parameters"></a>
 
@@ -238,14 +215,14 @@ Bir katmana <kbd>array $params</kbd> değişkeni ile parametreler enjekte edebil
 class Maintenance implements MiddlewareInterface, ParamsAwareInterface {}
 ```
 
-Sonra katman sınıfı içerisinde setParams() metodu ilan edilerek <kbd>$params</kbd> değişkeni elde edilebilir.
+Sonra katman sınıfı içerisinden getParams() metodu ile <kbd>$params</kbd> değişkeni elde edilebilir.
 
 ```php
-public function setParams(array $params)
+public function __invoke(Request $request, Response $response, callable $next = null)
 {
-    $this->params = $params;
+    $params = $this->getParams();
 
-    return $this;
+    return $next($request, $response);
 }
 ```
 
@@ -258,7 +235,7 @@ Yukarıdaki örnek <kbd>Maintenance</kbd> katmanından alıntıdır.
 Eğer bir katman içerisinde <kbd>terminate()</kbd> metodu kullanılırsa bu metot içerisine yazılan tüm işlevler uygulama kapatıldıktan sonra gerçekleşir.
 
 ```php
-class Debugger implements MiddlewareInterface, ContainerAwareInterface, TerminableInterface()
+class Debugger implements MiddlewareInterface, ImmutableContainerAwareInterface, TerminableInterface
 ```
 
 Katmanın sonlandırılabilir olarak tanımlanabilmesi için <kbd>TerminableInterface</kbd> arayüzüne genişlemesi ve katman içinde <kbd>terminate()</kbd> metodunun ilan edilmesi gerekir.

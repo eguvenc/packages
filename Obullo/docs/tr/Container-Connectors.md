@@ -1,7 +1,7 @@
 
 ### Konnektörler
 
-Konnektörler bağlantı yönetimi ile ilgili servis sağlayıcılarıdır. Bir konnektör kendisine farklı parametreler gönderilerek açılan bağlantıları yönetir ve her yazılımcının aynı parametreler ile uygulamada birden fazla bağlantı açmasının önüne geçer.Kullanmak istediğiniz konnektöre ait servis sağlayıcıların <kbd>app/providers.php</kbd> dosyasında tanımlı olmaları gerekir.
+Konnektörler bağlantı yönetimi ile ilgili servis sağlayıcılarıdır. Bir konnektör kendisine farklı parametreler gönderilerek açılan bağlantıları yönetir ve her yazılımcının aynı parametreler ile uygulamada birden fazla bağlantı açmasının önüne geçer. Kullanmak istediğiniz konnektöre ait servis sağlayıcıların <kbd>app/providers.php</kbd> dosyasında tanımlı olmaları gerekir.
 
 ```php
 /*
@@ -175,7 +175,7 @@ $cache = $container->get('cacheFactory')->shared(
 
 #### Database
 
-<kbd>Database</kbd> paketindeki bağlantı adaptörlerini tek bir arayüz üzerinden kontrol edebilmek ve bağlantı yönetimini sağlamak için yazılmış servis sağlayıcısıdır. Uygulamanızdaki database.php konfigürasyonunu kullanarak seçilen database sürücüsüne göre ilişkili database (RBDMS) nesnelerini yönetir.
+<kbd>Database</kbd> paketindeki bağlantı adaptörlerini tek bir arayüz üzerinden kontrol edebilmek ve bağlantı yönetimini sağlamak için yazılmış servis sağlayıcısıdır. Uygulamanızdaki <kbd>providers/database.php</kbd> konfigürasyonunu kullanarak seçilen database sürücüsüne göre PDO nesnelerini yönetir.
 
 ```php
 'connections' => array(
@@ -238,14 +238,13 @@ pgsql:host=127.0.0.1;port=5432;dbname=anydb
 
 <a href="http://www.doctrine-project.org/projects/dbal.html" target="_blank">DoctrineDBAL</a> veritabanı şema yönetimi gibi birçok özelliği destekleyen güçlü bir <a href="http://php.net/manual/en/book.pdo.php" target="_blank">PDO</a> arayüzüdür. En popüler veritabanı türleri için ortak bir arayüz sağlar. Eğer DoctrineDBAL servis sağlayıcısını kullanmak istiyorsanız,
 
-<kbd>app/classes/ServiceProvider/Database.php</kbd> dosyası içerisindeki veritabanı sağlayıcınıza ait satırı derleme içine alarak DoctrineDBAL sağlayıcısını derleme dışına çıkarın.
-
-
 ```php
 // $container->share('database', 'Obullo\Container\ServiceProvider\Connector\Database')
 //     ->withArgument($container)
 //     ->withArgument($config->getParams());
 ```
+
+yukarıdaki gibi <kbd>app/classes/ServiceProvider/Database.php</kbd> dosyası içerisindeki veritabanı sağlayıcınıza ait satırı derleme içine alarak DoctrineDBAL sağlayıcısını derleme dışına çıkarın.
 
 ```php
 // DoctrineDBAL Replacement
@@ -368,9 +367,6 @@ $mongo = $container->get('mongo')->factory(
     ]
 );
 ```
-
-Uygulamanızdaki database.php konfigürasyonunu kullanarak pdo bağlantılarını yönetmenize yardımcı olur.
-
 <a name="redis"></a>
 
 #### Redis
