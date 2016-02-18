@@ -3,7 +3,7 @@
 
 Bir anotasyon aslında bir metadata yı (örneğin yorum,  açıklama, tanıtım biçimini) yazıya, resime veya diğer veri türlerine tutturmaktır. Uygulama içinde anotasyonlar sınıflar yada sınıf metotları üzerine açıklama biçiminde yazılarak belirli işlevleri kontrol ederler.
 
-> **Not:** Anotasyonlar herhangi bir kurulum yapmayı gerektirmez ve uygulamanıza performans açısından ek bir yük getirmez. Php ReflectionClass sınıfı ile okunan anotasyonlar çekirdekte herhangi bir düzenli ifade işlemi kullanılmadan kolayca çözümlenir.
+> Anotasyonlar herhangi bir kurulum yapmayı gerektirmez ve uygulamanıza performans açısından ek bir yük getirmez. Php ReflectionClass sınıfı ile okunan anotasyonlar uygulamada kolayca çözümlenirler.
 
 <ul>
     <li>

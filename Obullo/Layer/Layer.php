@@ -115,16 +115,9 @@ class Layer
         $this->request = clone Controller::$instance->request;
         $this->router = clone Controller::$instance->router;  // Create copy of original Router class.
 
-        // $this->c['app.request'] = function () {
-        //     return $this->request;
-        // };
-
         $this->container->share('app.request', $this->request);
         $this->container->share('app.router', $this->router);
 
-        // $this->c['app.router'] = function () {
-        //     return $this->router;
-        // };
         $this->createUri($request, $uri);
     }
 
@@ -141,10 +134,7 @@ class Layer
         // Create new request object
 
         $this->container->share('request', $request);
-
-        // $this->c['request'] = function () use ($request) {
-        //     return $request;
-        // };
+        
         $this->container->get('request')->getUri()->clear();     // Reset uri objects we will reuse it for layer
         $this->container->get('request')->getUri()->setPath($uri);
 
@@ -205,11 +195,11 @@ class Layer
         
         $router = $this->container->get('router');
 
-        $directory = $router->getDirectory();
+        $directory = $router->getFolder();
         $className = $router->getClass();
         $method    = $router->getMethod();
 
-        $class = MODULES .$router->getModule('/') .$directory.'/'.$className. '.php';
+        $class = FOLDERS .$router->getPrimaryFolder('/') .$directory.'/'.$className. '.php';
         $className = '\\'.$router->getNamespace().$className;
 
         if (! class_exists($className, false)) {

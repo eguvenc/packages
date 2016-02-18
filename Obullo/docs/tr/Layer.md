@@ -61,7 +61,7 @@ Katmanlı mimari yazılım geliştirmenin arayüz sürecini etkileyici bir şeki
 * Bakımı Kolay Uygulamalar: Parçalara bölünen kullanıcı arayüzü bileşenleri MVC tasarım desenine bağlı kaldıkları için bakım kolaylığı sağlarlar.
 * Mantıksal Uygulamalar: Katmanlar birbirleri ile etkişim içerisinde olabilecekleri gibi uygulama üzerinde hakimiyet ve önbelleklenebilme özellikleri ile genişleyebilir mantıksal uygulamalar yaratmayı sağlarlar. Bölümsel olarak birbirinden ayrılan katmanlar bir <kbd>web servis</kbd> gibi de çalışabilirler.
 
-### Görünen Varlıkları ( views ) Katmanlar İle Oluşturmak
+### Görünümleri Katmanlar İle Oluşturmak
 
 Aşağıdaki figürde görüldüğü gibi katmanlı mimaride görünen varlıklar parçalara ayrılarak bileşen haline getirilir. 
 
@@ -86,11 +86,16 @@ Katman sınıfı <kbd>app/providers.php</kbd> dosyasında tanımlıdır bu yüzd
 #### Metotlara Erişim
 
 ```php
-$this->c['layer']->method();
+$container->get('layer')->method();
 ```
-Konteyner nesnesi ile yüklenmesi gerekir. 
 
-> **Not:** Kontrolör sınıfı içerisinden bu sınıfa $this->layer yöntemi ile de ulaşılabilir.
+Kontrolör içerisinden,
+
+```php
+$this->layer->method();
+```
+
+yöntemleri ile servis metotlarına ulaşılabilir.
 
 <a name="calling-layers"></a>
 
@@ -114,7 +119,9 @@ Katmanları daha iyi anlamak için <kbd>modules/views</kbd> klasörü altında a
 ```php
 namespace Views;
 
-class Header extends \Controller
+use Obullo\Http\Controller;
+
+class Header extends Controller
 {
     public function index()
     {
@@ -156,7 +163,9 @@ Görüldüğü gibi header katmanına ait bir view dosyası var ve bu view dosya
 ```php
 namespace Welcome;
 
-class Welcome extends \Controller
+use Obullo\Http\Controller;
+
+class Welcome extends Controller
 {
     public function index()
     {
@@ -222,7 +231,9 @@ Gezinme çubuğu yada diğer adıyla navigasyon menüsünü kontrol edecek olan 
 ```php
 namespace Views;
 
-class Header extends \Controller
+use Obullo\Http\Controller;
+
+class Header extends Controller
 {
     public function index()
     {
@@ -271,7 +282,9 @@ Gezinme çubuğuna ait görünüm dosyasını <kbd>modules/views/view/</kbd> kla
 ```php
 namespace Welcome;
 
-class Welcome extends \Controller
+use Obullo\Http\Controller;
+
+class Welcome extends Controller
 {
     public function index()
     {
@@ -310,8 +323,6 @@ Debugger modülü kurulu değilse kurmak için [Debugger.md](Debugger.md) dökü
 
 
 #### Fonksiyon Referansı
-
-------
 
 ##### $this->layer->post(string $uri, $data = array | int, expiration = 0);  
 

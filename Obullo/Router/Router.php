@@ -14,8 +14,8 @@ use Obullo\Router\Route\Group;
 use Obullo\Router\Route\Attach;
 use Obullo\Router\Route\Parameters;
 
-use Obullo\Router\Resolver\DirectoryResolver;
-use Obullo\Router\Resolver\ModuleResolver;
+use Obullo\Router\Resolver\FolderResolver;
+use Obullo\Router\Resolver\PrimaryFolderResolver;
 use Obullo\Router\Resolver\ClassResolver;
 
 /**
@@ -69,8 +69,8 @@ class Router implements RouterInterface
     {
         $this->uri = $this->container->get('request')->getUri();   // Reset cloned URI object.
         $this->class = '';
-        $this->directory = '';
-        $this->module = '';
+        $this->folder = '';
+        $this->primaryFolder = '';
     }
 
     /**
@@ -220,23 +220,22 @@ class Router implements RouterInterface
         if (empty($segments[0])) {
             return null;
         }
-        $this->setDirectory($segments[0]);      // Set first segment as default "top" directory 
-        $segments = $this->detectModule($segments);
-        $module = $this->getModule('/');
+        $this->setFolder($segments[0]);      // Set first segment as default folder
+        $segments      = $this->checkPrimaryFolder($segments);
+        $primaryFolder = $this->getPrimaryFolder('/');
 
-        if (empty($module)) {
+        if (empty($primaryFolder)) {
             
-            if (is_dir(MODULES .$this->getDirectory().'/')) {
+            if (is_dir(FOLDERS .$this->getFolder().'/')) {
 
-                $resolver = new DirectoryResolver($this);
+                $resolver = new FolderResolver($this);
                 return $resolver->resolve($segments);
             }
-            $this->setDirectory(null);
+            $this->setFolder(null);
             $resolver = new ClassResolver($this);
             return $resolver->resolve($segments);
         }
-
-        $resolver = new ModuleResolver($this);
+        $resolver = new PrimaryFolderResolver($this);
         return $resolver->resolve($segments);
     }
 
@@ -247,14 +246,14 @@ class Router implements RouterInterface
      * 
      * @return array
      */
-    protected function detectModule($segments)
+    protected function checkPrimaryFolder($segments)
     {
         if (! empty($segments[1])
             && strtolower($segments[1]) != 'view'  // http://example/debugger/view/index bug fix
-            && is_dir(MODULES .$segments[0].'/'. $segments[1].'/')  // Detect Module and change directory !!
+            && is_dir(FOLDERS .$segments[0].'/'. $segments[1].'/')  // Detect Module and change directory !!
         ) {
-            $this->setModule($segments[0]);
-            $this->setDirectory($segments[1]);
+            $this->setPrimaryFolder($segments[0]);
+            $this->setFolder($segments[1]);
             array_shift($segments);
         }
         return $segments;
@@ -379,56 +378,56 @@ class Router implements RouterInterface
     }
 
     /**
-     * Set the directory name : It must be lowercase otherwise sub module does not work
+     * Set the folder name : It must be lowercase otherwise sub module does not work
      *
-     * @param string $directory directory
+     * @param string $folder folder
      * 
      * @return object Router
      */
-    public function setDirectory($directory)
+    public function setFolder($folder)
     {
-        $this->directory = strtolower($directory);
+        $this->folder = strtolower($folder);
         return $this;
     }
 
     /**
-     * Sets top directory http://example.com/api/user/delete/4
+     * Sets top folder http://example.com/api/user/delete/4
      * 
-     * @param string $directory sets top directory
+     * @param string $folder sets top folder
      *
      * @return void
      */
-    public function setModule($directory)
+    public function setPrimaryFolder($folder)
     {
-        $this->module = strtolower($directory);
+        $this->primaryFolder = strtolower($folder);
     }
 
     /**
-     * Get module directory
+     * Get primary folder
      *
-     * @param string $separator directory seperator
+     * @param string $separator get folder seperator
      * 
      * @return void
      */
-    public function getModule($separator = '')
+    public function getPrimaryFolder($separator = '')
     {
-        return (empty($this->module)) ? '' : htmlspecialchars($this->module).$separator;
+        return (empty($this->primaryFolder)) ? '' : htmlspecialchars($this->primaryFolder).$separator;
     }
 
     /**
-     * Fetch the directory
+     * Get folder
      *
-     * @param string $separator directory seperator
+     * @param string $separator get folder seperator
      * 
      * @return string
      */
-    public function getDirectory($separator = '')
+    public function getFolder($separator = '')
     {
-        return (empty($this->directory)) ? '' : htmlspecialchars($this->directory).$separator;
+        return (empty($this->folder)) ? '' : htmlspecialchars($this->folder).$separator;
     }
 
     /**
-     * Fetch the current routed class name
+     * Returns to current routed class name
      *
      * @return string
      */
@@ -454,7 +453,7 @@ class Router implements RouterInterface
      */
     public function getNamespace()
     {
-        $namespace = $this->ucwordsUnderscore($this->getModule()).'\\'.$this->ucwordsUnderscore($this->getDirectory());
+        $namespace = $this->ucwordsUnderscore($this->getPrimaryFolder()).'\\'.$this->ucwordsUnderscore($this->getFolder());
         $namespace = trim($namespace, '\\');
 
         return (empty($namespace)) ? '' : $namespace.'\\';

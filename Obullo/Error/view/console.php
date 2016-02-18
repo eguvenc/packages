@@ -7,13 +7,13 @@ if (isset($fatalError)) {
     // We could not load error libraries when error is fatal.
     
     echo "\33[0;31m".str_replace(
-        array(APP, DATA, CLASSES, ROOT, OBULLO, MODULES, VENDOR), 
-        array('APP/', 'DATA/', 'CLASSES/', 'ROOT/', 'OBULLO/', 'MODULES/', 'VENDOR/'),
+        array(APP, DATA, CLASSES, ROOT, OBULLO, FOLDERS, VENDOR), 
+        array('APP/', 'DATA/', 'CLASSES/', 'ROOT/', 'OBULLO/', 'FOLDERS/', 'VENDOR/'),
         $e->getMessage()
     )."\33[0m\n";
     echo "\33[0;31m".str_replace(
-        array(APP, DATA, CLASSES, ROOT, OBULLO, MODULES, VENDOR),
-        array('APP/', 'DATA/', 'CLASSES/', 'ROOT/', 'OBULLO/', 'MODULES/', 'VENDOR/'),
+        array(APP, DATA, CLASSES, ROOT, OBULLO, FOLDERS, VENDOR),
+        array('APP/', 'DATA/', 'CLASSES/', 'ROOT/', 'OBULLO/', 'FOLDERS/', 'VENDOR/'),
         $e->getFile()
     ) . ' Line : ' . $e->getLine()."\33[0m\n";
     exit;

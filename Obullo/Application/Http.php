@@ -80,7 +80,7 @@ class Http extends Application
     {
         $router->init();
 
-        include MODULES .$router->getModule('/').$router->getDirectory('/').$router->getClass().'.php';
+        include FOLDERS .$router->getPrimaryFolder('/').$router->getFolder('/').$router->getClass().'.php';
         $className = '\\'.$router->getNamespace().$router->getClass();
         $method = $router->getMethod();
 

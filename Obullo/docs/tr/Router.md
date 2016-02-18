@@ -62,7 +62,7 @@ Router sınıfı uygulamanızda index.php dosyasına gelen istekleri <kbd>app/ro
 
 ### Konfigürasyon
 
-Router sınıfı konfigürasyon değerlerini aldıktan sonra router kurallarınızı çalıştırmaya başlar bu yüzden <kbd>$c['router']->configuration()</kbd> metodunun en tepede ilan edilmesi gerekir.
+Router sınıfı konfigürasyon değerlerini aldıktan sonra router kurallarınızı çalıştırmaya başlar bu yüzden <kbd>$router->configuration()</kbd> metodunun en tepede ilan edilmesi gerekir.
 
 <a name="domain-name"></a>
 
@@ -71,7 +71,7 @@ Router sınıfı konfigürasyon değerlerini aldıktan sonra router kuralların�
 Router sınıfı url yönlendirmelerini çalıştırabilmek için geçerli <b>kök domain</b> adresini bilmek zorundadır. Domain adresini aşağıdaki gibi tanımlayabilir,
 
 ```php
-$c['router']->configuration(
+$router->configuration(
     [
         'domain' => 'example.com',
         'defaultPage' => 'welcome',
@@ -120,7 +120,7 @@ Konfigürasyon kısmında defaulPage anahtarı varsayılan açılış sayfasına
 
 ```php
 
-$c['router']->configuration(
+$router->configuration(
     [
         'domain' => 'example.com',
         'defaultPage' => 'home/class/index',
@@ -139,7 +139,7 @@ Error404 anahtarı 404 hataları olması durumunda uygulamanın çalıştıraca�
 
 ```php
 
-$c['router']->configuration(
+$router->configuration(
     [
         'domain' => 'example.com',
         'defaultPage' => 'home/class/index',
@@ -198,7 +198,7 @@ example.com/shop/product/index/2
 Normalde URL nin 2. bölümü sınıf ismi için rezerve edilmiştir, fakat yukarıdaki örnekte <b>shop</b> ve <b>product</b> bölümünü silip sadece değerler ile gönderilen bir URL biçimine dönüştürmek (url rewriting) için bir route kuralı tanımlamanız gerekir.
 
 ```php
-$c['router']->get('([0-9])/(.*)', 'shop/product/index/$1/$2');
+$router->get('([0-9])/(.*)', 'shop/product/index/$1/$2');
 ```
 
 Bu tanımlamadan sonra aşağıdaki gibi bir URL <b>shop</b> dizinine yönlendirilir ve product sınıfı çalıştırılarak sonraki değerler argüman olarak gönderilir.  
@@ -222,7 +222,7 @@ http://example.com/54/test/whatever
 Yukarıdaki gibi bir URL adresini framework içerisinde başka bir route adresine yönlendirmek istiyorsanız aşağıdaki gibi bir route kuralı yazmanız gerekir.
 
 ```php
-$c['router']->get('([0-9]+)/([a-z]+).*', 'welcome/index/$1/$2');
+$router->get('([0-9]+)/([a-z]+).*', 'welcome/index/$1/$2');
 ```
 
 Bu kurala göre URL adresi ancak ilk bölümü 0-9 sayıları arasında olan, ikinci bölümü a-z karakterkerini içeren ve üçüncü bölümü herhangi bir değerden oluşan adres <kbd>welcome/index</kbd> sayfasına yönlendirilir.
@@ -230,7 +230,7 @@ Bu kurala göre URL adresi ancak ilk bölümü 0-9 sayıları arasında olan, ik
 <b>GET kuralı</b> - example.com/welcome/ örnek url adresine gelen http get isteklerini girilen değere yönlendirir.
 
 ```php
-$c['router']->get('welcome(.*)', 'home/index/$1');
+$router->get('welcome(.*)', 'home/index/$1');
 ```
 
 Route kuralları <kdd>düzenli ifadeler</kdd> (regex) yada <kbd>/wildcards</kbd> kullanılarak tanılanabilir.
@@ -238,25 +238,25 @@ Route kuralları <kdd>düzenli ifadeler</kdd> (regex) yada <kbd>/wildcards</kbd>
 <b>POST kuralı</b> - example.com/welcome/ örnek url adresine gelen http post isteklerini girilen değere yönlendirir.
 
 ```php
-$c['router']->post('welcome/(.+)', 'home/index/$1');
+$router->post('welcome/(.+)', 'home/index/$1');
 ```
 
 <b>Birden fazla http isteğini kabul etmek</b> ( GET, POST, DELETE, PUT ve diğerleri )
 
 ```php
-$c['router']->match(['get','post'], 'welcome/(.+)', 'home/index/$1');
+$router->match(['get','post'], 'welcome/(.+)', 'home/index/$1');
 ```
 
 yukarıdaki örnekte eğer bir URL "welcome/$arg/$arg .." değerini içeriyorsa gelen argümanlar "home/home/index/$arg" yani home dizini içerisinde home sınıfı index metoduna gönderilir.
 
 ```php
-$c['router']->put('welcome(.*)', 'home/index/$1');
+$router->put('welcome(.*)', 'home/index/$1');
 ```
 
 Eğer yukarıdaki gibi put metodu tanımlanmış bir kurala GET isteği gönderilirse "Http Error 405 Get method not allowed" hatası ile karşılaşırsınız.
 
 ```php
-$c['router']->get(
+$router->get(
     'welcome/index', null,
     function () use ($c) {
         $c['view']->load('dummy');
@@ -284,27 +284,27 @@ Route kuralları yazıldığında aynı zamanda http isteklerini istek tipine g�
     <tr>
     <td>post</td>
     <td>Bir route kuralının sadece POST isteğinde çalışmasını sağlar.</td>
-    <td>$c['router']->post($url, $rewrite)</td>
+    <td>$router->post($url, $rewrite)</td>
     </tr>
     <tr>
     <td>get</td>
     <td>Bir route kuralının sadece GET isteğinde çalışmasını sağlar.</td>
-    <td>$c['router']->get($url, $rewrite)</td>
+    <td>$router->get($url, $rewrite)</td>
     </tr>
     <tr>
     <td>put</td>
     <td>Bir route kuralının sadece PUT isteğinde çalışmasını sağlar.</td>
-    <td>$c['router']->put($url, $rewrite)</td>
+    <td>$router->put($url, $rewrite)</td>
     </tr>
     <tr>
     <td>delete</td>
     <td>Bir route kuralının sadece DELETE isteğinde çalışmasını sağlar.</td>
-    <td>$c['router']->delete($url, $rewrite)</td>
+    <td>$router->delete($url, $rewrite)</td>
     </tr>
     <tr>
     <td>match</td>
     <td>Bir route kuralının sadece girilen istek tiplerinde çalışmasını sağlar.</td>
-    <td>$c['router']->match(['get','post'], $url, $rewrite)</td>
+    <td>$router->match(['get','post'], $url, $rewrite)</td>
     </tr>
   </tbody>
 </table>
@@ -320,7 +320,7 @@ Eğer regex yani düzenli ifadeler kullanmayı tercih ediyorsanız route kuralla
 Tipik bir referanslı regex örneği.
 
 ```php
-$c['router']->get('([0-9]+)/([a-z]+)', 'welcome/index/$1/$2');
+$router->get('([0-9]+)/([a-z]+)', 'welcome/index/$1/$2');
 ```
 
 Yukarıdaki örnekte <kbd>example.com/1/test</kbd> adresine benzer bir URL <kbd>Welcome/welcome</kbd> kontrolör sınıfı index metodu parametresine <kbd>1 - 2</kbd> argümanlarını gönderir.
@@ -332,7 +332,7 @@ Yukarıdaki örnekte <kbd>example.com/1/test</kbd> adresine benzer bir URL <kbd>
 Route kuralları içerisinde isimsiz fonksiyonlar da kullanabilmek mümkündür.
 
 ```php
-$c['router']->get(
+$router->get(
     'welcome/([0-9]+)/([a-z]+)', 'welcome/index/$1/$2', 
     function () use ($c) {
         $c['view']->load('dummy');
@@ -349,7 +349,7 @@ Bu örnekte, <kbd>example.com/welcome/123/test</kbd> adresine benzer bir URL <kb
 Eğer girilen bölümleri fonksiyon içerisinden belirli kriterlere göre parametreler ile almak istiyorsanız süslü parentezler { } kullanın.
 
 ```php
-$c['router']->get(
+$router->get(
     'welcome/index/{id}/{name}', null,
     function ($id, $name) use ($c) {
         $c['response']->error($id.'-'.$name);
@@ -366,7 +366,7 @@ welcome/index/123/test
 Yukarıdaki örnek çalıştırıldığında, düzenli ifadeler route kuralı ile uyuşuyor ise sayfanın $id ve $name argümanlarından oluşan hata sayfasını çıktılaması gerekir.
 
 ```php
-$c['router']->get(
+$router->get(
     '{id}/{name}/{any}', 'shop/index/$1/$2/$3',
     function ($id, $name, $any) use ($c) {
         echo $id.'-'.$name.'-'.$any;
@@ -385,7 +385,7 @@ shop.example.com/123/electronic/mp3_player
 Gelişmiş bir örnek:
 
 ```php
-$c['router']->get(
+$router->get(
     'shop/{id}/{name}', null,
     function ($id, $name) use ($c) {
         
@@ -415,7 +415,7 @@ Bu örnekte ise <kbd>shop/{id}/{name}</kbd> olarak girilen URI şeması eğer <k
 Route grupları bir kurallar bütününü topluca yönetmenizi sağlar. Grup kuralları belirli <b>alt domainler</b> için çalıştırılabildiği gibi belirli <b>http katmanlarına</b> da tayin edilebilirler. Örneğin tanımladığınız route grubunda belirlediğiniz http katmanlarının çalışmasını istiyorsanız grup tanımlamalarına katman isimlerini girdikten sonra <kbd>$this->attach()</kbd> metodu ile katmanı istediğiniz URL adreslerine tuturmanız gerekir. Birden fazla katman middleware dizisi içine girilebilir.
 
 ```php
-$c['router']->group(
+$router->group(
     [
         'name' => 'Test',
         'middleware' => array('MethodNotAllowed')
@@ -443,7 +443,7 @@ Http Error 405 Get method not allowed.
 Eğer bir gurubu belirli bir alt alan adına tayin ederseniz grup içerisindeki route kuralları yalnızca bu alan adı için geçerli olur. Aşağıdaki örnekte <kbd>shop.example.com</kbd> alan adı için bir grup tanımladık.
 
 ```php
-$c['router']->group(
+$router->group(
     [
         'name' => 'Shop',
         'domain' => 'shop.example.com'
@@ -467,7 +467,7 @@ http://shop.example.com/product/123
 Aşağıda <kbd>account.example.com</kbd> adlı bir alt alan adı için kurallar tanımladık.
 
 ```php
-$c['router']->group(
+$router->group(
     [
         'name' => 'Accounts',
         'domain' => 'account.example.com'
@@ -498,7 +498,7 @@ http://account.example.com/123/john/test
 Alt alan adlarınızda eğer <kbd>sports19.example.com</kbd>, <kbd>sports20.example.com</kbd>, <kbd>sports21.example.com</kbd> gibi değişen sayılar mevcut ise alan adı kısmında düzenli ifadeler kullanarak route grubuna alan adınızı tayin edebilirsiniz.
 
 ```php
-$c['router']->group(
+$router->group(
     [
         'name' => 'Sports',
         'domain' => 'sports.*\d.example.com',
@@ -521,7 +521,7 @@ $c['router']->group(
 Eğer bir grubun URL den çağırılan değer ile eşleşme olduğunda çalışmasını istiyorsanız <kbd>match</kbd> ifadesi kullanmanız gerekir.
 
 ```php
-$c['router']->group(
+$router->group(
     [
         'match' => 'admin'
     ],
@@ -543,7 +543,7 @@ http://example.com/admin/membership/login
 Aynı anda uri ve domain eşleşmesi gerekiyorsa her iki ifadeyide kullanın.
 
 ```php
-$c['router']->group(
+$router->group(
     [
         'match' => 'admin'
         'domain' => 'example.com'
@@ -558,7 +558,7 @@ $c['router']->group(
 Eğer düzenli bir ifade kullanmanız gerekiyorsa domain ifadesinde olduğu gibi match ifadesi de düzenli ifadeleri destekler.
 
 ```php
-$c['router']->group(
+$router->group(
     [
         'match' => 'admin/([0-9]+)/([a-z]+).*'
     ],
@@ -582,13 +582,13 @@ Http katmanları tek bir route kuralına atanarak direkt çalıştırılabilecek
 Tek bir route kuralı için katmanlar atayabilmek mümkündür. Aşağıdaki örnekte <b>/hello</b> sayfasına güvenli olmayan bir get yada post isteği geldiğinde <b>welcome/index</b> sayfasına yönlendirilir ve [Https katmanı](Middleware-Https.md) çalıştırılarak istek <kbd>https://</kbd> protokolü ile çalışmaya zorlanır.
 
 ```php
-$c['router']->match(['get', 'post'], 'hello$', 'welcome/index')->middleware(['Https']);
+$router->match(['get', 'post'], 'hello$', 'welcome/index')->middleware(['Https']);
 ```
 
 Eğer birden fazla katman çalıştırmak isterseniz katmanları bir dizi içerisinde girin.
 
 ```php
-$c['router']->get('membership/restricted')->middleware(array('auth', 'guest'));
+$router->get('membership/restricted')->middleware(array('auth', 'guest'));
 ```
 
 <a name="group-md-assignment"></a>
@@ -598,7 +598,7 @@ $c['router']->get('membership/restricted')->middleware(array('auth', 'guest'));
 Bir grup için oluşturulan katmanı grup fonksiyonu içerisinde çalıştırabilmek için <kbd>$this->attach()</kbd> metodu kullanılır.
 
 ```php
-$c['router']->group(
+$router->group(
     array('name' => 'shop', 'domain' => 'shop.example.com', 'middleware' => array('Https')), 
     function () {
 
@@ -617,7 +617,7 @@ $c['router']->group(
 Aşağıdaki örnekte <kbd>http://</kbd> protokolüyle ile güvenli olmayan bir istek geldiğinde istek [Https katmanı](Middleware-Https.md) çalıştırılarak <kbd>https://</kbd> protokolü ile çalışmaya zorlanıyor. Ayrıca <kbd>orders/pay</kbd> ve <kbd>orders/pay/post</kbd> sayfalarındaki formlar için [Csrf katmanı](Middleware-Csrf.md) çalıştırılıyor.
 
 ```php
-$c['router']->group(
+$router->group(
     ['name' => 'SecurePayment', 'domain' => 'pay.example.com', 'middleware' => array('Https')],
     function () {
 
@@ -646,7 +646,7 @@ http://www.example.com/test/good_segment2
 Buna benzer durumlarda aşağıdaki gibi katmanların sadece belirli URL adreslerinde çalışmasını sağlayabilirsiniz.
 
 ```php
-$c['router']->group(
+$router->group(
     ['name' => 'Test', 'domain' => 'example.com', 'middleware' => array('Test')],
     function () {
 
@@ -658,7 +658,7 @@ $c['router']->group(
 Veya aşağıdaki gibi katmanları sadece sadece belirli url parçalarını içeren kelimeler ile sınırlandararak tanımlanan sayfalar hariç tüm sayfalarda Auth ve Guest katmanları çalıştırılmasını sağlayabilirsiniz.
 
 ```php
-$c['router']->group(
+$router->group(
     ['name' => 'auth', 'domain' => 'example.com', 'middleware' => ['Auth', 'Guest']],
     function () {
         $this->attach('^(?!login|logout|test|cart|payment).*$');
@@ -717,51 +717,51 @@ class Login extends \Controller
 
 ------
 
-##### $c['router']->configuration(array $params);
+##### $router->configuration(array $params);
 
 Geçerli domain adresi, varsayılan açılış sayfasını ve 404 error sayfasını konfigüre eder.
 
-##### $c['router']->defaultPage($page);
+##### $router->defaultPage($page);
 
 Konfigüre edilmiş varsayılan açılış sayfasını yeniden konfigüre eder.
 
-##### $c['router']->error404($page);
+##### $router->error404($page);
 
 Konfigüre edilmiş error 404 sayfasını yeniden konfigüre eder.
 
-##### $c['router']->match(array $methods, string $match, string $rewrite, $closure = null)
+##### $router->match(array $methods, string $match, string $rewrite, $closure = null)
 
 Girilen http istek metotlarına göre bir route yaratır, istek metotları get,post,put ve delete metotlarıdır.
 
-##### $c['router']->get(string $match, string $rewrite, $closure = null)
+##### $router->get(string $match, string $rewrite, $closure = null)
 
 Http GET isteği türünde bir route kuralı oluşturur.
 
-##### $c['router']->post(string $match, string $rewrite, $closure = null)
+##### $router->post(string $match, string $rewrite, $closure = null)
 
 Http POST isteği türünde bir route kuralı oluşturur.
 
-##### $c['router']->put(string $match, string $rewrite, $closure = null)
+##### $router->put(string $match, string $rewrite, $closure = null)
 
 Http PUT isteği türünde bir route kuralı oluşturur.
 
-##### $c['router']->delete(string $match, string $rewrite, $closure = null)
+##### $router->delete(string $match, string $rewrite, $closure = null)
 
 Http DELETE isteği türünde bir route kuralı oluşturur.
 
-##### $c['router']->group(array $options, $closure);
+##### $router->group(array $options, $closure);
 
 Bir route grubu oluşturur.
 
-##### $c['router']->where(array $replace);
+##### $router->where(array $replace);
 
 Bir route kuralı parameterelerini girilen düzenli ifadeler ile değiştirir.
 
-##### $c['router']->attach(string $route|$regex)
+##### $router->attach(string $route|$regex)
 
 Geçerli grubun katmanlarını route grubuna tayin eder.
 
-##### $c['router']->middleware(string|array $middlewares);
+##### $router->middleware(string|array $middlewares);
 
 Bir route kuralına girilen katmanları tayin eder.
 
@@ -777,13 +777,13 @@ Sunucuda çalışan host adresine geri döner. Örn: example.com
 
 App/routes.php dosyası içerisinde domain metodu ile tanımlanmış alan adına geri döner.
 
-##### $this->router->getModule();
+##### $this->router->getPrimaryFolder();
 
-Eğer bir modül çağrıldıysa modül ismine aksi durumda boş bir string '' değerine geri döner.
+Eğer alt dizinleri olan birincil bir dizin varsa bu dizin ismine aksi durumda boş bir string '' değerine geri döner.
 
-##### $this->router->getDirectory();
+##### $this->router->getFolder();
 
-Çağırılan dizin adına geri döner.
+Çağırılan bir dizin veya alt dizin adına geri döner.
 
 ##### $this->router->getClass();
 

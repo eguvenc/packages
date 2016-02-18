@@ -6,8 +6,8 @@ include_once OBULLO .'Error/view/header.php';
 
 $getError = function ($message) {
     return str_replace(
-        array(APP, DATA, CLASSES, ROOT, OBULLO, MODULES, VENDOR), 
-        array('APP/', 'DATA/', 'CLASSES/', 'ROOT/', 'OBULLO/', 'MODULES/', 'VENDOR/'),
+        array(APP, DATA, CLASSES, ROOT, OBULLO, FOLDERS, VENDOR), 
+        array('APP/', 'DATA/', 'CLASSES/', 'ROOT/', 'OBULLO/', 'FOLDERS/', 'VENDOR/'),
         $message
     );
 };

@@ -4,38 +4,18 @@
 Kontrolör sınıfı uygulamanın kalbidir ve uygulamaya gelen HTTP isteklerinin nasıl yürütüleceğini kontrol eder.
 
 <ul>
-<li>
-    <a href="#flow">İşleyiş</a>
-    <ul>
-        <li><a href="#what-is-the-controller">Kontrolör Nedir ?</a></li>
-    </ul>
-    <a href="#running">Çalıştırma</a>
-    <ul>
-        <li><a href="#container-loader">Konteyner Yükleyici</a></li>
-        <li><a href="#example-page">Örnek Bir Açılış Sayfası</a></li>
-        <li><a href="#method-arguments">Method Argümanları</a></li>
-        <li><a href="#modules">Modüller</a></li>
-        <li><a href="#middlewares">Http Katmanları</a></li>
-        <li><a href="#welcome-page">İlk Açılış Sayfası</a></li>
-    </ul>
-</li>
-
-<li>
-    <a href="#annotations">Anotasyonlar</a>
-    <ul>
-        <li><a href="#enabling-annotations">Anotasyonları Aktif Etmek</a></li>
-    </ul>
-</li>
-
-<li><a href="#reserved-methods">Rezerve Edilmiş Metotlar</a></li>
-
+    <li><a href="#controller">Kontrolör Nedir ?</a></li>
+    <li><a href="#folders">Klasörler</a></li>
+    <li><a href="#primary-folders">Birincil Klasörler</a></li>
+    <li><a href="#proxy-way">Proxy Yöntemi Nedir ?</a></li>
+    <li><a href="#arguments">Argümanlar</a></li>
+    <li><a href="#middlewares">Http Katmanları</a></li>
+    <li><a href="#welcome-page">İlk Açılış Sayfası</a></li>
+    <li><a href="#annotations">Anotasyonlar</a></li>
+    <li><a href="#reserved-methods">Rezerve Edilmiş Metotlar</a></li>
 </ul>
 
-<a name="flow"></a>
-
-### İşleyiş
-
-Kontrolör dosyaları http route çözümlemesinden sonra <kbd>modules/</kbd> klasöründen çağrılarak çalıştırılır.
+Kontrolör dosyaları http route çözümlemesinden sonra <kbd>folders/</kbd> klasöründen çağrılarak çalıştırılır.
 
 Bir http GET isteği çözümlemesi
 
@@ -51,11 +31,11 @@ $router->post('product/post', 'shop/product/post');
 
 Route çözümlemeleri ilgili daha fazla bilgi için [Router.md](Router.md) dosyasını gözden geçirebilirsiniz.
 
-<a name="what-is-the-controller"></a>
+<a name="controller"></a>
 
-#### Kontrolör Nedir ?
+### Kontrolör Nedir ?
 
-Kontrolör dosyaları uygulamada http adres satırından çağrıldığı ismi ile bağlantılı olarak çözümlenebilen basit php sınıflarıdır. Kontrolör dosyaları uygulamada <kbd>app/modules/</kbd> klasörü altın çalışırlar.
+Kontrolör dosyaları uygulamada http adres satırından çağrıldığı ismi ile bağlantılı olarak çözümlenebilen php sınıflarıdır. Kontrolör dosyaları uygulamada <kbd>app/folders/</kbd> klasörü altında çalışırlar.
 
 Örnek bir http isteği.
 
@@ -63,7 +43,7 @@ Kontrolör dosyaları uygulamada http adres satırından çağrıldığı ismi i
 http://example.com/index.php/welcome
 ```
 
-BU isteğe ait kontrolör dosyası.
+ve bu isteğe ait kontrolör dosyası.
 
 ```php
 use Obullo\Http\Controller;
@@ -77,29 +57,87 @@ class Welcome extends Controller
 }
 ```
 
-#### Modüller
-
-Modüller de kontrolör dosyalarıdır. Tek farkları bir <kbd>app/modules/modülismi/</kbd> gibi bir dizin içinde ve bir <kbd>namespace</kbd> ile çalışabiliyor olmalıdır.
-
-Aşağıdaki adres satırı blog adlı modül altında bulunan start isimli kontrolör dosyasını çağırır:
+<kbd>HelloWorld</kbd> gibi birden fazla kelime içeren bir kontrolör varsa sadece <kbd>ikinci</kbd> kelime büyük yazılmalı,
 
 ```php
-example.com/index.php/examples/start
+example.com/index.php/examples/helloWorld
 ```
 
-Yukarıdaki örnekte uygulama modüller altında önce <kbd>blog</kbd> isimli klasörü bulmayı dener eğer böyle bir klasör varsa daha sonra <kbd>Start</kbd> isimli kontrolör dosyasını arar ve bulursa onu yükleyerek <kbd>index</kbd> metodunu çalıştırır. 
+yada tüm kelimeler büyük yazılmalıdır.
 
-Not: Metod ismi son segment olarak girilmediğinde varsayılan olarak index metodu çalışır.
 
-<a name="running"></a>
+```php
+example.com/index.php/examples/HelloWorld
+```
 
-### Çalıştırma
+Aksi durumda kontrolör <kbd>helloworld</kbd> olarak çağrılırsa sayfaya ulaşılamaz.
 
-<a name="container-loader"></a>
+<a name="folders"></a>
 
-#### Konteyner Yükleyici
+### Klasörler
 
-Konteyner içerisinden yüklenen sınıflara diğer metotlar içerisinden aşağıdaki gibi <kbd>$this</kbd> nesnesi yardımı ile ulaşılır.
+Klasörleri kullanılarak çalışmak uygulama esnekliğini arttırır ve mantıksal uygulamalar yaratmanızı sağlar. Klasör içerisindeki kontrolör dosyalarını dışarıdaki kontrolör dosyalarından ayıran farklar bu dosyaların, <kbd>app/folders/klasöradı/</kbd> gibi bir dizin içinde ve bir <kbd>namespace</kbd> ile çalışıyor olmalarıdır.
+
+```php
+example.com/index.php/examples/
+```
+
+Yukarıdaki adres satırı <kbd>examples</kbd> adlı dizin altında bulunan <kbd>Examples.php</kbd> isimli kontrolör dosyasını çağırır.
+
+```php
+namespace Examples;
+
+use Obullo\Http\Controller;
+
+class Examples extends Controller
+{
+    public function index()
+    {
+        $this->view->load('examples');
+    }
+}
+```
+
+Yukarıdaki gibi bir dizin ve bir kontrolör adı aynı ise uygulama bu kontrolör dosyasını index kontrolör olarak çözümler.
+
+<a name="primary-folders"></a>
+
+### Birincil Klasörler
+
+Birincil klasörler, bir alt klasörü olan klasöre verilen addır.Örnek verirsek, uygulamanızdaa <kbd>app/folders/examples/captcha/</kbd> adlı bir dizin ve altında <kbd>Ajax.php</kbd> adlı bir kontrolörümüzün olduğunu varsayalım.
+
+Bu dosyayı çözümlemek için ziyaret edeceğimiz adres aşağıdaki gibi olur.
+
+```php
+http://framework/examples/captcha/ajax
+```
+
+Bu çözümlemede en dıştaki klasör <kbd>birincil</kbd>, sonraki klasör ise alt klasördür.
+
+```php
+namespace Examples\Captcha;
+
+use Obullo\Http\Controller;
+
+class Ajax extends Controller
+{
+    public function index()
+    {
+        echo $this->uri->segment(0);  // examples
+        echo $this->uri->segment(1);  // captcha
+
+        echo $this->router->getPrimaryFolder();  // examples
+        echo $this->router->getFolder();         // captcha
+    }
+}
+```
+Bir birincil klasör altına en fazla bir adet klasör açılabilir.
+
+<a name="proxy-way"></a>
+
+### Proxy Yöntemi Nedir ?
+
+Proxy yöntemi <kbd>$container->get()</kbd> yazımının kolaylaştırmak için kullanılır ve aşağıdaki gibi <kbd>$this</kbd> ile bir servise ulaşılmaya çalışıldığında devreye girer.
 
 ```php
 namespace Welcome;
@@ -116,13 +154,13 @@ class Welcome extends \Controller
 }
 ```
 
-Aşağıdaki gibi,
+<kbd>$this</kbd> ile çağırılan sınıflar,
 
 ```php
 $this->class
 ```
 
-<kbd>$this</kbd> ile çağırılan bir sınıf__get() proxy metodu ile konteyner içerisinde çağırılmış olur.
+<kbd>Obullo\Http\Controller</kbd> sınıfı içerisindeki __get() metodu aracılığı ile konteyner içerisinden çağırılmış olurlar.
 
 ```php
 public function __get($class)
@@ -131,153 +169,94 @@ public function __get($class)
 }
 ```
 
-Çağrılan kütüphane <kbd>app/providers.php</kbd> dosyası aracılığı ile konteyner içerisine tanımlı bir <kbd>servis</kbd> olmalıdır.
+Çağırılan kütüphaneler <kbd>app/providers.php</kbd> dosyası aracılığı ile konteyner içerisine tanımlanmış <kbd>servis</kbd> ler olmalıdırlar.
 
-<a name="example-page"></a>
+<a name="arguments"></a>
 
-#### Örnek Bir Açılış Sayfası
-
-Şimdi kontrolör sınıfını birazda iş başında görelim, aşağıdaki gibi <kbd>welcome</kbd> adında bir klasör yaratın.
-
-```php
--  app
--  modules
-    - welcome
-       - view
-           welcome.php
-        Welcome.php
-```
-
-Metin editörünüzü kullanarak klasör içine yine <kbd>Welcome</kbd> adında bir kontrolör sınıfı oluşturun.
-
-```php
-namespace Welcome;
-
-class Welcome extends \Controller
-{
-    public function index()
-    {
-        $this->view->load(
-            'welcome',
-            [
-                'title' => 'Welcome to Obullo !',
-            ]
-        );
-    }
-}
-
-/* Location: .modules/welcome/welcome.php */
-```
-
-Daha sonra adres satırına aşağıdaki gibi bir url yazıp çağırın.
-
-```php
-example.com/index.php/welcome
-```
-
-Sayfayı ziyaret ettiğinizde <kbd>welcome/welcome/index</kbd> metodu çalışmış olmalı.
-
-Klasör ismi ve sınıf ismi <kbd>welcome/welcome</kbd> şeklinde aynı olduğunda route sınıfı adres çözümlemesi için sınıf ismine ihtiyaç duymaz yani <kbd>welcome/index</kbd> şeklinde sayfayı ziyaret ettiğinizde sayfa yine çalışmış olur. Eğer <kbd>welcome/hello</kbd> adında bir kontrolör sınıfımız olsaydı bu durumda adres satırını aşağıdaki gibi değiştirmemiz gerekirdi.
-
-```php
-example.com/index.php/welcome/hello/index
-```
-
-<a name="method-arguments"></a>
-
-#### Method Argümanları
+### Argümanlar
 
 Eğer adres satırında bir metot dan sonra gelen segmentler birden fazla ise bu segmentler metot argümanları olarak çözümlenir. Örneğin aşağıdaki gibi bir url adresimizin olduğunu varsayalım:
 
 ```php
-example.com/index.php/products/computer/index/desktop/123
+example.com/products/computer/index/desktop/123
 ```
 
 Products klasörü altına Computer.php adlı bir sınıf oluşturun.
 
 ```php
 -  app
--  modules
+-  folders
     - products
         Computer.php
 ```
 
-Yukarıdaki url adresi tarayıcıda çalıştırıldığında URI sınıfı tarafından <kbd>desktop</kbd> segmenti <kbd>3.</kbd> ve <kbd>123</kbd> segmenti ise <kbd>4.</kbd> segment olarak çözümlenir.
+Yukarıdaki url adresi tarayıcıda çalıştırıldığında URI sınıfı tarafından segmentler aşağıdaki gibi çözümlenirler.
+
+* products (0)
+* computer (1)
+* index (2)
+* desktop (3)
+* 123 (4)
 
 ```php
 namespace Products;
 
-class Computer extends \Controller
+use Obullo\Http\Controller;
+
+class Computer extends Controller
 {
     public function index($type, $id)
     {
-        echo $type;           // Çıktı  desktop
-        echo $id;             // Çıktı  123 
-        echo $this->uri->segment(3);    // Çıktı  123 
+        echo $type;  // desktop
+        echo $id;    // 123
+        echo $this->uri->segment(0);    // products
+        echo $this->uri->segment(1);    // computer
+        echo $this->uri->segment(2);    // index
+        echo $this->uri->segment(3);    // desktop
+        echo $this->uri->segment(4);    // 123
+
+        echo $this->router->getFolder();  // products
+        echo $this->router->getPrimaryFolder();  // null
     }
 }
 
 /* Location: .modules/products/computer.php */
 ```
 
-Not: Eğer URI route özelliğini kullanıyorsanız fonksiyonunuza gelen segmentler route edilmiş segment değerleri olacaktır.
-
-<a name="modules"></a>
-
-#### Modüller
-
-Modüller klasörleri kapsayan en dışdaki ana dizinlerdir ve alt dizinleri içerirler. Bir klasörü bir modül haline getirmek mümkündür, bunun için yapmanız gereken tek şey ana bir dizin açıp alt klasörlerinizi bu anadizin içerisine taşımak. 
-
-Örneğin bir önceki örnekte kullandığımız <kbd>products</kbd> adlı dizini, <kbd>shop</kbd> adında bir modül oluşturup bu modül içerisine taşıyalım.
-
-```php
--  app
--  modules
-    - shop
-       - products
-            Computer.php
-```
-
-Bir modül altında sadece bir alt klasör açılabilir. Böyle bir değişiklikten sonra url adresini artık aşağıdaki gibi çağırmanız gerekir.
-
-```php
-example.com/index.php/shop/products/computer/index/desktop/123
-```
 <a name="middlewares"></a>
 
-#### Http Katmanları
+### Http Katmanları
 
-Katmanlar <kbd>app/classes/Http</kbd> klasörü içerisinde yeralan basit php sınıflarıdır. Bir katman route yapısında tutturulabilir yada uygulamada evrensel olarak çalışabilir. Http katmanları http çözümlemesinden önce <kbd>$request</kbd> yada <kbd>$response</kbd> nesnelerini etkilemek için kullanılırlar. Daha fazla bilgi için [App-Middlewares.md](App-Middlewares.md) dökümentasyonunu inceleyebilirsiniz.
-
+Http katmanları http çözümlemesinden önce <kbd>$request</kbd> yada <kbd>$response</kbd> nesnelerini etkilemek için kullanılırlar. Katmanlar <kbd>app/classes/Http/Middlewares</kbd> klasörü içerisinde yeralan php sınıflarıdır. Bir katman route yapısında tutturulabilir yada uygulamada evrensel olarak çalışabilir. Daha fazla bilgi için [App-Middlewares.md](App-Middlewares.md) dökümentasyonunu inceleyebilirsiniz.
 
 <a name="welcome-page"></a>
 
-#### İlk Açılış Sayfası
+### İlk Açılış Sayfası
 
-Uygulamaya eğer domain adresinizden sonra herhangi bir kontrolör segmenti gönderilmezse uygulama ilk açılış sayfası için varsayılan bir kontrolör tanımlamasına ihtiyaç duyar. Varsayılan kontrolör <kbd>app/routes.php</kbd> dosyasında tanımlı olmadığında uygulama hata verecektir.
-
-Bu nedenle route dosyanızı açıp varsayılan kontrolör sınıfınızı defaultPage() metodu ile aşağıdaki gibi belirlemeniz gerekir.
+Uygulamanıza gelen bir adrese aşağıdaki gibi herhangi bir segment girilmezse,
 
 ```php
-$router->domain($c['config']['url']['webhost']);
-$router->defaultPage('welcome/index');
+http://example.com/
+```
+
+router sınıfı ilk açılış sayfası için varsayılan bir kontrolör tanımlamasına ihtiyaç duyar. Bu nedenle <kbd>app/routes.php</kbd> dosyanızı açıp varsayılan kontrolör adresinizi <kbd>defaultPage</kbd> anahtarından konfigüre etmeniz gerekir.
+
+```php
+$router->configure(
+    [
+        'domain' => 'example.com',
+        'defaultPage' => 'welcome/index',
+    ]
+);
 ```
 
 <a name="annotations"></a>
 
 ### Anotasyonlar
 
-Bir anotasyon aslında bir metadata yı (örneğin yorum,  açıklama, tanıtım biçimini) yazıya, resime veya diğer veri türlerine tutturmaktır. Anotasyonlar genellikle orjinal bir verinin belirli bir bölümümü refere ederler.
+Bir anotasyon aslında bir metadata yı (örneğin yorum,  açıklama, tanıtım biçimini) yazıya, resime veya diğer veri türlerine tutturmaktır. Anotasyonlar genellikle orjinal bir veriyi yada işlemi refere ederler. Şu anki sürümde anotasyonlar sadece <kbd>Http Katman</kbd> işlemleri için kullanılıyor.
 
-Not: Anotasyonlar herhangi bir kurulum yapmayı gerektirmez ve uygulamanıza performans açısından ek bir yük getirmez. Php ReflectionClass sınıfı ile okunan anotasyonlar çekirdekte herhangi bir düzenli ifade işlemi kullanılmadan kolayca çözümlenir.
-
-Şu anki sürümde biz anotasyonları sadece <kbd>Http Katmanlarını</kbd> atamak ve <kbd>Event</kbd> sınıfına tayin edilen <kbd>Olayları Dinlemek</kbd> için kullanıyoruz.
-
-<a name="enabling-annotations"></a>
-
-#### Anotasyonları Aktif Etmek
-
-Config.php konfigürasyon dosyasını açın ve <kbd>annotations > enabled</kbd> anahtarının değerini <kbd>true</kbd> olarak güncelleyin.
+Anotasyonları aktif etmek için <kbd>config.php</kbd>  dosyasını açın ve <kbd>annotations</kbd> anahtarının değerini <kbd>true</kbd> olarak güncelleyin.
 
 ```php
 'extra' => [

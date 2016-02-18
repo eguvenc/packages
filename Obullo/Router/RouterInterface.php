@@ -22,6 +22,13 @@ interface RouterInterface
     public function configure(array $params);
 
     /**
+     * Set the route mapping
+     * 
+     * @return void
+     */
+    public function init();
+
+    /**
      * Sets default page controller
      * 
      * @param string $page uri
@@ -29,13 +36,6 @@ interface RouterInterface
      * @return object
      */
     public function defaultPage($page);
-
-    /**
-     * Set the route mapping
-     * 
-     * @return void
-     */
-    public function init();
 
     /**
      * Set the class name
@@ -56,22 +56,22 @@ interface RouterInterface
     public function setMethod($method);
 
     /**
-     * Set the directory name : It must be lowercase otherwise sub module does not work
+     * Set the folder name : It must be lowercase otherwise sub module does not work
      *
-     * @param string $directory directory
+     * @param string $folder name
      * 
      * @return object Router
      */
-    public function setDirectory($directory);
+    public function setFolder($folder);
 
     /**
-     * Sets top directory http://example.com/api/user/delete/4
+     * Sets top folder http://example.com/api/user/delete/4
      * 
-     * @param string $directory sets top directory
+     * @param string $folder sets top folder
      *
      * @return void
      */
-    public function setModule($directory);
+    public function setPrimaryFolder($folder);
 
     /**
      * Get module directory
@@ -80,14 +80,14 @@ interface RouterInterface
      * 
      * @return void
      */
-    public function getModule($separator = '');
+    public function getPrimaryFolder($separator = '');
 
     /**
      * Fetch the directory
      *
      * @return string
      */
-    public function getDirectory();
+    public function getFolder();
 
     /**
      * Fetch the current routed class name

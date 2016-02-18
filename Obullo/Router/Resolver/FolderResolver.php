@@ -5,12 +5,12 @@ namespace Obullo\Router\Resolver;
 use Obullo\Router\RouterInterface as Router;
 
 /**
- * Resolve module
+ * Resolve folder
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class ModuleResolver
+class FolderResolver
 {
     /**
      * Router
@@ -45,24 +45,18 @@ class ModuleResolver
      */
     public function resolve(array $segments)
     {
-        $module = $this->router->getModule('/');
-        $directory = $this->router->getDirectory();
+        $folder = $this->router->getFolder();
         $hasSegmentOne = empty($segments[1]) ? false : true;
-        
-        // Add support e.g http://project/widgets/tutorials/helloWorld.php
 
-        if ($hasSegmentOne && is_file(MODULES .$module.$directory.'/'.$this->router->ucwordsUnderscore($segments[1]).'.php')) {
+        $file = FOLDERS .$folder.'/'.$this->router->ucwordsUnderscore($folder).'.php';
 
-            $this->segments = $segments;
+        if (is_file($file)) {
 
-            return $this;
+            $index = ($hasSegmentOne && $segments[1] == 'index');
 
-        } else {
-            
-            // Add index file support 
-            //  Rewrite /widgets/tutorials/tutorials/test to /widgets/tutorials/test
-
-            array_unshift($segments, $directory); 
+            if ($hasSegmentOne == false || $index) {  // welcome/hello support
+                array_unshift($segments, $folder);
+            }
             $this->segments = $segments;
 
             return $this;

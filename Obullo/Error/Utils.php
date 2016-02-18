@@ -205,10 +205,10 @@ class Utils
                 'CLASSES/',
                 'ROOT/',
                 'OBULLO/',
-                'MODULES/',
+                'FOLDERS/',
                 'VENDOR/',
             );
-            return str_replace(array(APP, DATA, CLASSES, ROOT, OBULLO, MODULES, VENDOR), $replace, $file);
+            return str_replace(array(APP, DATA, CLASSES, ROOT, OBULLO, FOLDERS, VENDOR), $replace, $file);
         }
         if (is_string($file)) {
             if (strpos($file, ROOT) === 0) {
@@ -223,8 +223,8 @@ class Utils
             if (strpos($file, OBULLO) === 0) {
                 $file = 'PACKAGES/' . substr($file, strlen(OBULLO));
             }
-            if (strpos($file, MODULES) === 0) {
-                $file = 'MODULES/' . substr($file, strlen(MODULES));
+            if (strpos($file, FOLDERS) === 0) {
+                $file = 'FOLDERS/' . substr($file, strlen(FOLDERS));
             }
             if (strpos($file, VENDOR) === 0) {
                 $file = 'VENDOR/' . substr($file, strlen(VENDOR));

@@ -67,7 +67,7 @@ $container->share('view', 'Obullo\View\View')
         'addFolder',
         [
             'views',
-            MODULES .'views/view/'
+            FOLDERS .'views/view/'
         ]
     )
     ->withMethodCall(
