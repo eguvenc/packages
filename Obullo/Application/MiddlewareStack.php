@@ -21,6 +21,13 @@ class MiddlewareStack implements MiddlewareStackInterface
     protected $count;
 
     /**
+     * Container
+     * 
+     * @var object
+     */
+    protected $container;
+
+    /**
      * Names
      * 
      * @var array
@@ -170,7 +177,7 @@ class MiddlewareStack implements MiddlewareStackInterface
         $this->validateMiddleware($name);
         $Class = $this->registered[$name];
         $this->names[$name] = $this->count;
-        return $this->queue[$this->count] = new $Class;  // Store middlewares
+        return $this->queue[$this->count] = new $Class($this->container);  // Store middlewares
     }
 
     /**

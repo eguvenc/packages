@@ -138,7 +138,7 @@ class Attach
                 'name' => $middleware,
                 'options' => $options,
                 'route' => trim($route, '/'), 
-                'attachedRoute' => trim($route)
+                'attach' => trim($route)
             );
         }
     }

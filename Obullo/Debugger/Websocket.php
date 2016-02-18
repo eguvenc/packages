@@ -147,7 +147,7 @@ class Websocket
         
         if ($this->container->get('app')->request->isAjax()) {
 
-            $cookies = $this->app->request->getCookieParams();
+            $cookies = $this->container->get('app')->request->getCookieParams();
 
             if (isset($cookies['o_debugger_active_tab']) && $cookies['o_debugger_active_tab'] != 'obulloDebugger-environment') {
                 setcookie('o_debugger_active_tab', "obulloDebugger-ajax-log", 0, '/');  // Select ajax tab

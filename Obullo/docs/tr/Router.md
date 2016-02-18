@@ -80,12 +80,6 @@ $c['router']->configuration(
 );
 ```
 
-ya da ana konfigürasyon dosyasından gelmesini sağlayabilirsiniz.
-
-```php
-$c['config']['url']['webhost']; 
-```
-
 Kök domain adresinizi başında <b>"www."</b> öneki olmadan girin.
 
 ```php

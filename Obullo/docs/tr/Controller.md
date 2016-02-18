@@ -55,12 +55,36 @@ Route çözümlemeleri ilgili daha fazla bilgi için [Router.md](Router.md) dosy
 
 #### Kontrolör Nedir ?
 
-Kontrolör dosyaları uygulamada http adres satırından çağrıldığı ismi ile bağlantılı olarak çözümlenebilen basit php sınıflarıdır. Kontrolör dosyaları uygulamada <kbd>.modules/modüladı/</kbd> klasörü altında tutulurlar. Uygulama içerisinde her bir kontrolör kendine ait isim alanı ( namespace ) ile belirtilmek zorundadır aksi takdirde çözümlenemezler.
+Kontrolör dosyaları uygulamada http adres satırından çağrıldığı ismi ile bağlantılı olarak çözümlenebilen basit php sınıflarıdır. Kontrolör dosyaları uygulamada <kbd>app/modules/</kbd> klasörü altın çalışırlar.
+
+Örnek bir http isteği.
+
+```php
+http://example.com/index.php/welcome
+```
+
+BU isteğe ait kontrolör dosyası.
+
+```php
+use Obullo\Http\Controller;
+
+class Welcome extends Controller
+{
+    public function index()
+    {
+        $this->view->load('views::welcome');
+    }
+}
+```
+
+#### Modüller
+
+Modüller de kontrolör dosyalarıdır. Tek farkları bir <kbd>app/modules/modülismi/</kbd> gibi bir dizin içinde ve bir <kbd>namespace</kbd> ile çalışabiliyor olmalıdır.
 
 Aşağıdaki adres satırı blog adlı modül altında bulunan start isimli kontrolör dosyasını çağırır:
 
 ```php
-example.com/index.php/blog/start
+example.com/index.php/examples/start
 ```
 
 Yukarıdaki örnekte uygulama modüller altında önce <kbd>blog</kbd> isimli klasörü bulmayı dener eğer böyle bir klasör varsa daha sonra <kbd>Start</kbd> isimli kontrolör dosyasını arar ve bulursa onu yükleyerek <kbd>index</kbd> metodunu çalıştırır. 

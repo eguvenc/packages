@@ -42,7 +42,11 @@ Bir view dosyası bir modüle ait ise modül dizini içerisindeki <kbd>/modules/
 
 View sınıfı görünüm dosyalarını işlemek için harici kütüphaneler kullanır. View sınıfının hangi motoru kullanacağı servis sağlayıcısı üzerinden <kbd>engine</kbd> konfigürasyonu ile belirlenir. Takip eden liste kullanılabilceğiniz motorları gösteriyor.
 
+* Native ( Varsayılan )
 * <a href="http://platesphp.com/" target="_blank">Plates</a>
+
+
+Varsayılan ( Native ) görünüm motoru ile daha yüksek performans elde etmeniz muhtemeldir, fakat daha gelişmiş özelliklere ihtiyacınız varsa diğer görünüm motorlarını da tercih edebilirsiniz.
 
 <a name="serviceProvider"></a>
 
@@ -79,7 +83,7 @@ Servis sağlayıcısı view sınıfına ait önkonfigurasyonu yönetir.
 
 <a name="addFolder"></a>
 
-#### $this->view->addFolder();
+#### $this->view->addFolder()
 
 Görünüm sınıfına klasörler konfigüre eder.
 
@@ -87,7 +91,7 @@ Görünüm sınıfına klasörler konfigüre eder.
 $this->view->addFolder('templates', '/resources/templates/');
 ```
 
-Tanımladığınız klasörden view dosyalarına ulaşmak için <kbd>:</kbd> karakteri kullanılır.
+Tanımladığınız klasörden view dosyalarına ulaşmak için <kbd>::</kbd> sembolü kullanılır.
 
 ```php
 $string = $this->view->get('templates::maintenance');
@@ -95,7 +99,7 @@ $string = $this->view->get('templates::maintenance');
 
 <a name="load"></a>
 
-#### $this->view->load();
+#### $this->view->load()
 
 ```php
 $this->view->load(
@@ -120,40 +124,15 @@ Welcome kontrolör dosyasında olduğu gibi kontrolör dosyası bir modül içer
 </html>
 ```
 
-View klasörü içerisinde iç içe klasörler açılabilir. 
-
-```php
-echo $this->view->load('subfolder/filename');
-```
-
 <a name="get"></a>
 
-#### $this->view->get();
+#### $this->view->get()
 
-Views modülü Footer kontrolör dosyasında olduğu gibi eğer bir view dosyası <kbd>$response</kbd> nesnesi içerisine gönderilmek yerine <kbd>string</kbd> türünde alınmak isteniyorsa get metodu kullanılır.
-
-```php
-namespace Views;
-
-use Obullo\Http\Controller;
-
-class Footer extends Controller
-{
-    public function index()
-    {        
-        echo $this->view->get(
-            'footer',
-            [
-                'footer' => 'Footer Controller'
-            ]
-        );
-    }
-}
-```
+Bir view dosyası <kbd>$response</kbd> nesnesi içerisine gönderilmek yerine <kbd>string</kbd> türünde alınmak isteniyorsa get metodu kullanılır.
 
 <a name="withStream"></a>
 
-#### $this->view->withStream();
+#### $this->view->withStream()
 
 Daha çok bir görünüm dosyası ile bir response gövdesi oluşturmak için kullanılır. Bu metod <kbd>Obullo\Http\Stream</kbd> nesnesine geri döner.
 
@@ -173,7 +152,7 @@ $body = $this->view->withStream("Example view")->get();
 
 <a name="withData"></a>
 
-#### $this->view->withData();
+#### $this->view->withData()
 
 Değişken atamak için diğer bir alternatiftir.
 

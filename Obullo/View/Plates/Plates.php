@@ -9,7 +9,7 @@ use League\Container\ImmutableContainerAwareInterface;
 use League\Plates\Engine;
 
 /**
- * Plates handler - http://platesphp.com/
+ * Plates engine - http://platesphp.com/
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license

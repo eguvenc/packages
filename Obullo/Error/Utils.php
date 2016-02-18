@@ -20,7 +20,10 @@ class Utils
      */
     public static function dumpArgument(& $var, $length = 128, $level = 0)
     {
-        global $c;
+        global $container;
+        
+        $charset = $container->get('config')['locale']['charset'];
+
         if ($var === null) {
             return '<small>null</small>';
         } elseif (is_bool($var)) {
@@ -36,16 +39,17 @@ class Utils
                     if (stream_is_local($file)) { 
                         $file = static::securePath($file);
                     }
-                    return '<small>resource</small><span>(' . $type . ')</span> ' . htmlspecialchars($file, ENT_NOQUOTES, $c['config']['locale']['charset']);
+                    return '<small>resource</small><span>(' . $type . ')</span> ' . htmlspecialchars($file, ENT_NOQUOTES, $charset);
                 }
             } else {
                 return '<small>resource</small><span>(' . $type . ')</span>';
             }
         } elseif (is_string($var)) {
             // Encode the string
-            $str = htmlspecialchars($var, ENT_NOQUOTES, $c['config']['locale']['charset']);
+            $str = htmlspecialchars($var, ENT_NOQUOTES, $charset);
 
             return '<small>string</small><span>(' . strlen($var) . ')</span> "' . $str . '"';
+
         } elseif (is_array($var)) {
             $output = array();
             $space  = str_repeat($s = '    ', $level);   // Indentation for this variable
@@ -68,7 +72,7 @@ class Utils
                     if ($key === $marker)
                         continue;
                     if (!is_int($key)) {
-                        $key = '"' . htmlspecialchars($key, ENT_NOQUOTES, $c['config']['locale']['charset']) . '"';
+                        $key = '"' . htmlspecialchars($key, ENT_NOQUOTES, $charset) . '"';
                     }
                     $output[] = "$space$s$key => " . static::dumpArgument($val, $length, $level + 1);
                 }
@@ -79,7 +83,6 @@ class Utils
                 // Depth too great
                 $output[] = "(\n$space$s...\n$space)";
             }
-
             return '<small>array</small><span>(' . count($var) . ')</span> ' . implode("\n", $output);
 
         } elseif (is_object($var)) {
@@ -130,7 +133,7 @@ class Utils
             }
             return '<small>object</small> <span class="object">' . get_class($var) . '(' . count($array) . ')</span> ' . implode("<br />", $output);
         } else {
-            return '<small>' . gettype($var) . '</small> ' . htmlspecialchars(print_r($var, true), ENT_NOQUOTES, $c['config']['locale']['charset']);
+            return '<small>' . gettype($var) . '</small> ' . htmlspecialchars(print_r($var, true), ENT_NOQUOTES, $charset);
         }
     }
 
@@ -146,7 +149,9 @@ class Utils
      */
     public static function debugFileSource($trace, $key = 0, $prefix = '')
     {
-        global $c;
+        global $container;
+        $charset = $container->get('config')['locale']['charset'];
+
         $file = $trace['file'];
         $line_number = $trace['line'];
 
@@ -166,7 +171,7 @@ class Utils
                 break;
 
             if ($line >= $range['start']) {
-                $row = htmlspecialchars($row, ENT_NOQUOTES, $c['config']['locale']['charset']);  // Make the row safe for output
+                $row = htmlspecialchars($row, ENT_NOQUOTES, $charset);  // Make the row safe for output
                 $row = '<span class="number">' . sprintf($format, $line) . '</span> ' . $row;  // Trim whitespace and sanitize the row
                 if ($line === $line_number) {
                     $row = '<span class="line highlight">' . $row . '</span>';  // Apply highlighting to this row

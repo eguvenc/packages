@@ -85,9 +85,6 @@ return array(
     'log' => [
         'enabled' => true,
     ],
-    'http' => [
-        'webhost' => 'framework',
-    ],
     'locale' => [
         'timezone' => 'gmt',
         'date' => [

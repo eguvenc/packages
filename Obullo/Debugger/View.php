@@ -306,12 +306,10 @@ pre span.string {color: #cc0000;}
     margin-top:25px;
 }
 </style>
-
 <?php 
 $getDebuggerURl = function ($method = 'index') {
-    return '/debugger/debugger/'.$method;
+    return '/debugger/'.$method;
 };
-$refreshUrl = '/debugger/';
 ?>
 <script type="text/javascript">
 /**
@@ -576,7 +574,7 @@ function reconnect() {
     if (websocket.readyState == 3) {
         ajax.get(<?php echo "'".$getDebuggerURl('ping')."'" ?>, function(html){
                 if (html == 1) {
-                    window.location = <?php echo "'".$refreshUrl."'" ?>;
+                    window.location = <?php echo "'".$getDebuggerURl()."'" ?>;
                 } else {
                     disconnect();
                 }

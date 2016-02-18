@@ -11,19 +11,24 @@ class Debugger extends Controller
     protected $msg;
     protected $socket;
     protected $length;
+    protected $debugger;
     protected $connection;
     protected $maxByte = 10242880;  // 10 Mb
     protected $clients = array();
 
     /**
      * Loader
+     *
+     * @param object $container container
      * 
      * @return void
      */
-    public function __construct()
+    public function __construct($container)
     {
         self::registerErrorHandler();     // We disable errors otherwise we get socket write errors in ajax response
         self::registerExceptionHandler();
+
+        $this->debugger = $container->get('config')->load('debugger');
     }
 
     /**
@@ -49,14 +54,14 @@ class Debugger extends Controller
 
         ob_implicit_flush();   /* Turn on implicit output flushing so we see what we're getting as it comes in. */
 
-        if (false == preg_match('#(ws:\/\/(?<host>(.*)))(:(?<port>\d+))(?<url>.*?)$#i', $this->container->get('config')['http']['debugger']['socket'], $matches)) {
+        if (false == preg_match('#(ws:\/\/(?<host>(.*)))(:(?<port>\d+))(?<url>.*?)$#i', $this->debugger['socket'], $matches)) {
             throw new RuntimeException("Debugger socket connection error, example web socket configuration: ws://127.0.0.1:9000");
         }
         /**
          * Enable websocket
          */
         $newArray = $this->config->load('config');
-        $newArray['http']['debugger']['enabled'] = true;
+        $newArray['extra']['debugger'] = true;
 
         $this->config->write('config', $newArray);
 

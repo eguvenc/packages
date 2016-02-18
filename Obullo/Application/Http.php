@@ -122,11 +122,11 @@ class Http extends Application
 
             foreach ($attach->getArray() as $value) {
 
-                $attachedRoute = str_replace('#', '\#', $value['attachedRoute']);  // Ignore delimiter
+                $attachRegex = str_replace('#', '\#', $value['attach']);  // Ignore delimiter
 
                 if ($value['route'] == $uriString) {     // if we have natural route match
                     $object = $middleware->add($value['name']);
-                } elseif (ltrim($attachedRoute, '.') == '*' || preg_match('#'. $attachedRoute .'#', $uriString)) {
+                } elseif (ltrim($attachRegex, '.') == '*' || preg_match('#'. $attachRegex .'#', $uriString)) {
                     $object = $middleware->add($value['name']);
                 }
                 if ($object instanceof ParamsAwareInterface && ! empty($value['options'])) {  // Inject parameters
@@ -134,8 +134,7 @@ class Http extends Application
                 }
             }
         }
-        $config = $this->container->get('config');
-        if (isset($config['debugger']) && $config['debugger']['enabled']) {  // Boot debugger
+        if ($this->container->get('config')['extra']['debugger']) {  // Boot debugger
             $middleware->add('Debugger');
         }
         $this->inject($middleware);

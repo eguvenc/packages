@@ -4,6 +4,7 @@ namespace Obullo\Debugger;
 
 use RuntimeException;
 use Obullo\Log\Handler\Raw;
+use Interop\Container\ContainerInterface as Container;
 
 /**
  * Debugger manager
@@ -13,13 +14,6 @@ use Obullo\Log\Handler\Raw;
  */
 class Manager
 {
-    /**
-     * Container class
-     * 
-     * @var object
-     */
-    protected $container;
-
     /**
      * Logger class
      * 
@@ -35,14 +29,23 @@ class Manager
     protected $config;
 
     /**
-     * Constructor
+     * Container class
+     * 
+     * @var object
      */
-    public function __construct()
+    protected $container;
+
+    /**
+     * Constructor
+     *
+     * @param object $container Container
+     */
+    public function __construct(Container $container)
     {
-        global $container;
         $this->container = $container;
         $this->logger = $container->get('logger');
         $this->config = $container->get('config')->load('providers::logger');
+        $this->debugger = $container->get('config')->load('debugger');
     }
 
     /**
@@ -57,8 +60,8 @@ class Manager
          * 
          * @var string
          */
-        $websocketUrl = $this->container->get('config')['http']['debugger']['socket'];
-        $debuggerOff  = (int)$this->container->get('config')['http']['debugger']['enabled'];
+        $websocketUrl = $this->debugger['socket'];
+        $debuggerOff  = (int)$this->container->get('config')['extra']['debugger'];
         $debuggerUrl  = $this->container->get('url')->getBaseUrl(INDEX_PHP.'/debugger/body');
 
         $env = new Environment(
@@ -85,7 +88,7 @@ class Manager
     {
         if (false == preg_match(
             '#(ws:\/\/(?<host>(.*)))(:(?<port>\d+))(?<url>.*?)$#i', 
-            $this->container->get('config')['http']['debugger']['socket'], 
+            $this->debugger['socket'], 
             $matches
         )) {
             throw new RuntimeException("Debugger socket connection error, example web socket configuration: ws://127.0.0.1:9000");
