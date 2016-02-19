@@ -76,7 +76,7 @@ Aksi durumda kontrolör <kbd>helloworld</kbd> olarak çağrılırsa sayfaya ula�
 
 ### Klasörler
 
-Klasörleri kullanılarak çalışmak uygulama esnekliğini arttırır ve mantıksal uygulamalar yaratmanızı sağlar. Klasör içerisindeki kontrolör dosyalarını dışarıdaki kontrolör dosyalarından ayıran farklar bu dosyaların, <kbd>app/folders/klasöradı/</kbd> gibi bir dizin içinde ve bir <kbd>namespace</kbd> ile çalışıyor olmalarıdır.
+Klasör içerisine konulan dosyalar <kbd>app/folders/klasöradı/</kbd> gibi bir dizin içinde ve php <kbd>namespace</kbd> ler ile çalışırlar. Klasörler kullanarak çalışmak uygulama esnekliğini arttırır ve mantıksal uygulamalar yaratmanızı sağlar. 
 
 ```php
 example.com/index.php/examples/
@@ -98,13 +98,13 @@ class Examples extends Controller
 }
 ```
 
-Yukarıdaki gibi bir dizin ve bir kontrolör adı aynı ise uygulama bu kontrolör dosyasını index kontrolör olarak çözümler.
+Dizin ve kontrolör adı aynı ise uygulama bu kontrolör dosyasını <kbd>index</kbd> kontrolör olarak çözümler.
 
 <a name="primary-folders"></a>
 
 ### Birincil Klasörler
 
-Birincil klasörler, bir alt klasörü olan klasöre verilen addır.Örnek verirsek, uygulamanızdaa <kbd>app/folders/examples/captcha/</kbd> adlı bir dizin ve altında <kbd>Ajax.php</kbd> adlı bir kontrolörümüzün olduğunu varsayalım.
+Birincil klasörler, bir alt klasörü olan klasöre verilen addır.Örnek verirsek, uygulamanızda <kbd>app/folders/examples/captcha/</kbd> adlı bir dizin ve altında <kbd>Ajax.php</kbd> adlı bir kontrolörümüzün olduğunu varsayalım.
 
 Bu dosyayı çözümlemek için ziyaret edeceğimiz adres aşağıdaki gibi olur.
 
@@ -209,6 +209,7 @@ class Computer extends Controller
     {
         echo $type;  // desktop
         echo $id;    // 123
+        
         echo $this->uri->segment(0);    // products
         echo $this->uri->segment(1);    // computer
         echo $this->uri->segment(2);    // index

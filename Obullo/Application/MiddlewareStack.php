@@ -189,25 +189,18 @@ class MiddlewareStack implements MiddlewareStackInterface
      */
     public function remove($name)
     {
-        if (is_string($name)) {
-            $this->validateMiddleware($name);
+        $this->validateMiddleware($name);
 
-            if (! isset($this->names[$name])) {
-                throw new RuntimeException(
-                    sprintf(
-                        'Middleware "%s" is not available',
-                        $name
-                    )
-                );
-            }
-            $index = $this->names[$name];
-            unset($this->queue[$index], $this->names[$name]);
+        if (! isset($this->names[$name])) {
+            throw new RuntimeException(
+                sprintf(
+                    'Middleware "%s" is not available.',
+                    $name
+                )
+            );
         }
-        if (is_array($name)) {
-            foreach ($name as $key) {
-                $this->remove($key);
-            }
-        }
+        $index = $this->names[$name];
+        unset($this->queue[$index], $this->names[$name]);
     }
 
     /**
@@ -219,10 +212,13 @@ class MiddlewareStack implements MiddlewareStackInterface
      */
     protected function validateMiddleware($name)
     {
+        if (! is_string($name)) {
+            throw new RuntimeException("Middleware name must be string.");
+        }
         if (! isset($this->registered[$name])) {
             throw new RuntimeException(
                 sprintf(
-                    'Middleware "%s" is not registered in middlewares.php',
+                    'Middleware "%s" is not registered in middlewares.php.',
                     $name
                 )
             );

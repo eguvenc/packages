@@ -3,8 +3,6 @@
 
 Bir uygulamada kullanıcı girdilerini filtrelemek uygulama güvenliği açısından büyük önem taşır. Kullanıcı girdilerine güvenerek filtrelemeyi ihmal etmek uygulama içeriğinize, kullanıcı verilerine hatta uygulamanın barındırıldığı sunucu üzerinde izinsiz girişlere neden olabilir.
 
-Obullo da filtreleme iki ayrı sınıf ile yapılır doğrulama filtresi için <b>Is</b> sınıfı ve arındırma filtresi için <b>Clean</b> sınıfı kullanılır. Bu filtreler <kbd>app/providers.php</kbd> dosyası içerisinde komponent olarak tanımlıdırlar. Eğer sizinde uygulamaya özgü filtreleriniz oluşursa onları aynı dosyada komponent olarak tanımlayabilir yada mevcut komponente genişleyerek kendi fonksiyonlarınınızı dahil edebilirsiniz.
-
 <ul>
 <li>
     <a href="#is">Is Sınıfı</a>  ( Doğrulama )
@@ -39,7 +37,7 @@ Obullo da filtreleme iki ayrı sınıf ile yapılır doğrulama filtresi için <
 
 ### Is Sınıfı
 
-Is sınıfı php filter_var() fonksiyonlarını kullanarak belirli data tipleri üzerinde doğrulama kontrolü sağlar. Filtreleme özellikleri gönderilen çeşitli parametreler ile değiştirilebilir.
+Is sınıfı php <kbd>filter_var()</kbd> fonksiyonlarını kullanarak belirli data tipleri üzerinde doğrulama kontrolü sağlar. Filtreleme özellikleri gönderilen çeşitli parametreler ile değiştirilebilir.
 
 #### Metotlara Erişim
 
@@ -63,7 +61,7 @@ Bir kullanıcı girdisinin bir tamsayı olup olup olmadığını kontrol etmek i
 $this->is->int(285); // Çıktı 285
 ```
 
-İkinci parametre, işlemin başarısız olması durumunda hangi değere dönüleceğini belirler. Varsayılan değer <b>false</b> değeridir.
+İkinci parametre, işlemin başarısız olması durumunda hangi değere dönüleceğini belirler. Varsayılan değer <kbd>false</kbd> değeridir.
 
 ```php
 $this->is->int(285.8, null); // Çıktı null
@@ -110,7 +108,7 @@ Bir kullanıcı girdisinin float olup olmadığını kontrol etmek için kullan�
 $this->is->float(10.99); // Çıktı 10.99
 ```
 
-İkinci parametre, işlemin başarısız olması durumunda hangi değere dönüleceğini belirler. Varsayılan değer <b>false</b> değeridir.
+İkinci parametre, işlemin başarısız olması durumunda hangi değere dönüleceğini belirler. Varsayılan değer <kbd>false</kbd> değeridir.
 
 ```php
 $this->is->float(10, null);  // Çıktı null
@@ -136,7 +134,7 @@ Bir kullanıcı girdisinin boolean olup olmadığını kontrol etmek için kulla
 $this->is->bool(true); // Çıktı true
 ```
 
-İkinci parametre, işlemin başarısız olması durumunda hangi değere dönüleceğini belirler. Varsayılan değer <b>false</b> değeridir.
+İkinci parametre, işlemin başarısız olması durumunda hangi değere dönüleceğini belirler. Varsayılan değer <kbd>false</kbd> değeridir.
 
 ```php
 $this->is->bool(10, 0);  // Çıktı 0
@@ -145,8 +143,10 @@ $this->is->bool(10, 0);  // Çıktı 0
 ###### Request Sınıfı İle Birlikte Kullanmak
 
 ```php
-if ($this->request->post('allow', 'is')->bool()) {
+$value = $this->request->post('value');
 
+if ($value = $this->is->bool($value)) {
+    // ..
 }
 ```
 
@@ -160,7 +160,7 @@ Bir kullanıcı girdisinin email olup olmadığını kontrol etmek için kullan�
 $this->is->email('user@example.com');  // Çıktı user@example.com
 ```
 
-İkinci parametre, işlemin başarısız olması durumunda hangi değere dönüleceğini belirler. Varsayılan değer <b>false</b> değeridir.
+İkinci parametre, işlemin başarısız olması durumunda hangi değere dönüleceğini belirler. Varsayılan değer <kbd>false</kbd> değeridir.
 
 ```php
 $this->is->email(user.example.com, null);  // Çıktı null
@@ -186,7 +186,7 @@ Bir kullanıcı girdisinin ip adresi olup olmadığını kontrol etmek için kul
 $this->is->ip('127.0.0.1');  // Çıktı 127.0.0.1
 ```
 
-İkinci parametre, işlemin başarısız olması durumunda hangi değere dönüleceğini belirler. Varsayılan değer <b>false</b> değeridir.
+İkinci parametre, işlemin başarısız olması durumunda hangi değere dönüleceğini belirler. Varsayılan değer <kbd>false</kbd> değeridir.
 
 ```php
 $this->is->ip('0938493', '0.0.0.0');  // Çıktı 0.0.0.0
@@ -249,8 +249,10 @@ Seçenekler
 ###### Request Sınıfı İle Birlikte Kullanmak
 
 ```php
-if ($this->request->post('ip_address', 'is')->ip('v4|no_priv_range')) {
+$ip = $this->request->post('ip_address');
 
+if ($ip = $this->is->ip('v4|no_priv_range')) {
+    echo $ip;
 }
 ```
 
@@ -264,7 +266,7 @@ Bir kullanıcı girdisinin url adresi olup olmadığını kontrol etmek için ku
 $this->is->url('http://example.com');  // Çıktı http://example.com
 ```
 
-İkinci parametre, işlemin başarısız olması durumunda hangi değere dönüleceğini belirler. Varsayılan değer <b>false</b> değeridir.
+İkinci parametre, işlemin başarısız olması durumunda hangi değere dönüleceğini belirler. Varsayılan değer <kbd>false</kbd> değeridir.
 
 ```php
 $this->is->url('//example.com', null); // Çıktı null
@@ -315,8 +317,8 @@ Seçenekler
 ```php
 $url = $this->request->post('url_adress');
 
-if ($this->is->url($url, false, 'host|query')) {
-
+if ($url = $this->is->url($url, false, 'host|query')) {
+    echo $url;
 }
 ```
 
@@ -324,17 +326,18 @@ if ($this->is->url($url, false, 'host|query')) {
 
 ### Clean Sınıfı
 
-------
-
-Clean sınıfı php filter_var() fonksiyonlarını kullanarak belirli data tipleri yardımı ile girilen değeri <b>arındırır</b>. Filtreleme özellikleri gönderilen çeşitli parametreler ile değiştirilebilir.
-
+Clean sınıfı php filter_var() fonksiyonlarını kullanarak belirli data tipleri yardımı ile girilen değeri <kbd>arındırır</kbd>. Filtreleme özellikleri gönderilen çeşitli parametreler ile değiştirilebilir.
 
 #### Metotlara Erişim
 
--------
+```php
+$container->get('clean')->method();
+```
+
+kontrolör içinden,
 
 ```php
-$this->c['clean']->method();
+$this->clean->method();
 ```
 
 <a name="clean-str"></a>
@@ -343,18 +346,17 @@ $this->c['clean']->method();
 
 Bir kullanıcı girdisinden bütün html taglarını siler.
 
-
 ```php
-$this->clean->str("<b>Hello World</b>"); // Çıktı Hello World
+$this->clean->str("<kbd>Hello World</kbd>"); // Çıktı Hello World
 ```
 
-İkinci parametre, işlem seçeneklerini belirler. Varsayılan değer <b>strip_low</b> değeridir.
+İkinci parametre, işlem seçeneklerini belirler. Varsayılan değer <kbd>strip_low</kbd> değeridir.
 
 ```php
 echo $this->clean->str("<h1>Hello WorldÆØÅ!</h1>", 'strip_high|encode_amp'); // Çıktı Hello World!
 ```
 
-Tek ve çift tırnak karakterlerinin kodlanmasını engellemek istiyorsanız <b>no_encode_quotes</b> seçeneğini kullanmanız gerekir.
+Tek ve çift tırnak karakterlerinin kodlanmasını engellemek istiyorsanız <kbd>no_encode_quotes</kbd> seçeneğini kullanmanız gerekir.
 
 ```php
 $str1 = $this->clean->str("Welcome <script> alert('Hello World')</script>");   
@@ -376,14 +378,9 @@ var_dump($str2);
 ###### Request Sınıfı İle Birlikte Kullanmak
 
 ```php
-if ($entry = $this->request->post('entry', 'clean')->str()) {
-    echo $entry;
-}
-```
-Eğer parametre girmek istiyorsanız ilk parametrenin olmadığını varsayıp gönderin.
+$entry = $this->request->post('entry');
 
-```php
-if ($entry = $this->request->post('entry', 'clean')->str('strip_high|encode_amp')) {
+if ($entry = $this->clean->str($entry, 'strip_high|encode_amp')) {
     echo $entry;
 }
 ```
@@ -427,7 +424,7 @@ Seçenekler
         <tr>
             <td>encode_amp</td>
             <td>FILTER_FLAG_ENCODE_AMP</td>
-            <td>"<b>&</b>" karakterini <b>&</b>amp; olarak kodlar.</td>
+            <td>"<kbd>&</kbd>" karakterini <kbd>&</kbd>amp; olarak kodlar.</td>
         </tr>
     </tbody>
 </table>
@@ -437,7 +434,7 @@ Seçenekler
 
 ##### $this->clean->raw($str);
 
-Bir kullanıcı girdisinden uygulamaya zarar verebilecek potansiyel verileri temizler. Özel karakterleri silmek veya istenmeyen karakterleri kodlamak için kullanılır. Html karakterlerini temizlemez.
+Bir kullanıcı girdisinden uygulamaya zarar verebilecek potansiyel verileri temizler. Özel karakterleri silmek veya istenmeyen karakterleri kodlamak için kullanılır. Html karakterlerini <kbd>temizlemez</kbd>.
 
 ```php
 var_dump($this->clean->raw("Is Peter �� & \0\n funny?", 'strip_high'));
@@ -455,14 +452,6 @@ var_dump($this->clean->raw("Is Peter �� & \0\n funny?", 'strip_high|encode_a
 
 ```
 // Çıktı string(25) "Is Peter & funny?" 
-```
-
-###### Request Sınıfı İle Birlikte Kullanmak
-
-```php
-if ($entry = $this->request->post('entry', 'clean')->raw('strip_high|encode_amp')) {
-    echo $entry;
-}
 ```
 
 Seçenekler
@@ -499,7 +488,7 @@ Seçenekler
         <tr>
             <td>encode_amp</td>
             <td>FILTER_FLAG_ENCODE_AMP</td>
-            <td>"<b>&</b>" karakterini <b>&</b>amp; olarak kodlar.</td>
+            <td>"<kbd>&</kbd>" karakterini <kbd>&</kbd>amp; olarak kodlar.</td>
         </tr>
     </tbody>
 </table>
@@ -518,8 +507,10 @@ $this->clean->int("5-2+3pp"); // "5-2+3"
 ###### Request Sınıfı İle Birlikte Kullanmak
 
 ```php
-if ($id = $this->request->get('id', 'clean')->int()) {
-    echo $id;
+$id = $this->request->post('id');
+
+if ($int = $this->clean->int($id)) {
+    echo $int;
 }
 ```
 
@@ -533,7 +524,7 @@ Float formatında bir kullanıcı girdisinden tüm usulsüz karakterleri siler.
 $this->clean->float("10.2p#a"); // "10.2"
 ```
 
-İkinci parametreye <b>thousand</b> değeri girilirse fonksiyon "," karakterlerini silmez.
+İkinci parametreye <kbd>thousand</kbd> değeri girilirse fonksiyon "," karakterlerini silmez.
 
 ```php
 $this->clean->float("10,2p#a", 'thousand'); // "10,2"
@@ -548,7 +539,9 @@ $this->clean->float("10.2p,#aE", 'fraction|thousand|scientific'); // "10.2,E"
 ###### Request Sınıfı İle Birlikte Kullanmak
 
 ```php
-if ($price = $this->request->post('price', 'clean')->float('fraction|thousand')) {
+$price = $this->request->post('price');
+
+if ($price = $this->clean->float($price, 'fraction|thousand')) {
     echo $price;
 }
 ```
@@ -592,8 +585,7 @@ Email formatında bir kullanıcı girdisinden tüm usulsüz karakterleri siler.
 echo $this->clean->email('u(s)er@ex\\ample.com'); // Çıktı user@example.com
 ```
 
-> **Not:** Bu metodun request sınıfı ile birlikte kullanımı str metoduyla aynıdır.
-
+Bu metodun request sınıfı ile birlikte kullanımı str metoduyla aynıdır.
 
 <a name="clean-quote"></a>
 
@@ -605,7 +597,7 @@ Bir kullanıcı girdisindeki tek veya çift tırnak karakterleri başına addsla
 $this->clean->quote("Ayşe'nin elbisesi");  // Çıktı Ayşe\'nin elbisesi 
 ```
 
-> **Not:** Bu metodun request sınıfı ile birlikte kullanımı str metoduyla aynıdır.
+Bu metodun request sınıfı ile birlikte kullanımı str metoduyla aynıdır.
 
 <a name="clean-escape"></a>
 
@@ -614,11 +606,11 @@ $this->clean->quote("Ayşe'nin elbisesi");  // Çıktı Ayşe\'nin elbisesi
 Bir kullanıcı girdisindeki özel karakterlerden kaçış için kullanılır. Özel karakterlere kaçış atarak karakterlerin olduğu gibi gösterilmesini sağlar.
 
 ```php
-echo $this->clean->escape("Is Peter <b>smart</b>> & funny?");
+echo $this->clean->escape("Is Peter <kbd>smart</kbd>> & funny?");
 ```
 
 ```php
-// Çıktı Is Peter <b>smart</b> & funny? 
+// Çıktı Is Peter <kbd>smart</kbd> & funny? 
 ```
 
 Seçenekler
@@ -655,14 +647,13 @@ Seçenekler
     </tbody>
 </table>
 
-> **Not:** Bu metodun request sınıfı ile birlikte kullanımı str metoduyla aynıdır.
-
+Bu metodun request sınıfı ile birlikte kullanımı str metoduyla aynıdır.
 
 <a name="clean-fullEscape"></a>
 
 ##### $this->clean->fullEscape($html, $flag = null);
 
-Bir kullanıcı girdisindeki özel karakterleri kodlar. <b>ENT_QUOTES</b> ile kullanılmış bir php htmlspecialchars() fonksiyonuna eş değerdir. Bu fonksiyonda tırnaklardan kaçış kodlaması <b>FILTER_FLAG_NO_ENCODE_QUOTES</b> özelliği ile kapatılabilir. Htmlspecialchars fonksiyonunda olduğu gibi bu filtrede varsayılan karakter setine duyarlıdır.
+Bir kullanıcı girdisindeki özel karakterleri kodlar. <kbd>ENT_QUOTES</kbd> ile kullanılmış bir php htmlspecialchars() fonksiyonuna eş değerdir. Bu fonksiyonda tırnaklardan kaçış kodlaması <kbd>FILTER_FLAG_NO_ENCODE_QUOTES</kbd> özelliği ile kapatılabilir. Htmlspecialchars fonksiyonunda olduğu gibi bu filtrede varsayılan karakter setine duyarlıdır.
 
 ```php
 $str = "Is It Peter's?";
@@ -690,9 +681,7 @@ Seçenekler
     </tbody>
 </table>
 
-
-> **Not:** Bu metodun request sınıfı ile birlikte kullanımı str metoduyla aynıdır.
-
+Bu metodun request sınıfı ile birlikte kullanımı str metoduyla aynıdır.
 
 <a name="clean-url"></a>
 
@@ -748,8 +737,7 @@ Seçenekler
     </tbody>
 </table>
 
-
-> **Not:** Bu metodun request sınıfı ile birlikte kullanımı str metoduyla aynıdır.
+Bu metodun request sınıfı ile birlikte kullanımı str metoduyla aynıdır.
 
 <a name="clean-urlencode"></a>
 
@@ -776,7 +764,9 @@ echo $this->clean->urlencode("http://example��.com", 'strip_high');
 ###### Request Sınıfı İle Birlikte Kullanmak
 
 ```php
-if ($url = $this->request->get('url', 'clean')->urlencode('strip_high')) {
+$url = $this->request->post('url');
+
+if ($url = $this->clean->urlencode($url, 'strip_high')) {
     echo $url;
 }
 ```

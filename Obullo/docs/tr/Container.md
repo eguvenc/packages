@@ -1,7 +1,7 @@
 
 ## Konteyner Sınıfı
 
-Bir konteyner, uygulamanızda servisler ve servis sağlayıcıları oluşturabilmeyi sağlar ve bağımlılık enjeksiyonunu yönetir. Çerçeve içerisinde konteyner paketi olarak <a href="http://thephpleague.com" target="blank">The Php League</a> php grubu tarafından geliştirilen <a href="http://container.thephpleague.com/" target="_blank">League Container</a> sınıfı seçilmiştir.
+Bir konteyner, uygulamanızda servisler ve servis sağlayıcıları oluşturabilmeyi sağlar ve bağımlılık enjeksiyonunu yönetir. Çerçeve içerisinde konteyner paketi harici olarak kullanılır ve <a href="http://thephpleague.com" target="blank">The Php League</a> php grubu tarafından geliştirilen <a href="http://container.thephpleague.com/" target="_blank">League Container</a> sınıfı tercih edilmiştir.
 
 <ul>
 <li>

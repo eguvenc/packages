@@ -5,7 +5,6 @@ namespace Obullo\Form;
 use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Config\ConfigInterface as Config;
 use Interop\Container\ContainerInterface as Container;
-
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
@@ -613,7 +612,7 @@ class Element
         }
         $post = $this->request->getParsedBody();
 
-        $value   = (isset($post[$field])) ? $this->container->get('form')->getValue($field) : '';
+        $value = (isset($post[$field])) ? $this->container->get('form')->getValue($field) : '';
 
         if (! isset($post[$field])) { // If POST data not available use Database $row
 

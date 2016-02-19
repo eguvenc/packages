@@ -161,8 +161,8 @@ class View implements ViewInterface
             $this->data($key, $val);
         }
         return $this;
-    }    
-
+    }
+    
     /**
      * With http stream
      *

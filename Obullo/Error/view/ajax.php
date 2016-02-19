@@ -28,9 +28,17 @@ echo "Details: \n";
 $fullTraces  = $e->getTrace();
 $debugTraces = array();
 
-foreach ($fullTraces as $key => $val) {
-    if (isset($val['file']) && isset($val['line'])) {
-        $debugTraces[] = $val;
+global $container;
+
+if ($container->has('config') 
+    && $container->get('config')['extra']['debugger'] == false
+    && $container->get('config')['extra']['debug_backtrace'] == true
+) {  // disable backtrace if websocket enabled otherwise we get memory error.
+
+    foreach ($fullTraces as $key => $val) {
+        if (isset($val['file']) && isset($val['line'])) {
+            $debugTraces[] = $val;
+        }
     }
 }
 if (isset($debugTraces[0]['file']) && isset($debugTraces[0]['line'])) {

@@ -104,7 +104,7 @@ class Session
      * 
      * @return array
      */
-    public function outputArray() 
+    public function getOutputArray()
     {
         $messages = array();
         foreach (array('success', 'error', 'info', 'warning') as $key) {
@@ -123,9 +123,9 @@ class Session
      * 
      * @return string
      */
-    public function output($newline = '<br />')
+    public function getOutput($newline = '<br />')
     {
-        $array = $this->outputArray();
+        $array = $this->getOutputArray();
         return implode($newline, $array);
     }
 

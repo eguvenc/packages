@@ -1,82 +1,31 @@
 
 ## Flaş Sınıfı
 
-Flash sınıfı uygulama içerisinde son kullanıcıya gösterilen onay, hata veya bilgi mesajlarını yönetir. Bir işlemden sonra flaş sınıfı aracılığı ile <b>session</b> nesnesine kaydedilen mesaj veya mesajlar bir sonraki http isteğinde mevcut olurlar ve bir kez görüntülendikten sonra mevcut session verisinden silinirler.
+Uygulama içerisinde son kullanıcıya gösterilen onay, hata veya bilgi mesajlarını yönetir. Bir işlemden sonra flaş sınıfı aracılığı ile <kbd>session</kbd> nesnesine kaydedilen mesaj veya mesajlar bir sonraki http isteğinde mevcut olurlar ve bir kez görüntülendikten sonra mevcut session verisinden silinirler. Flaş sınıfına ait mesajlar olası bir karışıklığı önlemek için session anahtarına <kbd>"flash_"</kbd> öneki ile kaydedilirler.
 
-**Note:** Flaş sınıfına ait mesajlar olası bir karışıklığı önlemek için session anahtarına <b>"flash_"</b> öneki ile kaydedilirler.
-
-### Sınıfı Yüklemek
+### Metotlara Erişim
 
 ```php
-$this->c['flash']->method();
+$container->get('flash')->method();
 ```
 
-#### Konfigürasyon
-
-Flaş sınıfına ait konfigürasyon dosyası <kbd>config/flash.php</kbd> dosyasından yönetilir. Konfigürasyon dosyası flaş mesajlarına ait html şablonu ve niteliklerini belirler. Varsayılan CSS şablonu bootstrap css çerçevesi için konfigüre edilmiştir. <a href="http://getbootstrap.com" target="_blank">http://getbootstrap.com</a>
+kontrolör içerisinden,
 
 ```php
-return array(
-
-    'message' => '<div class="{class}">{icon}{message}</div>',
-
-    'error'  => [
-        'class' => 'alert alert-danger', 
-        'icon' => '<span class="glyphicon glyphicon-remove-sign"></span> '
-    ],
-    'success' => [
-        'class' => 'alert alert-success', 
-        'icon' => '<span class="glyphicon glyphicon-ok-sign"></span> '
-    ],
-    'warning' => [
-        'class' => 'alert alert-warning', 
-        'icon' => '<span class="glyphicon glyphicon-exclamation-sign"></span> '
-    ],
-    'info' => [
-        'class' => 'alert alert-info',
-        'icon' => '<span class="glyphicon glyphicon-info-sign"></span> '
-    ],
-);
-
-/* End of file flash.php */
-/* Location: .config/flash.php */
+$this->flash->method();
 ```
 
-#### Servis Kurulumu
+### Servis Sağlayıcısı
 
-Flaş sınıfı varsayılan olarak session sürücüsü kullanır ve çalışabilmesi için aşağıdaki gibi bir servis kurulumuna ihtiyaç duyar.
+<kbd>app/providers.php</kbd> dosyasında servis sağlayıcısının tanımlı olduğundan emin olun.
 
 ```php
-namespace Service;
-
-use Obullo\Flash\Session;
-use Obullo\Container\ServiceInterface;
-use Obullo\Container\ContainerInterface;
-
-class Flash implements ServiceInterface
-{
-    /**
-     * Registry
-     *
-     * @param object $c container
-     * 
-     * @return void
-     */
-    public function register(ContainerInterface $c)
-    {
-        $c['flash'] = function () use ($c) {
-            return new Session($c);
-        };
-    }
-}
-
-// END Flash service
-
-/* End of file Flash.php */
-/* Location: .app/classes/Service/Flash.php */
+$container->addServiceProvider('Obullo\Container\ServiceProvider\Flash');
 ```
 
-#### Bir Flaş Mesajı Göstermek
+Konfigürasyon dosyası <kbd>providers/flash.php</kbd> dosyasından yönetilir ve flaş mesajlarına ait html şablonu ve niteliklerini belirler. Varsayılan css şablonu bootstrap çerçevesi için konfigüre edilmiştir. <a href="http://getbootstrap.com" target="_blank">http://getbootstrap.com</a>
+
+### Flaş Mesajı
 
 Bir flaş mesajı göstermek oldukça kolaydır bir durum metodu seçin ve içine mesajınızı girin.
 
@@ -88,7 +37,7 @@ Ve aşağıdaki kodu view sayfanıza yerleştirin.
 
 
 ```php
-$this->flash->output();  // Çıktı Form saved successfully.
+$this->flash->getOutput();  // Form saved successfully.
 ```
 
 Durum Metotları
@@ -120,10 +69,7 @@ Durum Metotları
     </tbody>
 </table>
 
-
-#### Birden Fazla Flaş Mesajı Göstermek
-
-Birden fazla flaş mesajı göstermek için birden fazla metot kullanın.
+Birden fazla flaş mesajı göstermek için birden fazla metot kullanmanız gerekir.
 
 ```php
 $this->flash->success('Form saved successfully.');
@@ -131,7 +77,7 @@ $this->flash->error('Error.');
 $this->flash->warning('Something went wrong.');
 $this->flash->info('Email has been sent to your mail address.');
 
-$this->flash->output();
+$this->flash->getOutput();
 ```
 
 ```php
@@ -145,9 +91,9 @@ Something went wrong.
 */
 ```
 
-#### Bir İşlemden Sonra Mesaj Göstermek
+### Gerçek Bir Örnek
 
-Uygulama içerisinde mesajlar göstermek için <b>if .. else</b> komutlarından yararlanabilirsiniz.
+Uygulama içerisinde mesajlar göstermek için <kbd>if .. else</kbd> komutlarından yararlanabilirsiniz.
 
 ```php
 $delete = $this->db->transactional(
@@ -162,7 +108,7 @@ if ($delete) {
 }
 ```
 
-#### Bir Flaş Mesajının Kalıcılığını Korumak
+### Mesajın Kalıcılığını Korumak
 
 Eğer bir flaş mesajının bir sonraki http isteğinde kalıcı olmasını istiyorsanız keep metodu kullanmanız gerekir.
 
@@ -171,15 +117,15 @@ $this->flash->keep('notice:warning');
 $this->flash->keep('notice:success');
 ```
 
-#### Geçerli Durum Değerini Almak
+### Durum Değerini Almak
 
-Bir flaş mesajına ait durum değerini <b>status</b> anahtarı ile alabilirsiniz.
+Bir flaş mesajına ait durum değerini <kbd>status</kbd> anahtarı ile alabilirsiniz.
 
 ```php
 $this->flash->get('notice:status');  // Çıktı success
 ```
 
-#### Kendi Flaş Mesajlarınızı Eklemek
+### Özel Durum Mesajları
 
 Mevcut durum metotları dışında kendinize ait flaş mesajları da ekleyebilirsiniz. Bunun için set fonksiyonunu kullanmanız gerekir.
 
@@ -193,16 +139,15 @@ Mesajları okumak için ise get fonksiyonu kullanılır.
 echo $this->flash->get('anahtar', '<p class="example">', '</p>');
 ```
 
+Eğer flaş mesajı boş ise get() fonksiyonu boş bir string değerine döner aksi durumda mesaja döncektir. 
+
 ```php
 // Çıktı  <p class="example">değer</p>
 ```
 
-Eğer flaş mesajı boş ise $this->flash->get() fonksiyonu boş bir string değerine döner aksi durumda mesaja döncektir. Eğer $prefix ve $suffix değerleri boş değilse mesaj html şablonu ile birlikte görüntülenir.
-
+Eğer $prefix ve $suffix değerleri boş değilse mesaj konfigüre edilmiş şablon ile birlikte görüntülenir.
 
 ### Flaş Sınıfı Referansı
-
-------
 
 ##### $this->flash->success(string $message);
 
@@ -220,13 +165,13 @@ Bir flaş mesajını uyarı durum verisi ile kaydeder.
 
 Bir flaş mesajını bilgi durum verisi ile kaydeder.
 
-##### $this->flash->output();
+##### $this->flash->getOutput();
 
-Tüm flaş mesajlarını <b>string</b> türünde alır ve flaş verilerinin sonraki istekte silinmesi için verileri <b>old</b> değeri ile kaydeder.
+Tüm flaş mesajlarını <kbd>string</kbd> türünde alır ve flaş verilerinin sonraki istekte silinmesi için verileri <kbd>old</kbd> değeri ile kaydeder.
 
-##### $this->flash->outputArray();
+##### $this->flash->getOutputArray();
 
-Tüm flaş mesajlarını <b>array</b> türünde alır ve flaş verilerinin sonraki istekte silinmesi için verileri <b>old</b> değeri ile kaydeder.
+Tüm flaş mesajlarını <kbd>array</kbd> türünde alır ve flaş verilerinin sonraki istekte silinmesi için verileri <kbd>old</kbd> değeri ile kaydeder.
 
 ##### $this->flash->keep(string $key)
 
@@ -238,4 +183,4 @@ Durum metotlarında tanımlı olmayan yeni bir flaş verisi kaydeder.
 
 ##### $this->flash->get(string $key)
 
-Girilen anahtara ait flaş mesajlanı <b>string</b> türünde alır ve flaş verisinin sonraki istekte silinmesi için veriyi <b>old</b> değeri ile kaydeder.
+Girilen anahtara ait flaş mesajlarını <kbd>string</kbd> türünde alır ve flaş verisinin sonraki istekte silinmesi için veriyi <kbd>old</kbd> değeri ile kaydeder.

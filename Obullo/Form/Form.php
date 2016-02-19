@@ -30,6 +30,13 @@ class Form
     const CODE_INFO = 3;
 
     /**
+     * Form element
+     * 
+     * @var object
+     */
+    protected $element;
+
+    /**
      * Container
      *
      * @var object
@@ -77,7 +84,7 @@ class Form
         $this->request = $request;
         $this->container = $container;
 
-        $this->error        = $params['error'];
+        $this->error        = $params['validation']['error'];
         $this->notification = $params['notification'];
 
         $this->messages['success'] = static::ERROR;
@@ -149,7 +156,7 @@ class Form
      * 
      * @return void
      */
-    public function code($code = 0)
+    public function setCode($code = 0)
     {
         $this->messages['code'] = (int)$code;
     }
@@ -171,7 +178,7 @@ class Form
      * 
      * @return void
      */
-    public function status($status = 0)
+    public function setStatus($status = 0)
     {
         $this->messages['success'] = (int)$status;
     }
@@ -187,7 +194,7 @@ class Form
     }
 
     /**
-     * Set key for json_encode().
+     * Set custom items to message array
      * 
      * Set success, message, errors and any custom key.
      * 
@@ -196,7 +203,7 @@ class Form
      *
      * @return void
      */
-    public function setKey($key, $val)
+    public function setItem($key, $val)
     {
         $this->messages[$key] = $val;
     }
@@ -253,7 +260,7 @@ class Form
      */
     public function setMessage($message, $status = 0)
     {
-        $this->status($status);
+        $this->setStatus($status);
         $this->messages['messages'][] = (string)$message;
     }
 
@@ -280,13 +287,27 @@ class Form
     }
 
     /**
+     * Returns to message array
+     * 
+     * @return array
+     */
+    public function getMessageArray()
+    {
+        $messages = array();
+        foreach ($this->messages['messages'] as $message) {
+            $messages[] = $this->addTemplate($message);
+        }
+        return $messages; 
+    }
+
+    /**
      * Add message template
      * 
      * @param string $message message
      *
      * @return string
      */
-    protected function addTemplate($message)
+    public function addTemplate($message)
     {
         $array = $this->getValidTemplate();
         return str_replace(
@@ -321,24 +342,40 @@ class Form
      * 
      * @return array
      */
-    public function outputArray()
+    public function getOutputArray()
     {
         return $this->messages;
     }
 
     /**
      * Get all outputs of the form 
-     *
-     * @param array $assoc whether to return associative array
      * 
      * @return object|array|false
      */
-    public function getResults($assoc = false)
+    public function getResultArray()
     {
         if (isset($this->messages['results'])) {
-            return ($assoc) ? $this->messages['results'] : (object)$this->messages['results'];
+            return $this->messages['results'];
         }
         return false;
+    }
+
+    /**
+     * Creates form element object
+     * 
+     * @return object
+     */
+    public function getElement()
+    {
+        if ($this->element != null) {
+            return $this->element;
+        }
+        return $this->element = new Element(
+            $this->container,
+            $this->container->get('request'),
+            $this->container->get('config'),
+            $this->container->get('logger')
+        );
     }
 
     /**

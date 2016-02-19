@@ -30,16 +30,6 @@ class Native implements ImmutableContainerAwareInterface
     protected $folders = array();
 
     /**
-     * Protected variables
-     * 
-     * @var array
-     */
-    protected $_boolStack   = array();    // Boolean type view variables
-    protected $_arrayStack  = array();    // Array type view variables
-    protected $_stringStack = array();    // String type view variables
-    protected $_objectStack = array();    // Object type view variables
-
-    /**
      * Constructor
      * 
      * @param stirng $path default
@@ -148,103 +138,20 @@ class Native implements ImmutableContainerAwareInterface
     /**
      * Make
      * 
-     * @param string $filename filename
-     * @param array  $data     data
+     * @param string $name name
+     * @param array  $data data
      * 
      * @return string
      */
-    public function make($filename, $data = null)
+    public function make($name, $data = array())
     {
-        $this->assignVariables($data);
-
-        extract($this->_stringStack, EXTR_SKIP);
-        extract($this->_arrayStack, EXTR_SKIP);
-        extract($this->_objectStack, EXTR_SKIP);
-        extract($this->_boolStack, EXTR_SKIP);
+        extract($data);
 
         ob_start();
-        include $this->getDefaultPath() . $filename . '.php';
+        include $this->getDefaultPath() . $name . '.php';
         $body = ob_get_clean();
         
         return $body;
-    }
-
-    /**
-     * Assign view variables
-     * 
-     * @param array $data view data
-     * 
-     * @return void
-     */
-    protected function assignVariables($data)
-    {
-        if (is_array($data)) {
-            foreach ($data as $key => $value) {
-                $this->assign($key, $value);
-            }
-        }
-    }
-
-    /**
-     * Set variables
-     * 
-     * @param mixed $key view key => data or combined array
-     * @param mixed $val mixed
-     * 
-     * @return void
-     */
-    protected function assign($key, $val = null)
-    {
-        if (is_array($key)) {
-            foreach ($key as $k => $v) {
-                $this->assignVar($k, $v);
-            }
-        } else {
-            $this->assignVar($key, $val);
-        }
-    }
-
-    /**
-     * Set variables
-     * 
-     * @param string $key view key data
-     * @param mixed  $val mixed
-     * 
-     * @return void
-     */
-    protected function assignVar($key, $val)
-    {
-        if (is_int($val)) {
-            $this->_stringStack[$key] = $val;
-            return;
-        }
-        if (is_string($val)) {
-            $this->_stringStack[$key] = $val;
-            return;
-        }
-        $this->_arrayStack[$key] = array();  // Create empty array
-        if (is_array($val)) {
-            if (count($val) == 0) {
-                $this->_arrayStack[$key] = array();
-            } else {
-                foreach ($val as $array_key => $value) {
-                    $this->_arrayStack[$key][$array_key] = $value;
-                }
-            }
-        }
-        if (is_object($val)) {
-            $this->_objectStack[$key] = $val;
-            $this->_arrayStack = array();
-            return;
-        }
-        if (is_bool($val)) {
-            $this->_boolStack[$key] = $val;
-            $this->_arrayStack = array();
-            return;
-        }
-        $this->_stringStack[$key] = $val;
-        $this->_arrayStack = array();
-        return;
     }
 
     /**

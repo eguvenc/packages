@@ -1,12 +1,12 @@
 
 ## Http Request Sınıfı
 
-Http request sınıfı gelen istek türü, bağlantının güvenli olup olmadığı, ip adresi, ajax istekleri ve buna benzer sunucuda dinamik oluşan bilgilere ulaşmanızı sağlar. Bunun yanında süper küresel değişkenlerden elde edilen girdileri [filters](Filters.md) paketi yardımı ile opsiyonel doğrulama ve filtreleme işlevlerinden geçirerek güvenilir girdiler elde etmenizi yardımcı olur.
-
-Http paketi Psr7 Standartlarını destekler ve Zend-Diactoros kütüphanesi bileşenlerinden oluşur.
+Http request sınıfı gelen istek türü, bağlantının güvenli olup olmadığı, ip adresi, ajax istekleri ve buna benzer http istekleri ile ilgili bilgilere ulaşmamızı sağlar. Http paketi <a href="https://github.com/zendframework/zend-diactoros" target="_blank">Zend-Diactoros</a> kütüphanesi bileşenlerinden oluşturulmuştur ve <a href="http://www.php-fig.org/psr/psr-7/" target="_blank">Psr7</a> http standartlarını destekler.
 
 <ul>
-    <li><a href="#loading-class">Sınıfı Yüklemek</a></li>
+    <li>
+        <a href="#accessing-methods">Metotlara Erişmek</a>
+    <li>
     <li>
     	<a href="#super-globals">Girdi Değerlerine Erişmek</a>
     	<ul>
@@ -20,15 +20,6 @@ Http paketi Psr7 Standartlarını destekler ve Zend-Diactoros kütüphanesi bile
     		<li><a href="#sheaders-get">$this->request->withHeader()</a></li>
             <li><a href="#sheaders-all">$this->request->getHeaders()</a></li>
     		<li><a href="#getParsedBody">$this->request->getParsedBody()</a></li>
-    	</ul>
-    </li>
-
-    <li>
-    	<a href="#input-filters">Girdi Doğrulama / Filtreleme</a>
-    	<ul>
-    		<li><a href="#re-get">$this->request->get()</a></li>
-    		<li><a href="#re-post">$this->request->post()</a></li>
-			<li><a href="#isValidIp">$this->request->isValidIp()</a></li>
     	</ul>
     </li>
 
@@ -56,15 +47,21 @@ Http paketi Psr7 Standartlarını destekler ve Zend-Diactoros kütüphanesi bile
     </li>
 </ul>
 
-<a name="loading-class"></a>
+<a name="accessing-methods"></a>
 
-### Sınıfı Yüklemek
+### Metotlara Erişmek
 
 ```php
-$this->c['request']->method();
+$container->get('request')->method()
 ```
 
-Request sınıfı <kbd>app/providers.php</kbd> dosyasında tanımlı olduğundan çağrıldığında conteiner sınıfı içerisinden yüklenir.
+Kontrolör içerisinden,
+
+```php
+$this->request->method();
+```
+
+Request sınıfı çekirdek seviyede tanımlı olduğundan çağrıldığında konteyner sınıfı içerisinden yüklenir.
 
 <a name="super-globals"></a>
 
@@ -323,9 +320,7 @@ echo $cleanVariable;
 
 ##### $this->request->isValidIp($ip);
 
-Girilen ip adresi doğru ise true değerine aksi durumda false değerine geri döner.
-
-> **Not:** $this->request->getIpAddress() fonksiyonu ip doğrulama işlevini kendi içerisinde zaten yapar.
+Girilen ip adresi doğru ise true değerine aksi durumda false değerine geri döner. $this->request->getIpAddress() fonksiyonu ip doğrulama işlevini kendi içerisinde zaten yapar.
 
 ```php
 if ( ! $this->request->isValidIp($ip)) {
