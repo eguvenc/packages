@@ -2,8 +2,8 @@
 
 namespace Obullo\Url;
 
-use Interop\Container\ContainerInterface as Container;
 use Obullo\Log\LoggerInterface as Logger;
+use Interop\Container\ContainerInterface as Container;
 
 /**
  * Url Class
@@ -177,7 +177,7 @@ class Url implements UrlInterface
     public function anchor($uri = '', $label = '', $attributes = '', $baseUrl = true)
     {
         if ($baseUrl) {
-            $uri = $this->getBaseUrl($uri);
+            $uri = $this->basePath($uri);
         }
         if (empty($label)) {
             $label = $uri;
@@ -235,9 +235,9 @@ class Url implements UrlInterface
     {
         $url = '';
         if ($disableBaseUrl == false) {
-            $url = $this->params['assets']['url'];
-            if ($this->params['assets']['url'] != '' && $this->params['assets']['url'] != '/') {
-                $url = $this->prep($this->params['assets']['url']); 
+            $url = $this->params['assets']['path'];
+            if ($this->params['assets']['path'] != '' && $this->params['assets']['path'] != '/') {
+                $url = $this->prep($this->params['assets']['path']); 
             }
         }
         $url = rtrim($url, '/').'/';
@@ -257,9 +257,9 @@ class Url implements UrlInterface
      * 
      * @return string
      */
-    public function getBaseUrl($uri = '')
+    public function basePath($uri = '')
     {
-        return rtrim($this->params['baseurl'], '/') .'/'. ltrim($uri, '/');
+        return rtrim($this->params['base']['path'], '/') .'/'. ltrim($uri, '/');
     }
 
     /**

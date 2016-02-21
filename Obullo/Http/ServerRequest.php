@@ -344,34 +344,28 @@ class ServerRequest implements ServerRequestInterface
     /**
      * GET wrapper
      * 
-     * @param string|null $key key
+     * @param string $key key
      * 
      * @return mixed
      */
-    public function get($key = null)
+    public function get($key)
     {
         $get = $this->getQueryParams();
 
-        if (is_null($key)) {
-            return $get;
-        }
         return isset($get[$key]) ? $get[$key] : false;
     }
 
     /**
      * POST wrapper
      * 
-     * @param string|null $key key
+     * @param string $key key
      * 
      * @return mixed
      */
-    public function post($key = null)
+    public function post($key)
     {
         $post = $this->getParsedBody();
 
-        if (is_null($key)) {
-            return $post;
-        }
         return isset($post[$key]) ? $post[$key] : false;
     }
 
@@ -395,23 +389,18 @@ class ServerRequest implements ServerRequestInterface
     }
 
     /**
-     * Get $server variable items
+     * Check ip is valid
      * 
-     * @param string|null $key server key
+     * @param string $ip address
      * 
-     * @return void
+     * @return boolean
      */
-    public function server($key = null) 
+    public function isValidIp($ip)
     {
-        $server = $this->getServerParams();
-        
-        if (is_null($key)) {
-            return $server;
+        if (filter_var($ip, FILTER_VALIDATE_IP) === false) {
+            return false;
         }
-        if (isset($server[$key])) {
-            return $server[$key];
-        }
-        return null;
+        return true;
     }
 
     /**

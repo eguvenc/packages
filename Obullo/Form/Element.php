@@ -68,7 +68,7 @@ class Element
         if ($attributes == '') {
             $attributes = 'method="post"';
         }
-        $action = ( strpos($action, '://') === false) ? $this->container->get('url')->getBaseUrl($action) : $action;
+        $action = ( strpos($action, '://') === false) ? $this->container->get('url')->basePath($action) : $action;
         $form  = '<form action="'.$action.'"';
         $form .= $this->attributesToString($attributes, true);
         $form .= '>';

@@ -88,7 +88,7 @@ class Image extends AbstractProvider implements CaptchaInterface
     public function init()
     {
         $this->buildHtml();
-        $this->imageUrl = $this->url->getBaseUrl($this->params['form']['img']['attributes']['src']); // add Directory Seperator ( / )
+        $this->imageUrl = $this->url->basePath($this->params['form']['img']['attributes']['src']); // add Directory Seperator ( / )
         $this->defaultFontPath = RESOURCES .'fonts/';
     }
 

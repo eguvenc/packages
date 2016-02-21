@@ -92,7 +92,7 @@ class Translator implements TranslatorInterface
         $this->logger = $logger;
         $this->params = $params;   // Load package config file
 
-        $this->setDefault($this->params['default']['locale']);    // Sets default langugage from translator config file.
+        $this->setDefault($this->params['default']['locale']); // Sets default langugage from translator config.
         $this->setFallback($this->params['fallback']['locale']);  // Default lang code
 
         $this->logger->debug('Translator Class Initialized');

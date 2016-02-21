@@ -62,7 +62,7 @@ class Manager
          */
         $websocketUrl = $this->debugger['socket'];
         $debuggerOff  = (int)$this->container->get('config')['extra']['debugger'];
-        $debuggerUrl  = $this->container->get('url')->getBaseUrl(INDEX_PHP.'/debugger/body');
+        $debuggerUrl  = $this->container->get('url')->basePath(INDEX_PHP.'/debugger/body');
 
         $env = new Environment(
             $this->container->get('request'),

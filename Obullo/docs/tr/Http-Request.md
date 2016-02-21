@@ -4,45 +4,57 @@
 Http request sınıfı gelen istek türü, bağlantının güvenli olup olmadığı, ip adresi, ajax istekleri ve buna benzer http istekleri ile ilgili bilgilere ulaşmamızı sağlar. Http paketi <a href="https://github.com/zendframework/zend-diactoros" target="_blank">Zend-Diactoros</a> kütüphanesi bileşenlerinden oluşturulmuştur ve <a href="http://www.php-fig.org/psr/psr-7/" target="_blank">Psr7</a> http standartlarını destekler.
 
 <ul>
+    <li><a href="#accessing-methods">Metotlara Erişmek</a></li>
     <li>
-        <a href="#accessing-methods">Metotlara Erişmek</a>
-    <li>
-    <li>
-    	<a href="#super-globals">Girdi Değerlerine Erişmek</a>
-    	<ul>
-    		<li><a href="#sget">$this->request->get()</a></li>
-    		<li><a href="#spost">$this->request->post()</a></li>
-    		<li><a href="#sall">$this->request->all()</a></li>
-    		<li><a href="#sserver">$this->request->server()</a></li>
-    		<li><a href="#smethod">$this->request->getMethod()</a></li>
-    		<li><a href="#sip">$this->request->getIpAddress()</a></li>
+        <a href="#inputs">Girdileri Almak / Değiştirmek</a>
+        <ul>
+    		<li><a href="#get">$this->request->get()</a></li>
+    		<li><a href="#post">$this->request->post()</a></li>
+    		<li><a href="#all">$this->request->all()</a></li>
+            <li><a href="#getQueryParams">$this->request->getQueryParams()</a></li>
+    		<li><a href="#getQueryParams">$this->request->withQueryParams()</a></li>
+            <li><a href="#getParsedBody">$this->request->getParsedBody()</a></li>
+            <li><a href="#withParsedBody">$this->request->withParsedBody()</a></li>
+            <li><a href="#getServerParams">$this->request->getServerParams()</a></li>
+            <li><a href="#getCookieParams">$this->request->getCookieParams()</a></li>
+            <li><a href="#withCookieParams">$this->request->withCookieParams()</a></li>
+            <li><a href="#getAttributes">$this->request->getAttributes()</a></li>
+    		<li><a href="#getAttribute">$this->request->getAttribute()</a></li>
+            <li><a href="#withAttribute">$this->request->withAttribute()</a></li>
+            <li><a href="#withoutAttribute">$this->request->withoutAttribute()</a></li>
+            <li><a href="#getMethod">$this->request->getMethod()</a></li>
+            <li><a href="#withMethod">$this->request->withMethod()</a></li>
+            <li><a href="#getIpAddress">$this->request->getIpAddress()</a></li>
+            <li><a href="#isValidIp">$this->request->isValidIp()</a></li>
+            <li><a href="#getBody">$this->request->getBody()</a></li>
+            <li><a href="#withBody">$this->request->withBody()</a></li>
+            <li><a href="#getUploadedFiles">$this->request->getUploadedFiles()</a></li>
+            <li><a href="#withUploadedFiles">$this->request->withUploadedFiles()</a></li>
+            <li><a href="#getHeaders">$this->request->getHeaders()</a></li>
             <li><a href="#hasHeader">$this->request->hasHeader()</a></li>
-    		<li><a href="#sheaders-get">$this->request->withHeader()</a></li>
-            <li><a href="#sheaders-all">$this->request->getHeaders()</a></li>
-    		<li><a href="#getParsedBody">$this->request->getParsedBody()</a></li>
+            <li><a href="#hasHeader">$this->request->getHeader()</a></li>
+            <li><a href="#withHeader">$this->request->withHeader()</a></li>
+            <li><a href="#withAddedHeader">$this->request->withAddedHeader()</a></li>
+            <li><a href="#withoutHeader">$this->request->withoutHeader()</a></li>
+            <li><a href="#getUri">$this->request->getUri()</a></li>
+            <li><a href="#withUri">$this->request->withUri()</a></li>
     	</ul>
     </li>
-
     <li>
-    	<a href="#filtering-http-requests">Http İsteklerini Filtrelemek</a>
+    	<a href="#filters">İstek Türlerini Filtrelemek</a>
     	<ul>
+            <li><a href="#isCli">$this->request->isCli()</a></li>
     		<li><a href="#isAjax">$this->request->isAjax()</a></li>
     		<li><a href="#isSecure">$this->request->isSecure()</a></li>
     		<li><a href="#isLayer">$this->request->isLayer()</a></li>
-    	</ul>
-    </li>
-
-    <li>
-    	<a href="#filtering-http-methods">Http Metodunu Filtrelemek</a>
-    	<ul>
-    		<li><a href="#isPost">$this->request->isPost()</a></li>
-    		<li><a href="#isGet">$this->request->isGet()</a></li>
-    		<li><a href="#isPut">$this->request->isPut()</a></li>
-    		<li><a href="#isDelete">$this->request->isDelete()</a></li>
-    		<li><a href="#isHead">$this->request->isHead()</a></li>
-    		<li><a href="#isOption">$this->request->isOption()</a></li>
-    		<li><a href="#isPatch">$this->request->isPatch()</a></li>
-    		<li><a href="#isMethod">$this->request->isMethod()</a></li>
+            <li><a href="#isPost">$this->request->isPost()</a></li>
+            <li><a href="#isGet">$this->request->isGet()</a></li>
+            <li><a href="#isPut">$this->request->isPut()</a></li>
+            <li><a href="#isDelete">$this->request->isDelete()</a></li>
+            <li><a href="#isHead">$this->request->isHead()</a></li>
+            <li><a href="#isOption">$this->request->isOption()</a></li>
+            <li><a href="#isPatch">$this->request->isPatch()</a></li>
+            <li><a href="#isMethod">$this->request->isMethod()</a></li>
     	</ul>
     </li>
 </ul>
@@ -54,35 +66,137 @@ Http request sınıfı gelen istek türü, bağlantının güvenli olup olmadı�
 ```php
 $container->get('request')->method()
 ```
-
 Kontrolör içerisinden,
 
 ```php
 $this->request->method();
 ```
 
-Request sınıfı çekirdek seviyede tanımlı olduğundan çağrıldığında konteyner sınıfı içerisinden yüklenir.
+<a name="inputs"></a>
 
-<a name="super-globals"></a>
+### Girdileri Almak / Değiştirmek
 
-### Girdi Değerlerine Erişmek
+<a name="get"></a>
 
-##### $this->request->getServerParams();
-##### $this->request->getCookieParams();
-##### $this->request->withCookieParams(array $cookies);
+##### $this->request->get(string $key)
+
+<kbd>$_GET</kbd> süper küresel değişkeninden değerler almanıza yardımcı olur. Değişkenlere direkt olarak $_GET['variable'] şeklinde ulaşmak yerine get fonksiyonu kullanmanın ana avantajı değişkenin varlığını kontrol etme durumunda isset() fonksiyonu kullanımı ortadan kaldırmasıdır. Eğer girdi $_GET küresel değişkeni içerisinde yoksa <kbd>false (boolean)</kbd> değerine var ise kendi değerine geri döner. 
+
+Normal şartlarda <kbd>isset($_GET['variable'])</kbd> bloğunu her seferinde yazmamak için aşağıdaki gibi request sınıfı get metodu kullanmanız tavsiye edilir.
+
+```php
+if ($variable = $this->request->get('variable')) {
+    echo $variable;
+}
+```
+
+<a name="post"></a>
+
+##### $this->request->post(string $key)
+
+<kbd>$_POST</kbd> değişkeninden değerler almanıza yardımcı olur.
+
+```php
+if ($variable = $this->request->post('variable')) {
+    echo $variable;
+}
+```
+
+<a name="all"></a>
+
+##### $this->request->all(string|null $key = null)
+
+<kbd>$_REQUEST</kbd> değişkeninden değerler almanıza yardımcı olur.
+
+```php
+if ($variable = $this->request->all('variable')) {
+    echo $variable;
+}
+```
+
+Tüm değerlere ulaşmak için parametre girmeyin.
+
+```php
+$request = $this->request->all();
+```
+
+<a name="getQueryParams"></a>
+
 ##### $this->request->getQueryParams();
+
+Eğer varsa query string argümanlarına geri döner.
+
+```php
+http://example.com/?a=b&c=d
+```
+
+```php
+$query = $this->request->getQueryParams();
+
+print_r($query);  // Array ( [a] => b [c] => d )
+```
+
+<a name="withQueryParams"></a>
+
 ##### $this->request->withQueryParams(array $query);
+
+Girilen sorgu argümanları ile birlikte http request nesnesine geri döner.
+
+<a name="getParsedBody"></a>
 
 ##### $this->request->getParsedBody();
 
+Eğer http <kbd>Content-Type</kbd> başlığı <kbd>application/x-www-form-urlencoded</kbd> yada <kbd>multipart/form-data</kbd> ve istek metodu POST ise metot $_POST değişkeni içeriğine geri döner. Aksi durumda bu metot http request gövdesinde gelen deserialize olmuş yada çözümlenmiş gövde içeriğine dönebilir. Potansiyel data türleri <kbd>array</kbd> veya <kbd>object</kbd> türüdür. Eğer <kbd>null</kbd> tipinde bir değer gelirse bu gövde içeriğinin olmadığı anlamına gelir.
+
+<a name="withParsedBody"></a>
 
 ##### $this->request->withParsedBody($data);
+
+Girilen veri ile birlikte http request nesnesine geri döner. Verinin $_POST türünden gelmesi gerekmez fakat veri sonuçlarının, deserialize olmuş bir gövde içeriğinden gelmesi gerekir. Deserialize/çözümlenme yapılandırılmış bu ve bunun gibi bir veriye geri döner, bu metot yalnızca <kbd>array</kbd>, <kbd>object</kbd> veya eğer bir veri gelmediyse <kbd>null</kbd> değerine döner.
+
+<a name="getServerParams"></a>
+
+##### $this->request->getServerParams();
+
+Php $_SERVER türünden değişken değerlerine erişmeyi sağlar. Veri kökeni $_SERVER değişkeninden gelmek zorunda değildir.
+
+<a name="getCookieParams"></a>
+
+##### $this->request->getCookieParams();
+
+İstemci tarafından suncuya gönderilen çerezlere erişmeyi sağlar. Gelen veri $_COOKIE php süper küreseli yapısına uygun olmak zorundadır. yapısına uygun olmak zorundadır.
+
+<a name="withCookieParams"></a>
+
+##### $this->request->withCookieParams(array $cookies);
+
+Girilen çerez verisi ile birlikte http request nesnesine geri döner. Veri php $_COOKIE süper küreselinden gelmek zorunda değildir fakat php $_COOKIE yapısına uygun olmak zorundadır.
+
+<a name="getAttributes"></a>
+
 ##### $this->request->getAttributes();
+
+Http isteğinden doğan niteliklere geri döner. İstek "nitelikleri" request nesnesine enjekte edilmek istenen herhangi bir veriye ait parametreler olabilir. Örneğin çerez decrypt işlemi sonuçları, deserialize edilmiş http gövde içerikleri ve path eşleşme işlemlerinden doğan parametreler gibi.
+
+<a name="getAttribute"></a>
+
 ##### $this->request->getAttribute($attribute, $default = null);
+
+Tek bir http isteği niteliğini elde etmeyi sağlar. İkinci parametre nitelik elde edilemezse işlemin hangi türe döneceğini belirler.
+
+<a name="withAttribute"></a>
+
 ##### $this->request->withAttribute($attribute, $value);
+
+Girilen tek nitelik ile birlikte http request nesnesine geri döner. 
+
+<a name="withoutAttribute"></a>
+
 ##### $this->request->withoutAttribute($attribute);
 
-<a name="smethod"></a>
+Girilen http isteği niteliğini nesne içerisinden silerek http request nesnesine döner.
+
+<a name="getMethod"></a>
 
 ##### $this->request->getMethod()
 
@@ -91,86 +205,13 @@ Php <kbd>$_SERVER['REQUEST_METHOD']</kbd> değerine ger döner.
 ```php
 $this->request->getMethod();  // GET
 ```
+<a name="withMethod"></a>
 
-##### $this->request->withMethod();
+##### $this->request->withMethod(string $method);
 
-     * Set the request method.
-     *
-     * Unlike the regular Request implementation, the server-side
-     * normalizes the method to uppercase to ensure consistency
-     * and make checking the method simpler.
-     *
+Http isteği metodunu belirler. Method ismini büyük harfler ile girilmesi gerekir.
 
-##### $this->request->getBody()
-
-Gets the body of the message.
-
-##### $this->request->withBody(StreamInterface $body)
-
-Return an instance with the specified message body. The body MUST be a StreamInterface object.
-
-##### $this->request->getUploadedFiles();
-##### $this->request->withUploadedFiles();
-
-
-<a name="sget"></a>
-
-##### $this->request->get(mixed $key, $filter = '')
-
-<kbd>$_GET</kbd> süper küresel değişkeninden değerler almanıza yardımcı olur. Değişkenlere direkt olarak $_GET['variable'] şeklinde ulaşmak yerine get fonksiyonu kullanmanın ana avantajı değişkenin varlığını kontrol etme durumunda isset() fonksiyonu kullanımı ortadan kaldırmasıdır. Eğer girdi $_GET küresel değişkeni içerisinde yoksa <kbd>false (boolean)</kbd> değerine var ise kendi değerine geri döner. 
-
-Normal şartlarda isset($_GET['variable']) bloğunu her seferinde yazmamak için aşağıdaki gibi request sınıfı get metodu kullanmanız tavsiye edilir.
-
-```php
-if ($variable = $this->request->get('variable')) {
-	echo $variable;
-}
-```
-
-Eğer tüm get değerlerine ulaşmak isteseydik ilk parametreye true değerini göndermeliydik.
-
-```php
-$GET = $this->request->get(true);
-print_r($GET);
-```
-
-<a name="spost"></a>
-
-##### $this->request->post(mixed $key, $filter = '')
-
-<kbd>$_POST</kbd> süper küresel değişkeninden değerler almanıza yardımcı olur.
-
-```php
-if ($variable = $this->request->post('variable')) {
-	echo $variable;
-}
-```
-
-<a name="sall"></a>
-
-##### $this->request->all(mixed $key, $filter = '')
-
-<kbd>$_REQUEST</kbd> süper küresel değişkeninden değerler almanıza yardımcı olur.
-
-```php
-if ($variable = $this->request->all('variable')) {
-	echo $variable;
-}
-```
-
-<a name="sserver"></a>
-
-##### $this->request->server(mixed $key)
-
-<kbd>$_SERVER</kbd> süper küresel değişkeninden değerler almanıza yardımcı olur. Eğer girilen anahtar $_SERVER küresel değişkeni içerisinde mevcut değilse fonksiyon <b>null</b> değerine döner.
-
-```php
-if ($variable = $this->request->server('variable')) {
-	echo $variable;
-}
-```
-
-<a name="sip"></a>
+<a name="getIpAddress"></a>
 
 ##### $this->request->getIpAddress()
 
@@ -178,7 +219,45 @@ if ($variable = $this->request->server('variable')) {
 echo $this->request->getIpAddress(); // 88.54.844.15
 ```
 
-<a name="sheaders-all"></a>
+<a name="isValidIp"></a>
+
+##### $this->request->isValidIp($ip);
+
+Girilen ip adresi doğru ise true değerine aksi durumda false değerine geri döner. $this->request->getIpAddress() fonksiyonu ip doğrulama işlevini kendi içerisinde zaten yapar.
+
+```php
+if ( ! $this->request->isValidIp($ip)) {
+    echo 'Not Valid';
+} else {
+    echo 'Valid';
+}
+```
+
+<a name="getBody"></a>
+
+##### $this->request->getBody()
+
+Eğer bir stream türünde bir mesaj sözkonusu stream nesnesine geri döner.
+
+<a name="withBody"></a>
+
+##### $this->request->withBody(StreamInterface $body)
+
+Girilen mesaj gövdesi ile birlikte http request nesnesine geri döber. Gövde StreamInterface arayüzünü uygulayan bir nesne olmak zorundadır.
+
+<a name="getUploadedFiles"></a>
+
+##### $this->request->getUploadedFiles();
+
+Normalize edilmiş dosya yükleme verisine geri döner. Bu metot normalize edilmiş ağaç içerisindeki metadaya geri döner. Her bir veri parçası <kbd>Psr\Http\Message\UploadedFileInterface</kbd> sınıfına genişler. Bu metoda gelen değerler $_FILES değişkeninden hazırlanmış, yada örnekleme sırasında bir mesaj gövdesi ile gelmiş, yada  withUploadedFiles() metodu ile enjekte edilmiş olabilir.
+
+<a name="withUploadedFiles"></a>
+
+##### $this->request->withUploadedFiles(array $uploadedFiles);
+
+Belirlenen yüklü dosyalar ile birlikte http request nesnesine geri döner.
+
+<a name="getHeaders"></a>
 
 ##### $this->request->getHeaders()
 
@@ -205,142 +284,121 @@ Array
 
 ##### $this->request->hasHeader($key)
 
+Girilen http sunucu başlığına ait anahtar http sunucu başlıklarında mevcut ise <kbd>true</kbd> değilse <kbd>false</kbd> değerine döner.
 
-
-<a name="sheaders-get"></a>
+<a name="getHeader"></a>
 
 ##### $this->request->getHeader($key)
 
 Seçilen http sunucu başlığına geri döner.
 
 ```php
-echo $this->request->getHeader('host'); // demo_blog
-echo $this->request->getHeader('content-type'); // gzip, deflate
+echo $this->request->getHeader('Host'); // localhost
+echo $this->request->getHeader('Content-Type'); // gzip, deflate
 ```
+
+<a name="getHeaderLine"></a>
 
 ##### $this->request->getHeaderLine($name);
 
 Retrieves a comma-separated string of the values for a single header.
 
+<a name="withHeader"></a>
+
 ##### $this->request->withHeader($header, $value);
 
 Return an instance with the provided header, replacing any existing values of any headers with the same case-insensitive name.
+
+<a name="withAddedHeader"></a>
 
 ##### $this->request->withAddedHeader($header, $value)
 
 Return an instance with the specified header appended with the given value.
 
+<a name="withoutHeader"></a>
+
 ##### $this->request->withoutHeader($header)
 
 Return an instance without the specified header.
 
-<a name="getParsedBody"></a>
+<a name="getUri"></a>
 
 ##### $this->request->getUri()
 
+Http URI nesnesine geri döner. Bu metot UriInterface arayüzünü uygulayan bir nesneye dönmek zorundadır.
+
+<a name="withUri"></a>
+
 ##### $this->request->withUri($uri, $preserveHost = false)
 
-     *
-     * This method will update the Host header of the returned request by
-     * default if the URI contains a host component. If the URI does not
-     * contain a host component, any pre-existing Host header will be carried
-     * over to the returned request.
+Bu metot eğer URI bir host bileşeni içeriyorsa, istenen varsayılan request nesnesine dönerek http Host başlığını değiştirir. Eğer URI bir host bileşeni içermiyorsa varsayılan Host başlığı dönen yeni http nesnesi üzerine taşınır.
+
+<a name="getRequestTarget"></a>
 
 ##### $this->request->getRequestTarget()
 
-     * Retrieves the message's request-target either as it will appear (for
-     * clients), as it appeared at request (for servers), or as it was
-     * specified for the instance (see withRequestTarget()).
+Bu metot aşağıdaki gibi gelen bir http isteğine ait,
+
+```php
+http://example.com/
+```
+
+eğer yukarıdaki gibi <kbd>getPath()</kbd> değeri yoksa varsayılan path "/" değerine döner,
+
+```php
+echo $this->request->getRequestTarget();  // "/"
+```
+
+```php
+http://example.com/welcome
+```
+
+eğer yukarıdaki gibi <kbd>getPath()</kbd> değeri varsa gelen path değerine döner,
+
+
+```php
+echo $this->request->getRequestTarget();  // "/welcome"
+```
+
+```php
+http://example.com/welcome?a=b&c=d
+```
+
+eğer yukarıdaki gibi <kbd>getPath()</kbd> ve <kbd>getQuery()</kbd> değerleri varsa bu değerlerin birleşimine döner.
+
+```php
+echo $this->request->getRequestTarget();  // "/welcome?a=b&c=d"
+```
+
+<a name="withRequestTarget"></a>
 
 ##### $this->request->withRequestTarget($requestTarget)
 
-     * If the request needs a non-origin-form request-target — e.g., for
-     * specifying an absolute-form, authority-form, or asterisk-form —
-     * this method may be used to create an instance with the specified
-     * request-target, verbatim.
-     *
+Belirlenen hedef adres ile birlikte http request nesnesine geri döner.
+
+<a name="getProtocolVersion"></a>
 
 ##### $this->request->getProtocolVersion();
 
-Retrieves the HTTP protocol version as a string.
+HTTP protokol versiyonuna string türünde geri döner.
 
-##### $this->request->withProtocolVersion();
+<a name="withProtocolVersion"></a>
+
+##### $this->request->withProtocolVersion(string $version);
 
  Return an instance with the specified HTTP protocol version. The version string MUST contain only the HTTP version number (e.g., "1.1", "1.0").
 
-
-
-
-<a name="input-filters"></a>
-
-### Girdi Doğrulama / Filtreleme
-
-Request sınıfındaki get, post ve all metotlarına ikinci parametre olarak filtre ismi girilerek [Filters](Filters.md) paketine ait filtreler çalıştırılabilir. 
-
-<a name="re-get"></a>
-
-##### $this->request->get($key, $filter = null);
-
-Doğrulama filtresi
-
-```php
-if ($variable = $this->request->get('variable', 'is')->int()) {
-	echo 'variable is integer';
-}
-```
-Temizleme filtresi
-
-```php
-$cleanVariable = $this->request->get('variable', 'clean')->int();
-
-echo $cleanVariable;
-```
-
-> **Not:** Daha fazla filtreleme örnekleri için filters paketine ait [Filters.md](Filters.md) sayfasını ziyaret edin.
-
-<a name="re-post"></a>
-
-##### $this->request->post($key, $filter = null);
-
-Doğrulama filtresi
-
-```php
-if ($variable = $this->request->get('variable', 'is')->str()) {
-	echo 'variable is string';
-}
-```
-Temizleme filtresi
-
-```php
-$cleanVariable = $this->request->get('variable', 'clean')->str('strip_high');
-echo $cleanVariable;
-```
-
-<a name="isValidIp"></a>
-
-##### $this->request->isValidIp($ip);
-
-Girilen ip adresi doğru ise true değerine aksi durumda false değerine geri döner. $this->request->getIpAddress() fonksiyonu ip doğrulama işlevini kendi içerisinde zaten yapar.
-
-```php
-if ( ! $this->request->isValidIp($ip)) {
-	echo 'Not Valid';
-} else {
-	echo 'Valid';
-}
-```
-
-<a name="filtering-http-requests"></a>
+<a name="filters"></a>
 
 ### Http İsteklerini Filtrelemek
 
 Http isteklerini metotlar yardımı ile filtelenebilir.
 
-<a name="isLayer"></a>
+<a name="isCli"></a>
 
-##### $this->request->isLayer();
+##### $this->request->isCli();
 
-Uygulama gelen istek eğer katman ( Layer diğer bir adıyla Hmvc ) isteği ise true değerine aksi durumda false değerine geri döner.
+Uygulama gelen istek eğer bir konsol isteği ise true değerine aksi durumda false değerine geri döner.
 
 <a name="isAjax"></a>
 
@@ -354,12 +412,11 @@ Uygulama gelen istek eğer xmlHttpRequest ( Ajax ) isteği ise true değerine ak
 
 Uygulamaya gelen istek eğer https protokülünden geliyorsa true aksi durumda false değerine geri döner.
 
+<a name="isLayer"></a>
 
-<a name="filtering-http-methods"></a>
+##### $this->request->isLayer();
 
-#### Http Metodunu Filtrelemek
-
-Uygulamanıza gelen http istekleri metot türüne göre filtrelenebilir.
+Uygulama gelen istek eğer katman ( hmvc ) isteği ise true değerine aksi durumda false değerine geri döner.
 
 <a name="isPost"></a>
 

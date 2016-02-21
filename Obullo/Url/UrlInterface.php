@@ -96,13 +96,13 @@ interface UrlInterface
     public function asset($uri);
 
     /**
-     * Get Base URL definition
+     * Get base path definition
      * 
      * @param string $uri custom uri
      * 
      * @return string
      */
-    public function getBaseUrl($uri = '');
+    public function basePath($uri = '');
 
     /**
      * Prep URL

@@ -16,7 +16,7 @@ Url sınıfı uygulamanızda kullandığınız iç ve dış html linklerini olu�
         <ul>
             <li><a href="#anchor">$this->url->anchor()</a></li>
             <li><a href="#asset">$this->url->asset()</a></li>
-            <li><a href="#getBaseUrl">$this->url->getBaseUrl()</a></li>
+            <li><a href="#getBaseUrl">$this->url->basePath()</a></li>
             <li><a href="#prep">$this->url->prep()</a></li>
             <li>
                 <a href="#chain">Zincirleme Metotlar</a>
@@ -39,21 +39,23 @@ Url sınıfı uygulamanızda kullandığınız iç ve dış html linklerini olu�
 
 <a name="config"></a>
 
-Url sınıfı <kbd>app/providers.php</kbd> dosyasında servis sağlayıcısı olarak tanımlıdır. Url sınıfına ait servis parametreleri <kbd>app/$env/providers/url.php</kbd> dosyasından konfigüre edilir.
+Url sınıfı <kbd>app/providers.php</kbd> dosyasında servis sağlayıcısı olarak tanımlıdır. Url sınıfına ait servis parametreleri <kbd>app/local/providers/url.php</kbd> dosyasından konfigüre edilir.
 
 ```php
 'params' => [
 
-    'baseurl'  => '/',
+    'base' => [
+        'path' => '/'
+    ],
     'assets'   => [
-        'url' => '/',
+        'path' => '/',
         'folder' => '/assets/',
     ]
 ]
 ```
 
-* <b>baseurl</b> : Url fonksiyonları kök adresi, genellikle "/" karakteri yeterli olur.
-* <b>assets.url</b> : Kaynaklar kök adresi, genellikle "/" karakteri yeterli olur. Buraya bir <kbd>cdn</kbd> sağlayıcı adresi de girilebilir.
+* <b>base.path</b> : Url fonksiyonları kök adresi, genellikle "/" karakteri yeterli olur.
+* <b>assets.path</b> : Kaynaklar kök adresi, genellikle "/" karakteri yeterli olur. Buraya bir <kbd>cdn</kbd> sağlayıcı adresi de girilebilir.
 * <b>assets.folder</b> : Kaynaklar klasörünü belirler varsayılan klasör "/assets/" klasörüdür.
 
 <a name="methods"></a>
@@ -127,7 +129,7 @@ Eğer konfigürasyon dosyanızda bir dış url tanımlı ise.
 
 ```php
 'assets'   => [
-    'url' => 'static.example.com',
+    'path' => 'static.example.com',
     'folder' => '/assets/',
 ]
 ```
@@ -140,12 +142,12 @@ http://static.example.com/assets/images/logo.png
 
 <a name="getBaseUrl"></a>
 
-#### $this->url->getBaseUrl()
+#### $this->url->basePath($uri = '')
 
-Konfigürasyonda tanımlı olan kök url adresine geri döner.
+Konfigürasyonda tanımlı olan kök dizine geri döner.
 
 ```php
-echo $this->url->getBaseUrl();
+echo $this->url->basePath();
 ```
 
 Çıktı
@@ -154,10 +156,10 @@ echo $this->url->getBaseUrl();
 / 
 ```
 
-Bir url adresi ile birlikte kök url adresi alınabilir.
+Bir url adresi ile birlikte kök dizin adresi alınabilir.
 
 ```php
-echo $this->url->getBaseUrl('examples/forms');
+echo $this->url->basePath('examples/forms');
 ```
 
 Çıktı
@@ -168,7 +170,7 @@ echo $this->url->getBaseUrl('examples/forms');
 
 <a name="prep"></a>
 
-#### $this->url->prep()
+#### $this->url->prep($url)
 
 Girilen url adresinin başında <kbd>http://</kbd> protokolü eksik ise tamamlar.
 
@@ -195,7 +197,6 @@ echo $this->url->prep('https://example.com');
 https://example.com
 ```
 
-
 <a name="chain"></a>
 
 ### Zincirleme Metotlar
@@ -217,7 +218,7 @@ echo $this->url->withHost('example.com')
 Çıktı
 
 ```php
-<a href="http://example.com">Click Here</a>
+<a href="https://example.com">Click Here</a>
 ```
 
 Eğer bir url berlirtilmezse geçerli host adresi host olarak kabul edilir.
