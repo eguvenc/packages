@@ -14,13 +14,7 @@
     <li><a href="#caching-with-params">Parametreler İle Önbellekleme</a></li>
     <li><a href="#flushing-with-params">Parametreler İle Önbelleklenmiş Katmanı Silmek</a></li>
     <li><a href="#creating-navigation-bar">Katmanlarla Bir Gezinme Çubuğu Yaratalım</a></li>
-    <li>
-        <a href="#helper-features">Kurtarıcı Özellikler</a>
-        <ul>
-            <li><a href="#creating-layouts">Katmanlar İle Görünüm Dosyalarına Ait Şablonlar Yaratmak</a></li>
-            <li><a href="#following-layers">Katmanları Hata Ayıklayıcısından Takip Etmek</a></li>
-        </ul>
-    </li>
+    <li><a href="#debugger">Çıktı Görüntüleyici</a></li>
     <li><a href="#reference">Fonksiyon Referansı</a></li>
 </ul>
 
@@ -135,7 +129,7 @@ header.php
             Header.php
 ```
 
-Görüldüğü gibi header katmanına ait bir view dosyası var ve bu view dosyasını yöneten bir kontrolör dosyası mevcut. Şimdi oluşturduğunuz katmanı welcome modülü welcome kontrolör dosyası içerisinde çalıştırın.
+Görüldüğü gibi header katmanına ait bir view dosyası var ve bu view dosyasını yöneten bir kontrolör dosyası mevcut. Şimdi oluşturduğunuz katmanı welcome klasörü welcome kontrolör dosyası içerisinde çalıştırın.
 
 ```php
 namespace Welcome;
@@ -250,7 +244,7 @@ Gezinme çubuğuna ait görünüm dosyasını <kbd>folders/views/view/</kbd> kla
 </div>
 ```
 
-Şimdi oluşturduğumuz katmanı <kbd>welcome/</kbd> modülünden çağıralım.
+Şimdi oluşturduğumuz katmanı <kbd>welcome/</kbd> klasöründen çağıralım.
 
 
 ```php
@@ -271,21 +265,9 @@ class Welcome extends Controller
 
 Eğer yukarıdaki işlemleri doğru yaptıysak gezinme çubuğuna ait çıktıyı almış olmamız gerekir. Gezinme çubuğunun doğru görüntülenebilmesi için ilgili stil nesnelerini ana css dosyasınızda oluşturmayı unutmayın.
 
-<a name="helper-features"></a>
+<a name="debugger"></a>
 
-## Kurtarıcı Özellikler
-
-Katmanlarla ile çalışırken katmanları  görünüm dosyaları için şablon oluşturmak için kullanabilir ve oluşturduğunuz katmanları hata ayıklayıcısı ile gözlemleyebilirsiniz.
-
-<a name="creating-layouts"></a>
-
-### Katmanlar İle Görünüm Dosyalarına Ait Şablonlar Yaratmak
-
-Katmanlar ile şablonlar oluşturup bu şablonları görünüm dosyaları içerisine değişken olarak gönderebilmek mümkündür. Daha fazla bilgi için [View.md](/Layer/Docs/View/tr/View.md) dökümentasyonunu inceleyebilirsiniz.
-
-<a name="following-layers"></a>
-
-### Katmanları Hata Ayıklayıcısından Takip Etmek
+### Çıktı Görüntüleyici
 
 Aşağıdaki resimde görüldüğü üzere yarattığınız gezinme çubuğuna ait katmanı <kbd>http://yourproject/debugger</kbd> adresini ziyaret ederek katmanların bileşenler halinde nasıl çıktılandığını takip edebilirsiniz.
 

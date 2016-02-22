@@ -45,7 +45,6 @@ View sınıfı görünüm dosyalarını işlemek için harici kütüphaneler kul
 * Native ( Varsayılan )
 * <a href="http://platesphp.com/" target="_blank">Plates</a>
 
-
 Varsayılan ( Native ) görünüm motoru ile daha yüksek performans elde etmeniz muhtemeldir, fakat daha gelişmiş özelliklere ihtiyacınız varsa diğer görünüm motorlarını da tercih edebilirsiniz.
 
 <a name="serviceProvider"></a>
@@ -189,7 +188,7 @@ Bu mimariyi kullanmanın faydalarını aşağıdaki gibi sıralayabiliriz.
 
 #### View Kontrolör
 
-View Kontrolör <kbd>/modules/views/</kbd> klasörü içerisinde oluşturulan kontrolör dosyalarıdır. Bu dosyalara dışarıdan http yada ajax isteği ile, yada içeriden aşağıdaki gibi
+View Kontrolör <kbd>/folders/views/</kbd> klasörü içerisinde oluşturulan kontrolör dosyalarıdır. Bu dosyalara dışarıdan http yada ajax isteği ile, yada içeriden aşağıdaki gibi
 
 ```php
 $output = $this->layer->get('views/$controllerName');
