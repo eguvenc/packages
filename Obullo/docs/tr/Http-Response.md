@@ -1,118 +1,107 @@
 
 ## Http Response Sınıfı
 
-Http response sınıfının ana fonksiyonu finalize edilmiş web çıktısını tarayıcıya göndermektir. Tarayıcı başlıklarını, json yanıtı, http durum kodunu, 404 page not found yada özel bir hata mesajı göndermek response sınıfının diğer fonksiyonlarındandır. Ayrıca response sınıfı tarayıcıya gönderilen çıktıyı gzip yöntemi ile sıkıştırabilir fakat bu özellik opsiyoneldir ve bütün tarayıcılar desteklemeyebilir.
-
-Http paketi Psr7 Standartlarını destekler ve Zend-Diactoros kütüphanesi bileşenlerinden oluşur.
+Http response sınıfının ana fonksiyonu finalize edilmiş web çıktısını tarayıcıya göndermektir. Tarayıcı başlıklarını, json yanıtı, http durum kodunu, 404 page not found yada özel bir hata mesajı göndermek response sınıfının diğer fonksiyonlarındandır. Http paketi <a href="https://github.com/zendframework/zend-diactoros" target="_blank">Zend-Diactoros</a> kütüphanesi bileşenlerinden oluşturulmuştur ve <a href="http://www.php-fig.org/psr/psr-7/" target="_blank">Psr7</a> http standartlarını destekler.
 
 <ul>
-    <li><a href="#loading-class">Sınıfı Yüklemek</a></li>
+    <li><a href="#accessing-methods">Metotlara Erişim</a></li>
+    <li><a href="#newInstance">$this->response->newInstance()</a></li>
+    <li><a href="#getBody">$this->response->getBody()</a></li>
+    <li><a href="#withBody">$this->response->withBody()</a></li>
+    <li><a href="#withStatus">$this->response->withStatus()</a></li>
+    <li><a href="#getStatusCode">$this->response->getStatusCode()</a></li>
+    <li><a href="#getReasonPhrase">$this->response->geReasonPhrase()</a></li>
+    <li><a href="#getHeaders">$this->response->getHeaders()</a></li>
+    <li><a href="#hasHeader">$this->response->hasHeader()</a></li>
+    <li><a href="#getHeader">$this->response->getHeader()</a></li>
+    <li><a href="#getHeaderLine">$this->response->getHeaderLine()</a></li>
+    <li><a href="#withHeader">$this->response->withHeader()</a></li>
+    <li><a href="#withAddedHeader">$this->response->withAddedHeader()</a></li>
+    <li><a href="#withoutHeader">$this->response->withoutHeader()</a></li>
     <li>
-        <a href="#output-control">Çıktı Kontrolü</a>
+        <a href="#helper-methods">Kurtarıcı Metotlar</a>
         <ul>
-            <li><a href="#enableOutput">$this->response->enableOutput()</a></li>
-            <li><a href="#disableOutput">$this->response->disableOutput()</a></li>
-            <li><a href="#write">$this->response->write()</a></li>
-            <li><a href="#setOutput">$this->response->setOutput()</a></li>
-            <li><a href="#getOutput">$this->response->getOutput()</a></li>
+            <li><a href="#json">$this->response->json()</a></li>
+            <li><a href="#html">$this->response->html()</a></li>
+            <li><a href="#redirect">$this->response->redirect()</a></li>
+            <li><a href="#emptyContent">$this->response->emptyContent()</a></li>
         </ul>
     </li>
-
     <li>
-        <a href="#final-methods">Çıktı Sonlandırma Fonksiyonları</a>
+        <a href="#templates">Şablonlar</a>
         <ul>
-            <li><a href="#finalize">$this->response->finalize()</a></li>
-            <li><a href="#sendHeaders">$this->response->sendHeaders()</a></li>
+            <li><a href="#templates::error">$this->view->get('templates::error')</a></li>
+            <li><a href="#templates::404">$this->view->get('templates::404')</a></li>
+            <li><a href="#templates::maintenance">$this->view->get('templates::maintenance')</a></li>
         </ul>
     </li>
-
-    <li>
-        <a href="#header-methods">Http Başlık Fonksiyonları</a>
-        <ul>
-            <li><a href="#status">$this->response->withStatus()</a></li>
-            <li><a href="#geStatusCode">$this->response->getStatusCode()</a></li>
-            <li><a href="#geReasonPhrase">$this->response->geReasonPhrase()</a></li>
-            <li><a href="#headers-set">$this->response->setHeader()</a></li>
-            <li><a href="#headers-get">$this->response->getHeader()</a></li>
-            <li><a href="#headers-get">$this->response->withoutHeader()</a></li>
-            <li><a href="#headers-all">$this->response->getHeaders()</a></li>
-        </ul>
-    </li>
-
-    <li>
-        <a href="#custom-methods">Özel Çıktı Metotları</a>
-        <ul>
-            <li><a href="#response-json">$this->response->json()</a></li>
-            <li><a href="#response-show404">$this->response->error404()</a></li>
-            <li><a href="#response-showError">$this->response->error()</a></li>
-        </ul>
-    </li>
-
-    <li>
-        <a href="#compressing">Sıkıştırma</a>
-        <ul>
-            <li><a href="#compressing-test">Sıkıştırılmış Bir Sayfayı Test Etmek</a></li>
-        </ul>
-    </li>
-
 </ul>
 
-<a name="loading-class"></a>
+<a name="accessing-methods"></a>
 
-### Sınıfı Yüklemek
-
-```php
-$this->c['response']->method();
-```
-Konteyner nesnesi ile yüklenmesi gerekir. Response sınıfı <kbd>app/providers.php</kbd> dosyası içerisinde komponent olarak tanımlıdır.
-
-> **Not:** Kontrolör sınıfı içerisinden bu sınıfa $this->response yöntemi ile de ulaşılabilir.
-
-<a name="output-control"></a>
-
-### Çıktı Kontrolü
-
-Çıktıyı kontrol etmenizi sağlayan fonksiyonlardır.
-
-<a name="write"></a>
-
-##### $this->response->getbody()->write(string $output);
-
-Çıktı gövdesine oluşturduğunuz çıktıları ekler.
+### Metotlara Erişim
 
 ```php
-$this->response->write('<p>example append data</p>');
-$this->response->write('<p>example append data</p>');
+$container->get('response')->method();
 ```
-> **Not:** View paketi çıktıları oluştururken write fonksiyonunu kullanır. 
 
-##### $this->response->newInstance($body = 'php://memory', $status = 200, array $headers = []);
+Kontrolör içerisinden,
+
+```
+$this->response->method();
+```
+
+<a name="newInstance"></a>
+
+##### $this->response->newInstance($body = 'php://memory', $status = 200, array $headers = [])
 
 Yeni bir response nesnesi oluşturur.
 
+<a name="getBody"></a>
 
-<a name="header-methods"></a>
+##### $this->response->getbody()
 
-#### Http Başlık Fonksiyonları
-
-Tarayıcı başlıklarını kontrol eden fonksiyonları içerir.
-
-<a name="status"></a>
-
-##### $this->response->withStatus($code = 401, 'text');
-
-Tarayıcı gönderilen durum kodunu belirler.
+<kbd>Psr\Http\Message\StreamInterface</kbd> arayüzünü uygulayan Stream nesnesine geri döner. 
 
 ```php
-$this->reponse->withStatus('401');  // Http başlığını "Unauthorized" olarak ayarlar.
+$body = $this->response->getBody();
 ```
-Http durum kodu listesi için [Buraya tıklayın](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html)
+
+Böylece stream nesnesine ait metotlara erişilir. Aşağıdaki örnekte write fonksiyonu ile çıktı gövdesine veriler ekleniyor.
+
+```php
+$body->write('<p>example append data</p>');
+```
+<a name="withBody"></a>
+
+##### $this->response->withBody(StreamInterface $body)
+
+Girilen mesaj gövdesi ile birlikte http response nesnesine geri döner. Gövde StreamInterface arayüzünü uygulayan bir nesne olmak zorundadır.
+
+<a name="withStatus"></a>
+
+##### $this->response->withStatus($code, $reasonPhrase = '')
+
+Tarayıca gönderilen durum kodunu belirler.
+
+```php
+$body = $container->get('view')
+    ->withStream()
+    ->get('templates::404');
+
+return $this->response
+    ->withStatus(404)
+    ->withHeader('Content-Type', 'text/html')
+    ->withBody($body);
+```
+
+Birinci parametre durum kodunu, ikinci parametre ise varsa bu duruma yolaçan ifadeyi değiştirir. Http durum kodu ve ifade listesini görmek için [Buraya tıklayın](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html).
 
 <a name="getStatusCode"></a>
 
-##### $this->response->getStatusCode();
+##### $this->response->getStatusCode()
 
-Mevcut http durum kodu değerini verir.
+Mevcut http durum kodu ifadesini verir.
 
 ```php
 echo $this->reponse->getStatusCode();   // 401
@@ -120,14 +109,14 @@ echo $this->reponse->getStatusCode();   // 401
 
 <a name="getReasonPhrase"></a>
 
-##### $this->response->getReasonPhrase();
+##### $this->response->getReasonPhrase()
 
-Mevcut http durum kodu mesajına geri döner.
+Mevcut http durum kodu ifadesine geri döner.
 
 ```php
 echo $this->reponse->getReasonPhrase();  // OK
 ```
-Bazı örnek http durum mesajları
+Bazı örnek http durum ifadeleri
 
 ```php
 (200) OK
@@ -136,54 +125,12 @@ Bazı örnek http durum mesajları
 (203) Non-Authoritative Information
 (404) Not Found
 ```
-<a name="headers-set"></a>
 
-##### $this->response->withHeader(string $header, string $value = null, $replace = true);
+<a name="getHeaders"></a>
 
-Çıktı tarayıcıya gönderilmeden önce http başlıkları eklemenizi sağlar. Takip eden örnekte bir çıktının içerik türü belirleniyor.
+##### $this->response->getHeaders()
 
-```php
-$this->response->headers->set("content-type", "application/json");
-```
-
-Ya da aşağıdaki gibi birden fazla başlık eklenebilir.
-
-```php
-$this->response->withHeader("HTTP/1.0 200 OK");
-$this->response->withHeader("HTTP/1.1 200 OK");
-$this->response->withHeader("last-modified", gmdate('D, d M Y H:i:s', time()).' GMT');
-$this->response->withHeader("cache-control", "no-store, no-cache, must-revalidate");
-$this->response->withHeader("cache-control", "post-check=0, pre-check=0");
-$this->response->withHeader("pragma", "no-cache");
-```
-
-Http başlıkları tam listesi için [Buraya tıklayın](https://en.wikipedia.org/wiki/List_of_HTTP_header_fields)
-
-<a name="headers-get"></a>
-
-##### $this->response->getHeaders();
-
-Http başlığına eklenmiş bir başlığın değerine döner.
-
-```php
-echo $this->response->headers->get('pragma');  // no-cache
-```
-
-<a name="headers-remove"></a>
-
-##### $this->response->withoutHeader();
-
-Http başlığından bir değeri siler.
-
-```php
-echo $this->response->withoutHeader('pragma');
-```
-
-<a name="headers-all"></a>
-
-##### $this->response->getHeaders();
-
-Http başlığında ekleniş tüm başlıklara döner.
+Http başlığında eklenmiş tüm başlıklara döner.
 
 ```php
 Array
@@ -193,53 +140,156 @@ Array
 )
 ```
 
-##### $this->response->newInstance($body = 'php://memory', $status = 200, array $headers = []);
+<a name="hasHeader"></a>
 
-Yeni bir response nesnesi oluşturur.
+##### $this->response->hasHeader($header)
 
+Girilen http sunucu başlığına ait anahtar http sunucu başlıklarında mevcut ise <kbd>true</kbd> değilse <kbd>false</kbd> değerine döner.
 
-<a name="custom-methods"></a>
+<a name="getHeader"></a>
 
-#### Özel Çıktı Metotları
+##### $this->response->getHeader($header)
 
-Json formatında yada 404 sayfa bulunamadı gibi özel başlıkları içeren metotlar aşağıda sıralanmıştır.
-
-<a name="response-json"></a>
-
-##### $this->response->json(array $data, mixed $header = 'default');
-
-Json formatında kodlanmış bit metni http json başlığı ile birlikte tarayıcıya gönderir.
+Http başlığına eklenmiş bir başlığın değerine döner.
 
 ```php
-echo $this->response->json(['test']);  // Çıktı [ "test" ]
+echo $this->response->getHeader('pragma');  // no-cache
 ```
 
-İkinci parametre <kbd>config/response.php</kbd> konfigürasyon dosyasında tanımlı olan http başlıklığını kullanır varsayılan değer <kbd>default</kbd> değeridir.
+<a name="getHeaderLine"></a>
+
+##### $this->request->getHeaderLine($header)
+
+Birden fazla niteliği olan bir http başlığına ait array türündeki değerleri virgüllerle birleştirerek string türünde tek bir satır olarak almayı sağlar.
+
+<a name="withHeader"></a>
+
+##### $this->response->withHeader(string $header, string $value = null, $replace = true)
+
+Girilen http başlığı ile birlikte http response nesnesine geri döner. Eğer girilen başlık http başlıklarında mevcut ise, değeri yenisi ile günceller.
 
 ```php
-echo $this->response->json(['test'], 'second');
+$this->response->withHeader("content-type", "application/json");
 ```
 
-Yukarıda örnek tanımlı ise <kbd>second</kbd> adlı konfigürasyona ait http başlıklarını ekler.
+Http başlıkları tam listesi için [Buraya tıklayın](https://en.wikipedia.org/wiki/List_of_HTTP_header_fields)
 
-<a name="response-show404"></a>
+<a name="withAddedHeader"></a>
 
-##### $this->response->error404();
+##### $this->request->withAddedHeader($header, $value)
 
-<kbd>resources/templates/errors/404.php</kbd> html şablon dosyasını kullanarak <kbd>404 Page Not Found</kbd> hatası oluşturur.
+Girilen http başlığını eski başlıkların üzerine ekleyerek oluşan başlıklar ile birlikte http response nesnesine geri döner.
 
 ```php
-$this->response->error404();
+$this->response->withAddedHeader("HTTP/1.0 200 OK");
+$this->response->withAddedHeader("HTTP/1.1 200 OK");
+$this->response->withAddedHeader("last-modified", gmdate('D, d M Y H:i:s', time()).' GMT');
+$this->response->withAddedHeader("cache-control", "no-store, no-cache, must-revalidate");
+$this->response->withAddedHeader("cache-control", "post-check=0, pre-check=0");
+$this->response->withAddedHeader("pragma", "no-cache");
 ```
 
-<a name="response-showError"></a>
+<a name="withoutHeader"></a>
 
-##### $this->response->error(string $message, $status_code = 500, $heading = 'An Error Was Encountered');
+##### $this->response->withoutHeader($header)
 
-<kbd>resources/templates/errors/general.php</kbd> html şablon dosyasını kullanarak uygulamaya özel hatalar oluşturur.
+Girilen http başlığını varolan başlıklardan silerek http response nesnesine geri döner.
 
 ```php
-$this->response->error('Custom error message');
+$this->response->withoutHeader('pragma');
 ```
 
-> **Not:** Hata mesajları girdilerine güvenlik amacıyla response sınıfı içerisinde özel karakter filtrelmesi yapılır.
+<a name="helper-methods"></a>
+
+### Kurtarıcı Metotlar
+
+Aşağıdaki ek metotlar duruma göre uygulamanızın <kbd>json</kbd>, <kbd>html</kbd> veya <kbd>emptyContent</kbd> gibi sık kullanılan http başlıklarını kolayca oluşturmasına yardımcı olur.
+
+<a name="json"></a>
+
+##### $this->response->json(array $data, $status = 200, array $headers = [], $encodingOptions = 15)
+
+Json kodlanmış bir metin ile birlikte Content-Type http başlığını <kbd>application/json</kbd> olarak belirleyerek tarayıcıya gönderir.
+
+```php
+return $this->response->json(['test']);  // Çıktı [ "test" ]
+```
+
+<a name="html"></a>
+
+##### $this->response->html($html, $status = 200, array $headers = [])
+
+Html kodlanmış bir metin ile birlikte Content-Type http başlığını <kbd>text/html</kbd> olarak belirleyerek tarayıcıya gönderir.
+
+<a name="redirect"></a>
+
+##### $this->response->redirect($uri, $status = 301, array $headers = [])
+
+Varsayılan 301 durum kodu ile tarayıcıya girilen url adresine yönlendirir.
+
+<a name="emptyContent"></a>
+
+##### $this->response->emptyContent($status = 204, array $headers = [])
+
+Varsayılan 204 durum kodu ile tarayıcıya boş bir sayfa (içerik) gönderir.
+
+<a name="templates"></a>
+
+### Şablonlar
+
+Bazı durumlarda özelleştirilebilir şablonlar kullanarak uygulamanızın daha esnek olması sağlanabilir.
+
+<a name="templates::error"></a>
+
+##### $this->view->get('templates::error')
+
+Uygulamanızda oluşturduğunuz genel hatalar için <kbd>error</kbd> şablonunu kullanabilirsiniz.
+
+```php
+$body = $this->view
+    ->withStream()
+    ->get(
+        'templates::error',
+        [
+            'error' => sprintf(
+                '%s Method Not Allowed',
+                "GET"
+            )
+        ]
+    );
+return $this->response->withStatus(405)
+    ->withHeader('Content-Type', 'text/html')
+    ->withBody($body);
+```
+
+<a name="templates::404"></a>
+
+##### $this->view->get('templates::404')
+
+Uygulamanızda oluşturduğunuz sayfa bulunamadı hataları için <kbd>404</kbd> şablonunu kullanabilirsiniz.
+
+```php
+$body = $this->view
+    ->withStream()
+    ->get('templates::404');
+
+return $this->response->withStatus(404)
+    ->withHeader('Content-Type', 'text/html')
+    ->withBody($body);
+```
+
+<a name="templates::maintenance"></a>
+
+##### $this->view->get('templates::maintenance')
+
+Uygulamanızda oluşturduğunuz bakıma alma durumları için <kbd>maintenance</kbd> şablonunu kullanabilirsiniz.
+
+```php
+$body = $this->view->get('view')
+    ->withStream()
+    ->get('templates::maintenance');
+
+return $this->response->withStatus(404)
+    ->withHeader('Content-Type', 'text/html')
+    ->withBody($body);
+```
