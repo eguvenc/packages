@@ -30,7 +30,7 @@ Http response sınıfının ana fonksiyonu finalize edilmiş web çıktısını 
     <li>
         <a href="#templates">Şablonlar</a>
         <ul>
-            <li><a href="#templates::error">$this->view->get('templates::error')</a></li>
+            <li><a href="#templates.error">$this->view->get('templates::error')</a></li>
             <li><a href="#templates::404">$this->view->get('templates::404')</a></li>
             <li><a href="#templates::maintenance">$this->view->get('templates::maintenance')</a></li>
         </ul>
