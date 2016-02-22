@@ -4,33 +4,16 @@
 Çok katmanlı programlama tekniği hiyerarşik kontrolör programlama kalıbından türetilmiş uygulamanızı ölçeklenebilir hale getirmek için kullanılan bir tasarım kalıbıdır. ( bknz. <a href="http://www.javaworld.com/article/2076128/design-patterns/hmvc--the-layered-pattern-for-developing-strong-client-tiers.html" target="_blank">Java Hmvc</a> ).
 
 <ul>
-    <li>
-        <a href="#architecture">Mimari Yapı</a>
-        <ul>
-            <li><a href="#usage">Katmanlı Mimariyi Kullanmak</a></li>
-        </ul>
-    </li>
-
-    <li>
-        <a href="#running">Çalıştırma</a>
-        <ul>
-            <li><a href="#methods">Metotlara Erişim</a></li>
-            <li><a href="#calling-layers">Bir Katmanı Çağırmak</a></li>
-            <li><a href="#hello-layers">Merhaba Katmanlar</a></li>
-            <li><a href="#caching-layers">Bir Katmanı Önbelleklemek</a></li>
-            <li><a href="#flushing-cached-layers">Bir Katmanı Önbellekten Silmek</a></li>
-            <li><a href="#caching-with-params">Parametreler İle Önbellekleme</a></li>
-            <li><a href="#flushing-with-params">Parametreler İle Önbelleklenmiş Katmanı Silmek</a></li>
-        </ul>
-    </li>
-
-    <li>
-        <a href="#examples">Örnekler</a>
-        <ul>
-            <li><a href="#creating-navigation-bar">Katmanlarla Bir Gezinme Çubuğu Yaratalım</a></li>
-        </ul>
-    </li>
-
+    <li><a href="#architecture">Mimari Yapı</a></li>
+    <li><a href="#views">Görünümleri Katmanlar İle Oluşturmak</a></li>
+    <li><a href="#methods">Metotlara Erişim</a></li>
+    <li><a href="#calling-layers">Bir Katmanı Çağırmak</a></li>
+    <li><a href="#hello-layers">Merhaba Katmanlar</a></li>
+    <li><a href="#caching-layers">Bir Katmanı Önbelleklemek</a></li>
+    <li><a href="#flushing-cached-layers">Bir Katmanı Önbellekten Silmek</a></li>
+    <li><a href="#caching-with-params">Parametreler İle Önbellekleme</a></li>
+    <li><a href="#flushing-with-params">Parametreler İle Önbelleklenmiş Katmanı Silmek</a></li>
+    <li><a href="#creating-navigation-bar">Katmanlarla Bir Gezinme Çubuğu Yaratalım</a></li>
     <li>
         <a href="#helper-features">Kurtarıcı Özellikler</a>
         <ul>
@@ -38,12 +21,12 @@
             <li><a href="#following-layers">Katmanları Hata Ayıklayıcısından Takip Etmek</a></li>
         </ul>
     </li>
-
+    <li><a href="#reference">Fonksiyon Referansı</a></li>
 </ul>
 
 <a name="architecture"></a>
 
-## Mimari Yapı
+### Mimari Yapı
 
 Çok katmanlı mimari MVC katmanlarını bir üst-alt hiyerarşisi içerisinde çözümler. Uygulama içerisinde tekrarlayan bu model yapılandırılmış bir client-tier mimarisi sağlar.
 
@@ -51,15 +34,13 @@
 
 Her bir katman basit kontrolör sınıflarıdır. Layer sınıfı tarafından tekralanabilir olarak çağrılabilen katmanlar uygulamayı parçalayarak farklı işlevsel özellikleri bileşen yada web servisleri haline getirir.
 
-<a name="usage"></a>
-
-### Katmanlı Mimariyi Kullanmak
-
 Katmanlı mimari yazılım geliştirmenin arayüz sürecini etkileyici bir şekilde yönetir. Bu mimariyi kullanmanın faydalarını aşağıdaki gibi sıralayabiliriz.
 
 * Arayüz Tutarlılığı: Katmanlı programlama görünen varlıkları ( views ) kesin parçalara ayırır ve her bölüm kendisinden sorumlu olduğu fonksiyonu çalıştırır ( view controller ) böylece her katman bir layout yada widget hissi verir.
 * Bakımı Kolay Uygulamalar: Parçalara bölünen kullanıcı arayüzü bileşenleri MVC tasarım desenine bağlı kaldıkları için bakım kolaylığı sağlarlar.
 * Mantıksal Uygulamalar: Katmanlar birbirleri ile etkişim içerisinde olabilecekleri gibi uygulama üzerinde hakimiyet ve önbelleklenebilme özellikleri ile genişleyebilir mantıksal uygulamalar yaratmayı sağlarlar. Bölümsel olarak birbirinden ayrılan katmanlar bir <kbd>web servis</kbd> gibi de çalışabilirler.
+
+<a name="views"></a>
 
 ### Görünümleri Katmanlar İle Oluşturmak
 
@@ -75,15 +56,11 @@ Burada üzerinde durulan önemli nokta katmanlı mimaride oluşturduğunuz katma
 
 Bu özelliğin yanında katman içerisinde bir kez yapılması gereken veritabanı sorguları önbelleklenebilir. Eğer örneğimizdeki gezinme çubuğunu bir web servis gibi düşünürsek, bu web servise gönderilen istekler girilen parametrelere göre önbelleklenerek uygulama performansı arttrılabilir.
 
-<a name="running"></a>
-
-### Çalıştırma
-
-Katman sınıfı <kbd>app/providers.php</kbd> dosyasında tanımlıdır bu yüzdan ayrıca konfigüre edilmeye gerek duymaz.
-
 <a name="methods"></a>
 
-#### Metotlara Erişim
+### Metotlara Erişim
+
+Katman sınıfı <kbd>app/providers.php</kbd> dosyasında servis sağlayıcı olarak tanımlıdır.
 
 ```php
 $container->get('layer')->method();
@@ -99,22 +76,22 @@ yöntemleri ile servis metotlarına ulaşılabilir.
 
 <a name="calling-layers"></a>
 
-#### Bir Katmanı Çağırmak
+### Bir Katmanı Çağırmak
 
-Katmanlar layer sınıfı üzerinden web servis metotlarına benzer şekilde çağırılırlar. Bir katman get yada post metodları yaratılabilir.
+Katmanlar layer sınıfı üzerinden web servis metotlarına benzer şekilde çağırılırlar. Bir katman http get yada post metodları ile yaratılabilir.
 
 ```php
 echo $this->layer->get('controller/method/args', $data = array());
 echo $this->layer->post('controller/method/args', $data = array());
 ```
 
-Katman istekleri <kbd>module/controller/method/args</kbd> standart url çağırma yöntemi ile Obullo router sınıfı üzerinden oluşturulurlar.
+Katman istekleri <kbd>folder/controller/method/args</kbd> standart url çağırma yöntemi ile varolan router sınıfı üzerinden oluşturulurlar.
 
 <a name="hello-layers"></a>
 
-#### Merhaba Katmanlar
+### Merhaba Katmanlar
 
-Katmanları daha iyi anlamak için <kbd>modules/views</kbd> klasörü altında aşağıdaki gibi Header.php adında bir view kontrolör yaratın.
+Katmanları daha iyi anlamak için <kbd>folders/views</kbd> klasörü altında aşağıdaki gibi Header.php adında bir view kontrolör yaratın.
 
 ```php
 namespace Views;
@@ -134,10 +111,10 @@ class Header extends Controller
     }
 }
 
-/* Location: .modules/views/header.php */
+/* Location: .folders/views/header.php */
 ```
 
-Daha sonra oluşturduğunuz header katmanı için <kbd>modules/views/view</kbd> klasörü altında aşağıdaki gibi bir view dosyası yaratın.
+Daha sonra oluşturduğunuz header katmanı için <kbd>folders/views/view</kbd> klasörü altında aşağıdaki gibi bir view dosyası yaratın.
 
 header.php
 
@@ -145,10 +122,10 @@ header.php
 <div><?php echo $header ?></div>
 ```
 
-###### Dosya Görünümü
+##### Dosya Görünümü
 
 ```php
-- modules
+- folders
       - welcome
           + view
             Welcome.php
@@ -158,7 +135,7 @@ header.php
             Header.php
 ```
 
-Görüldüğü gibi header katmanına ait bir view dosyası var ve bu view dosyasını yöneten bir kontrolör dosyası mevcut.Şimdi oluşturduğunuz katmanı welcome modülü welcome kontrolör dosyası içerisinde çalıştırın.
+Görüldüğü gibi header katmanına ait bir view dosyası var ve bu view dosyasını yöneten bir kontrolör dosyası mevcut. Şimdi oluşturduğunuz katmanı welcome modülü welcome kontrolör dosyası içerisinde çalıştırın.
 
 ```php
 namespace Welcome;
@@ -173,14 +150,14 @@ class Welcome extends Controller
     }
 }
 
-/* Location: .modules/welcome/welcome.php */
+/* Location: .folders/welcome/welcome.php */
 ```
 
 Son olarak <kbd>http://myproject/welcome</kbd> sayfasını ziyaret edin. Eğer yukarıdaki işlemleri doğru yaptı iseniz welcome sayfası içerisinde bir <kbd>HELLO HEADER LAYER</kbd> çıktısı almanız gerekir.
 
 <a name="caching-layers"></a>
 
-#### Bir Katmanı Önbelleklemek
+### Bir Katmanı Önbelleklemek
 
 Katman sınıfı get fonksiyonunu ikinci veya üçüncü parametresine bir tamsayı gönderilirse katman çıktısı gönderilen süre kadar cache sınıfı aracılığı ile önbellekte tutulur.
 
@@ -190,7 +167,7 @@ $this->layer->get('views/header', $expiration = 7200);
 
 <a name="flushing-cached-layers"></a>
 
-#### Bir Katmanı Önbellekten Silmek
+### Bir Katmanı Önbellekten Silmek
 
 Katman sınıfı flush metodu ile önbelleğe alınmış bir katman önbellekten temizlenir.
 
@@ -200,7 +177,7 @@ $this->layer->flush('views/header');
 
 <a name="caching-with-params"></a>
 
-#### Parametreler ile Önbellekleme
+### Parametreler ile Önbellekleme
 
 Katman sınıfı get fonksiyonunu ikinci parametresinden array türünde bir parametre gönderilirse gönderilen her farklı parametre serileştirilerek json raw formatına dönüştürülür ve elde edilen çıktıdan tekil bir katman kimliği ( ID ) üretilir. Eğer önbellekleme süresi üçüncü parametreye bir tamsayı olarak girilirse elde edilen katman kimliği ile ( ID ) her seferinde parametrelere duyarlı veriler önbelleğe kaydedilmiş olur.
 
@@ -211,22 +188,19 @@ Yukarıdaki örnekte kullanıcı id değerinin sağlanması ile her bir kullanı
 
 <a name="flushing-with-params"></a>
 
-#### Parametreler ile Önbelleklenmiş Katmanı Silmek
+### Parametreler ile Önbelleklenmiş Katmanı Silmek
 
 Bir katmanı önbellekten temizlemek için katman yolu (url) ve varsa katman parametrelerini flush metoduna göndermek yeterlidir.
 
 ```php
 $this->layer->flush('views/header', array('user_id' => 5));
 ```
-<a name="examples"></a>
-
-## Örnekler
 
 <a name="creating-navigation-bar"></a>
 
 ### Katmanlar İle Bir Gezinme Çubuğu Yaratalım
 
-Gezinme çubuğu yada diğer adıyla navigasyon menüsünü kontrol edecek olan kontrolör dosyasını <kbd>modules/views/</kbd> klasörü altına Header.php adıyla oluşturalım.
+Gezinme çubuğu yada diğer adıyla navigasyon menüsünü kontrol edecek olan kontrolör dosyasını <kbd>folders/views/</kbd> klasörü altına Header.php adıyla oluşturalım.
 
 ```php
 namespace Views;
@@ -260,10 +234,10 @@ class Header extends Controller
     }
 }
 
-/* Location: .modules/views/header.php */
+/* Location: .folders/views/header.php */
 ```
 
-Gezinme çubuğuna ait görünüm dosyasını <kbd>modules/views/view/</kbd> klasörü altında header.php adıyla oluşturun.
+Gezinme çubuğuna ait görünüm dosyasını <kbd>folders/views/view/</kbd> klasörü altında header.php adıyla oluşturun.
 
 ```php
 <div id="header"> 
@@ -292,7 +266,7 @@ class Welcome extends Controller
     }
 }
 
-/* Location: .modules/welcome/welcome.php */
+/* Location: .folders/welcome/welcome.php */
 ```
 
 Eğer yukarıdaki işlemleri doğru yaptıysak gezinme çubuğuna ait çıktıyı almış olmamız gerekir. Gezinme çubuğunun doğru görüntülenebilmesi için ilgili stil nesnelerini ana css dosyasınızda oluşturmayı unutmayın.
@@ -321,8 +295,9 @@ Debugger <kbd>http://myproject/debugger</kbd> modülünü çalıştırdığını
 
 Debugger modülü kurulu değilse kurmak için [Debugger.md](Debugger.md) dökümentasyonunu inceleyebilirsiniz.
 
+<a name="reference"></a>
 
-#### Fonksiyon Referansı
+### Fonksiyon Referansı
 
 ##### $this->layer->post(string $uri, $data = array | int, expiration = 0);  
 

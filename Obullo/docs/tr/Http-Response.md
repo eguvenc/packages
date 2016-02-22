@@ -1,7 +1,7 @@
 
 ## Http Response Sınıfı
 
-Http response sınıfının ana fonksiyonu finalize edilmiş web çıktısını tarayıcıya göndermektir. Tarayıcı başlıklarını, json yanıtı, http durum kodunu, 404 page not found yada özel bir hata mesajı göndermek response sınıfının diğer fonksiyonlarındandır. Http paketi <a href="https://github.com/zendframework/zend-diactoros" target="_blank">Zend-Diactoros</a> kütüphanesi bileşenlerinden oluşturulmuştur ve <a href="http://www.php-fig.org/psr/psr-7/" target="_blank">Psr7</a> http standartlarını destekler.
+Http response sınıfının ana fonksiyonu finalize edilmiş web çıktısını tarayıcıya göndermektir. Http durum kodu, http sunucu başlıkları göndermek gibi ana fonksiyonlarla beraber json, html ve redirect gibi sayfa başlıklarını oluşturmak da response sınıfının diğer fonksiyonlarındandır. Http paketi <a href="https://github.com/zendframework/zend-diactoros" target="_blank">Zend-Diactoros</a> kütüphanesi bileşenlerinden oluşturulmuştur ve <a href="http://www.php-fig.org/psr/psr-7/" target="_blank">Psr7</a> http standartlarını destekler.
 
 <ul>
     <li><a href="#accessing-methods">Metotlara Erişim</a></li>
@@ -30,9 +30,9 @@ Http response sınıfının ana fonksiyonu finalize edilmiş web çıktısını 
     <li>
         <a href="#templates">Şablonlar</a>
         <ul>
-            <li><a href="#templates::error">$this->view->get('templates::error')</a></li>
-            <li><a href="#templates::404">$this->view->get('templates::404')</a></li>
-            <li><a href="#templates::maintenance">$this->view->get('templates::maintenance')</a></li>
+            <li><a href="#templates_error">$this->view->get('templates::error')</a></li>
+            <li><a href="#templates_404">$this->view->get('templates::404')</a></li>
+            <li><a href="#templates_maintenance">$this->view->get('templates::maintenance')</a></li>
         </ul>
     </li>
 </ul>
@@ -239,7 +239,7 @@ Varsayılan 204 durum kodu ile tarayıcıya boş bir sayfa (içerik) gönderir.
 
 Bazı durumlarda özelleştirilebilir şablonlar kullanarak uygulamanızın daha esnek olması sağlanabilir.
 
-<a name="templates::error"></a>
+<a name="templates_error"></a>
 
 ##### $this->view->get('templates::error')
 
@@ -262,7 +262,7 @@ return $this->response->withStatus(405)
     ->withBody($body);
 ```
 
-<a name="templates::404"></a>
+<a name="templates_404"></a>
 
 ##### $this->view->get('templates::404')
 
@@ -278,7 +278,7 @@ return $this->response->withStatus(404)
     ->withBody($body);
 ```
 
-<a name="templates::maintenance"></a>
+<a name="templates_maintenance"></a>
 
 ##### $this->view->get('templates::maintenance')
 

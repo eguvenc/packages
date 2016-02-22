@@ -38,6 +38,10 @@ Http request sınıfı gelen istek türü, bağlantının güvenli olup olmadı�
             <li><a href="#withoutHeader">$this->request->withoutHeader()</a></li>
             <li><a href="#getUri">$this->request->getUri()</a></li>
             <li><a href="#withUri">$this->request->withUri()</a></li>
+            <li><a href="#getRequestTarget">$this->request->getRequestTarget()</a></li>
+            <li><a href="#withRequestTarget">$this->request->withRequestTarget()</a></li>
+            <li><a href="#getProtocolVersion">$this->request->getProtocolVersion()</a></li>
+            <li><a href="#withProtocolVersion">$this->request->withProtocolVersion()</a></li>
     	</ul>
     </li>
     <li>
@@ -384,7 +388,7 @@ HTTP protokol versiyonuna string türünde geri döner.
 
 <a name="withProtocolVersion"></a>
 
-##### $this->request->withProtocolVersion(string $version)
+##### $this->request->withProtocolVersion($version)
 
 Girilen HTTP protokol versiyonu ile birlikte http nesnesine geri döner. Versiyon numarası sadece HTTP versiyon numaralarını içermelidir. ( örn., "1.1", "1.0").
 

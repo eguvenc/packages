@@ -672,20 +672,6 @@ class Uri implements UriInterface
     }
 
     /**
-     * Gets complete native REQUEST_URI
-     * 
-     * @return string
-     */
-    public function getRequestUri()
-    {
-        $queryParams = $this->getQuery();
-        if (! empty($queryParams)) {
-            return $this->getPath().'?'.$queryParams;
-        }
-        return $this->getPath();
-    }
-
-    /**
      * Explode the URI Segments. The individual segments will
      * be stored in the $this->segments array.
      *
