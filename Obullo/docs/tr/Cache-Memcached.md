@@ -4,17 +4,11 @@
 Memcached sürücüsü sunucunuzda php extension olarak kurulmayı gerektirir. Ubuntu ve benzer linux sistemleri altında memcached kurulumu için <a href="https://github.com/obullo/warmup/tree/master/Memcached" target="_blank">bu belgeden</a> yararlanabilirsiniz.
 
 <ul>
-<li> 
-  <a href="#memcached-configuration">Konfigürasyon</a>
-    <ul>
-        <li><a href="#memcached-service-provider">Servis Sağlayıcısı</a></li>
-        <li><a href="#memcached-service-provider-connections">Servis Sağlayıcısı Bağlantıları</a></li>
-        <li><a href="#memcached-service">Servis</a></li>
-    </ul>
-</li>
-
+<li><a href="#service-provider">Servis Sağlayıcısı</a></li>
+<li><a href="#service-provider-connections">Servis Sağlayıcısı Bağlantıları</a></li>
+<li><a href="#service">Servis</a></li>
 <li>
-    <a href="#memcached-reference">Memcached Referansı</a>
+    <a href="#memcached-reference">Memcached Sürücü Referansı</a>
     <ul>
         <li><a href="#memcached-has">$this->cache->has()</a></li>
         <li><a href="#memcached-set">$this->cache->set()</a></li>
@@ -33,9 +27,9 @@ Memcached sürücüsü sunucunuzda php extension olarak kurulmayı gerektirir. U
 <li><a href="#helper-methods">Yardımcı Fonksiyonlar</a></li>
 </ul>
 
-<a name="memcached-configuration"></a>
+<a name="service-provider"></a>
 
-### Konfigürasyon
+#### Servis Sağlayıcısı
 
 <kbd>app/providers.php</kbd> dosyasında servis sağlayıcıların tanımlı olduğundan emin olun.
 
@@ -44,25 +38,19 @@ $container->addServiceProvider('ServiceProvider\Connector\Memcached');
 $container->addServiceProvider('ServiceProvider\Connector\CacheFactory');
 ```
 
-Memcached sürücüsü bağlantı ayarlarınızı <kbd>providers/memcached.php</kbd> dosyasında tanımlamanız gerekir.
-
-<a name="memcached-service-provider"></a>
-
-#### Servis Sağlayıcısı
-
-Cache servis sağlayıcısı önbellekleme için ortak bir arayüz sağlar.
+CacheFactory servis sağlayıcısı önbellekleme için ortak bir arayüz sağlar.
 
 ```php
-$this->cache = $this->container->get('cacheFactory')->shared(
+$cache = $this->container->get('cacheFactory')->shared(
       [
         'driver' => 'memcached', 
         'connection' => 'default'
       ]
 );
-$this->cache->method();
+$cache->method();
 ```
 
-<a name="memcached-service-provider-connections"></a>
+<a name="service-provider-connections"></a>
 
 #### Servis Sağlayıcısı Bağlantıları
 
@@ -86,35 +74,39 @@ return array(
 );
 ```
 
-<a name="memcached-service"></a>
+<a name="service"></a>
 
 #### Servis
 
-CacheFactory servisi aracılığı ile cache metotlarına aşağıdaki gibi erişilebilir.
+Cache servisi uygulamanızda önceden yapılandırılmış cache arayüzüne erişmenizi sağlar.
 
 ```php
-$this->container->get('cacheFactory')->metod();
+$this->container->get('cache')->metod();
 ```
 
-Varsayılan sürücü türü <kbd>app/classes/ServiceProvider/CacheFactory</kbd> servisinden belirlenir.
+Varsayılan sürücü türü <kbd>app/classes/ServiceProvider/Cache</kbd> servis sağlayıcısından yapılandırılır.
 
 ```php
 $container->share(
     'cache',
-    $container->get('memcached')->shared(
+    $container->get('cacheFactory')->shared(
         [
+            'driver' => 'memcached',
             'connection' => 'default'
         ]
     )
 );
 ```
 
+Yukarıda görüldüğü gibi redis servis sağlayıcısı varsayılan cache servisi olarak tanımlanıyor.
+
+
+
 <a name="memcached-reference"></a>
 
-#### Memcached Referansı
+#### Memcached Sürücü Referansı
 
 Bu sınıf içerisinde tanımlı olmayan metotlar __call metodu ile php <kbd>Memcached</kbd> sınıfından çağrılırlar.
-
 
 <a name="memcached-has"></a>
 

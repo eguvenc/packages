@@ -4,16 +4,11 @@
 Redis sürücüsü sunucunuzda php extension olarak kurulmayı gerektirir. Ubuntu ve benzer linux sistemleri altında redis kurulumu için <a href="https://github.com/obullo/warmup/tree/master/Redis" target="_blank">bu belgeden</a> yararlanabilirsiniz.
 
 <ul>
-<li> 
-  <a href="#redis-configuration">Konfigürasyon</a>
-    <ul>
-        <li><a href="#redis-service-provider">Servis Sağlayıcısı</a></li>
-        <li><a href="#redis-service-provider-connections">Servis Sağlayıcısı Bağlantıları</a></li>
-        <li><a href="#memcached-service">Servis</a></li>
-    </ul>
-</li>
+<li><a href="#service-provider">Servis Sağlayıcısı</a></li>
+<li><a href="#service-provider-connections">Servis Sağlayıcısı Bağlantıları</a></li>
+<li><a href="#service">Servis</a></li>
 <li>
-    <a href="#redis-reference">Redis Cache Sürücü Referansı</a>
+    <a href="#cache-reference">Redis Sürücü Referansı</a>
     <ul>
         <li><a href="#redis-has">$this->cache->has()</a></li>
         <li><a href="#redis-set">$this->cache->set()</a></li>
@@ -33,9 +28,9 @@ Redis sürücüsü sunucunuzda php extension olarak kurulmayı gerektirir. Ubunt
 </li>
 </ul>
 
-<a name="redis-configuration"></a>
+<a name="service-provider"></a>
 
-### Konfigürasyon
+#### Servis Sağlayıcısı
 
 <kbd>app/providers.php</kbd> dosyasında servis sağlayıcıların tanımlı olduğundan emin olun.
 
@@ -44,28 +39,23 @@ $container->addServiceProvider('ServiceProvider\Connector\Redis');
 $container->addServiceProvider('ServiceProvider\Connector\CacheFactory');
 ```
 
-Redis sürücüsü bağlantı ayarlarınızı <kbd>providers/redis.php</kbd> dosyasında tanımlamanız gerekir.
-
-<a name="redis-service-provider"></a>
-
-#### Servis Sağlayıcısı
-
 CacheFactory servis sağlayıcısı önbellekleme için ortak bir arayüz sağlar.
 
 ```php
-$this->cache = $this->container->get('cacheFactory')->shared(
+$cache = $this->container->get('cacheFactory')->shared(
       [
         'driver' => 'redis', 
         'connection' => 'default'
       ]
 );
-$this->cache->method();
+$cache->method();
 ```
-<a name="redis-service-provider-connections"></a>
+
+<a name="service-provider-connections"></a>
 
 #### Servis Sağlayıcısı Bağlantıları
 
-Servis sağlayıcısı <kbd>connection</kbd> anahtarındaki bağlantı değerlerini <kbd>providers/redis.php</kbd> içerisinden alır.
+Servis sağlayıcısı <kbd>connection</kbd> anahtarındaki bağlantı değerlerini bu dosya içerisinden alır.
 
 ```php
 
@@ -91,32 +81,36 @@ return array(
 );
 ```
 
-<a name="memcached-service"></a>
+<a name="service"></a>
 
 #### Servis
 
-CacheFactory servisi aracılığı ile cache metotlarına aşağıdaki gibi erişilebilir.
+Cache servisi uygulamanızda önceden yapılandırılmış cache arayüzüne erişmenizi sağlar.
 
 ```php
-$this->container->get('cacheFactory')->metod();
+$this->container->get('cache')->metod();
 ```
 
-Varsayılan sürücü türü <kbd>app/classes/ServiceProvider/CacheFactory</kbd> servisinden belirlenir.
+Varsayılan sürücü türü <kbd>app/classes/ServiceProvider/Cache</kbd> servis sağlayıcısından yapılandırılır.
 
 ```php
 $container->share(
     'cache',
-    $container->get('redis')->shared(
+    $container->get('cacheFactory')->shared(
         [
+            'driver' => 'redis',
             'connection' => 'default'
         ]
     )
 );
 ```
 
-<a name="redis-reference"></a>
+Yukarıda görüldüğü gibi redis servis sağlayıcısı varsayılan cache servisi olarak tanımlanıyor.
 
-### Redis Cache Sürücü Referansı
+
+<a name="cache-reference"></a>
+
+### Cache Sınıfı Referansı
 
 Bu sınıf içerisinde tanımlı olmayan metotlar __call metodu ile php <kbd>Redis</kbd> sınıfından çağrılırlar. Anahtar içerisinde <kbd>:</kbd> karakterini kullanırsanız anahtarlar gruplanarak gösterilirler.
 

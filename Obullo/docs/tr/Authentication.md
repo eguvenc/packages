@@ -214,13 +214,12 @@ return array(
 
 #### Servisi Yüklemek
 
-Yetki doğrulama paketi sınıflarına erişim 
+Yetki doğrulama paketi sınıflarına erişim User servis sağlayıcısı ile olur.
 
 ```php
 $container->addServiceProvider('Obullo\Container\ServiceProvider\User');
 ```
-
-yukarıda gösterilen servis sağlayıcısı ile olur. <kbd>User</kbd> servisi yetki doğrulama servisine ait olan <kbd>Login</kbd>, <kbd>Identity</kbd> ve <kbd>Storage</kbd> gibi sınıfları kontrol eder, böylece paket içerisinde kullanılan tüm sınıflara tek bir servis üzerinden erişim sağlanmış olur.
+<kbd>User</kbd> servisi yetki doğrulama servisine ait olan <kbd>Login</kbd>, <kbd>Identity</kbd> ve <kbd>Storage</kbd> gibi sınıfları kontrol eder, böylece paket içerisinde kullanılan tüm sınıflara tek bir servis üzerinden erişim sağlanmış olur.
 
 ```php
 $container->get('user')->class->method();

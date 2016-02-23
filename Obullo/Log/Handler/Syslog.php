@@ -59,7 +59,7 @@ class Syslog extends AbstractHandler implements HandlerInterface
      */
     public function write(array $event)
     {
-        foreach ($event['record'] as $record) {
+        foreach ($event['records'] as $record) {
             $record = $this->arrayFormat($event, $record);
             syslog($record['level'], $this->lineFormat($record));
         }

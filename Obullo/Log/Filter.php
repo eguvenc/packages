@@ -3,9 +3,9 @@
 namespace Obullo\Log;
 
 use Obullo\Log\LoggerInterface as Logger;
-use Obullo\Container\ParamsAwareInterface;
-use League\Container\ImmutableContainerAwareInterface;
+
 use League\Container\ContainerAwareInterface;
+use League\Container\ImmutableContainerAwareInterface;
 
 /**
  * Log filter handler
@@ -32,16 +32,13 @@ class Filter
             $method = $value['method'];
 
             $filter = new $Class;  // Resolve components
-
             if ($filter instanceof ImmutableContainerAwareInterface || $filter instanceof ContainerAwareInterface) {
                 global $container;
                 $filter->setContainer($container);
             }
-            if ($filter instanceof ParamsAwareInterface) {
-                $filter->setParams($value['params']); // Inject filter parameters
-            }
-            if (count($event['record']) > 0) {
-                $event['record'] = self::doFilter($event['record'], $filter, $method);
+
+            if (count($event['records']) > 0) {
+                $event['records'] = self::doFilter($event['records'], $filter, $method, $value['params']);
             }
         }
         return $event;
@@ -53,14 +50,15 @@ class Filter
      * @param array  $records data
      * @param object $filter  object
      * @param string $method  name
+     * @param array  $params  filter options
      * 
      * @return array records
      */
-    public static function doFilter($records, $filter, $method)
+    public static function doFilter($records, $filter, $method, $params = array())
     {
         $filteredRecords = array();
         foreach ($records as $key => $record) {
-            $filteredRecord = $filter->$method($record);
+            $filteredRecord = $filter->$method($record, $params);
             if (! empty($filteredRecord)) {
                 $filteredRecords[$key] = $filteredRecord;
             }

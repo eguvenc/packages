@@ -39,7 +39,7 @@ class Debugger extends AbstractHandler implements HandlerInterface
     public function write(array $event)
     {
         $lines = '';
-        foreach ($event['record'] as $record) {
+        foreach ($event['records'] as $record) {
             $record = $this->arrayFormat($event, $record);
             $lines.= DebugFormatter::format($record, $this->params);
         }

@@ -269,3 +269,12 @@ Katmanların nasıl çalıştığını anlamak için oluşturduğunuz bir katman
 ```php
 http://myproject/views/navbar
 ```
+
+Eğer bir uygulamada en dıştaki yani ilk oluşturulan katmana ait <kbd>$request</kbd> nesnesi değerlerine ulaşılmak isteniyorsa <kbd>$this->request</kbd> yöntemi yerine <kbd>$this->app->request</kbd> yöntemi kullanılmalıdır.
+
+
+```php
+$this->app->request->get('link')
+```
+
+Böylece katman isteklerinden sonra değişime uğramamış orijinal request nesnesine ulaşılmış olur.

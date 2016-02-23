@@ -35,7 +35,7 @@ class Logger extends AbstractLogger implements LoggerInterface
     protected $priorityQueue = array();       // Log priority queue objects
     protected $handlerRecords = array();      // Handler records
     protected $loadedHandlers = array();      // Loaded handlers
-    protected $requestString;
+    protected $requestType;
 
     /**
      * Registered error handlers
@@ -390,7 +390,7 @@ class Logger extends AbstractLogger implements LoggerInterface
         }
         $this->channel($this->params['default']['channel']);    // Reset channel to default
         $this->loadedHandlers = array();  // Reset loaded handler.
-        array_pop($this->track);         // Remove last track to reset handler filters
+        array_pop($this->track);          // Remove last track to reset handler filters
     }
 
     /**
@@ -430,18 +430,27 @@ class Logger extends AbstractLogger implements LoggerInterface
      */
     protected function detectRequest($request)
     {
-        $this->requestString = 'http';
+        $this->requestType = 'http';
         if ($request->isAjax()) {
-            $this->requestString ='ajax';
+            $this->requestType ='ajax';
         }
         if (defined('STDIN')) {
-            $this->requestString = 'cli';
+            $this->requestType = 'cli';
         }
         $server = $request->getServerParams();
         if (isset($server['argv'][1]) && $server['argv'][1] == 'worker') {  // Job Server request
-            $this->requestString = 'worker';
-            $this->enabled = $this->params['app']['worker']['log']; // Initialize to config if $handler->isAllowed() method ignored.
+            $this->requestType = 'worker';
         }      
+    }
+
+    /**
+     * Returns to request type
+     * 
+     * @return string
+     */
+    protected function getRequestType()
+    {
+        return $this->requestType;
     }
 
      /**
@@ -457,11 +466,11 @@ class Logger extends AbstractLogger implements LoggerInterface
             return;
         }
         $this->payload['writers'][10]['handler'] = $name;
-        $this->payload['writers'][10]['request'] = $this->requestString;
+        $this->payload['writers'][10]['request'] = $this->getRequestType();
         $this->payload['writers'][10]['type']    = 'writer';
         $this->payload['writers'][10]['time']    = time();
         $this->payload['writers'][10]['filters'] = $this->getFilters($name);
-        $this->payload['writers'][10]['record']  = $records; // set record array      
+        $this->payload['writers'][10]['records'] = $records; // set record array      
     }
 
     /**
@@ -481,11 +490,11 @@ class Logger extends AbstractLogger implements LoggerInterface
             }
             $priority = $val['priority'];
             $this->payload['writers'][$priority]['handler'] = $name;
-            $this->payload['writers'][$priority]['request'] = $this->requestString;
+            $this->payload['writers'][$priority]['request'] = $this->requestType;
             $this->payload['writers'][$priority]['type']    = 'handler';
             $this->payload['writers'][$priority]['time']    = time();
             $this->payload['writers'][$priority]['filters'] = $this->getFilters($name);
-            $this->payload['writers'][$priority]['record']  = $records; // set record array
+            $this->payload['writers'][$priority]['records'] = $records; // set record array
         }
     }
 

@@ -96,7 +96,7 @@ class Email extends AbstractHandler implements HandlerInterface
     public function write(array $event)
     {
         $lines = '';
-        foreach ($event['record'] as $record) {
+        foreach ($event['records'] as $record) {
             $record = $this->arrayFormat($event, $record);
             $lines .= str_replace("\n", $this->newlineChar, $this->lineFormat($record));
         }

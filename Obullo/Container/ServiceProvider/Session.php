@@ -31,7 +31,7 @@ class Session extends AbstractServiceProvider
         $config    = $this->getConfiguration('session');
 
         $session = $container->share('session', 'Obullo\Session\Session')
-            ->withArgument($container->get('redis'))
+            ->withArgument($container->get('cacheFactory'))
             ->withArgument($container->get('config'))
             ->withArgument($container->get('request'))
             ->withArgument($container->get('logger'))

@@ -26,6 +26,7 @@ class Image extends AbstractProvider implements CaptchaInterface
     protected $url;
     protected $request;
     protected $params = array();
+    protected $charset = 'UTF-8';
     protected $session;
     protected $logger;
     protected $captcha;
@@ -75,7 +76,7 @@ class Image extends AbstractProvider implements CaptchaInterface
         $this->session = $session;
         $this->translator = $translator;
         $this->params['background'] = 'none';
-        $this->init();
+        $this->defaultFontPath = RESOURCES .'fonts/';
         
         $this->logger->debug('Captcha Class Initialized');
     }
@@ -87,9 +88,58 @@ class Image extends AbstractProvider implements CaptchaInterface
      */
     public function init()
     {
-        $this->buildHtml();
         $this->imageUrl = $this->url->basePath($this->params['form']['img']['attributes']['src']); // add Directory Seperator ( / )
-        $this->defaultFontPath = RESOURCES .'fonts/';
+    }
+
+    /**
+     * Set charset
+     * 
+     * @param string $charset default utf-8
+     *
+     * @return void
+     */
+    public function setCharset($charset = 'UTF8')
+    {
+        $this->charset = strtoupper($charset);
+    }
+
+    /**
+     * Set input element attributes
+     * 
+     * @param array $attributes input element attributes
+     * 
+     * @return object
+     */
+    public function setInputAttributes(array $attributes)
+    {
+        $this->params['form']['input']['attributes'] = $attributes;
+        return $this;
+    }
+    
+    /**
+     * Set image attrributes
+     * 
+     * @param array $attributes captcha image element attributes
+     * 
+     * @return object
+     */
+    public function setImageAttributes($attributes)
+    {
+        $this->params['form']['img']['attributes'] = $attributes;
+        return $this;
+    }
+
+    /**
+     * Set refresh button html tag
+     * 
+     * @param string $html button tag
+     * 
+     * @return object
+     */
+    public function setRefreshButton($html)
+    {
+        $this->params['form']['refresh']['button'] = $html;
+        return $this;
     }
 
     /**
@@ -105,31 +155,6 @@ class Image extends AbstractProvider implements CaptchaInterface
     {
         $this->params['background'] = $bg;
         return $this;
-    }
-
-    /**
-     * Set capthca id
-     * 
-     * @param string $captchaId captcha id
-     * 
-     * @return void
-     */
-    public function setInputId($captchaId)
-    {
-        $this->params['form']['input']['attributes']['id'] = $captchaId;
-        return $this;
-    }
-    
-    /**
-     * Set image unique id
-     * 
-     * @param string $uniqId unique id
-     * 
-     * @return void
-     */
-    protected function setImageId($uniqId)
-    {
-        $this->imageId = $uniqId;
     }
 
     /**
@@ -359,12 +384,11 @@ class Image extends AbstractProvider implements CaptchaInterface
         $code  = '';
         $defaultPool = $this->params['characters']['default']['pool'];
         $possible    = $this->params['characters']['pools'][$defaultPool];
-        $charset     = strtoupper($this->params['locale']['charset']);
 
         for ($i = 0; $i < $this->params['characters']['length']; $i++) {
             $code .= mb_substr(
                 $possible,
-                mt_rand(0, mb_strlen($possible, $charset) - 1), 1, $charset
+                mt_rand(0, mb_strlen($possible, $this->charset) - 1), 1, $this->charset
             );
         }
         $this->setCode($code);
@@ -396,7 +420,6 @@ class Image extends AbstractProvider implements CaptchaInterface
                 'expiration' => time() + $this->params['image']['expiration']
             )
         );
-        $this->init(); // Reset variables
     }
 
     /**
@@ -615,6 +638,9 @@ class Image extends AbstractProvider implements CaptchaInterface
      */
     public function printHtml()
     {
+        $this->init();
+        $this->buildHtml();
+
         return $this->html;
     }
 
@@ -640,4 +666,17 @@ class Image extends AbstractProvider implements CaptchaInterface
     {
         return;
     }
+
+    /**
+     * Set image unique id
+     * 
+     * @param string $uniqId unique id
+     * 
+     * @return void
+     */
+    protected function setImageId($uniqId)
+    {
+        $this->imageId = $uniqId;
+    }
+
 }

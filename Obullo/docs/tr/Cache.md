@@ -4,18 +4,11 @@
 Cache servisi sık kullanılan önbellekleme türleri için basit ve ortak bir arayüz sağlar.
 
 <ul>
-
+<li><a href="#service-provider">Servis Sağlayıcısı</a> ( CacheFactory )</li>
 <li>
-    <a href="#configuration">Konfigürasyon</a>
+    <a href="#service">Servis</a>
     <ul>
-        <li><a href="#service-provider">Servis Sağlayıcısı</a> ( CacheFactory )</li>
-    </ul>
-</li>
-
-<li>
-    <a href="#running">Servis</a>
-    <ul>
-        <li><a href="#cache-drivers">Önbellek Sürücüleri</a></li>
+        <li><a href="#cache-drivers">Sürücüler</a></li>
         <li>
             <a href="#interface">Ortak Arayüz Metotları</a>
             <ul>
@@ -48,20 +41,16 @@ Cache servisi sık kullanılan önbellekleme türleri için basit ve ortak bir a
 
 </ul>
 
-<a name="configuration"></a>
-
-### Konfigürasyon
-
-Cache sınıfı konfigürasyonu <kbd>providers/$sürücü.php</kbd> dosyasından konfigüre edilir. Örneğin memcached sürücüsü için <kbd>providers/memcached.php</kbd> dosyasını konfigüre etmeniz gerekir.
-
 <a name="service-provider"></a>
 
 #### Servis Sağlayıcısı
 
-Servis kurulumu için tek yapmanız gereken kullanmak istediğiniz servis sağlayıcısının parametrelerini servis konfigürasyonuna girmek, aşağıdaki örnekte <kbd>default</kbd> bağlantısı seçilmiştir.
+Cache sınıfı konfigürasyonu <kbd>providers/$sürücü.php</kbd> dosyasından konfigüre edilir. Örneğin memcached sürücüsü için <kbd>providers/memcached.php</kbd> dosyasını konfigüre etmeniz gerekir.
+
+Aşağıdaki örnekte <kbd>default</kbd> bağlantısı ile redis cache sürücüsüne bağlanılıyor.
 
 ```php
-$this->container->get('cacheFactory')->shared(
+$cache = $this->container->get('cacheFactory')->shared(
     [
         'driver' => 'redis'
         'connection' => 'default'
@@ -69,32 +58,36 @@ $this->container->get('cacheFactory')->shared(
 );
 ```
 
-<a name="running"></a>
+<a name="service"></a>
 
 ### Servis
 
-CacheFactory servisi aracılığı ile cache metotlarına aşağıdaki gibi erişilebilir.
+Cache servisi uygulamanızda önceden yapılandırılmış cache arayüzüne erişmenizi sağlar.
 
 ```php
-$this->container->get('cacheFactory')->metod();
+$this->container->get('cache')->metod();
 ```
 
-Varsayılan sürücü türü <kbd>app/classes/ServiceProvider/CacheFactory</kbd> servisinden belirlenir.
+Varsayılan sürücü türü <kbd>app/classes/ServiceProvider/Cache</kbd> servis sağlayıcısından yapılandırılır.
 
 ```php
 $container->share(
     'cache',
-    $container->get('redis')->shared(
+    $container->get('cacheFactory')->shared(
         [
+            'driver' => 'redis',
             'connection' => 'default'
         ]
     )
 );
 ```
 
+Yukarıda görüldüğü gibi redis servis sağlayıcısı varsayılan cache servisi olarak tanımlanıyor.
+
+
 <a name="cache-drivers"></a>
 
-#### Önbellek Sürcüleri
+#### Sürcüler
 
 Bu sürüm için varolan cache sürücüleri aşağıdaki gibidir:
 

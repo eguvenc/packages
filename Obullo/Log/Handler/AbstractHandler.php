@@ -27,16 +27,10 @@ abstract class AbstractHandler
     {
         $isBrowserRequest = ($event['request'] == 'http' || $event['request'] == 'ajax') ? true : false;
 
-        if (in_array($event['request'], array(null, 'http','ajax','cli'))) { // Disable logs if request not allowed
-            if ($isBrowserRequest && $request->getUri()->segment(0) == 'debugger') {  // Disable http debugger logs
-                return false;
-            }
-            return true;
+        if ($isBrowserRequest && $request->getUri()->segment(0) == 'debugger') {  // Disable http debugger logs
+            return false;
         }
-        if ($event['request'] == 'worker') {
-            return $this->params['app']['worker']['log'];    // Disable / enable worker logs
-        }
-        return false;
+        return true;
     }
 
     /**

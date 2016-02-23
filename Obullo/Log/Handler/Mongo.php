@@ -139,7 +139,7 @@ class Mongo extends AbstractHandler implements HandlerInterface
     public function write(array $event)
     {
         $records = array();
-        foreach ($event['record'] as $record) {
+        foreach ($event['records'] as $record) {
             $records[] = $this->arrayFormat($event, $record);
         }
         $this->mongoCollection->batchInsert(

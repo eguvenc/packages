@@ -65,8 +65,10 @@ class Cache implements SaveHandlerInterface
     public function open($savePath, $sessionName)
     {
         $savePath = $sessionName = null;
+
         $this->storage = $this->provider->shared(
-            [
+            [   
+                'driver' => $this->params['storage']['driver'],
                 'connection' => $this->params['provider']['connection']
             ]
         );

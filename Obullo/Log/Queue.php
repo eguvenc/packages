@@ -27,8 +27,10 @@ class Queue implements JobInterface, ImmutableContainerAwareInterface
      */
     public function fire($job, array $data)
     {
-        $queue = $this->getContainer()->get('queue');
-        $params = $this->getContainer()->get('logger.params');
+        $container = $this->getContainer();
+
+        $queue =  $container->get('queue');
+        $params = $container->get('logger.params');
 
         $queue->push(
             'Workers@Logger',

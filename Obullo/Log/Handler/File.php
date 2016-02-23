@@ -49,7 +49,7 @@ class File extends AbstractHandler implements HandlerInterface
     {
         $lines = '';
         $path  = '';
-        foreach ($event['record'] as $record) {
+        foreach ($event['records'] as $record) {
             $record = $this->arrayFormat($event, $record);
             $lines .= $this->lineFormat($record);
         }

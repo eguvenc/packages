@@ -1,9 +1,7 @@
 <?php
 
-namespace Obullo\Log\Filters;
+namespace Obullo\Log\Filter;
 
-use Obullo\Container\ParamsAwareTrait;
-use Obullo\Container\ParamsAwareInterface;
 use League\Container\ImmutableContainerAwareTrait;
 use League\Container\ImmutableContainerAwareInterface;
 
@@ -13,18 +11,19 @@ use League\Container\ImmutableContainerAwareInterface;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class PriorityFilter implements ImmutableContainerAwareInterface, ParamsAwareInterface
+class PriorityFilter implements ImmutableContainerAwareInterface
 {
-    use ImmutableContainerAwareTrait, ParamsAwareTrait;
+    use ImmutableContainerAwareTrait;
 
     /**
      * Filter in array
      * 
-     * @param array $record unformatted record data
+     * @param array $record log record
+     * @param array $levels log levels
      * 
      * @return array|null
      */
-    public function in(array $record)
+    public function in(array $record, $levels = array())
     {
         if (empty($record)) {
             return array();
@@ -33,7 +32,7 @@ class PriorityFilter implements ImmutableContainerAwareInterface, ParamsAwareInt
             ->get('logger')
             ->getPriority($record['level']);
 
-        if (in_array($priority, $this->getParams())) {
+        if (in_array($priority, $levels)) {
             return $record;
         }
         return;
@@ -42,11 +41,12 @@ class PriorityFilter implements ImmutableContainerAwareInterface, ParamsAwareInt
     /**
      * Filter "not" in array
      * 
-     * @param array $record unformatted record data
+     * @param array $record log record
+     * @param array $levels log levels
      * 
      * @return array|null
      */
-    public function notIn(array $record)
+    public function notIn(array $record, $levels = array())
     {
         if (empty($record)) {
             return array();
@@ -55,7 +55,7 @@ class PriorityFilter implements ImmutableContainerAwareInterface, ParamsAwareInt
             ->get('logger')
             ->getPriority($record['level']);
 
-        if (! in_array($priority, $this->getParams())) {
+        if (! in_array($priority, $levels)) {
             return $record;
         }
         return;
