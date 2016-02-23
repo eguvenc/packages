@@ -59,13 +59,13 @@ Uygulamada loglanmaya başlanan veriler önce bir dizi içerisinde toplanır ve 
 
 * Kuyruk Servisinin Kapalı Olduğu Durum ( Varsayılan )
 
-Eğer kuyruğa atma opsiyonu log servisinden kapalı ise mevcut sayfada bir dizi içerisine sıralanmış tüm log verileri uygulamanın kapatılmasından sonra kuyruğa önemlilik sırasına göre <kbd>app/classes/Workers/Logger</kbd> sınıfına gönderilirler.
+Bu durumda mevcut sayfadaki tüm log verileri önemlilik sırasına göre <kbd>app/classes/Workers/Logger</kbd> sınıfına gönderilirler.
 
 Şemaya göre <kbd>app/classes/Workers/Logger</kbd> sınıfının çalışmasından sonra elde edilen veri çözümlenerek filtrelerden geçirilir ve log servisinden belirlenmiş yazma önceliklerine göre log sürücüleri çalıştırılarak yazma işlemleri gerçekleştirilir.
 
 * Kuyruk Servisinin Açık Olduğu Durum
 
-Eğer kuyruğa atma opsiyonu log servisinden açık ise mevcut sayfada bir dizi içerisine sıralanmış tüm log verileri logger sınıfının kapatılmasından sonra kuyruğa atılırlar. Kuyruğa gönderilme işlemi her sayfa için bir kere yapılır. Kuyruğa atılan log verilerini <kbd>app/classes/workers/Logger</kbd> sınıfı konsoldan çalıştırılarak <kbd>php task queue listen</kbd> komutu yardımı ile dinlenerek tüketilir. Konsoldan <kbd>php task queue listen</kbd> komutunun işlemci sayısına göre birden fazla çalıştırılması çoklu iş parçacıkları (multi threading) oluşturarak kuyruğun daha hızlı tüketilmesini sağlar. 
+Bu durumda mevcut sayfadaki tüm log verileri <kbd>queue</kbd> servisi yardımı ile kuyruğa atılırlar. Kuyruğa gönderilme işlemi her sayfa için bir kere yapılır. Kuyruğa atılan log verileri konsoldan <kbd>php task queue listen</kbd> komutu yardımı ile <kbd>app/classes/workers/Logger</kbd> sınıfı üzerinden dinlenerek tüketilir. Konsoldan <kbd>php task queue listen</kbd> komutunun işlemci sayısına göre birden fazla çalıştırılması çoklu iş parçacıkları (multi threading) oluşturarak kuyruğun daha hızlı tüketilmesini sağlar. 
 
 <a name="configuration"></a>
 
