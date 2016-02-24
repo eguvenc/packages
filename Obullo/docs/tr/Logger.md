@@ -463,7 +463,7 @@ Kuyruğu tüketmek için konsoldan aşağıdaki komut ile bir php işçisi çal�
 php task queue listen --worker=Workers@Logger --job=logger.1 --output=0
 ```
 
-Yukarıdaki komut aynı anda birden fazla konsolda çalıştırıldığında <kbd>Obullo/Task/QueueController</kbd> sınıfı üzerinden her seferinde  <kbd>Obullo/Task/WorkerController.php</kbd> dosyasını çalıştırarak yeni bir iş parçaçığı oluşturur. Yerel ortamda birden fazla komut penceresi açarak kuyruğun eş zamanlı nasıl tüketildiğini test edebilirsiniz.
+Yukarıdaki komut aynı anda birden fazla konsolda çalıştırıldığında <kbd>Obullo/Cli/Task/Queue</kbd> sınıfı listen metodu ile her seferinde  <kbd>Obullo/Queue/Worker.php</kbd> dosyasını çalıştırarak yeni bir iş parçaçığı oluşturur. Yerel ortamda birden fazla komut penceresi açarak kuyruğun eş zamanlı nasıl tüketildiğini test edebilirsiniz.
 
 ```php
 php task queue listen --worker=Workers@Logger --job=logger.1 --delay=0 --memory=128 --timeout=0 --output=1
@@ -472,7 +472,7 @@ Yerel ortamda yada test işlemleri için output parametresini 1 olarak gönderdi
 
 Ayrıca UNIX benzeri işletim sistemlerinde prodüksiyon ortamında kuyruk tüketimini otomasyona geçirmek ve çoklu iş parçaları (multithreading) ile çalışmak için Supervisor adlı programdan yararlanabilirsiniz. <a href="http://supervisord.org/" target="_blank">http://supervisord.org/</a>.
 
-Bir işlemci için açılması gereken optimum işçi sayısı 1 olmalıdır. Örneğin 16 çekirdekli bir sunucuya sahipseniz işçi sayısı 16 olmalıdır. İlgili makaleye bu bağlantıdan gözatabilirsiniz. <a href="http://stackoverflow.com/questions/1718465/optimal-number-of-threads-per-core">Optimal Number of Threads Per Core</a>.
+Bir işlemci için açılması gereken optimum işçi sayısı 1 olmalıdır. Örneğin 16 çekirdekli bir sunucuya sahipseniz işçi sayısının 16 olması önerilir. İlgili makaleye bu bağlantıdan gözatabilirsiniz. <a href="http://stackoverflow.com/questions/1718465/optimal-number-of-threads-per-core">Optimal Number of Threads Per Core</a>.
 
 <a name="worker-parameters"></a>
 

@@ -1,27 +1,15 @@
 
 ## Kuyruklama
 
-Kuyruklama paketi uzun sürmesi beklenen işlemlere ( loglama, email gönderme, sipariş alma gibi. ) ait verileri mesaj gönderim protokolü  ( AMQP ) üzerinden arkaplanda işlem sırasına sokar. Kuyruğa atılan veriler eş zamanlı işlemler (multi threading) ile tüketilerek işler arkaplanda tamamlanır ve kuyruktan silinir, böylece uzun süren işlemler ön yüzde sadece işlem sırasına atıldığından uygulamanıza gelen http istekleri yorulmamış olur.
+Kuyruklama paketi uzun sürmesi beklenen işlemlere ( loglama, email gönderme, sipariş alma gibi. ) ait verileri mesaj gönderim protokolü  ( AMQP ) üzerinden arkaplanda işlem sırasına sokar. Kuyruğa atılan veriler eş zamanlı işlemler (multi threading) ile tüketilerek işler arkaplanda tamamlanır ve kuyruktan silinir, böylece uzun süren işlemler ön yüzde sadece işlem sırasına atıldığından uygulamanıza gelen http istekleri büyük bir yükten kurtulmuş olur.
 
 <ul>
-
-<li>
-    <a href="#configuration">Konfigürasyon</a>
-    <ul>
-        <li><a href="#service-configuration">Servis Konfigürasyonu</a></li>
-        <li><a href="#service-provider-configuration">Servis Sağlayıcı Konfigürasyonu</a></li>
-        <li><a href="#server-requirements">Sunucu Gereksinimleri</a></li>
-    </ul>
-</li>
-
-<li>
-    <a href="#running">Çalıştırma</a>
-    <ul>
-        <li><a href="#loading-service">Servisi Yüklemek</a></li>
-        <li><a href="#queuing-a-job">Bir İşi Kuyruğa Atmak</a></li>
-        <li><a href="#delaying-a-job">Bir İşin Çalışmasını Geciktirmek</a></li>
-    </ul>
-</li>
+<li><a href="#service-configuration">Konfigürasyon</a></li>
+<li><a href="#service-provider-configuration">Servis Sağlayıcısı</a></li>
+<li><a href="#server-requirements">Sunucu Gereksinimleri</a></li>
+<li><a href="#loading-service">Servisi Yüklemek</a></li>
+<li><a href="#queuing-a-job">Bir İşi Kuyruğa Atmak</a></li>
+<li><a href="#delaying-a-job">Bir İşin Çalışmasını Geciktirmek</a></li>
 
 <li>
     <a href="#workers">İşçiler</a>
@@ -97,7 +85,7 @@ Kuyruklama paketi uzun sürmesi beklenen işlemlere ( loglama, email gönderme, 
 
 ### Konfigürasyon
 
-Queue servisi ana konfigürasyonu <kbd>config/$env/queue/amqp.php</kbd> dosyasından konfigüre edilir. Dosya içerisindeki <kbd>exchange</kbd> anahtarına AMQP sürücüsüne ait ayarlar konfigüre edilirken <kbd>connections</kbd> anahtarına ise AMQP servis sağlayıcısı için gereken bağlantı bilgileri girilir.
+Queue servisi ana konfigürasyonu <kbd>app/local/providers/queue.php</kbd> dosyasından konfigüre edilir. Dosya içerisindeki <kbd>exchange</kbd> anahtarına AMQP sürücüsüne ait, <kbd>connections</kbd> anahtarına ise AMQP servis sağlayıcısı için gereken bağlantı bilgileri girilir.
 
 ```php
 return array(
@@ -121,6 +109,44 @@ return array(
     ],
 );
 ```
+
+<a name="service-provider"></a>
+
+### Servis Sağlayıcısı
+
+<kbd>app/providers.php</kbd> dosyasında servis sağlayıcının tanımlı olduğundan emin olun.
+
+```php
+$container->addServiceProvider('ServiceProvider\Connector\Amqp');
+```
+
+### Servis
+
+Queue servisi <kbd>app/providers.php</kbd> dosyasından kontrol edilir.
+
+```php
+$container->addServiceProvider('ServiceProvider\Queue');
+```
+
+Queue servisinde varsayılan olarak <kbd>Amqp</kbd> sürücüsü tanımlıdır. Kuyruklama servisi için sürücü seçenekleri aşağıdaki gibidir.
+
+* Amqp ( PECL )
+* AmqpLib ( Composer / php-amqplib )
+
+```php
+$container->share('queue', 'Obullo\Queue\Handler\Amqp')
+    ->withArgument($container->get('amqp'))
+    ->withArgument($config->getParams());
+```
+
+Eğer AmqpLib alternatifini kullanmak istiyorsanız yorum içine alınmış satırları yorumdan çıkarıp yukarıdaki satırları da yorum içerisine alın.
+
+```php
+// $container->share('queue', 'Obullo\Queue\Handler\AmqpLib')
+//     ->withArgument($container->get('amqp'))
+//     ->withArgument($config->getParams());
+```
+
 <a name="server-requirements"></a>
 
 #### Sunucu Gereksinimleri
@@ -129,100 +155,26 @@ Kuyruklama servisinin çalışabilmesi için php AMQP extension kurulu olması g
 
 <a href="https://github.com/obullo/warmup/tree/master/AMQP/RabbitMQ">RabbitMQ ve Php AMQP Extension Kurulumu </a>
 
-##### Diğer AMQP Yazılımları ve Servisler
+Diğer AMQP Yazılımları ve Bazı Servisler
 
 * <a href="http://zeromq.org/bindings:php/" target="_blank">ZeroMQ</a>
 * <a href="https://qpid.apache.org/" target="_blank">Apache Qpid</a>
 * <a href="https://www.cloudamqp.com/" target="_blank">Cloud AMQP</a>
 
-
-<a name="service-configuration"></a>
-
-#### Servis Konfigürasyonu
-
-Queue paketini kullanabilmeniz için aşağıdaki gibi servis ayarlarınının yapılandırılmış olması gerekir.
-
-```php
-namespace Service;
-
-use Obullo\Queue\QueueManager;
-use Obullo\Container\ServiceInterface;
-use Obullo\Container\ContainerInterface;
-
-class Queue implements ServiceInterface
-{
-    public function register(ContainerInterface $c)
-    {
-        $c['queue'] = function () use ($c) {
-
-            $parameters = [
-                'class' => '\Obullo\Queue\Handler\Amqp',
-                'provider' => [
-                    'name' => 'amqp',
-                    'params' => [
-                        'connection' => 'default'
-                    ]
-                ]
-            ];
-            $manager = new QueueManager($c);
-            $manager->setParameters($parameters);
-            $handler = $manager->getHandler();
-            return $handler;
-        };
-    }
-}
-```
-
-Mevcut Kuyruk Sınıfları
-
-* \Obullo\Queue\Handler\Amqp
-* \Obullo\Queue\Handler\AmqpLib
-
-
-<a name="service-provider-configuration"></a>
-
-#### Servis Sağlayıcı Konfigürasyonu
-
-Servis ayarlarında tanımladığınız servis sağlayıcısının <kbd>app/providers.php</kbd> içerisinden tanımlı olması gerekir.
-
-```php
-$c['app']->provider(
-    [
-        'database' => 'Obullo\Service\Provider\Database',
-        // 'database' => 'Obullo\Service\Provider\DoctrineDBAL',
-        // 'qb' => 'Obullo\Service\Provider\DoctrineQueryBuilder',
-        'cache' => 'Obullo\Service\Provider\Cache',
-        'redis' => 'Obullo\Service\Provider\Redis',
-        'memcached' => 'Obullo\Service\Provider\Memcached',
-        'amqp' => 'Obullo\Service\Provider\Amqp',
-        // 'amqp' => 'Obullo\Service\Provider\AmqpLib',
-        'mongo' => 'Obullo\Service\Provider\Mongo',
-    ]
-);
-```
-
-Mevcut Servis Sağlayıcıları 
-
-* amqp ( PECL )
-* amqpLib ( Composer / php-amqplib )
-
-Varsayılan servis sağlayıcısı pecl <b>amqp</b> sınıfıdır. Eğer servis sağlayıcı sınıfını <kbd>AmqpLib</kbd> olarak değiştirirseniz queue servisi içerisindeki class parametresini <kbd>\Obullo\Queue\Handler\AmqpLib</kbd> olarak değiştirmeniz gerekir.
-
-
-<a name="running"></a>
-
-### Çalıştırma
-
-Servis konteyner içerisinden çağırıldığında tanımlı olan queue arayüzü üzerinden ( AMQP ) kuyruklama metotlarına ulaşılmış olur. 
-
 <a name="loading-service"></a>
 
-#### Servisi Yüklemek
+#### Metotlara Erişim
 
 Queue servisi aracılığı ile queue metotlarına aşağıdaki gibi erişilebilir.
 
 ```php
-$this->c['queue']->metod();
+$container->get('queue')->method();
+```
+
+Kontrolör içerisinden,
+
+```php
+$this->queue->method();
 ```
 
 <a name="queuing-a-job"></a>
@@ -668,7 +620,7 @@ stdout_logfile=/var/www/project/data/logs/myMailerProcess.log
 stdout_logfile_maxbytes=1MB
 ```
 
-> **Not:** Burada <kbd>numprocs=3</kbd> sayısı yani 3, işlem başına açılacak iş parçaçığı (thread) anlamına gelir. Bu sayı optimum performans için sunucunuzun işlemci sayısı ile aynı olmalıdır. Örneğin 16 çekirdekli bir makineye sahipseniz bu sayıyı 16 yapabilirsiniz. Böylece bir işi 16 işçi eş zamanlı çalışarak daha kısa zamanda bitirecektir.
+Burada <kbd>numprocs=3</kbd> sayısı yani 3, işlem başına açılacak iş parçaçığı (thread) anlamına gelir. Bu sayı optimum performans için sunucunuzun işlemci sayısı ile aynı olmalıdır. Örneğin 16 çekirdekli bir makineye sahipseniz bu sayıyı 16 yapabilirsiniz. Böylece bir işi 16 işçi eş zamanlı çalışarak daha kısa zamanda bitirecektir.
 
 Bir işlemci için açılması gereken optimum işçi sayısının neden 1 olması gerektiği hakkındaki makaleye bu bağlantıdan gözatabilirsiniz. <a href="http://stackoverflow.com/questions/1718465/optimal-number-of-threads-per-core">Optimal Number of Threads Per Core</a>.
 

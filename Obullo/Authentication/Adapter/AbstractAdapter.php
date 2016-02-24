@@ -32,13 +32,16 @@ abstract class AbstractAdapter implements AdapterInterface
      */
     public function verifyPassword($plain, $hash)
     {
-        $cost = $this->params['security']['passwordNeedsRehash']['cost'];
+        $cost = $this->params['password']['cost'];
+        $algo = $this->params['password']['algo'];
 
-        if (password_verify($plain, $hash)) {
+        $password = $this->container->get('password');
 
-            if (password_needs_rehash($hash, PASSWORD_BCRYPT, array('cost' => $cost))) {
+        if ($password->verify($plain, $hash)) {
 
-                $value = password_hash($plain, PASSWORD_BCRYPT, array('cost' => $cost));
+            if ($password->needsRehash($hash, $algo, array('cost' => $cost))) {
+
+                $value = $password->hash($plain, $algo, array('cost' => $cost));
 
                 return array('hash' => $value);
             }

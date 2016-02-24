@@ -397,10 +397,9 @@ class Identity extends AbstractIdentity
      */
     public function validate(array $credentials)
     {
-        $password = $this->params['db.password'];
-        $plain    = $credentials[$password];
+        $plain = $credentials[$this->params['db.password']];
 
-        return password_verify($plain, $this->getPassword());
+        return $this->container->get('password')->verify($plain, $this->getPassword());
     }
 
     /**

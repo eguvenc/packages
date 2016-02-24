@@ -3,7 +3,7 @@
 namespace Obullo\Utils;
 
 use RuntimeException;
-use Obullo\Container\ContainerInterface as Container;
+use League\Container\ContainerInterface as Container;
 
 trait SingletonTrait
 {
