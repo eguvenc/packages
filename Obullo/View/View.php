@@ -5,9 +5,9 @@ namespace Obullo\View;
 use Closure;
 use Obullo\Http\Stream;
 use Obullo\Http\Controller;
+use Psr\Http\Message\StreamInterface;
 use Obullo\Log\LoggerInterface as Logger;
 use Interop\Container\ContainerInterface as Container;
-use Psr\Http\Message\StreamInterface;
 
 /**
  * View Class
@@ -151,7 +151,7 @@ class View implements ViewInterface
      * 
      * @return object
      */
-    public function withData($key, $val)
+    public function withData($key, $val = null)
     {
         if (is_array($key)) {
             foreach ($key as $k => $v) {

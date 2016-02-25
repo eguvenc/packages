@@ -7,16 +7,11 @@ use PhpAmqpLib\Wire\AMQPTable;
 use PhpAmqpLib\Message\AMQPMessage;
 
 use Obullo\Queue\QueueInterface;
-use Obullo\Config\ConfigInterface as Config;
 use Obullo\Queue\JobHandler\AmqpLibJob;
-use Obullo\Container\ServiceProviderInterface as Provider;
+use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
 
 /**
- * For COMPOSER package videlalvaro/php-amqplib
- */
-
-/**
- * AmqpLib Handler
+ * AmqpLib Handler ( composer : videlalvaro/php-amqplib )
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
@@ -45,16 +40,22 @@ class AmqpLib implements QueueInterface
     protected $defaultQueueName;
 
     /**
+     * Service parameters
+     * 
+     * @var array
+     */
+    protected $params = array();
+
+    /**
      * Constructor
-     *
-     * @param object $config   \Obullo\Config\ConfigInterface
-     * @param object $provider \Obullo\Service\Provider\ServiceProviderInterface 
+     * 
+     * @param object $provider \Obullo\Container\ServiceProvider\ServiceProviderInterface 
      * @param array  $params   provider parameters
      */
-    public function __construct(Config $config, Provider $provider, array $params)
+    public function __construct(ServiceProvider $provider, array $params)
     {
-        $this->config = $config->load('queue')['amqp'];
-        $this->AMQPconnection = $provider->get($params);
+        $this->params = $params;
+        $this->AMQPconnection = $provider->shared($params['provider']);
         
         $this->ch = $this->AMQPconnection->channel();
         $this->defaultQueueName = 'default';
@@ -70,8 +71,8 @@ class AmqpLib implements QueueInterface
      */
     protected function getOptions($type = null, $flag = null)
     {
-        $type = (empty($type)) ? strtolower($this->config['exchange']['type']) : strtolower($type);
-        $flag = (empty($flag)) ? strtolower($this->config['exchange']['flag']) : strtolower($flag);
+        $type = (empty($type)) ? strtolower($this->params['exchange']['type']) : strtolower($type);
+        $flag = (empty($flag)) ? strtolower($this->params['exchange']['flag']) : strtolower($flag);
         
         $passive = true;
         $durable = false;

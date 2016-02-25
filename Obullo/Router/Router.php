@@ -32,11 +32,12 @@ class Router implements RouterInterface
     protected $class = '';                   // Controller class name
     protected $route;                        // Route object
     protected $attach;                       // Attachment object
-    protected $module = '';                  // Module name
     protected $container;                    // Container
-    protected $directory = '';               // Directory name
+    protected $folder = '';                  // Folder name
+    protected $primaryFolder = '';           // Primary foldername
     protected $method = 'index';             // Default method is index and its immutable !
     protected $defaultController = '';       // Default controller name
+    protected $argumentFactor;               // Argument slice factor
     protected $group;                        // Group object
 
     /**
@@ -205,6 +206,7 @@ class Router implements RouterInterface
             $segments[$two] = 'index';         // This lets the "routed" segment array identify that the default index method is being used.
             $this->setMethod('index');
         }
+        $this->argumentFactor = (3 + $factor);
         $this->uri->setRoutedSegments($segments);  // Update our "routed" segment array to contain the segments.
     }
 
@@ -240,7 +242,17 @@ class Router implements RouterInterface
     }
 
     /**
-     * Check first segment if have a module set module name
+     * Returns to argument slice factor
+     * 
+     * @return integer
+     */
+    public function getArgumentFactor()
+    {
+        return $this->argumentFactor;
+    }
+
+    /**
+     * Check first segment if have a primary folder & set it.
      * 
      * @param array $segments uri segments
      * 
@@ -250,7 +262,7 @@ class Router implements RouterInterface
     {
         if (! empty($segments[1])
             && strtolower($segments[1]) != 'view'  // http://example/debugger/view/index bug fix
-            && is_dir(FOLDERS .$segments[0].'/'. $segments[1].'/')  // Detect Module and change directory !!
+            && is_dir(FOLDERS .$segments[0].'/'. $segments[1].'/')  // Detect primary folder and change folder !!
         ) {
             $this->setPrimaryFolder($segments[0]);
             $this->setFolder($segments[1]);
@@ -263,7 +275,7 @@ class Router implements RouterInterface
      * Parse Routes
      *
      * This function matches any routes that may exist in the routes.php file against the URI to
-     * determine if the directory/class need to be remapped.
+     * determine if the folder/class need to be remapped.
      *
      * @return void
      */
@@ -378,7 +390,7 @@ class Router implements RouterInterface
     }
 
     /**
-     * Set the folder name : It must be lowercase otherwise sub module does not work
+     * Set the folder name : It must be lowercase otherwise folder does not work
      *
      * @param string $folder folder
      * 
@@ -481,8 +493,9 @@ class Router implements RouterInterface
     /**
      * Replace underscore to spaces to use ucwords
      * 
-     * Before : widgets\tutorials a  
-     * After  : Widgets\Tutorials_A
+     * Before  : widgets\tutorials_a 
+     * Ucwords : widgets\Tutorials A
+     * Final   : Widgets\Tutorials_A
      * 
      * @param string $string namespace part
      * 

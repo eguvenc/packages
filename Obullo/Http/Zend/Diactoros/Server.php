@@ -11,7 +11,7 @@ USE Obullo\Http\Response\SapiEmitter;
 use Obullo\Http\Response\EmitterInterface;
 
 /**
- * Borrowed from Zend Diactoros.
+ * Zend Diactoros.
  * 
  * Given a callback, takes an incoming request, dispatches it to the
  * callback, and then sends a response.
@@ -137,7 +137,7 @@ class Server
         ResponseInterface $response = null
     ) {
         if (! $response) {
-            $response = new Response();
+            $response = new Response;
         }
         return new static($callback, $request, $response);
     }
@@ -179,7 +179,7 @@ class Server
     private function getEmitter()
     {
         if (! $this->emitter) {
-            $this->emitter = new SapiEmitter();
+            $this->emitter = new SapiEmitter;
         }
 
         return $this->emitter;

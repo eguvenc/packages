@@ -41,8 +41,8 @@ class Database implements StorageInterface
      */
     public function __construct(Config $config, ServiceProvider $provider, array $params)
     {
-        $database   = $config->load('providers::database');
-        $connection = $params['failedJob']['provider']['params']['connection'];
+        $database   = $config->load('providers::database')['params'];
+        $connection = $params['job']['saveFailures']['provider']['connection'];
 
         if (! isset($database['connections'][$connection])) {
             throw new RuntimeException(
@@ -52,8 +52,8 @@ class Database implements StorageInterface
                 )
             );
         }
-        $this->db = $provider->shared($params['failedJob']['provider']['params']);
-        $this->tablename = $params['failedJob']['table'];
+        $this->db = $provider->shared(['connection' => $connection]);
+        $this->tablename = $params['job']['saveFailures']['table'];
     }
 
     /**

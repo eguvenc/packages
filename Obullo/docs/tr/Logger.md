@@ -644,7 +644,7 @@ if ($this->job instanceof Job) {
 
 Varsayılan olarak konsoldan uygulamaya gelen işçi isteklerine ait log kayıtları tutulmaz. Bu verilere genellikle işçilerin <kbd>ayrı sunucularda</kbd> tutulması gerektiğinde ihtiyaç duyulur.
 
-Bir işçi sunucusuna ait iş loglarını açmak için <kbd>Workers\Logger</kbd> sınıfı içerisinden <kbd>return</kbd> komutunu yorum içerisine almanız yeterli olur.
+İşci sunucularınız ayrı ise bir işçi sunucusuna ait iş loglarını açmak için <kbd>Workers\Logger</kbd> sınıfı içerisinden <kbd>return</kbd> komutunu yorum içerisine almanız yeterli olur.
 
 ```php
 if ($event['request'] == 'worker') {   // Disable worker server logs.

@@ -3,7 +3,6 @@
 namespace Obullo\Cli\Task;
 
 use Obullo\Cli\Controller;
-use Obullo\Queue\Worker as QueueWorker;
 
 class Worker extends Controller
 {
@@ -14,8 +13,7 @@ class Worker extends Controller
      */
     public function run()
     {
-        $worker = new QueueWorker(
-            $this->container->get('app'),
+        $worker = new \Obullo\Queue\Worker(
             $this->container->get('config'),
             $this->container->get('queue'),
             $this->container->get('request')->getUri(),

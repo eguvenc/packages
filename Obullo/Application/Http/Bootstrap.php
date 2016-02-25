@@ -56,6 +56,7 @@ $request->setContainer($container);
  * Register core components
  */
 $container->share('request', $request);
+$container->share('response', 'Obullo\Http\Response');
 
 /**
  * Initialize to application

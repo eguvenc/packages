@@ -46,7 +46,6 @@ class ClassResolver
     public function resolve(array $segments)
     {
         $this->segments = $segments;
-
         return $this;
     }
 

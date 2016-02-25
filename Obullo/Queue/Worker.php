@@ -42,13 +42,6 @@ class Worker
     protected $cli;
 
     /**
-     * Application
-     * 
-     * @var object
-     */
-    protected $app;
-
-    /**
      * Config
      * 
      * @var object
@@ -191,16 +184,14 @@ class Worker
 
     /**
      * Create a new queue worker.
-     *
-     * @param object $app    \Obullo\Application\Application
+     * 
      * @param object $config \Obullo\Config\ConfigInterface
      * @param object $queue  \Obullo\Queue\QueueInterface
      * @param object $uri    \Obullo\Cli\UriInterface
      * @param object $logger \Obullo\Log\LogInterface
      */
-    public function __construct(Application $app, Config $config, Queue $queue, Uri $uri, Logger $logger)
+    public function __construct(Config $config, Queue $queue, Uri $uri, Logger $logger)
     {
-        $this->app = $app;
         $this->uri = $uri;
         $this->config = $config;
         $this->queue = $queue;
@@ -442,18 +433,19 @@ class Worker
         // Worker does not well catch failed job exceptions because of we
         // use this function in exception handler.Thats the point why we need to try catch block.
 
-        $params = $this->config['queue'];
-        if (! $params['failedJob']['enabled']) {
+        $params = $this->config->load('providers::queue')['params'];
+        
+        if (! $params['job']['saveFailures']['enabled']) {
             return;
         }
         $event = $this->prependJobDetails($event);
         if ($this->output) {
             $this->debugOutput($event);
         }
-        $storageClassName = '\\'.ltrim($params['failedJob']['storage'], '\\');
+        $storageClassName = '\\'.ltrim($params['job']['saveFailures']['storage'], '\\');
         $storage = new $storageClassName(
             $this->config,
-            $this->app->provider($params['failedJob']['provider']['name']),
+            $this->container->get($params['job']['saveFailures']['provider']['name']),
             $params
         );
         $storage->save($event, $errorTrace);

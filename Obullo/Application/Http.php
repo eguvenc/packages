@@ -9,6 +9,7 @@ use Obullo\Container\ParamsAwareInterface;
 use League\Container\ContainerAwareInterface;
 use League\Container\ImmutableContainerAwareInterface;
 use Obullo\Http\Controller\ControllerAwareInterface;
+use Obullo\Http\Controller\ImmutableControllerAwareInterface;
 
 use ReflectionClass;
 use Obullo\Router\RouterInterface as Router;
@@ -56,7 +57,7 @@ class Http extends Application
             ->withArgument($container)
             ->withArgument($container->get('request'))
             ->withArgument($container->get('logger'));
-            
+
         $middleware = $container->get('middleware');
 
         include APP .'middlewares.php';
@@ -81,8 +82,9 @@ class Http extends Application
         $router->init();
 
         include FOLDERS .$router->getPrimaryFolder('/').$router->getFolder('/').$router->getClass().'.php';
+
         $className = '\\'.$router->getNamespace().$router->getClass();
-        $method = $router->getMethod();
+        $method    = $router->getMethod();
 
         if (! class_exists($className, false)) {
             $router->clear();  // Fix layer errors.
@@ -154,7 +156,7 @@ class Http extends Application
             if ($object instanceof ImmutableContainerAwareInterface || $object instanceof ContainerAwareInterface) {
                 $object->setContainer($this->getContainer());
             }
-            if ($this->controller != null && $object instanceof ControllerAwareInterface) {
+            if ($this->controller != null && $object instanceof ImmutableControllerAwareInterface || $object instanceof ControllerAwareInterface) {
                 $object->setController($this->controller);
             }
         }
@@ -197,12 +199,14 @@ class Http extends Application
         $this->container->share('response', $response);  // Refresh objects
         $this->container->share('request', $request);
 
+        $router = $this->container->get('router');
+
         $result = call_user_func_array(
             array(
                 $this->controller,
-                $this->container->get('router')->getMethod()
+                $router->getMethod()
             ),
-            array_slice($this->controller->request->getUri()->getRoutedSegments(), 3)
+            array_slice($this->controller->request->getUri()->getRoutedSegments(), $router->getArgumentFactor())
         );
         if ($result instanceof Response) {
             $response = $result;

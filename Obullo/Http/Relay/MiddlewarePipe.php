@@ -46,6 +46,16 @@ class MiddlewarePipe implements MiddlewareInterface
     }
 
     /**
+     * Get app response
+     * 
+     * @return object
+     */
+    public function getResponse()
+    {
+        return $this->container->get('response');
+    }
+    
+    /**
      * Returns to final handler class
      *
      * @param Response $response response

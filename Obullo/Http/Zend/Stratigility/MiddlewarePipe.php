@@ -53,7 +53,7 @@ class MiddlewarePipe implements MiddlewareInterface
     public function __construct(Container $container)
     {
         $this->container = $container;
-        $this->pipeline = new SplQueue();
+        $this->pipeline = new SplQueue;
         $middleware = $this->container->get('middleware');
         $middleware->add('Error')->setContainer($container);  // Error middleware must be defined end of the queue.
 
@@ -73,7 +73,7 @@ class MiddlewarePipe implements MiddlewareInterface
     }
 
     /**
-     * Get app request
+     * Get app response
      * 
      * @return object
      */

@@ -65,7 +65,7 @@ class Route
      */
     public function add($methods, $match, $rewrite = null, $closure = null)
     {
-        $options = $this->router->getGroup()->getOptions();
+        $options = ($this->router->getGroup()) ? $this->router->getGroup()->getOptions() : array();
 
         $this->routes[$this->domainName][] = array(
             'group' => $this->_getGroupNameValue($options),
@@ -128,6 +128,9 @@ class Route
         }
         if ($this->domainName == $configDomain) {
 
+            $replace = $this->addBrackets($replace); // support for 
+                                                     // ->where(array('id' => '[0-9]+', 'name' => '[a-z]+', 'any' => '.*'));
+                                                     // instead of array('id' => '([0-9]+)'
             $scheme = str_replace(
                 array_keys($replace),
                 array_values($replace),
@@ -140,6 +143,24 @@ class Route
             );
             $this->routes[$this->domainName][$count]['match'] = $scheme;
         }
+    }
+
+    /**
+     * Add brackets to regex
+     * 
+     * @param array $replace uri replace string
+     *
+     * @return array
+     */
+    protected function addBrackets(array $replace)
+    {
+        $newArray = array();
+        foreach ($replace as $key => $value) {
+            if (substr($value, 0, 1) != '(') {      // If have not brackets
+                $newArray[$key] = '('.$value.')';   // Add brackets to regex for preg_replace() operation in router.php dispatchRouteMatches() func.
+            }
+        }
+        return $newArray;
     }
 
     /**

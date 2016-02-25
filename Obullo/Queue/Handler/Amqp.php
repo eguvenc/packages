@@ -11,7 +11,7 @@ use AMQPConnection;
 use RuntimeException;
 use Obullo\Queue\QueueInterface;
 use Obullo\Queue\JobHandler\AmqpJob;
-use Obullo\Container\SerivceProvider\ServiceProviderInterface as ServiceProvider;
+use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
 
 /**
  * Info

@@ -7,8 +7,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 use SplQueue;
 
-use Interop\Container\ContainerInterface as Container;
-
 /**
  * Iterate a queue of middlewares and execute them.
  */
@@ -39,14 +37,13 @@ class Next
      *
      * Clones the queue provided to allow re-use.
      *
-     * @param SplQueue  $queue     queue
-     * @param callable  $done      done
-     * @param container $container container
+     * @param SplQueue $queue queue
+     * @param callable $done  done
      */
-    public function __construct(SplQueue $queue, callable $done, Container $container)
+    public function __construct(SplQueue $queue, callable $done)
     {
-        $this->queue    = clone $queue;
-        $this->done     = $done;
+        $this->queue = clone $queue;
+        $this->done  = $done;
 
         $this->dispatch = new Dispatch;
     }
