@@ -118,7 +118,7 @@ Daha fazla örnek için <a href="https://github.com/videlalvaro/php-amqplib" tar
 
 #### CacheFactory
 
-<kbd>CacheFactory</kbd> paketindeki sürücüleri tek bir arayüz üzerinden kontrol etmek için yazılmış servis sağlayıcısıdır. Uygulamanızdaki seçilen sürücüye göre <kbd>providers/sürücü.php</kbd> konfigürasyonunu kullanarak cache bağlantılarını yönetir.
+<kbd>CacheFactory</kbd> paketindeki sürücüleri tek bir arayüz üzerinden kontrol etmek için yazılmış servis sağlayıcısıdır. Uygulamanızdaki seçilen sürücüye göre <kbd>providers/$sürücü.php</kbd> konfigürasyonunu kullanarak cache bağlantılarını yönetir.
 
 Varolan bir önbellek bağlantısını almak için aşağıdaki yöntem izlenir.
 

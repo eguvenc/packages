@@ -108,7 +108,7 @@ $newArray['params']['token']['name'] = 'test_token';  // Yeni değerleri atayal�
 $this->config->write('providers::csrf', $newArray);
 ```
 
-Şimdi <kbd>.app/local/providers/csrf.php</kbd> dosyasına bir gözatın.
+Şimdi <kbd>providers/csrf.php</kbd> dosyasına bir gözatın.
 
 ```php
 return array(

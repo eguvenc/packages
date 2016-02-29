@@ -4,13 +4,7 @@
 Url sınıfı uygulamanızda kullandığınız iç ve dış html linklerini oluşturmanıza yardımcı olmayı sağlayan fonksiyonları içerir.
 
 <ul>
-    <li>
-        <a href="#setup">Kurulum</a>
-        <ul>
-            <li><a href="#config">Servis Konfigürasyonu</a></li>
-        </ul>
-    </li>
-
+    <li><a href="#service-provider">Servis Sağlayıcısı</a></li>
     <li>
         <a href="#methods">Metotlara Erişim</a>
         <ul>
@@ -19,7 +13,7 @@ Url sınıfı uygulamanızda kullandığınız iç ve dış html linklerini olu�
             <li><a href="#getBaseUrl">$this->url->basePath()</a></li>
             <li><a href="#prep">$this->url->prep()</a></li>
             <li>
-                <a href="#chain">Zincirleme Metotlar</a>
+                <a href="#chain">Dış Url Adresleri Üretmek</a>
                 <ul>
                     <li><a href="#withAnchor">$this->url->withHost()->withAnchor()</a></li>
                     <li><a href="#withAsset">$this->url->withHost()->withAsset()</a></li>
@@ -35,11 +29,17 @@ Url sınıfı uygulamanızda kullandığınız iç ve dış html linklerini olu�
     </li>
 </ul>
 
-### Servis Konfigürasyonu
+<a name="service-provider"></a>
 
-<a name="config"></a>
+### Servis Sağlayıcısı
 
-Url sınıfı <kbd>app/providers.php</kbd> dosyasında servis sağlayıcısı olarak tanımlıdır. Url sınıfına ait servis parametreleri <kbd>app/local/providers/url.php</kbd> dosyasından konfigüre edilir.
+<kbd>app/providers.php</kbd> dosyasında servis sağlayıcısının tanımlı olduğundan emin olun.
+
+```php
+$container->addServiceProvider('ServiceProvider\Url');
+```
+
+Url sınıfına ait servis parametreleri ise <kbd>providers/url.php</kbd> dosyasından konfigüre edilir.
 
 ```php
 'params' => [
@@ -54,8 +54,8 @@ Url sınıfı <kbd>app/providers.php</kbd> dosyasında servis sağlayıcısı ol
 ]
 ```
 
-* <b>base.path</b> : Url fonksiyonları kök adresi, genellikle "/" karakteri yeterli olur.
-* <b>assets.path</b> : Kaynaklar kök adresi, genellikle "/" karakteri yeterli olur. Buraya bir <kbd>cdn</kbd> sağlayıcı adresi de girilebilir.
+* <b>base.path</b> : Url fonksiyonları kök adresidir, genellikle "/" karakteri yeterli olur.
+* <b>assets.path</b> : Kaynaklar kök adresidir, genellikle "/" karakteri yeterli olur. Buraya bir <kbd>cdn</kbd> sağlayıcı adresi de girilebilir.
 * <b>assets.folder</b> : Kaynaklar klasörünü belirler varsayılan klasör "/assets/" klasörüdür.
 
 <a name="methods"></a>
@@ -76,7 +76,7 @@ $container->get('url')->method();
 
 #### $this->url->anchor($uri, $label = '', $attributes = '')
 
-Yerel site adresinize göre standart bir HTML bağlantı çıktısı oluşturur.
+Yerel site adresinize göre standart bir HTML bağlantısı oluşturur.
 
 ```php
 echo $this->url->anchor('welcome', 'Click Here');
@@ -94,6 +94,8 @@ echo $this->url->anchor('welcome', 'Click Here');
 echo $this->url->anchor('welcome', 'Click Here', ' title="Welcome" class="btn btn-default" ');
 ```
 
+Çıktı
+
 ```php
 <a href="/welcome" title="Welcome" class="btn btn-default">Click Here</a>
 ```
@@ -102,7 +104,7 @@ echo $this->url->anchor('welcome', 'Click Here', ' title="Welcome" class="btn bt
 
 #### $this->url->asset($path)
 
-Public dizini içerisinde yer alan bir kaynak dosyasına ait url adresi oluşturmak için asset fonksiyonu kullanılır.
+<kbd>public</kbd> dizini içerisinde yer alan bir kaynak dosyasına ait url adresi oluşturmak için kullanılır.
 
 ```php
 echo $this->url->asset('css/welcome.css');
@@ -199,9 +201,9 @@ https://example.com
 
 <a name="chain"></a>
 
-### Zincirleme Metotlar
+### Dış Url Adresleri Üretmek
 
-Dinamik url adresleri oluşturmak için <kbd>Http\Uri</kbd> nesnesine geri döner.
+Url sınıfı dış url adresleri oluşturmak için <kbd>Http\Uri</kbd> nesnesi kullanılır.
 
 <a name="withAnchor"></a>
 
@@ -288,14 +290,13 @@ Eğer geçerli protokol ile bir bağlantı oluşturulmak isteniyorsa withScheme(
 
 ```php
 echo $this->url->withHost('example.com')
-    ->withScheme('https')
-    ->getUriString();
+    ->withScheme('https');
 ```
 
 Çıktı
 
 ```php
-https://test.com
+https://example.com
 ```
 
 Kesin bir url berlirtilmezse varsayılan olarak baseUrl kullanılır.
@@ -309,8 +310,7 @@ Geçerli url adresine port ekler.
 ```php
 echo $this->url->withHost('example.com')
     ->withScheme('http')
-    ->withUserInfo('username', '123456')
-    ->getUriString();
+    ->withUserInfo('username', '123456');
 ```
 
 Çıktı
@@ -328,14 +328,13 @@ Geçerli url adresine port ekler.
 ```php
 echo $this->url->withHost('example.com')
     ->withScheme('https')
-    ->withPort(9090)
-    ->getUriString();
+    ->withPort(9090);
 ```
 
 Çıktı
 
 ```php
-https://test.com:9090
+https://example.com:9090
 ```
 
 <a name="withPath"></a>
@@ -347,14 +346,13 @@ Geçerli url adresine dizin ekler.
 ```php
 echo $this->url->withHost('example.com')
     ->withScheme('https')
-    ->withPath('forum/welcome')
-    ->getUriString();
+    ->withPath('forum/welcome');
 ```
 
 Çıktı
 
 ```php
-https://test.com/forum/welcome
+https://example.com/forum/welcome
 ```
 
 <a name="withQuery"></a>
@@ -367,8 +365,7 @@ Geçerli url adresine sorgu parçaları ekler.
 echo $this->url->withHost('example.com')
     ->withScheme('http')
     ->withPath('en')
-    ->withQuery("a=1&b=2")
-    ->getUriString();
+    ->withQuery("a=1&b=2");
 ```
 
 Çıktı
@@ -381,11 +378,12 @@ http://example.com/en?a=1&b=2
 
 ##### $this->url->withHost()->getUriString();
 
-EN son üretilen uri değerine döner.
+En son üretilen uri değerini bir değişkene atamak için kullanılır.
 
 ```php
-echo $this->url->withHost('example.com')
-    ->getUriString();
+$uriString = $this->url->withHost('example.com')->getUriString();
+
+echo $uriString;
 ```
 
 Çıktı

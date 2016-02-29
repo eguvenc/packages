@@ -27,6 +27,13 @@ interface SessionInterface
     public function getName();
 
     /**
+     * Returns to session_id() value
+     * 
+     * @return string
+     */
+    public function getId();
+    
+    /**
      * Session start
      * 
      * @return void

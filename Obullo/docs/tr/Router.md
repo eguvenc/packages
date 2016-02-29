@@ -33,7 +33,7 @@ Router sınıfı uygulamanızda index.php dosyasına gelen istekleri <kbd>app/ro
         <li><a href="#regex-md">Düzenli İfadeler</a></li>
     </ul>
 </li>
-<li><a href="#method-reference">Fonksiyon Referansı</a></li>
+<li><a href="#method-reference">Router Sınıfı Referansı</a></li>
 </ul>
 
 <a name="configuration"></a>
@@ -457,7 +457,7 @@ Http katmanları tek bir route kuralına atanarak direkt çalıştırılabilecek
 
 #### Bir Kurala Katman Atamak
 
-Tek bir route kuralı için katmanlar atayabilmek mümkündür. Aşağıdaki örnekte <kbd>/hello</kbd> sayfasına güvenli olmayan bir get yada post isteği geldiğinde <kbd>welcome/index</kbd> sayfasına yönlendirilir ve [Https katmanı](Middleware-Https.md) çalıştırılarak istek <kbd>https://</kbd> protokolü ile çalışmaya zorlanır.
+Tek bir route kuralı için katmanlar atayabilmek mümkündür. Aşağıdaki örnekte <kbd>/hello</kbd> sayfasına güvenli olmayan bir get yada post isteği geldiğinde <kbd>welcome/index</kbd> sayfasına yönlendirilir ve <a href="http://github.com/obullo/http-middlewares" target="_blank">Https katmanı</a> çalıştırılarak istek <kbd>https://</kbd> protokolü ile çalışmaya zorlanır.
 
 ```php
 $router->match(['get', 'post'], 'hello$', 'welcome/index')->middleware(['Https']);
@@ -495,7 +495,7 @@ $router->group(
  
 #### Düzenli İfadeler
 
-Bir grup içerisinde kullanılan katmanlar bazen URL adresinde belirli bölümler içerinde çalıştırılmak istenmeyebilir. Aşağıdaki gibi URL adreslerimizin olduğunu varsayalım.
+Bir grup içerisinde kullanılan katmanlar, bazen belirli URL segmentleri haricinde çalıştırılmak istenebilir.
 
 ```php
 http://www.example.com/test/bad_segment
@@ -503,7 +503,7 @@ http://www.example.com/test/good_segment1
 http://www.example.com/test/good_segment2
 ```
 
-Buna benzer durumlarda aşağıdaki gibi katmanların sadece belirli URL adreslerinde çalışmasını sağlayabilirsiniz.
+Yukarıdaki örneğe benzer adreslerimiz olduğunu varsayarsak,
 
 ```php
 /**
@@ -521,7 +521,7 @@ $router->group(
 );
 ```
 
-Veya aşağıdaki gibi katmanları sadece sadece belirli url parçalarını içeren kelimeler ile sınırlandararak tanımlanan sayfalar hariç tüm sayfalarda Auth ve Guest katmanları çalıştırılmasını sağlayabilirsiniz.
+Yukarıdaki kural gurubu için <kbd>bad_segment</kbd> segmenti dışındaki tüm url adreslerinde <kbd>Test</kbd> katmanı çalışmış olur.
 
 ```php
 /**
@@ -537,6 +537,8 @@ $router->group(
     }
 );
 ```
+
+Yukarıdaki kural grubunda ise parentez içerisinde tanımlı sayfalar hariç tüm sayfalarda <kbd>Auth</kbd> ve <kbd>Guest</kbd> katmanları çalışmış olur.
 
 <a name="method-reference"></a>
 

@@ -7,7 +7,7 @@
 
 #### Konfigürasyon
 
-Başarısız işlere ait ayarlar <kbd>app/local/providers/queue.php</kbd> konfigürasyon dosyasında tutulur. Başarısız işlere ait mevcut kayıt edici sınıf <kbd>Obullo\Queue\Failed\Storage\Database</kbd> olarak belirlenmiştir.
+Başarısız işlere ait ayarlar <kbd>providers/queue.php</kbd> konfigürasyon dosyasında tutulur. Başarısız işlere ait mevcut kayıt edici sınıf <kbd>Obullo\Queue\Failed\Storage\Database</kbd> olarak belirlenmiştir.
 
 ```php
 'job' => 

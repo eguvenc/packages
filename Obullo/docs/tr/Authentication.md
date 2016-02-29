@@ -66,14 +66,12 @@ Yetki doğrulama,
 
 * Hafıza depoları, ( Storages ) 
 * Adaptörler,
-* Kullanıcı kimlikleri
 * Çoklu oturumları sonlandırma
-* Kullanıcı kimliklerini önbelleklenme
-* Kullanıcı sorgularını özelleştirebilme ( User model class )
+* Kimliklerini önbelleklenme
+* Kullanıcı sorgularını özelleştirebilme ( User Model )
 * Yetki doğrulama onaylandırma ( Verification )
-* Oturum id sini yeniden yaratma, ( Session regenerate )
-* Tarayıcı türünü doğrulama ( User agent validation )
-* Hatırlatma çerezi ve beni hatırla ( Remember me )
+* Tarayıcı türünü doğrulama
+* Hatırlatma çerezi ve beni hatırla
 
 gibi özellikleri barındırır.
 
@@ -93,7 +91,7 @@ Akış şemasına göre GenericUser login butonuna bastığı anda ilk önce ön
 
 ### Konfigürasyon
 
-Yetki doğrulama paketine ait konfigürasyon <kbd>app/$env/providers/user.php</kbd> dosyasında tutulmaktadır. Bu konfigürasyona ait bölümlerin ne anlama geldiği hakkında geniş bilgiye [Auth-Configuration.md](Auth-Configuration.md) dökümentasyonundan ulaşabilirsiniz.
+Yetki doğrulama paketine ait konfigürasyon <kbd>providers/user.php</kbd> dosyasında tutulmaktadır. Bu konfigürasyona ait bölümlerin ne anlama geldiği hakkında geniş bilgiye [Auth-Configuration.md](Auth-Configuration.md) dökümentasyonundan ulaşabilirsiniz.
 
 <a name="adapters"></a>
 
@@ -282,7 +280,7 @@ if ($auhtResult->isValid()) {
 }
 ```
 
-> Not: <kbd>app/modules/examples/membership</kbd> klasörü içerisinde oluşturulmuş örneğe göz atmayı unutmayın.
+<kbd>app/folders/examples/membership</kbd> klasörü içerisinde oluşturulmuş örneğe göz atmayı unutmayın.
 
 <a name="login-error-results"></a>
 

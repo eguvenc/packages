@@ -271,7 +271,7 @@ class Form
      * 
      * @return string
      */
-    public function getMessages($msg = '')
+    public function getMessageString($msg = '')
     {
         if (! empty($msg) && is_string($msg)) {
             $this->messages['messages'][] = (string)$msg;

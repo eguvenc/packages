@@ -20,12 +20,21 @@ class Reminder
     public $session;
 
     /**
+     * Service Parameters
+     * 
+     * @var array
+     */
+    public $params = array();
+
+    /**
      * Constructor 
      * 
-     * @param SessionInterface $session session
+     * @param object $session session
+     * @param array  $params  service parameters
      */
-    public function __construct(Session $session)
+    public function __construct(Session $session, array $params)
     {
+        $this->params = $params;
         $this->session = $session;
     }
 
@@ -69,17 +78,15 @@ class Reminder
      */
     protected function setSessionCookieLifetime($lifetime, $deleteOldSession = true)
     { 
-        $params = $this->session->getParams();
-
         if ($lifetime == null) {
-            $lifetime = $params['storage']['lifetime'];
+            $lifetime = $this->params['storage']['lifetime'];
         }
         session_set_cookie_params(
             $lifetime,
-            $params['cookie']['path'],
-            $params['cookie']['domain'],
-            $params['cookie']['secure'],
-            $params['cookie']['httpOnly']
+            $this->params['cookie']['path'],
+            $this->params['cookie']['domain'],
+            $this->params['cookie']['secure'],
+            $this->params['cookie']['httpOnly']
         );
         if ($this->session->exists()) {
             

@@ -79,7 +79,7 @@ $middleware->register(
 Ve son olarak bu evrensel katmanı uygulamaya dahil edin.
 
 ```php
-$middleware->add(
+$middleware->init(
     [
         'Router',
         'Hello'
@@ -105,10 +105,10 @@ Uygulamanıza katmanlar ekleyip çıkarabilmenin 3 yöntemi vardır.
 
 #### Evrensel Yöntem
 
-Eğer bir katmanı <kbd>app/middlewares.php</kbd> dosyası add() metodu içerisine eklerseniz katman, evrensel olarak uygulamanın bütününde çalışmaya başlar.
+Eğer bir katmanı <kbd>app/middlewares.php</kbd> dosyası init() metodu içerisine eklerseniz katman evrensel olarak uygulamanın bütününde çalışmaya başlar.
 
 ```php
-$middleware->add(
+$middleware->init(
     [
         'Router',
         'Hello'

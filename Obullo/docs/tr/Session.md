@@ -1,17 +1,11 @@
 
 ## Oturum Sınıfı
 
-Oturum sınıfı kullanıcılar uygulamayı gezerken statülerini devam ettirmeyi ve onlara ait aktiviteleri takip etmenizi sağlar. Bir oturum verisi içerisine kaydedilmiş statü, kullanıcı izinleri gibi kullanıcıya ait özel bilgiler oturum süresi boyunca oturum id si vastası ile hafıza depoları içerisinde saklı tutulur.
+Oturum sınıfı kullanıcılar uygulamayı gezerken kendilerine ait nitelikleri devam ettirmeyi ve onlara ait aktiviteleri takip etmenizi sağlar. Bir oturum verisi içerisine kaydedilmiş kimlik bilgileri, nitelikler ve kullanıcı izinleri gibi özel bilgiler oturum süresi boyunca oturum kimliği vasıtası ile hafıza depoları içerisinde saklı tutulur. Oturum sona erdiğinde ise bu bilgiler belirli bir süre içerisinde yok olur.
 
 <ul>
-    <li>
-        <a href="#setup">Kurulum</a>
-        <ul>
-            <li><a href="#config">Servis Konfigürasyonu</a></li>
-            <li><a href="#storages">Depolama Türleri</a></li>
-        </ul>
-    </li>
-
+    <li><a href="#service-provider">Servis Sağlayıcısı</a></li>
+    <li><a href="#storages">Depolama Türleri</a></li>
     <li>
         <a href="#methods">Metotlara Erişim</a>
         <ul>
@@ -20,12 +14,11 @@ Oturum sınıfı kullanıcılar uygulamayı gezerken statülerini devam ettirmey
             <li><a href="#remove">$this->session->remove()</a></li>
             <li><a href="#regenerateId">$this->session->regenerateId()</a></li>
             <li><a href="#exists">$this->session->exists()</a></li>
-            <li><a href="#id">$this->session->id()</a></li>
+            <li><a href="#getId">$this->session->getId()</a></li>
             <li><a href="#getAll">$this->session->getAll()</a></li>
             <li><a href="#destroy">$this->session->destroy()</a></li>
         </ul>
     </li>
-
     <li>
         <a href="#reminder">Hatırlatma Sınıfı</a>
         <ul>
@@ -33,22 +26,25 @@ Oturum sınıfı kullanıcılar uygulamayı gezerken statülerini devam ettirmey
             <li><a href="#forgetMe">$this->session->forgetMe()</a></li>
         </ul>
     </li>
-
 </ul>
 
-### Servis Konfigürasyonu
+<a name="service-provider"></a>
 
-<a name="config"></a>
+### Servis Sağlayıcısı
 
-Session sınıfı <b>app/providers.php</b> dosyasında servis olarak tanımlıdır. Servis sağlayıcısı, save handler ve diğer ayarlar <kbd>app/$env/providers/session.php</kbd> dosyasından konfigüre edilir.
+<kbd>app/providers.php</kbd> dosyasında servis sağlayıcısının tanımlı olduğundan emin olun.
+
+```php
+$container->addServiceProvider('Obullo\Container\ServiceProvider\Session');
+```
+
+Depolama sürücüsü ve diğer ayarlar <kbd>providers/session.php</kbd> dosyasından konfigüre edilir.
 
 ```php
 'methods' => [
-    'setParameters' => [
-        'registerSaveHandler' => '\Obullo\Session\SaveHandler\Cache',
-        'setName' => '',
-        'start' => '',
-    ]
+    ['name' => 'registerSaveHandler','argument' => ['Obullo\Session\SaveHandler\Cache']],
+    ['name' => 'setName','argument' => ['']],
+    ['name' => 'start','argument' => ['']]
 ]
 ```
 
@@ -76,7 +72,13 @@ Session sınıfı <b>app/providers.php</b> dosyasında servis olarak tanımlıd�
 ### Metotlara Erişim
 
 ```php
-$this->c['session']->method();
+$container->get('session')->method();
+```
+
+Kontrolör içerisinden,
+
+```php
+$this->session->method();
 ```
 
 <a name="set"></a>
@@ -173,14 +175,14 @@ if ($this->session->exists()) {
 }
 ```
 
-<a name="id"></a>
+<a name="getId"></a>
 
-#### $this->session->id()
+#### $this->session->getId()
 
-Kullanıcının geçerli oturum id değerine geri döner.
+Kullanıcının geçerli oturuma ait kimlik değerine geri döner.
 
 ```php
-echo $this->session->id()  // bqovdui8ra84tnv9g99vpqpav2
+echo $this->session->getId()  // bqovdui8ra84tnv9g99vpqpav2
 ```
 
 <a name="getAll"></a>
@@ -199,7 +201,7 @@ Kullanıcı oturumunu sonlandırır. Tüm oturum verilerini kalıcı olarak yok 
 
 ### Hatırlatma Sınıfı
 
-Hatırlatma nesnesi oturum çerezine (session cookie) ait sona erme süresini kontrol eder.
+Hatırlatma nesnesi, oturum çerezine (session cookie) ait sona erme süresini kontrol eder.
 
 <a name="rememberMe"></a>
 
@@ -211,7 +213,7 @@ Kullanıcı oturumu süresinin kalıcılığını belirler. Bir üyelik sistemin
 $this->session->rememberMe(6 * 30 * 24 * 3600);
 ```
 
-> Bu fonksiyon php <kbd>session_set_cookie_params()</kbd> metodu özelliklerini kullanır.
+Bu fonksiyon php <kbd>session_set_cookie_params()</kbd> metodu özelliklerini kullanır.
 
 <a name="forgetMe"></a>
 

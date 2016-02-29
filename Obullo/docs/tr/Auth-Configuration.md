@@ -1,7 +1,7 @@
 
 ## Yetki Doğrulama Konfigürasyonu
 
-Yetki doğrulama paketine ait konfigürasyon <kbd>app/$env/providers/user.php</kbd> dosyasından yönetilir.
+Yetki doğrulama paketine ait konfigürasyon <kbd>providers/user.php</kbd> dosyasından yönetilir.
 
 ### Değerler tablosu
 

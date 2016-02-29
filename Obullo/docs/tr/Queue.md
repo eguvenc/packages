@@ -41,7 +41,7 @@ Kuyruklama paketi uzun sürmesi beklenen işlemlere ( loglama, email gönderme, 
 
 ### Konfigürasyon
 
-Queue servisi ana konfigürasyonu <kbd>app/local/providers/queue.php</kbd> dosyasından konfigüre edilir. Dosya içerisindeki <kbd>connections</kbd> anahtarına AMQP servis sağlayıcısı için gereken bağlantı bilgileri girilir.
+Queue servisi ana konfigürasyonu <kbd>providers/queue.php</kbd> dosyasından konfigüre edilir. Dosya içerisindeki <kbd>connections</kbd> anahtarına AMQP servis sağlayıcısı için gereken bağlantı bilgileri girilir.
 
 <a name="server-requirements"></a>
 

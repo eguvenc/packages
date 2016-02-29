@@ -44,7 +44,7 @@ Logger sınıfı <kbd>Obullo\Log\Handler</kbd> klasöründeki log sürücülerin
         </ul>
     </li>
     <li><a href="#displaying-logs">Logları Görüntülemek</a></li>
-    <li><a href="#method-reference">Fonksiyon Referansı</a></li>
+    <li><a href="#method-reference">Log Sınıfı Referansı</a></li>
 </ul>
 
 <a name="flow-chart"></a>
@@ -692,7 +692,7 @@ Debugger paketi [Debugger.md](Debugger.md) dökümentasyonunu inceleyiniz.
 
 <a name="method-reference"></a>
 
-## Fonksiyon Referansı
+## Log Sınıfı Referansı
 
 ##### $this->logger->enable();
 

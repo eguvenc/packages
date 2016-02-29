@@ -15,7 +15,7 @@
     <li><a href="#flushing-with-params">Parametreler İle Önbelleklenmiş Katmanı Silmek</a></li>
     <li><a href="#creating-navigation-bar">Katmanlarla Bir Gezinme Çubuğu Yaratalım</a></li>
     <li><a href="#debugger">Çıktı Görüntüleyici</a></li>
-    <li><a href="#reference">Fonksiyon Referansı</a></li>
+    <li><a href="#reference">Layer Sınıfı Referansı</a></li>
 </ul>
 
 <a name="architecture"></a>
@@ -279,7 +279,7 @@ Debugger modülü kurulu değilse kurmak için [Debugger.md](Debugger.md) dökü
 
 <a name="reference"></a>
 
-### Fonksiyon Referansı
+### Layer Sınıfı Referansı
 
 ##### $this->layer->post(string $uri, $data = array | int, expiration = 0);  
 

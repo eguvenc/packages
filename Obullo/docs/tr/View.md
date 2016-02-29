@@ -34,13 +34,13 @@ Bir view dosyası basitçe html başlık ve gövdesinden oluşan bütün bir web
 
 ### View Sınıfı
 
-Bir view dosyası bir modüle ait ise modül dizini içerisindeki <kbd>/modules/$moduleName/view</kbd> klasörü içerisinden, bir kontrolöre bağlı bir view dosyası ise <kbd>/modules/views/</kbd> klasöründen çağrılır.
+Bir view dosyası eğer bir klasöre ait ise klasör içerisindeki <kbd>/folders/$folderName/view</kbd> klasörü içerisinden, bir kontrolöre bağlı bir view dosyası ise <kbd>/folders/views/</kbd> klasöründen çağrılır.
 
 <a name="engines"></a>
 
 #### Görünüm Motorları
 
-View sınıfı görünüm dosyalarını işlemek için harici kütüphaneler kullanır. View sınıfının hangi motoru kullanacağı servis sağlayıcısı üzerinden <kbd>engine</kbd> konfigürasyonu ile belirlenir. Takip eden liste kullanılabilceğiniz motorları gösteriyor.
+View sınıfı görünüm dosyalarını işlemek için harici kütüphaneler kullanır. View sınıfının hangi motoru kullanacağı servis sağlayıcısı üzerinden <kbd>engine</kbd> konfigürasyonu ile belirlenir. Takip eden liste desteklenen görünüm motorlarını gösteriyor.
 
 * Native ( Varsayılan )
 * <a href="http://platesphp.com/" target="_blank">Plates</a>
@@ -59,7 +59,7 @@ $container->share('view', 'Obullo\View\View')
     ->withArgument($container->get('logger'))
     ->withArgument(
         [
-            'engine' => 'Obullo\View\Plates\Plates',
+            'engine' => 'Obullo\View\Native',
         ]
     )
     ->withMethodCall(
@@ -258,7 +258,7 @@ class Navbar extends Controller
 }
 ```
 
-Projenizdeki örnekler modülüne giderek çalışan versiyonu görebilirsiniz.
+Projenizdeki örnekler klasörüne giderek çalışan versiyonu görebilirsiniz.
 
 ```php
 http://myproject/examples/layers/navbar

@@ -245,7 +245,7 @@ class Session implements SessionInterface
      * 
      * @return string
      */
-    public function id()
+    public function getId()
     {
         return session_id();
     }
@@ -334,16 +334,6 @@ class Session implements SessionInterface
     }
 
     /**
-     * Returns to service parameters
-     * 
-     * @return array
-     */
-    public function getParams()
-    {
-        return $this->params;
-    }
-
-    /**
      * Remember me
      * 
      * @param integer $lifetime         default 3600
@@ -353,7 +343,7 @@ class Session implements SessionInterface
      */
     public function rememberMe($lifetime = null, $deleteOldSession = true)
     {
-        $reminder = new Remminder($this);
+        $reminder = new Remminder($this, $this->params);
         $reminder->rememberMe($lifetime, $deleteOldSession);
     }
 
@@ -364,7 +354,7 @@ class Session implements SessionInterface
      */
     public function forgetMe()
     {
-        $reminder = new Remminder($this);
+        $reminder = new Remminder($this, $this->params);
         $reminder->forgetMe();
     }
 

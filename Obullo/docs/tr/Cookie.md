@@ -4,6 +4,7 @@
 Çerez, herhangi bir internet sitesi tarafından son kullanıcının bilgisayarına bırakılan bir tür tanımlama dosyasıdır. Çerez dosyalarında oturum bilgileri ve benzeri veriler saklanır. Çerez kullanan bir siteyi ziyaret ettiğinizde, bu site tarayıcınıza bir ya da birden fazla çerez bırakma konusunda talep gönderebilir.
 
 <ul>
+    <li><a href="#service-provider">Servis Sağlayıcısı</a></li>
     <li>
         <a href="#setcookie">Bir Çereze Veri Kaydetmek</a>
         <ul>
@@ -14,21 +15,31 @@
     <li><a href="#readcookie">Bir Çerez Verisini Okumak</a></li>
     <li><a href="#removecookie">Bir Çerezi Silmek</a></li>
     <li><a href="#prefix">Çerez Ön Ekleri</a></li>
-    <li><a href="#parameters">Parametre Açıklamaları</a></li>
+    <li><a href="#parameters">Parametreler</a></li>
     <li><a href="#method-reference">Cookie Sınıfı Referansı</a></li>
 </ul>
 
 Bir çereze kayıt edilebilecek maksimum veri 4KB tır.
 
+<a name="service-provider"></a>
+
+### Servis Sağlayıcısı
+
+<kbd>app/providers.php</kbd> dosyasında servis sağlayıcısının tanımlı olduğundan emin olun.
+
+```php
+$container->addServiceProvider('Obullo\Container\ServiceProvider\Cookie');
+```
+
 <a name="setcookie"></a>
 
-#### Bir Çereze Veri Kaydetmek
+### Bir Çereze Veri Kaydetmek
 
 Çerez sınıfını kullandığınızda bir çereze iki tür yöntemle veri kaydedebilirsiniz.
 
 <a name="method-chaining"></a>
 
-##### Zincirleme Method Yöntemi
+#### Zincirleme Method Yöntemi
 
 ```php
 $this->cookie
@@ -50,7 +61,7 @@ $this->cookie
 
 <a name="arrays"></a>
 
-##### Array Yöntemi
+#### Array Yöntemi
 
 Eğer konfigürasyon dosyasını ezerek bir çerez kaydetmek istiyorak aşağıdaki gibi tüm parametreleri göndermeliyiz.
 
@@ -71,7 +82,7 @@ $this->cookie->set($cookie);
 
 <a name="readcookie"></a>
 
-#### Bir Çerez Verisini Okumak
+### Bir Çerez Verisini Okumak
 
 Bir çerezi okumak için get metodu kullanılır.
 
@@ -85,7 +96,7 @@ Eğer çereze kayıtlı bir değer yoksa fonksiyon <kbd>false</kbd> değerine d�
 
 <a name="prefix"></a>
 
-#### Çerez Ön Ekleri
+### Çerez Ön Ekleri
 
 Eğer çerezler için önceden konfigürasyondan bir ön ek belirlenmişse tüm çerez işlemleri bu ön ek gözönüne alınarak yapılır. Eğer konfigürasyonda olmayan özel ön ekler kullanılıyorsa bu durumda ikinci parametereden ön ek girilmelidir.
 
@@ -97,7 +108,7 @@ if ($value = $this->cookie->get('name', 'prefix')) {
 
 <a name="removecookie"></a>
 
-#### Bir Çerezi Silmek
+### Bir Çerezi Silmek
 
 Bir çerezi silmek için çerez ismi girmeniz yeterlidir.
 
@@ -125,7 +136,7 @@ $this->cookie->name('name')->prefix('prf_')->domain('my.subdomain.com')->path('/
 
 <a name="parameters"></a>
 
-#### Parametre Açıklamaları
+### Parametreler
 
 <table>
     <thead>
@@ -172,8 +183,7 @@ $this->cookie->name('name')->prefix('prf_')->domain('my.subdomain.com')->path('/
 
 <a name="method-reference"></a>
 
-#### Cookie Sınıfı Referansı
-     
+### Cookie Sınıfı Referansı  
 
 ##### $this->cookie->name(string $name);
 
