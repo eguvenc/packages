@@ -1,14 +1,14 @@
 
 ## Görünümler
 
-Bir view dosyası basitçe html başlık ve gövdesinden oluşan bütün bir web sayfası olabileceği gibi, belirli bir sayfanın parçası (header, footer, sidebar) da olabilir.
+Bir görünüm dosyası basitçe html başlık ve gövdesinden oluşan bütün bir web sayfası olabileceği gibi, belirli bir sayfanın parçası (header, footer, sidebar) da olabilir.
 
 <ul>
     <li>
         <a href="#loading-class">View Sınıfı</a>
         <ul>
             <li><a href="#engines">Görünüm Motorları</a></li>
-            <li><a href="#serviceProvider">Servis Sağlayıcı</a></li>
+            <li><a href="#service-provider">Servis Sağlayıcısı</a></li>
             <li><a href="#addFolder">$this->view->addFolder()</a></li>
             <li><a href="#load">$this->view->load()</a></li>
             <li><a href="#get">$this->view->get()</a></li>
@@ -16,7 +16,6 @@ Bir view dosyası basitçe html başlık ve gövdesinden oluşan bütün bir web
             <li><a href="#withData">$this->view->withData()</a></li>
         </ul>
     </li>
-
     <li>
         <a href="#layers">Katmanlar</a>
         <ul>
@@ -34,7 +33,7 @@ Bir view dosyası basitçe html başlık ve gövdesinden oluşan bütün bir web
 
 ### View Sınıfı
 
-Bir view dosyası eğer bir klasöre ait ise klasör içerisindeki <kbd>/folders/$folderName/view</kbd> klasörü içerisinden, bir kontrolöre bağlı bir view dosyası ise <kbd>/folders/views/</kbd> klasöründen çağrılır.
+Bir görünüm dosyası eğer bir klasöre ait ise <kbd>/folders/$klasörismi/view</kbd> klasöründen, bağımsız bir görünüm dosyası ise <kbd>/folders/views/</kbd> klasöründen çağrılır.
 
 <a name="engines"></a>
 
@@ -47,11 +46,17 @@ View sınıfı görünüm dosyalarını işlemek için harici kütüphaneler kul
 
 Varsayılan ( Native ) görünüm motoru ile daha yüksek performans elde etmeniz muhtemeldir, fakat daha gelişmiş özelliklere ihtiyacınız varsa diğer görünüm motorlarını da tercih edebilirsiniz.
 
-<a name="serviceProvider"></a>
+<a name="service-provider"></a>
 
-#### Servis Sağlayıcı
+#### Servis Sağlayıcısı
 
-View sınıfına ait servis sağlayıcısı <kbd>app/providers.php</kbd> dosyasından yönetilir.
+<kbd>app/providers.php</kbd> dosyasında servis sağlayıcısının tanımlı olduğundan emin olun.
+
+```php
+$container->addServiceProvider('ServiceProvider\View');
+```
+
+Servis sağlayıcısı view sınıfına ait önkonfigurasyonu yönetir.
 
 ```php
 $container->share('view', 'Obullo\View\View')
@@ -59,7 +64,7 @@ $container->share('view', 'Obullo\View\View')
     ->withArgument($container->get('logger'))
     ->withArgument(
         [
-            'engine' => 'Obullo\View\Native',
+            'engine' => 'Obullo\View\Native', // 'Obullo\View\Plates\Plates',
         ]
     )
     ->withMethodCall(
@@ -78,8 +83,6 @@ $container->share('view', 'Obullo\View\View')
     );
 ```
 
-Servis sağlayıcısı view sınıfına ait önkonfigurasyonu yönetir.
-
 <a name="addFolder"></a>
 
 #### $this->view->addFolder()
@@ -90,7 +93,7 @@ Görünüm sınıfına klasörler konfigüre eder.
 $this->view->addFolder('templates', '/resources/templates/');
 ```
 
-Tanımladığınız klasörden view dosyalarına ulaşmak için <kbd>::</kbd> sembolü kullanılır.
+Tanımladığınız klasörden görünüm dosyalarına ulaşmak için <kbd>::</kbd> sembolü kullanılır.
 
 ```php
 $string = $this->view->get('templates::maintenance');
@@ -109,7 +112,7 @@ $this->view->load(
 );
 ```
 
-Welcome kontrolör dosyasında olduğu gibi kontrolör dosyası bir modül içerisinde değilse <kbd>/modules/views/view</kbd> klasöründe oluşturulmalıdır.
+Eğer bir kontrolör dosyası bir klasör içerisinde değilse dışarıdaki <kbd>/folders/views/view</kbd> klasöründe oluşturulmalıdır.
 
 ```php
 <html>
@@ -127,7 +130,7 @@ Welcome kontrolör dosyasında olduğu gibi kontrolör dosyası bir modül içer
 
 #### $this->view->get()
 
-Bir view dosyası <kbd>$response</kbd> nesnesi içerisine gönderilmek yerine <kbd>string</kbd> türünde alınmak isteniyorsa get metodu kullanılır.
+Bir görünüm dosyası <kbd>$response</kbd> nesnesi içerisine gönderilmek yerine <kbd>string</kbd> türünde alınmak isteniyorsa get metodu kullanılır.
 
 <a name="withStream"></a>
 
@@ -159,7 +162,7 @@ Değişken atamak için diğer bir alternatiftir.
 $this->view->withData('foo', 'bar');
 ```
 
-String türü veya aşağıdaki gibi array türü ile veriler gönderilebilir.
+Görünüm dosyasına atanan değişkenleri gönderir.
 
 ```php
 $this->view->withData(
@@ -173,13 +176,13 @@ $this->view->withData(
 
 ### Katmanlar
 
-Çerçeve içerisinde katman paketi sayesinde view dosyaları kontrolör dosyaları içerisinden zincirleme olarak içe içe çağırılabilir. Bu da her view dosyasına ait bir kontrolör dosyasının yaratılabileceği anlamına gelir. Bknz. [Layer.md](Layer.md)
+Çerçeve içerisinde katman paketi sayesinde görünüm dosyaları kontrolör dosyaları içerisinden zincirleme olarak içe içe çağırılabilir. Bu da her görünüm dosyasına ait bir kontrolör dosyasının yaratılabileceği anlamına gelir. Bknz. [Layer.md](Layer.md)
 
 ![Layers](images/layer-ui-components.png?raw=true "")
 
 Bu mimariyi kullanmanın faydalarını aşağıdaki gibi sıralayabiliriz.
 
-* <b>Arayüz Tutarlılığı:</b> Katmanlı programlama görünen varlıkları ( views ) kesin parçalara ayırır ve her bölüm kendisinden sorumlu olduğu fonksiyonu çalıştırır ( view controller ) böylece her katman bir layout yada widget hissi verir.
+* <b>Arayüz Tutarlılığı:</b> Katmanlı programlama görümleri kesin parçalara ayırır ve her bölüm kendisinden sorumlu olan sınıfı çalıştırır ( view kontrolör ) böylece her katman bir layout yada widget hissi verir.
 * <b>Bakımı Kolay Uygulamalar:</b> Parçalara bölünen kullanıcı arayüzü bileşenleri MVC tasarım desenine bağlı kaldıkları için bakım kolaylığı sağlarlar.
 * <b>Mantıksal Uygulamalar:</b> Katmanlar birbirleri ile etkişim içerisinde olabilecekleri gibi uygulama üzerinde hakimiyet ve önbelleklenebilme özellikleri ile genişleyebilir mantıksal uygulamalar yaratmayı sağlarlar. Bölümsel olarak birbirinden ayrılan katmanlar bir <kbd>web servis</kbd> gibi de çalışabilirler. Oluşturulan her katmana bir http yada ajax isteği ile ulaşılabilir.
 

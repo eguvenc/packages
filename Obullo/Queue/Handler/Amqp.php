@@ -62,7 +62,7 @@ class Amqp implements QueueInterface
      * @param object $provider \Obullo\Container\ServiceProvider\ServiceProviderInterface 
      * @param array  $params   provider parameters
      */
-    public function __construct(SerivceProvider $provider, array $params)
+    public function __construct(ServiceProvider $provider, array $params)
     {
         $this->params = $params;
         $this->AMQPconnection = $provider->shared($params['provider']);

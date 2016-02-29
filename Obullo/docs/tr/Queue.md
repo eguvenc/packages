@@ -4,7 +4,7 @@
 Kuyruklama paketi uzun sürmesi beklenen işlemlere ( loglama, email gönderme, sipariş alma gibi. ) ait verileri mesaj gönderim protokolü  ( AMQP ) üzerinden arkaplanda işlem sırasına sokar. Kuyruğa atılan veriler eş zamanlı işlemler (multi threading) ile tüketilerek işler arkaplanda tamamlanır ve kuyruktan silinir, böylece uzun süren işlemler ön yüzde sadece işlem sırasına atıldığından uygulamanıza gelen http istekleri büyük bir yükten kurtulmuş olur.
 
 <ul>
-<li><a href="#configuration">Konfigürasyon</a></li>
+<li><a href="#requirements">Sunucu Gereksinimleri</a></li>
 <li><a href="#service-provider">Servis Sağlayıcısı</a></li>
 <li><a href="#accessing-methods">Metotlara Erişim</a></li>
 <li><a href="#queuing-a-job">$this->queue->push()</a></li>
@@ -37,15 +37,9 @@ Kuyruklama paketi uzun sürmesi beklenen işlemlere ( loglama, email gönderme, 
 <li><a href="#method-reference">Queue Sınıfı Referansı</a></li>
 </ul>
 
-<a name="configuration"></a>
+<a name="requirements"></a>
 
-### Konfigürasyon
-
-Queue servisi ana konfigürasyonu <kbd>providers/queue.php</kbd> dosyasından konfigüre edilir. Dosya içerisindeki <kbd>connections</kbd> anahtarına AMQP servis sağlayıcısı için gereken bağlantı bilgileri girilir.
-
-<a name="server-requirements"></a>
-
-#### Sunucu Gereksinimleri
+### Sunucu Gereksinimleri
 
 Amqp servis sağlayıcısını kullanıyorsanız uygulamanızda php AMQP genişlemesinin kurulu olması gerekir. Php AMQP arayüzü ile çalışan birçok kuyruklama yazılımı mevcuttur. Bunlardan bir tanesi de <a href="https://www.rabbitmq.com/" target="_blank">RabbitMQ</a> yazılımıdır. Aşağıdaki linkten RabbitMQ yazılımı için Ubuntu işletim sistemi altında gerçekleştilen örnek bir kurulum bulabilirsiniz.
 
@@ -67,6 +61,8 @@ Queue servisi ve amqp servis sağlayıcısının <kbd>app/providers.php</kbd> do
 $container->addServiceProvider('ServiceProvider\Queue');
 $container->addServiceProvider('ServiceProvider\Connector\Amqp');
 ```
+
+Queue servisi ana konfigürasyonu <kbd>providers/queue.php</kbd> dosyasından konfigüre edilir. Dosya içerisindeki <kbd>connections</kbd> anahtarına AMQP servis sağlayıcısı için gereken bağlantı bilgileri girilir.
 
 <kbd>ServiceProvider\Queue</kbd> servisinde varsayılan olarak <kbd>Amqp</kbd> sürücüsü tanımlıdır. Kuyruklama servisi için sürücü seçenekleri aşağıdaki gibidir.
 

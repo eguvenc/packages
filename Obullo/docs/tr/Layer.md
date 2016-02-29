@@ -28,11 +28,11 @@
 
 Her bir katman basit kontrolör sınıflarıdır. Layer sınıfı tarafından tekralanabilir olarak çağrılabilen katmanlar uygulamayı parçalayarak farklı işlevsel özellikleri bileşen yada web servisleri haline getirir.
 
-Katmanlı mimari yazılım geliştirmenin arayüz sürecini etkileyici bir şekilde yönetir. Bu mimariyi kullanmanın faydalarını aşağıdaki gibi sıralayabiliriz.
+Katmanlı mimari uygulamanızda <kbd>önyüz sürecini</kbd> yönetmenizi sağlar. Bu mimariyi kullanmanın faydalarını aşağıdaki gibi sıralayabiliriz.
 
-* Arayüz Tutarlılığı: Katmanlı programlama görünen varlıkları ( views ) kesin parçalara ayırır ve her bölüm kendisinden sorumlu olduğu fonksiyonu çalıştırır ( view controller ) böylece her katman bir layout yada widget hissi verir.
-* Bakımı Kolay Uygulamalar: Parçalara bölünen kullanıcı arayüzü bileşenleri MVC tasarım desenine bağlı kaldıkları için bakım kolaylığı sağlarlar.
-* Mantıksal Uygulamalar: Katmanlar birbirleri ile etkişim içerisinde olabilecekleri gibi uygulama üzerinde hakimiyet ve önbelleklenebilme özellikleri ile genişleyebilir mantıksal uygulamalar yaratmayı sağlarlar. Bölümsel olarak birbirinden ayrılan katmanlar bir <kbd>web servis</kbd> gibi de çalışabilirler.
+* <b>Arayüz Tutarlılığı:</b> Katmanlı programlama görünümleri kesin parçalara ayırır ve her bölüm kendisinden sorumlu olan sınıfı çalıştırır ( view kontrolör ) böylece her katman bir layout yada widget hissi verir.
+* <b>Bakım Kolaylığı:</b> Parçalara bölünen kullanıcı arayüzü bileşenleri MVC tasarım desenine bağlı kaldıkları için bakım kolaylığı sağlarlar.
+* <b>Mantıksal Uygulamalar:</b> Katmanlar birbirleri ile etkişim içerisinde olabilecekleri gibi uygulama üzerinde hakimiyet ve önbelleklenebilme özellikleri ile genişleyebilir mantıksal uygulamalar yaratmayı sağlarlar. Bölümsel olarak birbirinden ayrılan katmanlar bir <kbd>web servis</kbd> gibi de çalışabilirler.
 
 <a name="views"></a>
 
