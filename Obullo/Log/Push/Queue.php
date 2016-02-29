@@ -1,9 +1,8 @@
 <?php
 
-namespace Obullo\Log;
+namespace Obullo\Log\Push;
 
 use Obullo\Queue\JobInterface;
-
 use League\Container\ImmutableContainerAwareTrait;
 use League\Container\ImmutableContainerAwareInterface;
 
@@ -34,7 +33,7 @@ class Queue implements JobInterface, ImmutableContainerAwareInterface
 
         $queue->push(
             'Workers@Logger',
-            $job->getName(),
+            $params['queue']['job'],
             $data,
             $params['queue']['delay']
         );

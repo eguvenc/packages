@@ -1,10 +1,9 @@
 
 ## Loglama Sınıfı
 
-Logger sınıfı <kbd>Obullo\Log\Handler</kbd> klasöründeki log sürücülerini kullanarak uygulamaya ait log verilerini <kbd>app/workers/logger</kbd> sınıfı yardımı ile direkt olarak (senkron) yada kuyruk servisi kullanarak (asenkron) olarak kaydeder. Logger sınıfı log verilerini arasındaki önemliliği destekler ve php SplPriorityQueue sınıfı yardımı ile log verilerini önem seviyelerine göre gruplar.
+Logger sınıfı <kbd>Obullo\Log\Handler</kbd> klasöründeki log sürücülerini kullanarak uygulamaya ait log verilerini <kbd>app/classes/Workers/Logger</kbd> sınıfı yardımı ile senkron yada kuyruk servisi ile asenkron olarak kaydeder. Logger sınıfı log verilerini arasındaki önemliliği destekler ve php SplPriorityQueue sınıfı yardımı ile log verilerini önem seviyelerine göre gruplar.
 
 <ul>
-
     <li><a href="#flow-chart">Akış Şeması</a></li>
     <li><a href="#configuration">Konfigürasyon</a></li>
     <li><a href="#service-provider">Servis Sağlayıcısı</a></li>
@@ -252,10 +251,10 @@ Yukarıdaki örneği gibi herhangi bir sayfada kullanabilirsiniz. Örnekte mongo
 
 ### Mesajlar
 
-Bir log mesajı aşağıdaki prototipte tanımlandığı gibi oluşturulur.
+Bir log mesajı aşağıdaki gibi oluşturulur.
 
 ```php
-$this->logger->{seviye}(string $message, $context = array(), $priority = 0);
+$this->logger->notice(string $message, $context = array(), $priority = 0);
 ```
 
 <a name="severities"></a>
@@ -273,56 +272,56 @@ $this->logger->{seviye}(string $message, $context = array(), $priority = 0);
 </thead>
 <tbody>
 <tr>
-<td>emergency</td>
+<td>emergency()</td>
 <td>0</td>
 <td>LOG_EMERG</td>
 <td>Emergency: Sistem kullanılamaz.</td>
 </tr>
 
 <tr>
-<td>alert</td>
+<td>alert()</td>
 <td>1</td>
 <td>LOG_ALERT</td>
 <td>Derhal müdahale edilmesi gereken eylemler. Örnek: Tüm web sitesinin düştüğü, veritabanına erişilemediği vb. durumlar. Bu log seviyesinde karşı tarafın SMS ile uyarılması tavsiye edilir.</td>
 </tr>
 
 <tr>
-<td>critical</td>
+<td>critical()</td>
 <td>2</td>
 <td>LOG_CRIT</td>
 <td>Kritik durumlar. Örnek: Uygulama bileşeni ulaşılamaz durumda yada beklenmedik bir istisnai hata.</td>
 </tr>
 
 <tr>
-<td>error</td>
+<td>error()</td>
 <td>3</td>
 <td>LOG_ERR</td>
 <td>Çalıştırma hataları ani müdahaleler gerektirmez fakat genel olarak loglanıp monitörlenmelidir.</td>
 </tr>
 
 <tr>
-<td>warning</td>
+<td>warning()</td>
 <td>4</td>
 <td>LOG_WARNING</td>
 <td>Hata olmayan istisnai olaylar. Örnek: Modası geçmiş bir web servisi ( API ),  kötü web servisi kullanımı, yanlış olmayan fakat istenmeyen durumlar.</td>
 </tr>
 
 <tr>
-<td>notice</td>
+<td>notice()</td>
 <td>4</td>
 <td>LOG_NOTICE</td>
 <td>Normal fakat önemli olaylar.</td>
 </tr>
 
 <tr>
-<td>info</td>
+<td>info()</td>
 <td>6</td>
 <td>LOG_INFO</td>
 <td>Bilgi amaçlı istenen yada ilgi çekici olaylar. Örnek: Kullanıcı logları, SQL logları, Uygulama performans/durum bilgileri.</td>
 </tr>
 
 <tr>
-<td>debug</td>
+<td>debug()</td>
 <td>7</td>
 <td>LOG_DEBUG</td>
 <td>Detaylı hata ayıklama bilgileri.</td>
@@ -406,7 +405,7 @@ Büyük veya orta ölçekli uygulamalarda kuyruklama gerekebilir. Kuyruklamanın
 
 ```php
 'push' => [
-    'handler' => '\Obullo\Log\Queue'   // '\Workers\Logger'
+    'handler' => 'Obullo\Log\Push\Queue'  // 'Workers\Logger', // Obullo\Log\Push\Amqp
 ]
 ```
 
@@ -430,6 +429,8 @@ $this->container->get('queue')
         $this->params['queue']['delay']
     );
 ```
+
+Kuyruklama için gelişmiş seçeneklere ihtiyacınız varsa kendinize ait push sürücünüzü <kbd>Obullo\Log\Push\Amqp</kbd> sürücüsünü model alarak geliştirebilirsiniz.
 
 Kuyruklama hakkında detaylı bilgi için [Queue.md](Queue.md) dosyasına gözatabilirsiniz.
 
@@ -740,4 +741,4 @@ Bir log kanalı belirler.
 
 ##### $this->logger->push();
 
-Load metodu ile yüklenen bir log yazıcısına ait log verilerini yazılması için log olayına işler.
+Load metodu ile yüklenen bir log yazıcısına ait log verilerini log olayına işler.
