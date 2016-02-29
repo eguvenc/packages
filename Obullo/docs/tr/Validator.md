@@ -37,6 +37,7 @@ Doğrulama sınıfı yazdığınız kodu minimize ederek form girdilerini kapsam
             <li><a href="#getFieldData">$this->validator->getFieldData()</a></li>
         </ul>
     </li>
+    <li><a href="#formClass">Form Nesnesi ile İlişkili Metotlar</a></li>
     <li>
         <a href="#callbackFunc">Geri Çağırım</a>
         <ul>
@@ -529,7 +530,7 @@ print_r($fields);
 
 <a name="formClass"></a>
 
-### Form Sınfı
+### Form Nesnesi ile İlişkili Metotlar
 
 Doğrulama işleminden sonra görünüm dosyasındaki formları yönetmek için form sınıfı kullanılır. Doğrulama ile ilişkili form metotlarını incelemek için [Validator-Form-Methods.md](Validator-Form-Methods.md) dosyasını inceleyebilirsiniz.
 
