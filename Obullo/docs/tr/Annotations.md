@@ -62,15 +62,15 @@ public function index()
     </thead>
     <tbody>
         <tr>
-            <td><b>@middleware->add();</b></td>
+            <td><b>@middleware->add()</b></td>
             <td>Bir middleware katmanını uygulamaya ekler. Virgül ile birden fazla katman ismi gönderebilirsiniz.</td>
         </tr>
         <tr>
-            <td><b>@middleware->remove();</b></td>
+            <td><b>@middleware->remove()</b></td>
             <td>Varolan bir middleware katmanını uygulamadan çıkarır. Virgül ile birden fazla katman ismi gönderebilirsiniz.</td>
         </tr>
         <tr>
-            <td><b>@middleware->method();</b></td>
+            <td><b>@middleware->method()</b></td>
             <td>Http protokolü tarafından gönderilen istek metodu belirlenen metotlardan biri ile eşleşmez ise sayfaya erişime izin verilmez. Virgül ile birden fazla katman ismi gönderebilirsiniz.</td>
         </tr>
          <tr>

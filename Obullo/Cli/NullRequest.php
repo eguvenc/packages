@@ -31,7 +31,19 @@ class NullRequest
         }
         return $this->uri;
     }
-
+    public function getServerParams() { return array(); }
+    public function getCookieParams() { return array(); }
+    public function withCookieParams(array $cookies){ return $this; }
+    public function getQueryParams(){ return array(); }
+    public function withQueryParams(array $query) { return $this; }
+    public function getUploadedFiles() { return array(); }
+    public function withUploadedFiles(array $uploadedFiles) { return $this; }
+    public function getParsedBody() { return null; }
+    public function withParsedBody($data) { return $this; }
+    public function getAttributes() { return array(); }
+    public function getAttribute($name, $default = null) { return null; }
+    public function withAttribute($name, $value) { return $this; }
+    public function withoutAttribute($name) { return $this; }
     /**
      * Magic null
      * 

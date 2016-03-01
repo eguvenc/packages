@@ -226,7 +226,7 @@ $logger->setWriter('file')
 $logger->setWriter('syslog')->filter('priority@notIn', array(LOG_DEBUG));
 ```
 
-**Önemli:** Prodüksiyon ortamında olan bir uygulama için LOG_DEBUG seviyesinin kapalı diğer log seviyelerinin (LOG_EMERG,LOG_ALERT,LOG_CRIT,LOG_ERR,LOG_WARNING,LOG_NOTICE) açık olması tavsiye edilir. Aksi durumda log veritabanları çok hızlı dolacaktır.
+Prodüksiyon ortamında olan bir uygulama için LOG_DEBUG seviyesinin kapalı diğer log seviyelerinin (LOG_EMERG,LOG_ALERT,LOG_CRIT,LOG_ERR,LOG_WARNING,LOG_NOTICE) açık olması tavsiye edilir. Aksi durumda log veritabanları çok hızlı dolacaktır.
 
 <a name="page-filters"></a>
 
@@ -385,12 +385,12 @@ Log yazıcıları yüklendiğinde load ve push metotları arasında kullanılan 
 Tüm log mesajları <kbd>app/classes/Workers/Logger</kbd> sınıfı aracılığı ile işlenir. Bu sınıfa gelen log verilerini <kbd>fire</kbd> metodu çözümler ve ilgili log yazıcılarını kullanarak yazma işlemlerinin gerçekleşmesini sağlar.
 
 ```php
-public function fire($job, array $data)
+public function fire(array $data, $job = null)
 {
     print_r($data);
 
     $this->job = $job;
-    $this->writers = $data['writers'];
+    $this->data = $data;
     $this->process();
 }
 ```
@@ -401,12 +401,10 @@ Tüm log kayıtları ve log bilgilerine ait olay verisi <kbd>$data</kbd> verisi 
 
 ### Kuyruklama
 
-Büyük veya orta ölçekli uygulamalarda kuyruklama gerekebilir. Kuyruklamanın doğru çalışabilmesi için queue servisinin doğru kurulduğundan ve çalışıyor olduğundan emin olun. Kurulum doğru ise log servisi konfigürasyonundaki <kbd>push => handler</kbd> anahtarına ait değerin <kbd>\Obullo\Log\Queue</kbd> ile değiştirdiğinizde log verileri artık queue servisinizde tanımlı olan kuyruk sürücünüze gönderilir.
+Büyük veya orta ölçekli uygulamalarda kuyruklama gerekebilir. Kuyruklamanın doğru çalışabilmesi için queue servisinin doğru kurulduğundan ve çalışıyor olduğundan emin olun. Kurulum doğru ise log servisi konfigürasyonundaki <kbd>pusher</kbd> anahtarına ait değerin <kbd>\Obullo\Log\Pusher\Queue</kbd> ile değiştirdiğinizde log verileri artık queue servisinizde tanımlı olan kuyruk sürücünüze gönderilir.
 
 ```php
-'push' => [
-    'handler' => 'Obullo\Log\Push\Queue'  // 'Workers\Logger', // Obullo\Log\Push\Amqp
-]
+'pusher' => 'Obullo\Log\Pusher\Queue'  // 'Obullo\Log\Pusher\Local', // Obullo\Log\Pusher\Amqp
 ```
 
 Queue servisi <kbd>Workers@Logger</kbd> adlı iş sınıfı üzerinden bir kanal açar ve bu kanal üzerinde konfigürasyonunuzdaki <kbd>job</kbd> anahtarı değeri ile bir kuyruk yaratır.
@@ -418,14 +416,14 @@ Queue servisi <kbd>Workers@Logger</kbd> adlı iş sınıfı üzerinden bir kanal
 ]
 ```
 
-Log mesajları <kbd>\Obullo\Log\Queue</kbd> sınıfı üzerinden queue servisi push metodu ile kuyruğa gönderilirler.
+Log mesajları <kbd>\Obullo\Log\Pusher\Queue</kbd> sınıfı üzerinden queue servisi push metodu ile kuyruğa gönderilirler.
 
 ```php
 $this->container->get('queue')
     ->push(
         'Workers@Logger',
         $this->params['queue']['job'],
-        $payload,
+        $data,
         $this->params['queue']['delay']
     );
 ```
@@ -568,12 +566,12 @@ php task queue listen --w=Workers@Logger --j=logger.1 --o=1
 <kbd>app/classes/Workers/Logger</kbd> sınfı fire metoduna gönderilen log verileri, istek tipi, yazıcı tipi, gönderilme süresi, log kayıtları gibi verileri aşağıdaki gibi bir array içerisinde gruplar. Php task listen komutu çalıştığında işçi veya işciler bu gruplanmış veriyi Workers/Logger sınıfı içerisinde arka planda çözümleyerek log yazıcılarına gönderirler.
 
 ```php
-public function fire($job, array $data)
+public function fire(array $data, $job = null)
 {
     print_r($data);
 
     $this->job = $job;
-    $this->writers = $data['writers'];
+    $this->data = $data;
     $this->process();
 }
 ```
@@ -585,41 +583,51 @@ Eğer yukarıda görülen <kbd>app/classes/Workers/Logger</kbd> sınıfı fire m
 /*
 Array
 (
-    [writers] => Array
-        (
-            [10] => Array
-                (
-                    [handler] => file
-                    [request] => http
-                    [type] => writer
-                    [time] => 1436797060
-                    [filters] => Array
-                        (
-                            [0] => Array
-                                (
-                                    [class] => Obullo\Log\Filter\PriorityFilter
-                                    [method] => notIn
-                                    [params] => Array
-                                        (
-                                        )
+    meta =>  Array(
 
-                                )
+        [request] => http
+        [time] => 1445593189
+        [host] => example.com
+        [uri] => /welcome/index
+    ),
 
-                        )
+    writers => Array(
 
-                    [records] => Array
-                        (
-                            [0] => Array
-                                (
-                                    [channel] => system
-                                    [level] => debug
-                                    [message] => Uri Class Initialized
-                                    [context] => Array
-                                        (
-                                            [uri] => /welcome/index
-                                        )
+        [5] => Array
+            (
+                [handler] => file
+                [type] => writer
+                [filters] => Array
+                            (
+                                [0] => Array
+                                    (
+                                        [class] => Obullo\Log\Filter\PriorityFilter
+                                        [method] => notIn
+                                        [params] => Array
+                                            (
+                                            )
 
-                                )
+                                    )
+
+                            )
+                [records] => Array
+                    (
+                        [0] => Array
+                            (
+                                [channel] => system
+                                [level] => debug
+                                [message] => Uri Class Initialized
+                                [context] => Array
+                                    (
+                                        [uri] => /welcome/index
+                                    )
+
+                            )
+        [6] => Array(
+
+            // handler data ..
+        )
+    )
 */
 ```
 
@@ -648,7 +656,7 @@ Varsayılan olarak konsoldan uygulamaya gelen işçi isteklerine ait log kayıtl
 İşci sunucularınız ayrı ise bir işçi sunucusuna ait iş loglarını açmak için <kbd>Workers\Logger</kbd> sınıfı içerisinden <kbd>return</kbd> komutunu yorum içerisine almanız yeterli olur.
 
 ```php
-if ($event['request'] == 'worker') {   // Disable worker server logs.
+if ($data['meta']['request'] == 'worker') {   // Disable worker server logs.
     // return;
 }
 ```
@@ -657,7 +665,7 @@ if ($event['request'] == 'worker') {   // Disable worker server logs.
 
 ### Logları Görüntülemek
 
-Uygulama logları konsoldan ve web arayüzünden görütülenebilir. Web arayüzünden görüntüleme daha detaylı log görüntüleme ve hata ayıklamalar için önerilir. Web arayüzü (debugger modülü) web socket teknolojisi kullanır.
+Uygulama logları konsoldan ve web arayüzünden görütülenebilir. Web arayüzünden görüntüleme daha detaylı log görüntüleme ve hata ayıklamalar için önerilir. Web arayüzü web socket teknolojisi kullanır.
 
 <a name="from-console"></a>
 
@@ -687,9 +695,9 @@ php task log clear
 
 <a name="from-debugger"></a>
 
-#### Debugger
+#### Web Arayüzü
 
-Debugger paketi [Debugger.md](Debugger.md) dökümentasyonunu inceleyiniz.
+Web arayüzü Debugger paketi ile oluşturulur, daha fazla bilgi için [Debugger.md](Debugger.md) dökümentasyonunu inceleyiniz.
 
 <a name="method-reference"></a>
 

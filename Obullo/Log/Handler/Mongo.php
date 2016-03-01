@@ -51,19 +51,20 @@ class Mongo extends AbstractHandler implements HandlerInterface
     /**
      * Constructor
      * 
-     * @param object $mongo  $mongo service provider
-     * @param array  $params mongo driver options
+     * @param array  $params      logger service paramters
+     * @param object $mongoClient mongo client object
+     * @param array  $options     mongo driver options
      */
-    public function __construct($mongo, array $params)
+    public function __construct(array $params, $mongoClient, $options = array())
     {
         $this->params = $params;
-        $this->mongoClient = $mongo;
-        $database = isset($params['database']) ? $params['database'] : null;
-        $collection = isset($params['collection']) ? $params['collection'] : null;
-        $this->saveOptions = isset($params['save_options']) ? $params['save_options'] : array();
-        $this->saveFormat = $params['save_format'];
+        $this->mongoClient = $mongoClient;
+        $database = isset($options['database']) ? $options['database'] : null;
+        $collection = isset($options['collection']) ? $options['collection'] : null;
+        $this->saveOptions = isset($options['options']) ? $options['options'] : array();
+        $this->saveFormat = $options['encoding'];
 
-        self::checkConfigurations($collection, $database, $mongo);
+        self::checkConfigurations($collection, $database, $mongoClient);
         $this->mongoCollection = $this->mongoClient->selectCollection($database, $collection);
 
     }
@@ -71,13 +72,13 @@ class Mongo extends AbstractHandler implements HandlerInterface
     /**
      * Check runtime errors
      * 
-     * @param string $collection name
-     * @param string $database   name
-     * @param object $mongo      client
+     * @param string $collection  name
+     * @param string $database    name
+     * @param object $mongoClient mongo client object
      * 
      * @return void
      */
-    protected static function checkConfigurations($collection, $database, $mongo)
+    protected static function checkConfigurations($collection, $database, $mongoClient)
     {
         if (null === $collection) {
             throw new InvalidArgumentException('The collection parameter cannot be empty');
@@ -85,11 +86,11 @@ class Mongo extends AbstractHandler implements HandlerInterface
         if (null === $database) {
             throw new InvalidArgumentException('The database parameter cannot be empty');
         }
-        if (get_class($mongo) != 'MongoClient' && get_class($mongo) != 'Mongo') {
+        if (get_class($mongoClient) != 'MongoClient' && get_class($mongoClient) != 'Mongo') {
             throw new InvalidArgumentException(
                 sprintf(
                     'Parameter of type %s is invalid; must be MongoClient or Mongo instance.', 
-                    is_object($mongo) ? get_class($mongo) : gettype($mongo)
+                    is_object($mongoClient) ? get_class($mongoClient) : gettype($mongoClient)
                 )
             );
         }
@@ -98,15 +99,14 @@ class Mongo extends AbstractHandler implements HandlerInterface
     /**
     * Format log records and build lines
     *
-    * @param string $event             handler log event
-    * @param array  $unformattedRecord current record
+    * @param array $unformattedRecord current record
     * 
     * @return array formatted record
     */
-    public function arrayFormat(array $event, array $unformattedRecord)
+    public function arrayFormat(array $unformattedRecord)
     {
         $record = array(
-            'datetime' => new MongoDate(strtotime(date($this->params['format']['date'], $event['time']))),
+            'datetime' => new MongoDate(strtotime(date($this->params['format']['date'], time()))),
             'channel'  => $unformattedRecord['channel'],
             'level'    => $unformattedRecord['level'],
             'message'  => $unformattedRecord['message'],
@@ -116,17 +116,29 @@ class Mongo extends AbstractHandler implements HandlerInterface
         if (isset($unformattedRecord['context']['extra']) && count($unformattedRecord['context']['extra']) > 0) {
             $record['extra'] = $unformattedRecord['context']['extra']; // Default extra data format is array.
             if ($this->saveFormat['extra'] == 'json') { // if extra data format json ?
-                $record['extra'] = json_encode($unformattedRecord['context']['extra'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); 
+                $record['extra'] = self::encodeJson($unformattedRecord['context']['extra']);
             }
             unset($unformattedRecord['context']['extra']);
         }
         if (count($unformattedRecord['context']) > 0) {
             $record['context'] = $unformattedRecord['context'];
             if ($this->saveFormat['context'] == 'json') {
-                $record['context'] = json_encode($unformattedRecord['context'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                $record['context'] = self::encodeJson($unformattedRecord['context']);
             }
         }
         return $record;
+    }
+
+    /**
+     * Encode json
+     * 
+     * @param array $data data
+     * 
+     * @return string
+     */
+    protected static function encodeJson($data)
+    {
+        return json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -140,7 +152,7 @@ class Mongo extends AbstractHandler implements HandlerInterface
     {
         $records = array();
         foreach ($event['records'] as $record) {
-            $records[] = $this->arrayFormat($event, $record);
+            $records[] = $this->arrayFormat($record);
         }
         $this->mongoCollection->batchInsert(
             $records, 

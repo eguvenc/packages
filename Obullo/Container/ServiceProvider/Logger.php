@@ -39,6 +39,7 @@ class Logger extends AbstractServiceProvider
 
         $logger = $container->share('logger', 'Obullo\Log\Logger')
             ->withArgument($container)
+            ->withArgument($container->get('request'))
             ->withArgument($container->get('config'))
             ->withArgument($config->getParams());
 

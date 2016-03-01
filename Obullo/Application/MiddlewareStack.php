@@ -246,7 +246,7 @@ class MiddlewareStack implements MiddlewareStackInterface
     }
 
     /**
-     * Get regsitered 
+     * Get regsitered path of middleware
      * 
      * @param string $name middleware key
      * 

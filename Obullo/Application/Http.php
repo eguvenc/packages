@@ -90,7 +90,7 @@ class Http extends Application
             $router->clear();  // Fix layer errors.
             $this->error = true;
         } else {
-            $this->controller = new $className;
+            $this->controller = new $className($this->container);
             $this->controller->setContainer($this->container);
 
             if ($method == 'setContainer' 

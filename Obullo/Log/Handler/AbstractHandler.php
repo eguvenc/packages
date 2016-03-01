@@ -3,8 +3,7 @@
 namespace Obullo\Log\Handler;
 
 use Obullo\Log\Formatter\LineFormatter;
-use Obullo\Container\ContainerInterface as Container;
-use Psr\Http\Message\ServerRequestInterface as Request;
+use Obullo\Log\Formatter\ArrayFormatter;
 
 /**
  * Abstract Log Handler
@@ -15,51 +14,15 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 abstract class AbstractHandler
 {
     /**
-     * Check log writing is allowed, deny not allowed
-     * requests.
-     *
-     * @param array                                   $event   handler log event
-     * @param Psr\Http\Message\ServerRequestInterface $request request
-     * 
-     * @return boolean
-     */
-    public function isAllowed(array $event, $request)
-    {
-        $isBrowserRequest = ($event['request'] == 'http' || $event['request'] == 'ajax') ? true : false;
-
-        if ($isBrowserRequest && $request->getUri()->segment(0) == 'debugger') {  // Disable http debugger logs
-            return false;
-        }
-        return true;
-    }
-
-    /**
     * Format log records
     *
-    * @param string $event             all log data
-    * @param array  $unformattedRecord current log record
+    * @param array $unformattedRecord current log record
     * 
     * @return array formatted record
     */
-    public function arrayFormat(array $event, array $unformattedRecord)
+    public function arrayFormat(array $unformattedRecord)
     {
-        $record = array(
-            'datetime' => date($this->params['format']['date'], $event['time']),
-            'channel'  => $unformattedRecord['channel'],
-            'level'    => $unformattedRecord['level'],
-            'message'  => $unformattedRecord['message'],
-            'context'  => null,
-            'extra'    => null,
-        );
-        if (isset($unformattedRecord['context']['extra']) && count($unformattedRecord['context']['extra']) > 0) {
-            $record['extra'] = var_export($unformattedRecord['context']['extra'], true);
-            unset($unformattedRecord['context']['extra']);     
-        }
-        if (count($unformattedRecord['context']) > 0) {
-            $str = var_export($unformattedRecord['context'], true);
-            $record['context'] = strtr($str, array("\r\n" => '', "\r" => '', "\n" => ''));
-        }
-        return $record; // formatted record
+        return ArrayFormatter::format($unformattedRecord, $this->params);
     }
 
     /**

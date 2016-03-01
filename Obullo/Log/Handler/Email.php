@@ -97,7 +97,7 @@ class Email extends AbstractHandler implements HandlerInterface
     {
         $lines = '';
         foreach ($event['records'] as $record) {
-            $record = $this->arrayFormat($event, $record);
+            $record = $this->arrayFormat($record);
             $lines .= str_replace("\n", $this->newlineChar, $this->lineFormat($record));
         }
         $message = sprintf($this->message, $lines);

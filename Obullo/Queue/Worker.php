@@ -10,7 +10,6 @@ use Obullo\Cli\UriInterface as Uri;
 use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Queue\QueueInterface as Queue;
 use Obullo\Config\ConfigInterface as Config;
-use Obullo\Application\ApplicationInterface as Application;
 
 /**
  * Queue Worker

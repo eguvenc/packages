@@ -15,10 +15,10 @@ interface JobInterface
     /**
      * Fire the job
      * 
-     * @param object $job  class \\Obullo\Queue\Job class
      * @param array  $data payload
+     * @param object $job  class \\Obullo\Queue\Job class
      * 
      * @return void
      */
-    public function fire($job, array $data);
+    public function fire(array $data, $job = null);
 }

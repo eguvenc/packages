@@ -34,18 +34,18 @@ class Syslog extends AbstractHandler implements HandlerInterface
     /**
      * Constructor
      * 
-     * @param array $params service parameters
-     * @param array $config handler config
+     * @param array $params  service parameters
+     * @param array $options handler options
      */
-    public function __construct(array $params, $config = array())
+    public function __construct(array $params, $options = array())
     {
         $this->params = $params;
 
-        if (! empty($config['facility'])) {
-            $this->facility = $config['facility'];  // Application facility
+        if (! empty($options['facility'])) {
+            $this->facility = $options['facility'];  // Application facility
         }
-        if (! empty($config['name'])) {       // Application name
-            $this->name = $config['name'];
+        if (! empty($options['name'])) {       // Application name
+            $this->name = $options['name'];
         }
         openlog($this->name, LOG_PID, $this->facility);
     }
@@ -60,7 +60,7 @@ class Syslog extends AbstractHandler implements HandlerInterface
     public function write(array $event)
     {
         foreach ($event['records'] as $record) {
-            $record = $this->arrayFormat($event, $record);
+            $record = $this->arrayFormat($record);
             syslog($record['level'], $this->lineFormat($record));
         }
     }

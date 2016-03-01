@@ -35,6 +35,7 @@ class Logger extends AbstractLogger implements LoggerInterface
     protected $priorityQueue = array();       // Log priority queue objects
     protected $handlerRecords = array();      // Handler records
     protected $loadedHandlers = array();      // Loaded handlers
+    protected $request;                       // Request object
     protected $requestType;
 
     /**
@@ -50,13 +51,15 @@ class Logger extends AbstractLogger implements LoggerInterface
      * Constructor
      *
      * @param object $container container
+     * @param object $request   request
      * @param object $config    config
      * @param array  $params    parameters
      */
-    public function __construct(Container $container, Config $config, $params = array())
+    public function __construct(Container $container, $request, Config $config, $params = array())
     {
         $this->params = $params;
         $this->container = $container;
+        $this->request = $request;
         $this->enabled = $config['log']['enabled'];
         
         $this->initialize();
@@ -70,7 +73,7 @@ class Logger extends AbstractLogger implements LoggerInterface
     public function initialize()
     {
         $this->channel = $this->params['default']['channel'];
-        $this->detectRequest($this->container->get('request'));
+        $this->detectRequest($this->request);
     }
 
     /**
@@ -465,10 +468,12 @@ class Logger extends AbstractLogger implements LoggerInterface
         if (empty($records)) {
             return;
         }
+        $this->payload['meta']['time'] = time();
+        $this->payload['meta']['request'] = $this->getRequestType();
+        $this->payload['meta']['host'] = $this->request->getUri()->getHost();
+        $this->payload['meta']['uri'] = $this->request->getRequestTarget();
         $this->payload['writers'][10]['handler'] = $name;
-        $this->payload['writers'][10]['request'] = $this->getRequestType();
         $this->payload['writers'][10]['type']    = 'writer';
-        $this->payload['writers'][10]['time']    = time();
         $this->payload['writers'][10]['filters'] = $this->getFilters($name);
         $this->payload['writers'][10]['records'] = $records; // set record array      
     }
@@ -492,7 +497,6 @@ class Logger extends AbstractLogger implements LoggerInterface
             $this->payload['writers'][$priority]['handler'] = $name;
             $this->payload['writers'][$priority]['request'] = $this->requestType;
             $this->payload['writers'][$priority]['type']    = 'handler';
-            $this->payload['writers'][$priority]['time']    = time();
             $this->payload['writers'][$priority]['filters'] = $this->getFilters($name);
             $this->payload['writers'][$priority]['records'] = $records; // set record array
         }
@@ -509,6 +513,29 @@ class Logger extends AbstractLogger implements LoggerInterface
     }
 
     /**
+     * Checj push is allowed
+     * 
+     * @param array $payload data
+     * 
+     * @return boolean
+     */
+    protected static function isAllowed($payload)
+    {
+        $requestType = $payload['meta']['request'];
+
+        if ($requestType == 'http' || $requestType == 'ajax') {
+
+            $parts = explode("/", ltrim($payload['meta']['uri'], "/")); 
+            $firstSegment = (isset($parts[0])) ? $parts[0] : null;
+
+            if ($firstSegment == 'debugger') {  // Disable http debugger logs
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * End of the logs and beginning of the handlers.
      *  
      * @return void
@@ -516,17 +543,19 @@ class Logger extends AbstractLogger implements LoggerInterface
     public function shutdown()
     {
         if ($this->isEnabled() && $this->isConnected()) {   // Lazy loading for Logger service
-                                                            // if connect method executed one time then we open connections and load classes
-                                                            // When connect booelan is true we execute standart worker or queue.
+                                                            // if connect method executed one time then we able to open connections.
             $this->execWriter();
             $this->execHandlers();
             $payload = $this->getPayload();
 
-            $Class = '\\'.trim($this->params['push']['handler'], '\\');
+            if (! self::isAllowed($payload)) {
+                return;
+            }
+            $Class = '\\'.trim($this->params['pusher'], '\\');
 
-            $worker = new $Class($this->params);
-            $worker->setContainer($this->container);
-            $worker->fire(null, $payload);
+            $pusher = new $Class($this->params);
+            $pusher->setContainer($this->container);
+            $pusher->push($payload);
         }
     }
 

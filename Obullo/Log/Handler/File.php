@@ -2,16 +2,16 @@
 
 namespace Obullo\Log\Handler;
 
-use Obullo\Container\ContainerInterface as Container;
-
 /**
  * File Handler 
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class File extends AbstractHandler implements HandlerInterface
+class File extends AbstractHandler implements MetadataAwareInterface, HandlerInterface
 {
+    use MetadataAwareTrait;
+
     /**
      * Service configuration
      * 
@@ -20,22 +20,22 @@ class File extends AbstractHandler implements HandlerInterface
     protected $params;
 
     /**
-     * Handler configuration
+     * Handler options
      * 
      * @var array
      */
-    protected $config;
+    protected $options;
 
     /**
      * Constructor
      * 
-     * @param array $params logger service parameters
-     * @param array $config config parameters
+     * @param array $params  logger service parameters
+     * @param array $options handler options
      */
-    public function __construct(array $params, $config = array())
+    public function __construct(array $params, $options = array())
     {
         $this->params = $params;
-        $this->config = $config;
+        $this->options = $options;
     }
 
     /**
@@ -50,38 +50,38 @@ class File extends AbstractHandler implements HandlerInterface
         $lines = '';
         $path  = '';
         foreach ($event['records'] as $record) {
-            $record = $this->arrayFormat($event, $record);
+            $record = $this->arrayFormat($record);
             $lines .= $this->lineFormat($record);
         }
-        $type = $event['request'];
-        if ($type == 'worker') {
-            $type = 'cli';
+        $meta = $this->getMetadata();
+        $type = $meta['request'];
+
+        if (isset($this->options['path'][$type])) {
+            $path = self::getPath($this->options['path'][$type]);
+            if (! $fop = fopen($path, 'ab')) {
+                return false;
+            }
+            flock($fop, LOCK_EX);
+            fwrite($fop, $lines);
+            flock($fop, LOCK_UN);
+            fclose($fop);
+            chown($path, CHOWN);
+            chmod($path, 0666);   
         }
-        if (isset($this->config['path'][$type])) {
-            $path = self::resolvePath($this->config['path'][$type]);
-        }
-        if (! $fop = fopen($path, 'ab')) {
-            return false;
-        }
-        flock($fop, LOCK_EX);
-        fwrite($fop, $lines);
-        flock($fop, LOCK_UN);
-        fclose($fop);
-        chown($path, CHOWN);
-        chmod($path, 0666);
     }
 
     /**
-     * If log path has "data/logs" folder, we replace it with "DIRECTORY_SEPERATOR".
+     * Returns to log path
      * 
      * @param string $path log path
      * 
      * @return string current path
      */
-    protected static function resolvePath($path)
+    protected static function getPath($path)
     {
         $path = ltrim($path, '/');
-        if (strpos($path, "resources/") === 0) {    // Add root 
+        $resourceFolder = str_replace(ROOT, "", RESOURCES);
+        if (strpos($path, $resourceFolder) === 0) {    // Add root 
             return ROOT .$path;
         }
         return $path;

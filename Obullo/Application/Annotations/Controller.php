@@ -47,7 +47,9 @@ class Controller
         $this->container->share(
             'annotation.middleware',
             'Obullo\Application\Annotations\Methods'
-        );
+        )
+            ->withArgument($container->get('request'))
+            ->withArgument($container->get('middleware'));
     }
 
     /**
