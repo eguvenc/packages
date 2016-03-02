@@ -77,7 +77,6 @@ abstract class AbstractNull
     {
         $credentials['__isAuthenticated'] = 1;
         $credentials['__isTemporary'] = 0;
-        $credentials['__isVerified'] = 1;
         $this->setCredentials($credentials, null, '__permanent', $this->getMemoryBlockLifetime('__permanent'));
     }
 

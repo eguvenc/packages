@@ -2,8 +2,6 @@
 
 namespace Obullo\Database;
 
-use Obullo\Http\Controller;
-
 /**
  * Model Class ( Default Model )
  * 
@@ -13,23 +11,6 @@ use Obullo\Http\Controller;
 class Model
 {
     /**
-     * Container
-     * 
-     * @var object
-     */
-    protected $container;
-
-    /**
-     * Container
-     * 
-     * @return object
-     */
-    public function getContainer()
-    {
-        return Controller::$instance->getContainer();
-    }
-
-    /**
      * Returns to service object
      * 
      * @param string $key 
@@ -38,10 +19,13 @@ class Model
      */
     public function __get($key)
     {
-        $return = $this->getContainer()->{$key};
-
-        if (is_object($return)) {
-            return $return;
+        if ((PHP_SAPI === 'cli' || defined('STDIN'))) {
+            $object = \Obullo\Cli\Controller::$instance->container->get($key);
+        } else {
+            $object = \Obullo\Http\Controller::$instance->container->get($key);
+        }
+        if (is_object($object)) {
+            return $object;
         }
         return;
     }

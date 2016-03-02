@@ -80,7 +80,6 @@ class Http extends Application
     protected function boot(Router $router, Middleware $middleware)
     {
         $router->init();
-
         include FOLDERS .$router->getPrimaryFolder('/').$router->getFolder('/').$router->getClass().'.php';
 
         $className = '\\'.$router->getNamespace().$router->getClass();
@@ -91,11 +90,9 @@ class Http extends Application
             $this->error = true;
         } else {
             $this->controller = new $className($this->container);
-            $this->controller->setContainer($this->container);
+            $this->controller->container = $this->container;
 
-            if ($method == 'setContainer' 
-                || $method == 'getContainer' 
-                || ! method_exists($this->controller, $method)
+            if (! method_exists($this->controller, $method)
                 || substr($method, 0, 1) == '_'
             ) {
                 $router->clear();  // Fix layer errors.

@@ -2,18 +2,20 @@
 
 namespace Obullo\Cli;
 
-use Obullo\Http\Controller\ImmutableControllerInterface;
-use League\Container\ImmutableContainerAwareTrait;
-
 /**
  * Obullo Layer ( Hmvc ) Based Controller.
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Controller implements ImmutableControllerInterface
+class Controller
 {
-    use ImmutableContainerAwareTrait;
+    /**
+     * Container
+     * 
+     * @var object
+     */
+    public $container;
 
     /**
      * Controller instance
@@ -34,7 +36,7 @@ class Controller implements ImmutableControllerInterface
         if (self::$instance == null) {
             self::$instance = &$this;
         }
-        return $this->getContainer()->get($key);
+        return $this->container->get($key);
     }
 
     /**

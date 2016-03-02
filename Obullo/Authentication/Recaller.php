@@ -5,7 +5,7 @@ namespace Obullo\Authentication;
 use League\Container\ContainerInterface as Container;
 
 use Obullo\Authentication\Model\ModelInterface as Model;
-use Obullo\Authentication\User\IdentityInterface as Identity;
+use Obullo\Authentication\IdentityInterface as Identity;
 use Obullo\Authentication\Storage\StorageInterface as Storage;
 
 /**

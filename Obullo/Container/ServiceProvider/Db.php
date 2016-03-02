@@ -29,7 +29,7 @@ class Db extends AbstractServiceProvider
     {
         $container = $this->getContainer();
 
-        $container->shared(
+        $container->share(
             'db',
             $container->get('database')
                 ->shared(['connection' => 'default'])

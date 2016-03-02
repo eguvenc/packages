@@ -209,15 +209,10 @@ class Cookie implements CookieInterface
     public function set($name = null, $value = null)
     {        
         if (is_array($name)) {
-
             $params = $name;
-
         } elseif (empty($name)) {
-
             $params = $this->responseCookies[$this->id];
-
         } elseif (is_string($name)) {
-
             if ($name != null) {
                 $this->name($name);
             }
@@ -227,8 +222,8 @@ class Cookie implements CookieInterface
             $params = $this->responseCookies[$this->id];
         }
         $properties = $this->buildParams($params);
-
         $this->toHeader($this->id, $properties);
+        
         return $this;
     }
 
@@ -248,7 +243,7 @@ class Cookie implements CookieInterface
         foreach (array('name','value','expire','domain','path','secure','httpOnly','prefix') as $k) {
             if (array_key_exists($k, $params)) {
                 $cookie[$k] = $params[$k];
-            } else {
+            } elseif (array_key_exists($k, $this->config['cookie'])) {
                 $cookie[$k] = $this->config['cookie'][$k];
             }
         }
@@ -385,6 +380,7 @@ class Cookie implements CookieInterface
 
         if (is_array($name)) {
             $name['expire'] = -1;
+            $name['value']  = null;
             $this->prefix($prefix);
             $this->set($name);
             return;
@@ -399,6 +395,19 @@ class Cookie implements CookieInterface
     }
 
     /**
+    * Alias of delete a cookie
+    *
+    * @param string|array $name   cookie
+    * @param string       $prefix custom prefix
+    * 
+    * @return void
+    */
+    public function remove($name = null, $prefix = null)
+    {
+        return $this->delete($name, $prefix);
+    }
+
+    /**
      * Removes cookie from response headers
      * 
      * @param string $name   cookie name
@@ -406,7 +415,7 @@ class Cookie implements CookieInterface
      * 
      * @return void
      */
-    public function remove($name, $prefix = null)
+    public function removeHeader($name, $prefix = null)
     {
         $prefix = ($prefix == null) ? $this->config['cookie']['prefix'] : $prefix;
 

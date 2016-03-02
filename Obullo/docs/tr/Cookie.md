@@ -113,13 +113,13 @@ if ($value = $this->cookie->get('name', 'prefix')) {
 Bir çerezi silmek için çerez ismi girmeniz yeterlidir.
 
 ```php
-$this->cookie->delete("name");
+$this->cookie->remove("name");
 ```
 
 İkinci parametre, varsayılan konfigürasyondan farklı bir ön ek kullanıbilmeniz için ayrılmıştır.
 
 ```php
-$this->cookie->delete($name = "name", $prefix = null)
+$this->cookie->remove($name = "name", $prefix = null)
 ```
 
 Domain ve path metotları ile bir örnek.
@@ -228,6 +228,10 @@ Kayıtlı bir çerezi okur eğer çerez mevcut değilese <kbd>false</kbd> değer
 ##### $this->cookie->delete(string $name, string $prefix = '');
 
 Gönderilen parametrelere göre bir çerezi tarayıcıdan siler.
+
+##### $this->cookie->remove(string $name, string $prefix = '');
+
+Delete fonksiyonu ile aynı işlevi görür.
 
 ##### $this->cookie->getHeaders();
 

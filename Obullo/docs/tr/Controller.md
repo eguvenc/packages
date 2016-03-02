@@ -165,7 +165,7 @@ $this->class
 ```php
 public function __get($class)
 {
-    return $this->getContainer()->get($class);
+    return $this->container->get($class);
 }
 ```
 
@@ -282,12 +282,12 @@ Kontrolör sınıfı içerisine tanımlanmış yada tanımlanması olası bazı 
     </thead>
     <tbody>
         <tr>
-            <td><kbd>setContainer()</kbd></td>
-            <td>Controller sınıfı içerisine container enjekte etmek için kullanılır. </td>
+            <td><kbd>__get()</kbd></td>
+            <td>Container nesnesinden servislere ulaşmak için kullanılır.</td>
         </tr>
         <tr>
-            <td><kbd>getContainer()</kbd></td>
-            <td>Controller sınıfı içerisinden container nesnesine erişmek için kullanılır. </td>
+            <td><kbd>__set()</kbd></td>
+            <td>Controller sınıfı içerisine nesne değerleri enjekte etmek için kullanılır. </td>
         </tr>
     </tbody>
 </table>

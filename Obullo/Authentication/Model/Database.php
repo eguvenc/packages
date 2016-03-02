@@ -15,7 +15,7 @@ use Interop\Container\ContainerInterface as Container;
 class Database implements ModelInterface
 {
     protected $db;                     // Database object
-    protected $select;                 // Selected fields
+    protected $fields;                 // Selected fields
     protected $tablename;              // Users tablename
     protected $columnId;               // Primary key column name
     protected $columnIdentifier;       // Username column name
@@ -54,7 +54,7 @@ class Database implements ModelInterface
                 'connection' => 'default'
             ]
         );
-        $this->select($params);
+        $this->selectFields($params);
     }
 
     /**
@@ -64,16 +64,18 @@ class Database implements ModelInterface
      * 
      * @return void
      */
-    protected function select(array $params)
+    protected function selectFields(array $params)
     {
-        $fields = [
-                $this->columnId,
-                $this->columnIdentifier,
-                $this->columnPassword,
-                $this->columnRememberToken
-            ];
-        if (! empty($params['db.select'])) {
-            $this->select = implode(",", array_merge($fields, $params['db.select']));
+        $fields = array(
+            $this->columnId,
+            $this->columnIdentifier,
+            $this->columnPassword,
+            $this->columnRememberToken
+        );
+        if (! empty($params['db.fields'])) {
+            $this->fields = implode(",", array_merge($fields, $params['db.fields']));
+        } else {
+            $this->fields = implode(",", $fields);
         }
     }
 
@@ -86,7 +88,7 @@ class Database implements ModelInterface
      */
     public function query(array $credentials)
     {
-        return $this->db->prepare(sprintf('SELECT %s FROM %s WHERE BINARY %s = ?', $this->select, $this->tablename, $this->columnIdentifier))
+        return $this->db->prepare(sprintf('SELECT %s FROM %s WHERE BINARY %s = ?', $this->fields, $this->tablename, $this->columnIdentifier))
             ->bindValue(1, $credentials[$this->columnIdentifier], PDO::PARAM_STR)
             ->execute()
             ->rowArray();
@@ -101,7 +103,7 @@ class Database implements ModelInterface
      */
     public function recallerQuery($token)
     {
-        return $this->db->prepare(sprintf('SELECT %s FROM %s WHERE %s = ?', $this->select, $this->tablename, $this->columnRememberToken))
+        return $this->db->prepare(sprintf('SELECT %s FROM %s WHERE %s = ?', $this->fields, $this->tablename, $this->columnRememberToken))
             ->bindValue(1, $token, PDO::PARAM_STR)
             ->execute()
             ->rowArray();

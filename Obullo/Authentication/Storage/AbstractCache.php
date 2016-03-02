@@ -62,7 +62,7 @@ abstract class AbstractCache extends AbstractStorage implements StorageInterface
 
             $data = $this->getCredentials($this->getMemoryBlockKey('__permanent'));
 
-            if (count($data) == 0) {
+            if (count($data) == 0 || ! isset($data['__isAuthenticated']) ) {
                 return false;
             }
             return $data;

@@ -7,7 +7,7 @@ Auth paketinde yetki doğrulama onayı gibi bazı ek özellikler de kullanılabi
     <li>
         <a href="#authentication-verify">Yetki Doğrulama Onay Özelliği</a>
         <ul>
-            <li><a href="#temporary-identities">Geçici Kimlikler</a></li>
+            <li><a href="#temporary-identity">Geçici Kimlikler</a></li>
             <li><a href="#permanent-identity">Kalıcı Kimlikler</a></li>
         </ul>
     </li>

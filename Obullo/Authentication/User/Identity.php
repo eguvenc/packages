@@ -89,7 +89,6 @@ class Identity extends AbstractIdentity
             $this->initialize();  // We need initialize again otherwise ignoreRecaller() does not work in Login class.
         }
         if ($this->params['middleware']['unique.session']) {
-            
             register_shutdown_function(array($this, 'close'));
         }
     }
@@ -104,9 +103,6 @@ class Identity extends AbstractIdentity
         if ($this->attributes = $this->storage->getCredentials('__permanent')) {
             $this->__isTemporary = 0;                   // Refresh memory key expiration time
             $this->setCredentials($this->attributes);
-            if ($this->isExpired()) {
-                $this->destroy();
-            }
             return;
         }
         $this->attributes = $this->storage->getCredentials('__temporary');
@@ -165,13 +161,13 @@ class Identity extends AbstractIdentity
     }
 
     /**
-     * Returns to "1" if user authenticated on temporary memory block otherwise "0".
+     * Returns to 1 if user authenticated on temporary memory block otherwise 0.
      *
      * @return boolean
      */
     public function isTemporary()
     {
-        return $this->get('__isTemporary');
+        return (bool)$this->get('__isTemporary');
     }
 
     /**
@@ -183,9 +179,7 @@ class Identity extends AbstractIdentity
      */
     public function expire($ttl)
     {
-        $data = $this->storage->getCredentials('__permanent');
-        $data['__expire'] = time() + $ttl;
-        $this->storage->setCredentials($data, null, '__permanent');
+        $this->storage->update('__expire', time() + $ttl);
     }
 
     /**
@@ -193,7 +187,7 @@ class Identity extends AbstractIdentity
      * 
      * @return boolean
      */
-    protected function isExpired()
+    public function isExpired()
     {
         if ($this->has('__expire') && $this->get('__expire') < time()) {
             return true;
@@ -219,19 +213,6 @@ class Identity extends AbstractIdentity
     public function makePermanent() 
     {
         $this->storage->makePermanent();
-    }
-
-    /**
-     * Check user is verified after succesfull login
-     *
-     * @return boolean
-     */
-    public function isVerified()
-    {
-        if ($this->get('__isVerified') == 1) {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -273,11 +254,11 @@ class Identity extends AbstractIdentity
     /**
      * Get the password needs rehash array.
      *
-     * @return mixed false|string new password hash
+     * @return boolean
      */
     public function getPasswordNeedsReHash()
     {
-        return $this->has('__passwordNeedsRehash') ? $this->get('__passwordNeedsReHash')['hash'] : false;
+        return $this->has('__passwordNeedsRehash') ? true : false;
     }
 
     /**
@@ -307,15 +288,12 @@ class Identity extends AbstractIdentity
      */
     public function logout()
     {
-        $credentials = $this->storage->getCredentials('__permanent');
-        $credentials['__isAuthenticated'] = 0;        // Sets memory auth to "0".
-
+        $this->storage->update('__isAuthenticated', 0);
         $this->updateRememberToken();
-        $this->storage->setCredentials($credentials, null, '__permanent');
     }
 
     /**
-     * Logout User and destroy cached identity data
+     * Destroy all identity data
      *
      * @param string $block block
      * 
@@ -383,7 +361,7 @@ class Identity extends AbstractIdentity
      */
     public function forgetMe()
     {
-        $this->container->get('cookie')->delete($this->params['login']['rememberMe']['cookie']);  // Delete rememberMe cookie if exists
+        $this->container->get('cookie')->delete($this->params['login']['rememberMe']['cookie']['name']);  // Delete rememberMe cookie if exists
     }
 
     /**

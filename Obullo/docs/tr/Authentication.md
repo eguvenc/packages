@@ -364,7 +364,6 @@ Array
 (
     [__isAuthenticated] => 1
     [__isTemporary] => 0
-    [__isVerified] => 1
     [__rememberMe] => 0
     [__time] => 1414244130.719945
     [id] => 1
@@ -394,10 +393,6 @@ Array
         <tr>
             <td>__isTemporary</td>
             <td>Yetki doğrulama onay özelliği için kullanılır. Bknz <a href="#additional-features">Ek Özellikler</a>.</td>
-        </tr>
-        <tr>
-            <td>__isVerified</td>
-            <td>Yetki doğrulama onayı kullanıyorsanız kullanıcıyı onayladığınızda bu anahtarın değeri <kbd>1</kbd> aksi durumda <kbd>0</kbd> olur.</td>
         </tr>
         <tr>
             <td>__rememberMe</td>
@@ -431,7 +426,17 @@ Kullanıcının yetkisi doğrulanmamış kullanıcı, yani bir ziyaretçi olup o
 
 ##### $this->user->identity->expire($ttl);
 
-Kullanıcı kimliğinin girilen süre göre geçtikten sonra yok olmasını sağlar.
+Kullanıcı kimliğinin girilen süre göre geçtikten sonra yok olması için __expire anahtarı içerisine sona erme süresini kaydeder.
+
+##### $this->user->identity->isExpired();
+
+Kimliğe expire() metodu ile kaydedilmiş süre sona erdiyse <kbd>true</kbd> aksi durumda <kbd>false</kbd> değerine döner. Bu method Http Auth katmanında aşağıdaki gibi kullanılabilir.
+
+```php
+if ($this->user->identity->isExpired()) {
+    $this->user->identity->destroy();    
+}
+```
 
 ##### $this->user->identity->makeTemporary();
 
@@ -440,10 +445,6 @@ Başarılı giriş yapmış bir kullanıcıya ait kalıcı kimliği konfigurasyo
 ##### $this->user->identity->makePermanent();
 
 Başarılı giriş yapmış kullanıcıya ait geçici kimliği konfigurasyon dosyasından belirlenmiş kalıcı süreye göre kalıcı hale getirir. Süre sona erdiğinde veritabanına tekrar sql sorgusu yapılarak kimlik tekrar hafızaya yazılır.
-
-##### $this->user->identity->isVerified();
-
-Yetki doğrulama onay özelliğinde başarılı oturum açma işleminden sonra kullanıcının onaylanıp onaylanmadığını gösterir. Kullanıcı onaylı ise <kbd>1</kbd> değerine değilse <kbd>0</kbd> değerine döner. Bknz. [Auth-AdditionalFeatures.md](Auth-AdditionalFeatures.md)
 
 ##### $this->user->identity->isTemporary();
 
@@ -510,7 +511,20 @@ Kullanıcı beni hatırla özelliğini kullandı ise <kbd>1</kbd> değerine, kul
 
 ##### $this->user->identity->getPasswordNeedsReHash();
 
-Kullanıcı giriş yaptıktan sonra eğer şifresi yenilenmesi gerekiyorsa hash edilmiş <kbd>yeni şifreye</kbd> gerekmiyorsa <kbd>false</kbd> değerine döner.
+Kullanıcı giriş yaptıktan sonra eğer şifresi yenilenmesi gerekiyorsa <kbd>true</kbd> gerekmiyorsa <kbd>false</kbd> değerine döner.
+
+```php
+if ($this->user->identity->getPasswordNeedsReHash()) {
+    
+    $newPassword = $this->user->identity->getPassword();  // Yeni hash
+
+    $this->db->update(     // Yeni hash değerini veritabanına kaydedin.
+        'users', 
+        ['password' => $newPassword],
+        ['id' => 55]
+    );
+}
+```
 
 ##### $this->user->identity->getRememberToken();
 

@@ -65,7 +65,6 @@ abstract class AbstractStorage
     {
         $credentials['__isAuthenticated'] = 0;
         $credentials['__isTemporary'] = 1;
-        $credentials['__isVerified'] = 0;
         $this->setCredentials($credentials, null, '__temporary', $this->getMemoryBlockLifetime('__temporary'));
     }
 
@@ -80,7 +79,6 @@ abstract class AbstractStorage
     {
         $credentials['__isAuthenticated'] = 1;
         $credentials['__isTemporary'] = 0;
-        $credentials['__isVerified'] = 1;
         $this->setCredentials($credentials, null, '__permanent', $this->getMemoryBlockLifetime('__permanent'));
     }
 
@@ -100,7 +98,6 @@ abstract class AbstractStorage
         }
         $credentials['__isAuthenticated'] = 1;
         $credentials['__isTemporary'] = 0;
-        $credentials['__isVerified'] = 1;
 
         if ($this->setCredentials($credentials, null, '__permanent')) {
             $this->deleteCredentials('__temporary');
@@ -125,7 +122,6 @@ abstract class AbstractStorage
         }
         $credentials['__isAuthenticated'] = 0;
         $credentials['__isTemporary'] = 1;
-        $credentials['__isVerified'] = 0;
 
         if ($this->setCredentials($credentials, null, '__temporary')) {
             $this->deleteCredentials('__permanent');

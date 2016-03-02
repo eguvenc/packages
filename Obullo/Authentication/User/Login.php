@@ -50,6 +50,9 @@ class Login
     {
         $this->ignoreRecaller();  // Ignore recaller if user has remember cookie
         
+        // We use ignore recaller for this situation :
+        // if user has remember cookie and still try to login attempt.
+
         $credentials['__rememberMe'] = ($rememberMe) ? 1 : 0;
 
         $credentials = $this->formatCredentials($credentials);

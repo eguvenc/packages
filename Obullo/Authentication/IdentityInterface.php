@@ -73,6 +73,13 @@ interface IdentityInterface
     public function expire($ttl);
 
     /**
+     * Check user is expired
+     *
+     * @return boolean
+     */
+    public function isExpired();
+
+    /**
      * Move permanent identity to temporary block
      * 
      * @return void
@@ -85,13 +92,6 @@ interface IdentityInterface
      * @return void
      */
     public function makePermanent();
-
-    /**
-     * Check user is verified after succesfull login
-     *
-     * @return boolean
-     */
-    public function isVerified();
 
     /**
      * Checks new identity data available in storage.
