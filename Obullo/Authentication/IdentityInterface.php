@@ -3,8 +3,8 @@
 namespace Obullo\Authentication;
 
 use Obullo\Session\SessionInterface as Session;
-use Psr\Http\Message\ServerRequestInterface as Request;
 use Interop\Container\ContainerInterface as Container;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Obullo\Authentication\Storage\StorageInterface as Storage;
 
 /**
@@ -183,18 +183,12 @@ interface IdentityInterface
     public function forgetMe();
 
     /**
-     * Kill authority of user using auth id
+     * Kill authority of user using login ids
      * 
      * @param integer $loginId e.g: 87060e89
      * 
      * @return boolean
      */
-    public function killSignal($loginId);
+    public function kill($loginId);
 
-    /**
-     * Do finish operations
-     * 
-     * @return void
-     */
-    public function close();
 }

@@ -88,9 +88,6 @@ class Identity extends AbstractIdentity
 
             $this->initialize();  // We need initialize again otherwise ignoreRecaller() does not work in Login class.
         }
-        if ($this->params['middleware']['unique.session']) {
-            register_shutdown_function(array($this, 'close'));
-        }
     }
 
     /**
@@ -222,7 +219,7 @@ class Identity extends AbstractIdentity
      */
     public function exists()
     {
-        if ($this->get('__isAuthenticated') !== false) {
+        if ($this->has('__isAuthenticated') !== false) {
             return true;
         }
         return false;
@@ -282,6 +279,19 @@ class Identity extends AbstractIdentity
     }
 
     /**
+     * Returns to login id of user, its an unique id for each browsers e.g: 87060e89.
+     * 
+     * @return string|false
+     */
+    public function getLoginId()
+    {
+        if (! $this->exists()) {
+            return false;
+        }
+        return $this->session->get('Auth/LoginId');
+    }
+
+    /**
      * Sets authority of user to "0" don't touch to cached data
      *
      * @return void
@@ -290,6 +300,7 @@ class Identity extends AbstractIdentity
     {
         $this->storage->update('__isAuthenticated', 0);
         $this->updateRememberToken();
+        $this->removeSessionIdentifiers();
     }
 
     /**
@@ -303,6 +314,18 @@ class Identity extends AbstractIdentity
     {
         $this->updateRememberToken();
         $this->storage->deleteCredentials($block);
+        $this->removeSessionIdentifiers();
+    }
+
+    /**
+     * Remove identifiers from session
+     * 
+     * @return void
+     */
+    protected function removeSessionIdentifiers()
+    {
+        $this->session->remove('Auth/LoginId');
+        $this->session->remove('Auth/Identifier');
     }
 
     /**
@@ -387,23 +410,9 @@ class Identity extends AbstractIdentity
      * 
      * @return boolean
      */
-    public function killSignal($loginId)
+    public function kill($loginId)
     {
-        $this->killSignal[$loginId] = $loginId;
+        $this->storage->killSession($loginId);
     }
 
-    /**
-     * Do finish operations
-     * 
-     * @return void
-     */
-    public function close()
-    {
-        if (empty($this->killSignal)) {
-            return;
-        }
-        foreach ($this->killSignal as $loginId) {
-            $this->storage->killSession($loginId);
-        }
-    }
 }

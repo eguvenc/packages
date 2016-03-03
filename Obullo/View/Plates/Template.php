@@ -2,10 +2,10 @@
 
 namespace Obullo\View\Plates;
 
-use League\Plates\Template\Template as AbstractTemplate;
+use LogicException;
 use League\Container\ImmutableContainerAwareTrait;
 use League\Container\ImmutableContainerAwareInterface;
-use LogicException;
+use League\Plates\Template\Template as AbstractTemplate;
 
 /**
  * Container which holds template data and provides access to template functions.

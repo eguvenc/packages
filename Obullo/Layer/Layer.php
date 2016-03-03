@@ -6,7 +6,6 @@ use stdClass;
 use Obullo\Http\Controller;
 use Obullo\Log\LoggerInterface as Logger;
 use Interop\Container\ContainerInterface as Container;
-
 use Psr\Http\Message\ServerRequestInterface;
 
 /**

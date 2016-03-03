@@ -28,7 +28,7 @@ class Log extends Controller
         }
         $Class = '\\Obullo\Cli\LogReader\\'.$reader;
         $class = new $Class;
-        $class->setContainer($this->getContainer());
+        $class->setContainer($this->container);
         $class->follow($direction);
     }
 

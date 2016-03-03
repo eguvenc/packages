@@ -25,10 +25,10 @@ Bir anotasyon aslında bir metadata yı (örneğin yorum,  açıklama, tanıtım
 
 #### Anotasyonları aktif etmek
 
-Config.php konfigürasyon dosyasını açın ve <kbd>annotations > enabled</kbd> anahtarının değerini <kbd>true</kbd> olarak güncelleyin.
+Config.php konfigürasyon dosyasını açın ve <kbd>annotations</kbd> anahtarının değerini <kbd>true</kbd> olarak güncelleyin.
 
 ```php
-'controller' => [
+'extra' => [
     'annotations' => true,
 ],
 ```

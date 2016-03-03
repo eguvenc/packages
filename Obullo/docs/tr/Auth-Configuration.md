@@ -46,9 +46,5 @@ Yetki doğrulama paketine ait konfigürasyon <kbd>providers/user.php</kbd> dosya
             <td>login[rememberMe]</td>
             <td>Eğer kullanıcı beni hatırla özelliğini kullanarak giriş bilgilerini kalıcı olarak tarayıcısına kaydetmek istiyorsa  <kbd>__rm</kbd> isimli bir çerez ilk oturum açmadan sonra tarayıcısına kaydedilir. Bu çerezin sona erme süresi varsayılan olarak 6 aydır. Kullanıcı farklı zamanlarda uygulamanızı ziyaret ettiğinde eğer bu çerez ( remember token ) tarayıcısında kayıtlı ise Identity sınıfı içerisinde <kbd>Authentication\Recaller->recallUser($token)</kbd> metodu çalışmaya başlar ve beni hatırla çerezi veritabanında kayıtlı olan değer ile karşılaştırılır, değerler birbiri ile aynı ise kullanıcı sisteme giriş yapmış olur. Güvenlik amacıyla her oturum açma (login) ve kapatma (logout) işlemlerinden sonra bu değer çereze ve veritabanına yeniden kaydedilir.</td>
         </tr>
-        <tr>
-            <td>middleware[unique.session]</td>
-            <td>Tekil oturum açma opsiyonu aktif olduğunda aynı kimlik bilgileri ile farklı aygıtlardan yalnızca bir kullanıcı oturum açabilir. Bu fonksiyon <kbd>app/classes/Http/Middlewares</kbd> dizinindeki auth katmanı çalıştırıldığı zaman devreye girer. Auth katmanı içerisinde kullandığınız trait sınıfının davranışına göre en son açılan oturum her zaman aktif kalırken eski oturumlar otomatik olarak sonlandırılır. Daha fazla bilgi için auth katmanı dökümentasyonunu inceleyebilirsiniz.</td> 
-        </tr>
     </tbody>
 </table>

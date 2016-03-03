@@ -78,10 +78,12 @@ class Controller
 
     /**
      * Parse docs blocks and execute filters
+     *
+     * @param bool $exec execute middlewares
      * 
-     * @return void
+     * @return void|array
      */
-    public function parse()
+    public function parse($exec = true)
     {
         $blocks = '';
         if ($this->reflector->hasMethod('__construct')) {
@@ -92,26 +94,28 @@ class Controller
         $docs = str_replace('*', '', $blocks);
         $docs = explode("@", $docs);
 
+        $output = array();
         if (strpos($blocks, 'middleware->') > 0) {
-
             foreach ($docs as $line) {
                 $methods = explode('->', $line);  // explode every methods
                 array_shift($methods);            // remove class name "filter"
                 foreach ($methods as $methodString) {
-                    $this->callMethod($methodString);
+                    $output[] = $this->callMethod($methodString, $exec);
                 }
             }
         }
+        return $output;
     }
 
     /**
      * Call filter methods
      * 
      * @param string $methodString middleware method name ( when, assign, method )
+     * @param bool   $exec         execute middlewares
      * 
-     * @return void
+     * @return void|
      */
-    public function callMethod($methodString)
+    public function callMethod($methodString, $exec)
     {
         $strstr = strstr($methodString, '(');
         $params = str_replace(array('(',')',';'), '', $strstr);
@@ -121,6 +125,9 @@ class Controller
         
         if (strpos($params, ',') > 0) {  // array support
             $parray = explode(',', $params);
+        }
+        if (! $exec) {
+            return array('method' => $method, 'params' => $parray);
         }
         $this->container->get('annotation.middleware')->$method($parray);  // Execute middleware methods
     }

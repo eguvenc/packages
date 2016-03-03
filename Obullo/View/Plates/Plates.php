@@ -3,10 +3,10 @@
 namespace Obullo\View\Plates;
 
 use Closure;
+use League\Plates\Engine;
 use Obullo\Log\LoggerInterface as Logger;
 use League\Container\ImmutableContainerAwareTrait;
 use League\Container\ImmutableContainerAwareInterface;
-use League\Plates\Engine;
 
 /**
  * Plates engine - http://platesphp.com/

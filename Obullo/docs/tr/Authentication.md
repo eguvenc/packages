@@ -67,11 +67,11 @@ Yetki doğrulama,
 * Hafıza depoları, ( Storages ) 
 * Adaptörler,
 * Çoklu oturumları sonlandırma
-* Kimliklerini önbelleklenme
+* Kimlikleri önbelleklenme
 * Kullanıcı sorgularını özelleştirebilme ( User Model )
 * Yetki doğrulama onaylandırma ( Verification )
 * Tarayıcı türünü doğrulama
-* Hatırlatma çerezi ve beni hatırla
+* Beni hatırla özelliği
 
 gibi özellikleri barındırır.
 
@@ -462,17 +462,21 @@ Geçici olarak oluşturulmuş kimlik bilgilerini güncellemenize olanak tanır.
 
 Önbellekteki kimliği bütünüyle yok eder.
 
+##### $this->user->identity->kill(string $loginId);
+
+Bir kullanıcıya ait bir veya birden fazla oturum tarayıcıya göre numaralandırılır. Kill fonksiyonu girilen oturum numarasına ait kimliği yok eder.
+
 ##### $this->user->identity->forgetMe();
 
 Beni hatırla çerezinin bütünüyle tarayıcıdan siler.
 
 ##### $this->user->identity->refreshRememberToken(array $credentials);
 
-Beni hatırla çerezini yenileyerek veritabanı ve çerezlere kaydeder.
+Beni hatırla çerezini yenileyerek veritabanı ve çereze kaydeder.
 
 ##### $this->user->identity->validate(array $credentials);
 
-Yetkilili kullanıcı kimliğine sahip kullanıcı bilgilerini dışarıdan gelen yeni bilgiler ile karşılaştırarak doğrulama yapar.
+Sisteme giriş yapmış kullanıcı kimliğine ait oturum açma bilgilerini dışarıdan gelen yeni bilgiler ile karşılaştırır bilgiler doğru ise <kbd>true</kbd> aksi durumda <kbd>false</kbd> değerine geri döner.
 
 
 <a name="identity-get-methods"></a>
@@ -529,6 +533,10 @@ if ($this->user->identity->getPasswordNeedsReHash()) {
 ##### $this->user->identity->getRememberToken();
 
 Beni hatırla çerezine döner.
+
+##### $this->user->identity->getLoginId();
+
+Bir kullanıcıya ait bir veya birden fazla oturum tarayıcıya göre numaralandırılır. Giriş yapmış kullanıcıya ait oturum numarasına aksi durumda false değerine döner.
 
 ##### $this->user->identity->getArray()
 

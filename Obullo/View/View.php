@@ -222,7 +222,7 @@ class View implements ViewInterface
         }
         $path = $router->getPrimaryFolder('/') . $router->getFolder();
 
-        $folder = (empty($path)) ? FOLDERS .'views' : FOLDERS .$path .'/view';
+        $folder = (empty($path)) ? FOLDERS .'views' : FOLDERS .$path .'/views';
 
         /**
          * End layer package support
