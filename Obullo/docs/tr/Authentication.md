@@ -159,11 +159,11 @@ Bu çözümler dışında başka bir çözüm kullanıyorsanız yazmış olduğu
 
 Mysql benzeri ilişkili bir database kullanıyorsanız aşağıdaki sql kodunu çalıştırarak demo için bir tablo yaratın.
 
-```php
-CREATE DATABASE IF NOT EXISTS test;
-```
-
 ```sql
+CREATE DATABASE IF NOT EXISTS test;
+
+use test;
+
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(100) NOT NULL,
@@ -173,15 +173,12 @@ CREATE TABLE IF NOT EXISTS `users` (
   KEY `username` (`username`),
   KEY `remember_token` (`remember_token`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
-```
 
-Aşağıdaki sql kodunu veritabanınızda çalıştırın. Test kullanıcı adı <kbd>user@example.com</kbd> ve şifre <kbd>123456</kbd> dır. 
-
-
-```sql
 INSERT INTO `users` (`id`, `username`, `password`, `remember_token`) VALUES 
 (1, 'user@example.com', '$2y$06$6k9aYbbOiVnqgvksFR4zXO.kNBTXFt3cl8xhvZLWj4Qi/IpkYXeP.', '');
 ```
+
+Test kullanıcı adı <kbd>user@example.com</kbd> ve şifre <kbd>123456</kbd> dır. 
 
 <kbd>User</kbd> servisi <kbd>providers/user.php</kbd> konfigürasyon dosyasını açarak servisi konfigüre edebilirsiniz.
 

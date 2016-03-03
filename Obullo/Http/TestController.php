@@ -50,7 +50,6 @@ class TestController
             '__construct',
             '__get',
             '__set',
-            'getViewName',
             'getClassMethods',
             '_add',
             '_generateTestResults',
@@ -58,8 +57,13 @@ class TestController
             'assertTrue',
             'assertFalse',
             'assertEqual',
+            'assertEmpty',
+            'assertNotEmpty',
+            'assertNotEqual',
             'assertInstanceOf',
             'assertContains',
+            'assertGreaterThan',
+            'assertLessThan',
         ];
         $html = "";
         $methods = get_class_methods($this);
@@ -68,17 +72,6 @@ class TestController
             $html.= $this->url->anchor(rtrim($this->request->getRequestTarget(), "/")."/".$name, $name)."<br>";
         }
         return $html;
-    }
-
-    /**
-     * Creates view filename
-     * 
-     * @return string
-     */
-    public function getViewName()
-    {
-        $class = explode("\\", get_class($this));
-        return strtolower(end($class));
     }
 
     /**
@@ -137,6 +130,25 @@ class TestController
     }
 
     /**
+     * Assert Not equal
+     * 
+     * @param mixed $x    value
+     * @param mixed $y    value
+     * @param mixed $desc description
+     * 
+     * @return boolean
+     */
+    public function assertNotEqual($x, $y, $desc = "")
+    {
+        if ($x !== $y) {
+            $this->_add(['pass' => true, 'desc' => $desc]);
+            return true;
+        }
+        $this->_add(['pass' => false, 'desc' => $desc]);
+        return false;
+    }
+
+    /**
      * Assert instance of
      * 
      * @param string $x    class name
@@ -172,8 +184,6 @@ class TestController
                 return true;
             }
         }
-        // http://stackoverflow.com/questions/9655687/php-check-if-array-contains-all-array-values-from-another-array
-
         if (is_array($needle) && count(array_intersect($needle, $haystack)) == count($needle)) {
             $this->_add(['pass' => true, 'desc' => $desc]);
             return true;
@@ -181,6 +191,80 @@ class TestController
         $this->_add(['pass' => false, 'desc' => $desc]);
         return false;
     }
+
+    /**
+     * Assert greater than
+     * 
+     * @param string $x    class name
+     * @param object $y    object
+     * @param string $desc description 
+     * 
+     * @return boolean
+     */
+    public function assertGreaterThan($x, $y, $desc = "")
+    {
+        if ($x > $y) {
+            $this->_add(['pass' => true, 'desc' => $desc]);
+            return true;
+        }
+        $this->_add(['pass' => false, 'desc' => $desc]);
+        return false;
+    } 
+
+    /**
+     * Assert less than
+     * 
+     * @param string $x    class name
+     * @param object $y    object
+     * @param string $desc description 
+     * 
+     * @return boolean
+     */
+    public function assertLessThan($x, $y, $desc = "")
+    {
+        if ($x < $y) {
+            $this->_add(['pass' => true, 'desc' => $desc]);
+            return true;
+        }
+        $this->_add(['pass' => false, 'desc' => $desc]);
+        return false;
+    }
+
+    /**
+     * Assert empty
+     * 
+     * @param mixed  $x    data
+     * @param string $desc description 
+     * 
+     * @return boolean
+     */
+    public function assertEmpty($x, $desc = "")
+    {
+        if (empty($x)) {
+            $this->_add(['pass' => true, 'desc' => $desc]);
+            return true;
+        }
+        $this->_add(['pass' => false, 'desc' => $desc]);
+        return false;
+    } 
+
+    /**
+     * Assert Not empty
+     * 
+     * @param mixed  $x    data
+     * @param string $desc description 
+     * 
+     * @return boolean
+     */
+    public function assertNotEmpty($x, $desc = "")
+    {
+        if (! empty($x)) {
+            $this->_add(['pass' => true, 'desc' => $desc]);
+            return true;
+        }
+        $this->_add(['pass' => false, 'desc' => $desc]);
+        return false;
+    } 
 
     /**
      * Dump output

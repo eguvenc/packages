@@ -176,7 +176,9 @@ class Identity extends AbstractIdentity
      */
     public function expire($ttl)
     {
-        $this->storage->update('__expire', time() + $ttl);
+        if ($this->check()) {
+            $this->storage->update('__expire', time() + $ttl);
+        } 
     }
 
     /**
