@@ -12,7 +12,7 @@ use Obullo\Http\Controller\ControllerAwareInterface;
 use Obullo\Http\Controller\ImmutableControllerAwareInterface;
 
 use ReflectionClass;
-use Obullo\Http\TestController;
+use Obullo\Http\Tests\HttpTestInterface;
 use Obullo\Router\RouterInterface as Router;
 use Obullo\Application\MiddlewareStackInterface as Middleware;
 
@@ -206,8 +206,8 @@ class Http extends Application
             ),
             array_slice($this->controller->request->getUri()->getRoutedSegments(), $router->getArgumentFactor())
         );
-        if ($this->controller instanceof TestController) {
-            $this->controller->_generateTestResults();
+        if ($router->getMethod() != 'index' && $this->controller instanceof HttpTestInterface) {
+            $result = $this->controller->generateTestResults();
         }
         if ($result instanceof Response) {
             $response = $result;

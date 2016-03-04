@@ -208,11 +208,9 @@ class Layer
             return $this->show404($method);
         }
         $controller = new $className;
-        $controller->setContainer($this->container);
+        $controller->container = $this->container;
 
-        if ($method == 'setContainer' 
-            || $method == 'getContainer' 
-            || ! method_exists($controller, $method)
+        if (! method_exists($controller, $method)
         ) {
             return $this->show404($method);
         }
@@ -281,17 +279,9 @@ class Layer
         $_GET = &$this->globals['_GET'];
         $_POST = &$this->globals['_POST'];
 
-        // unset($this->c['request'], $this->c['router']);
-
         $this->container->share('request', $this->request);
         $this->container->share('router', $this->router);
 
-        // $this->c['request'] = function () {
-        //     return $this->request;
-        // };
-        // $this->c['router'] = function () {
-        //     return $this->router;
-        // };
         Controller::$instance = $this->controller;
         Controller::$instance->router = $this->router;
         Controller::$instance->request = $this->request;

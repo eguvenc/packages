@@ -106,7 +106,6 @@ class Recaller
         $this->identity->setCredentials($credentials);
         
         $this->container->get('auth.adapter')->generateUser($credentials, $resultRowArray);  // Generate authenticated user without validation
-
         $this->removeInactiveSessions(); // Kill all inactive sessions of current user
     }
 

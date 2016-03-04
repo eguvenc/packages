@@ -82,10 +82,9 @@ class Identity extends AbstractIdentity
         $this->initialize();
 
         if ($rememberToken = $this->recallerExists()) {   // Remember the user if recaller cookie exists
-
             $recaller = new Recaller($container, $storage, $container->get('auth.model'), $this, $params);
             $recaller->recallUser($rememberToken);
-
+            
             $this->initialize();  // We need initialize again otherwise ignoreRecaller() does not work in Login class.
         }
     }
@@ -98,7 +97,6 @@ class Identity extends AbstractIdentity
     public function initialize()
     {
         if ($this->attributes = $this->storage->getCredentials('__permanent')) {
-            $this->__isTemporary = 0;                   // Refresh memory key expiration time
             $this->setCredentials($this->attributes);
             return;
         }
@@ -300,9 +298,11 @@ class Identity extends AbstractIdentity
      */
     public function logout()
     {
-        $this->storage->update('__isAuthenticated', 0);
-        $this->updateRememberToken();
-        $this->removeSessionIdentifiers();
+        if ($this->check()) {
+            $this->storage->update('__isAuthenticated', 0);
+            $this->updateRememberToken();
+            $this->removeSessionIdentifiers();
+        }
     }
 
     /**
@@ -314,6 +314,9 @@ class Identity extends AbstractIdentity
      */
     public function destroy($block = '__permanent')
     {
+        if ($block == '__permanent' && $this->guest()) {
+            return;
+        }
         $this->updateRememberToken();
         $this->storage->deleteCredentials($block);
         $this->removeSessionIdentifiers();
@@ -340,6 +343,9 @@ class Identity extends AbstractIdentity
      */
     public function updateTemporary($key, $val)
     {
+        if ($this->check()) {
+            return;
+        }
         $this->storage->update($key, $val, '__temporary');
     }
 
