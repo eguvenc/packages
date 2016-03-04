@@ -291,7 +291,7 @@ class Redis implements CacheInterface
      */
     public function sInter($keys = array())
     {
-        if (count($keys) > 0 AND is_array($keys)) {
+        if (count($keys) > 0 && is_array($keys)) {
             return $this->redis->sInter("'" . implode("','", $keys) . "'");
         }
         return false;
