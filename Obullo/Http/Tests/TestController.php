@@ -12,9 +12,10 @@ use Obullo\Http\Controller;
  */
 abstract class TestController extends Controller implements HttpTestInterface
 {
-    protected $_data = array();    // View data
-    protected $_varDump = null;    // Var dump variable
-    protected $_errors = array();  // Login trait errors
+    protected $_data = array();     // View data
+    protected $_varDump = null;     // Var dump variable
+    protected $_errors = array();   // Login trait errors
+    protected $_commands = array(); // Method commands
 
     /**
      * Index
@@ -60,11 +61,14 @@ abstract class TestController extends Controller implements HttpTestInterface
             '__getContentType',
             '__generateHtmlResponse',
             '__generateJsonResponse',
+            '__getParsedCommandBody',
             'getClassMethods',
             'getHtmlClassMethods',
             'generateTestResults',
             'varDump',
             'setError',
+            'setCommandWait',
+            'setCommandRefresh',
             'newLoginRequest',
             'assertTrue',
             'assertFalse',
@@ -73,12 +77,14 @@ abstract class TestController extends Controller implements HttpTestInterface
             'assertNotEmpty',
             'assertNotEqual',
             'assertInstanceOf',
-            'assertHas',
+            'assertArrayHasKey',
             'assertContains',
             'assertGreaterThan',
             'assertLessThan',
-            'assertType',
+            'assertInternaleType',
             'assertNotType',
+            'assertUnixTimeStamp',
+
         ];
         $methods = array();
         foreach (get_class_methods($this) as $name) {
@@ -125,12 +131,12 @@ abstract class TestController extends Controller implements HttpTestInterface
      */
     public function assertTrue($x, $message = "")
     {
+        $pass = false;
         if ($x === true) {
-            $this->__add(['pass' => true, 'message' => $message]);
-            return true;
+            $pass = true;
         }
-        $this->__add(['pass' => false, 'message' => $message]);
-        return false;
+        $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
     }
 
     /**
@@ -143,12 +149,12 @@ abstract class TestController extends Controller implements HttpTestInterface
      */
     public function assertFalse($x, $message = "")
     {
+        $pass = false;
         if ($x === false) {
-            $this->__add(['pass' => true, 'message' => $message]);
-            return true;
+            $pass = true;
         }
-        $this->__add(['pass' => false, 'message' => $message]);
-        return false;
+        $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
     }
 
     /**
@@ -162,12 +168,12 @@ abstract class TestController extends Controller implements HttpTestInterface
      */
     public function assertEqual($x, $y, $message = "")
     {
+        $pass = false;
         if ($x == $y) {
-            $this->__add(['pass' => true, 'message' => $message]);
-            return true;
+            $pass = true;
         }
-        $this->__add(['pass' => false, 'message' => $message]);
-        return false;
+        $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
     }
 
     /**
@@ -181,12 +187,12 @@ abstract class TestController extends Controller implements HttpTestInterface
      */
     public function assertNotEqual($x, $y, $message = "")
     {
+        $pass = false;
         if ($x != $y) {
-            $this->__add(['pass' => true, 'message' => $message]);
-            return true;
+            $pass = true;
         }
-        $this->__add(['pass' => false, 'message' => $message]);
-        return false;
+        $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
     }
 
     /**
@@ -200,12 +206,12 @@ abstract class TestController extends Controller implements HttpTestInterface
      */
     public function assertInstanceOf($x, $y, $message = "")
     {
+        $pass = false;
         if ($y instanceof $x) {
-            $this->__add(['pass' => true, 'message' => $message]);
-            return true;
+            $pass = true;
         }
-        $this->__add(['pass' => false, 'message' => $message]);
-        return false;
+        $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
     }
 
     /**
@@ -217,14 +223,14 @@ abstract class TestController extends Controller implements HttpTestInterface
      * 
      * @return boolean
      */
-    public function assertHas($needle, $haystack, $message = "")
+    public function assertArrayHasKey($needle, $haystack, $message = "")
     {
+        $pass = false;
         if (array_key_exists($needle, $haystack)) {
-            $this->__add(['pass' => true, 'message' => $message]);
-            return true;
+            $pass = true;
         }
-        $this->__add(['pass' => false, 'message' => $message]);
-        return false;
+        $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
     }
 
     /**
@@ -238,18 +244,18 @@ abstract class TestController extends Controller implements HttpTestInterface
      */
     public function assertContains($needle, array $haystack, $message = "")
     {
+        $pass = false;
         if (is_string($needle) || is_object($needle)) {
             if (in_array($needle, $haystack, true)) {
                 $this->__add(['pass' => true, 'message' => $message]);
-                return true;
+                $pass = true;
             }
         }
         if (is_array($needle) && count(array_intersect($needle, $haystack)) == count($needle)) {
-            $this->__add(['pass' => true, 'message' => $message]);
-            return true;
+            $pass = true;
         }
-        $this->__add(['pass' => false, 'message' => $message]);
-        return false;
+        $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
     }
 
     /**
@@ -263,12 +269,12 @@ abstract class TestController extends Controller implements HttpTestInterface
      */
     public function assertGreaterThan($x, $y, $message = "")
     {
+        $pass = false;
         if ($x > $y) {
-            $this->__add(['pass' => true, 'message' => $message]);
-            return true;
+            $pass = true;
         }
-        $this->__add(['pass' => false, 'message' => $message]);
-        return false;
+        $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
     } 
 
     /**
@@ -282,12 +288,12 @@ abstract class TestController extends Controller implements HttpTestInterface
      */
     public function assertLessThan($x, $y, $message = "")
     {
+        $pass = false;
         if ($x < $y) {
-            $this->__add(['pass' => true, 'message' => $message]);
-            return true;
+            $pass = true;
         }
-        $this->__add(['pass' => false, 'message' => $message]);
-        return false;
+        $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
     }
 
     /**
@@ -300,12 +306,12 @@ abstract class TestController extends Controller implements HttpTestInterface
      */
     public function assertEmpty($x, $message = "")
     {
+        $pass = false;
         if (empty($x)) {
-            $this->__add(['pass' => true, 'message' => $message]);
-            return true;
+            $pass = true;
         }
-        $this->__add(['pass' => false, 'message' => $message]);
-        return false;
+        $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
     } 
 
     /**
@@ -318,12 +324,12 @@ abstract class TestController extends Controller implements HttpTestInterface
      */
     public function assertNotEmpty($x, $message = "")
     {
+        $pass = false;
         if (! empty($x)) {
-            $this->__add(['pass' => true, 'message' => $message]);
-            return true;
+            $pass = true;
         }
-        $this->__add(['pass' => false, 'message' => $message]);
-        return false;
+        $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
     } 
 
     /**
@@ -392,13 +398,14 @@ abstract class TestController extends Controller implements HttpTestInterface
      * 
      * @return boolean
      */
-    public function assertType($expected, $actual, $message = "")
+    public function assertInternalType($expected, $actual, $message = "")
     {
         $pass = false;
         if ($this->__checkType($expected, $actual)) {
             $pass = true;
         }
         $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
     }
 
     /**
@@ -410,13 +417,86 @@ abstract class TestController extends Controller implements HttpTestInterface
      * 
      * @return boolean
      */
-    public function assertNotType($expected, $actual, $message = "")
+    public function assertNotInternalType($expected, $actual, $message = "")
     {
         $pass = false;
         if (false == $this->__checkType($expected, $actual)) {
             $pass = true;
         }
         $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
+    }
+
+    /**
+     * Assert unix time stamp
+     * 
+     * @param string|integer $timestamp value
+     * @param string         $message   message
+     * 
+     * @return bool
+     */
+    public function assertUnixTimeStamp($timestamp, $message = "")
+    {
+        $pass = ((string) (int) $timestamp === $timestamp) 
+            && ($timestamp <= PHP_INT_MAX)
+            && ($timestamp >= ~PHP_INT_MAX);
+
+        $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
+    }
+
+
+    /**
+     * Add wait command
+     *
+     * To remove command from json response, send command to server
+     * http://example.com/tests/authentication/identity/recallerExists?response=json&commands[wait]=1
+     *  
+     * @param integer $secs seconds
+     * 
+     * @return void
+     */
+    public function setCommandWait($secs = 1)
+    {
+        $commands = $this->__getParsedCommandBody();
+        if (isset($commands['wait'])) {  // Remove command data
+            return;
+        }
+        $this->_commands[]['command'] = 'wait';
+        $this->_commands[]['attributes']['seconds'] = $secs;
+    }
+
+    /**
+     * Add refresh command
+     *
+     * To remove command from json response, send command to server
+     * http://example.com/tests/authentication/identity/recallerExists?response=json&commands[refresh]=1
+     * 
+     * @return void
+     */
+    public function setCommandRefresh()
+    {
+        $commands = $this->__getParsedCommandBody();
+        if (isset($commands['refresh'])) { // Remove command data
+            return;
+        }
+        $this->_commands[]['command'] = 'refresh';
+    }
+
+    /**
+     * Returns to http command body
+     * 
+     * @return array
+     */
+    protected function __getParsedCommandBody()
+    {
+        $commands = array();
+        if ($this->request->get('commands')) {
+            $commands = $this->request->get('commands');
+        } elseif ($commands = $this->request->post('commands')) {
+            $commands = $this->request->post('commands');
+        }
+        return $commands;
     }
 
     /**
@@ -503,9 +583,9 @@ abstract class TestController extends Controller implements HttpTestInterface
      */
     protected function __generateJsonResponse()
     {
-        $results = array();
         $passes = 0;
         $failures = 0;
+        $results = array();
         foreach ($this->_data as $data) {
             if ($data['pass']) {
                 ++$passes;
@@ -525,7 +605,8 @@ abstract class TestController extends Controller implements HttpTestInterface
             array(
                 'results' => $results,
                 'dump'  => $this->_varDump,
-                'total' => ['passes' => $passes,'fails' => $failures]
+                'commands' => $this->_commands,
+                'total' => ['passes' => $passes,'fails' => $failures, 'assertions' => count($this->_data)]
             )
         );
     }

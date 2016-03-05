@@ -475,6 +475,17 @@ Beni hatırla çerezini yenileyerek veritabanı ve çereze kaydeder.
 
 Sisteme giriş yapmış kullanıcı kimliğine ait oturum açma bilgilerini dışarıdan gelen yeni bilgiler ile karşılaştırır bilgiler doğru ise <kbd>true</kbd> aksi durumda <kbd>false</kbd> değerine geri döner.
 
+##### $this->user->identity->initialize();
+
+Kimlik içerisinde yapılan değişiklikler her sayfa ziyaretinde bir dizi içerisine kaydedilirler. Eğer yapılan bir değişikliğin sayfa yenilemesi gerektirmeden hemen sonraki satırda etkin olması isteniyorsa değişiklikten hemen sonra initialize metodu kullanılmalıdır.
+
+```php
+var_dump($this->user->identity->guest());  // false
+$this->user->identity->logout();
+var_dump($this->user->identity->guest());  // false
+$this->user->identity->initialize();
+var_dump($this->user->identity->guest());  // true
+```
 
 <a name="identity-get-methods"></a>
 
