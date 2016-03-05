@@ -181,7 +181,7 @@ INSERT INTO `users` (`id`, `username`, `password`, `remember_token`) VALUES
 
 Test kullanıcı adı <kbd>user@example.com</kbd> ve şifre <kbd>123456</kbd> dır.
 
-<a name="loading-service"></a>
+<a name="service-provider"></a>
 
 #### Servis Sağlayıcısı
 
@@ -217,6 +217,8 @@ return array(
 **db.tablename:** Veritabanı işlemleri için tablo ismini belirlemenize olanak sağlar. Bu konfigürasyon veritabanı işlemlerinde kullanılır.
 
 <kbd>User</kbd> servisi yetki doğrulama servisine ait olan <kbd>Login</kbd>, <kbd>Identity</kbd> ve <kbd>Storage</kbd> gibi sınıfları kontrol eder, böylece paket içerisinde kullanılan tüm sınıflara tek bir servis üzerinden erişim sağlanmış olur.
+
+<a name="accessing-methods"></a>
 
 #### Metotlara Erişim
 
