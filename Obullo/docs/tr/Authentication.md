@@ -1,7 +1,7 @@
 
 ## Yetki Doğrulama
 
-Yetki doğrulama paketi yetki adaptörleri ile birlikte çeşitli ortak senaryolar için size bir API sağlar. Yetki doğrulama sorgu bellekleme özelliği ile birlikte gelir; yetkisi doğrulanmış kullanıcıları hafızada bellekler ve veritabanı sorgularının önüne geçer.
+Yetki doğrulama paketi yetki adaptörleri ile birlikte çeşitli ortak senaryolar için size bir API sağlar. Yetki doğrulama sorgu bellekleme özelliği ile birlikte gelir, yetkisi doğrulanmış kullanıcıları hafızada bellekler ve veritabanı sorgularının önüne geçer.
 
 <ul>
     <li><a href="#features">Özellikler</a></li>
@@ -24,7 +24,8 @@ Yetki doğrulama paketi yetki adaptörleri ile birlikte çeşitli ortak senaryol
     <li>
         <a href="#running">Çalıştırma</a>
         <ul>
-            <li><a href="#loading-service">Servisi Yüklemek</a></li>
+            <li><a href="#service-provider">Servis Sağlayıcısı</a></li>
+            <li><a href="#accessing-methods">Metotlara Erişim</a></li>
             <li><a href="#accessing-config-variables">Konfigürasyon Değerlerine Erişmek</a></li>
         </ul>
     </li>
@@ -178,9 +179,19 @@ INSERT INTO `users` (`id`, `username`, `password`, `remember_token`) VALUES
 (1, 'user@example.com', '$2y$06$6k9aYbbOiVnqgvksFR4zXO.kNBTXFt3cl8xhvZLWj4Qi/IpkYXeP.', '');
 ```
 
-Test kullanıcı adı <kbd>user@example.com</kbd> ve şifre <kbd>123456</kbd> dır. 
+Test kullanıcı adı <kbd>user@example.com</kbd> ve şifre <kbd>123456</kbd> dır.
 
-<kbd>User</kbd> servisi <kbd>providers/user.php</kbd> konfigürasyon dosyasını açarak servisi konfigüre edebilirsiniz.
+<a name="loading-service"></a>
+
+#### Servis Sağlayıcısı
+
+<kbd>app/providers.php</kbd> dosyasından servis sağlayıcısının tanımlı olduğundan emin olun.
+
+```php
+$container->addServiceProvider('Obullo\Container\ServiceProvider\User');
+```
+
+<kbd>User</kbd> servisi <kbd>providers/user.php</kbd> konfigürasyon dosyasından konfigüre edilir.
 
 ```php
 return array(
@@ -205,16 +216,9 @@ return array(
 
 **db.tablename:** Veritabanı işlemleri için tablo ismini belirlemenize olanak sağlar. Bu konfigürasyon veritabanı işlemlerinde kullanılır.
 
-<a name="loading-service"></a>
-
-#### Servisi Yüklemek
-
-Yetki doğrulama paketi sınıflarına erişim User servis sağlayıcısı ile olur.
-
-```php
-$container->addServiceProvider('Obullo\Container\ServiceProvider\User');
-```
 <kbd>User</kbd> servisi yetki doğrulama servisine ait olan <kbd>Login</kbd>, <kbd>Identity</kbd> ve <kbd>Storage</kbd> gibi sınıfları kontrol eder, böylece paket içerisinde kullanılan tüm sınıflara tek bir servis üzerinden erişim sağlanmış olur.
+
+#### Metotlara Erişim
 
 ```php
 $container->get('user')->class->method();
