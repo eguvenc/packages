@@ -11,11 +11,13 @@ namespace Obullo\Http\Tests;
 trait LoginTrait
 {
     /**
-     * Create new login request to your login web service
+     * Create new login request
+     *
+     * @param integer $rememberMe rememberMe option
      * 
      * @return void|string
      */
-    protected function newLoginRequest()
+    protected function newLoginRequest($rememberMe = 0)
     {
         $credentials = $this->config->load('tests')['login']['credentials'];
 
@@ -25,7 +27,8 @@ trait LoginTrait
                 [
                     'db.identifier' => $credentials['username'], 
                     'db.password'   => $credentials['password'],
-                ]
+                ],
+                $rememberMe
             );
             $results = $authResult->getArray();
 

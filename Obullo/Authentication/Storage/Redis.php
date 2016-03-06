@@ -57,7 +57,7 @@ class Redis extends AbstractStorage implements StorageInterface
     }
 
     /**
-     * Returns true if temporary credentials does "not" exists
+     * Returns true if credentials does "not" exists
      *
      * @param string $block __temporary or __permanent | full key
      * 
@@ -113,7 +113,7 @@ class Redis extends AbstractStorage implements StorageInterface
     }
 
     /**
-     * Get Temporary Credentials Data
+     * Get user credentials data
      *
      * @param string $block name
      * 
@@ -128,19 +128,19 @@ class Redis extends AbstractStorage implements StorageInterface
     }
 
     /**
-     * Deletes memory block
+     * Deletes memory block completely
      *
      * @param string $block name or key
      * 
      * @return void
      */
-    public function deleteCredentials($block = '__temporary')
+    public function deleteCredentials($block = '__permanent')
     {
         return $this->cache->remove($this->getBlock($block));
     }
 
     /**
-     * Update identity item value
+     * Update data
      * 
      * @param string $key   string
      * @param value  $val   value
@@ -156,7 +156,7 @@ class Redis extends AbstractStorage implements StorageInterface
     }
 
     /**
-     * Unset identity item
+     * Remove data
      * 
      * @param string $key   string
      * @param string $block block key
@@ -185,7 +185,7 @@ class Redis extends AbstractStorage implements StorageInterface
     }
 
     /**
-     * Returns to database sessions
+     * Return to all sessions of current user
      * 
      * @return array
      */

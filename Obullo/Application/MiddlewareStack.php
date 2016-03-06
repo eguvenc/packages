@@ -117,13 +117,13 @@ class MiddlewareStack implements MiddlewareStackInterface
     }
 
     /**
-     * Check middleware has 
+     * Check middleware has added
      * 
      * @param string $name middleware name
      * 
      * @return boolean
      */
-    public function isAdded($name)
+    public function exists($name)
     {
         $this->validateMiddleware($name);
 

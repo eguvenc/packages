@@ -301,24 +301,24 @@ class Identity extends AbstractIdentity
         if ($this->check()) {
             $this->storage->update('__isAuthenticated', 0);
             $this->updateRememberToken();
-            $this->removeSessionIdentifiers();
+            
+            // Do not remove identifier otherwise we can't get
+            // user data using $this->user->identity->getArray().
         }
     }
 
     /**
-     * Destroy all identity data
+     * Destroy permanent identity of authorized user
      *
-     * @param string $block block
-     * 
      * @return void
      */
-    public function destroy($block = '__permanent')
+    public function destroy()
     {
-        if ($block == '__permanent' && $this->guest()) {
+        if ($this->guest()) {
             return;
         }
         $this->updateRememberToken();
-        $this->storage->deleteCredentials($block);
+        $this->storage->deleteCredentials('__permanent');
         $this->removeSessionIdentifiers();
     }
 
@@ -350,6 +350,21 @@ class Identity extends AbstractIdentity
     }
 
     /**
+     * Destroy temporary identity of unauthorized user 
+     *
+     * @return void
+     */
+    public function destroyTemporary()
+    {
+        if ($this->check()) {
+            return;
+        }
+        $this->updateRememberToken();
+        $this->storage->deleteCredentials('__temporary');
+        $this->removeSessionIdentifiers();
+    }
+
+    /**
      * Update remember token if it exists in the memory and browser header
      *
      * @return int|boolean
@@ -366,7 +381,6 @@ class Identity extends AbstractIdentity
                 '__rememberToken' => $rememberToken
             ];
             $this->setCredentials($credentials);
-
             return $this->refreshRememberToken($credentials);
         }
     }
@@ -392,7 +406,7 @@ class Identity extends AbstractIdentity
      */
     public function forgetMe()
     {
-        $this->container->get('cookie')->delete($this->params['login']['rememberMe']['cookie']['name']);  // Delete rememberMe cookie if exists
+        return $this->container->get('cookie')->delete($this->params['login']['rememberMe']['cookie']['name']);  // Delete rememberMe cookie if exists
     }
 
     /**

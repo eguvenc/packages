@@ -50,13 +50,15 @@ $this->cookie
 Bu yöntemi kullanarak konfigürasyon dosyasından gelen varsayılan değerleri devre dışı bırakarak girilen değerleri çereze kaydedebilirsiniz. Çereze ait domain, path ve diğer girilmeyen bilgiler <kbd>config.php</kbd> konfigürasyon dosyasından okunur.
 
 ```php
-$this->cookie
+$set = $this->cookie
     ->name('hello')
     ->value('world')
     ->expire(86400)
     ->domain('')
     ->path('/')
-    ->set(); 
+    ->set();
+
+var_dump($set); // true 
 ```
 
 <a name="arrays"></a>
@@ -113,7 +115,9 @@ if ($value = $this->cookie->get('name', 'prefix')) {
 Bir çerezi silmek için çerez ismi girmeniz yeterlidir.
 
 ```php
-$this->cookie->remove("name");
+$isRemoved = $this->cookie->remove("name");
+
+var_dump($isRemoved);  // true
 ```
 
 İkinci parametre, varsayılan konfigürasyondan farklı bir ön ek kullanıbilmeniz için ayrılmıştır.

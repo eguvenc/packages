@@ -204,7 +204,7 @@ class Cookie implements CookieInterface
      * @param array|null|string $name  mixed name or parameters
      * @param mixed             $value value
      *
-     * @return object cookie
+     * @return boolean
      */
     public function set($name = null, $value = null)
     {        
@@ -224,7 +224,7 @@ class Cookie implements CookieInterface
         $properties = $this->buildParams($params);
         $this->toHeader($this->id, $properties);
         
-        return $this;
+        return $this->exists($this->id);
     }
 
     /**
@@ -285,6 +285,19 @@ class Cookie implements CookieInterface
             $result .= '; HttpOnly';
         }
         $this->headers[$id] = $result;
+    }
+
+    /**
+     * Returns to true if cookie id exists in headers
+     * 
+     * @param string $id cookie id
+     * 
+     * @return bool
+     */
+    public function exists($id = null)
+    {
+        $id = empty($id) ? $this->id : $id;
+        return isset($this->responseCookies[$id]);
     }
 
     /**
@@ -392,6 +405,7 @@ class Cookie implements CookieInterface
             $this->prefix($prefix);
         }
         $this->value(null)->expire(-1)->prefix($prefix)->set();
+        return $this->exists($this->id);
     }
 
     /**
@@ -400,7 +414,7 @@ class Cookie implements CookieInterface
     * @param string|array $name   cookie
     * @param string       $prefix custom prefix
     * 
-    * @return void
+    * @return bool
     */
     public function remove($name = null, $prefix = null)
     {
@@ -429,4 +443,5 @@ class Cookie implements CookieInterface
             }
         }
     }
+
 }

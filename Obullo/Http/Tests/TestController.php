@@ -78,10 +78,12 @@ abstract class TestController extends Controller implements HttpTestInterface
             'assertNotEqual',
             'assertInstanceOf',
             'assertArrayHasKey',
+            'assertArrayNotHasKey',
             'assertContains',
             'assertGreaterThan',
             'assertLessThan',
-            'assertInternaleType',
+            'assertInternalType',
+            'assertNotInternalType',
             'assertNotType',
             'assertUnixTimeStamp',
 
@@ -226,7 +228,34 @@ abstract class TestController extends Controller implements HttpTestInterface
     public function assertArrayHasKey($needle, $haystack, $message = "")
     {
         $pass = false;
-        if (array_key_exists($needle, $haystack)) {
+        if (! empty($haystack)
+            && is_string($needle)
+            && is_array($haystack)
+            && array_key_exists($needle, $haystack)
+        ) {
+            $pass = true;
+        }
+        $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
+    }
+
+    /**
+     * Opposite of assert array has a key
+     * 
+     * @param mixed $needle   value
+     * @param mixed $haystack value
+     * @param mixed $message  message
+     * 
+     * @return boolean
+     */
+    public function assertArrayNotHasKey($needle, $haystack, $message = "")
+    {
+        $pass = false;
+        if (! empty($haystack)
+            && is_string($needle)
+            && is_array($haystack)
+            && ! array_key_exists($needle, $haystack)
+        ) {
             $pass = true;
         }
         $this->__add(['pass' => $pass, 'message' => $message]);
@@ -445,42 +474,26 @@ abstract class TestController extends Controller implements HttpTestInterface
         return $pass;
     }
 
-
-    /**
-     * Add wait command
-     *
-     * To remove command from json response, send command to server
-     * http://example.com/tests/authentication/identity/recallerExists?response=json&commands[wait]=1
-     *  
-     * @param integer $secs seconds
-     * 
-     * @return void
-     */
-    public function setCommandWait($secs = 1)
-    {
-        $commands = $this->__getParsedCommandBody();
-        if (isset($commands['wait'])) {  // Remove command data
-            return;
-        }
-        $this->_commands[]['command'] = 'wait';
-        $this->_commands[]['attributes']['seconds'] = $secs;
-    }
-
     /**
      * Add refresh command
      *
      * To remove command from json response, send command to server
      * http://example.com/tests/authentication/identity/recallerExists?response=json&commands[refresh]=1
+     *
+     * @param integer $seconds seconds
      * 
      * @return void
      */
-    public function setCommandRefresh()
+    public function setCommandRefresh($seconds = 1)
     {
         $commands = $this->__getParsedCommandBody();
         if (isset($commands['refresh'])) { // Remove command data
             return;
         }
-        $this->_commands[]['command'] = 'refresh';
+        $this->_commands[] = [
+            'command' => 'refresh',
+            'attributes' => array('seconds' => $seconds)
+        ];
     }
 
     /**
@@ -537,7 +550,13 @@ abstract class TestController extends Controller implements HttpTestInterface
                 return $this->response->json(array('errors' => $this->_errors));
             } else {
                 foreach ($this->_errors as $error) {
-                    $this->view->load('templates::error', ['header' => $error['header'].' Error', 'error' => $error['message']]);
+                    $this->view->load(
+                        'templates::error',
+                        [
+                            'header' => $error['header'].' Error',
+                            'error' => $error['message']
+                        ]
+                    );
                 }
                 return;
             }

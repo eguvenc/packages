@@ -44,7 +44,7 @@ interface MiddlewareStackInterface
      * 
      * @return boolean
      */
-    public function isAdded($name);
+    public function exists($name);
 
     /**
      * Returns to middleware object to inject parameters

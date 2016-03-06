@@ -125,7 +125,7 @@ class Session extends AbstractNull implements StorageInterface
      * 
      * @return void
      */
-    public function deleteCredentials($block = '__temporary')
+    public function deleteCredentials($block = '__permanent')
     {
         $loginID = $this->getLoginId();
         $credentials = $this->session->get($this->getBlock($block));  // Don't do container cache

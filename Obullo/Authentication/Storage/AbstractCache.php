@@ -124,7 +124,7 @@ abstract class AbstractCache extends AbstractStorage implements StorageInterface
      * 
      * @return void
      */
-    public function deleteCredentials($block = '__temporary')
+    public function deleteCredentials($block = '__permanent')
     {
         $loginID = $this->getLoginId();
         $credentials = $this->cache->get($this->getBlock($block));  // Don't do container cache

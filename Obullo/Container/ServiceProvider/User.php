@@ -19,7 +19,7 @@ class User extends AbstractServiceProvider
         'auth.identity',
         'auth.login',
         'auth.model',
-        'auth.adapter',
+        'auth.adapter'
     ];
 
     /**
@@ -65,5 +65,6 @@ class User extends AbstractServiceProvider
             ->withArgument($container->get('session'))
             ->withArgument($container->get('auth.storage'))
             ->withArgument($params);
+
     }
 }

@@ -471,7 +471,7 @@ Bir kullanıcıya ait bir veya birden fazla oturum tarayıcıya göre numaraland
 
 ##### $this->user->identity->forgetMe();
 
-Beni hatırla çerezinin bütünüyle tarayıcıdan siler.
+Beni hatırla çerezinin bütünüyle tarayıcıdan siler. Çerez http başlıkları dizisinden silindiyse fonksiyon true değerine döner.
 
 ##### $this->user->identity->refreshRememberToken(array $credentials);
 
