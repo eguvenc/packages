@@ -170,7 +170,7 @@ abstract class AbstractStorage
 
         $agentStr  = isset($server['HTTP_USER_AGENT']) ? $server['HTTP_USER_AGENT'] : null;
         $userAgent = substr($agentStr, 0, 50);  // First 50 characters of the user agent
-        $loginId   = md5(trim($userAgent).microtime(true));
+        $loginId   = md5(trim($userAgent).time());
 
         $this->session->set($this->getCacheKey().'/LoginId', $loginId);
         return $loginId;
@@ -207,7 +207,7 @@ abstract class AbstractStorage
      */
     public function getMemoryBlockKey($block = '__temporary')
     {
-        return $this->cacheKey. ':' .$block. ':' .$this->getIdentifier();  // Create unique key
+        return $this->getCacheKey(). ':' .$block. ':' .$this->getIdentifier();  // Create unique key
     }
 
     /**
@@ -219,7 +219,7 @@ abstract class AbstractStorage
      */
     public function getUserKey($block = '__temporary')
     {
-        return $this->cacheKey. ':' .$block. ':'.$this->getUserId();
+        return $this->getCacheKey(). ':' .$block. ':'.$this->getUserId();
     }
 
     /**

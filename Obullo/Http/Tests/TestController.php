@@ -16,6 +16,7 @@ abstract class TestController extends Controller implements HttpTestInterface
     protected $_varDump = null;     // Var dump variable
     protected $_errors = array();   // Login trait errors
     protected $_commands = array(); // Method commands
+    protected $_disabledMethods = array();  // Disabled method array
 
     /**
      * Index
@@ -45,6 +46,18 @@ abstract class TestController extends Controller implements HttpTestInterface
     }
 
     /**
+     * Disabled methods
+     * 
+     * @param array $methods methods
+     *
+     * @return void
+     */
+    public function setDisabledMethods(array $methods)
+    {
+        $this->_disabledMethods = $methods;
+    }
+
+    /**
      * Returns to class methods
      * 
      * @return array
@@ -67,7 +80,7 @@ abstract class TestController extends Controller implements HttpTestInterface
             'generateTestResults',
             'varDump',
             'setError',
-            'setCommandWait',
+            'setDisabledMethods',
             'setCommandRefresh',
             'newLoginRequest',
             'assertTrue',
@@ -88,6 +101,7 @@ abstract class TestController extends Controller implements HttpTestInterface
             'assertUnixTimeStamp',
 
         ];
+        $disabledMethods = array_merge($disabledMethods, $this->_disabledMethods);
         $methods = array();
         foreach (get_class_methods($this) as $name) {
             if (! in_array($name, $disabledMethods))

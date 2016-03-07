@@ -174,7 +174,7 @@ class AbstractTestStorage extends TestController
         $agentStr  = isset($server['HTTP_USER_AGENT']) ? $server['HTTP_USER_AGENT'] : null;
         $userAgent = substr($agentStr, 0, 50);
         $expected  = $this->storage->getLoginId();
-        $loginId   = md5(trim($userAgent).microtime(true));
+        $loginId   = md5(trim($userAgent).time());
 
         $this->assertEqual($loginId, $expected, "I expect that the value is $loginId.");
     }
@@ -382,7 +382,6 @@ class AbstractTestStorage extends TestController
         $result = $this->storage->getCredentials();
 
         $this->assertEmpty($result, "I create fake credentials then i delete them and i expect that the value is true.");
-        $this->varDump($result);
     }
 
     /**
@@ -435,6 +434,7 @@ class AbstractTestStorage extends TestController
         $credentials = [
             'username' => 'user@example.com',
             'password' => '12346',
+            '__time' => time()
         ];
         $this->storage->createPermanent($credentials);
         $result  = $this->storage->getUserSessions();
@@ -443,8 +443,10 @@ class AbstractTestStorage extends TestController
         if ($this->assertArrayHasKey($loginId, $result, "I create fake credentials then i expect array has '$loginId' key.")) {
             $cacheIdentifier = $result[$loginId]['key'];
             $this->assertEqual($cacheIdentifier, $this->storage->getMemoryBlockKey('__permanent'), "I expect that the value of cache identifier is equal to $cacheIdentifier.");
+            $this->assertArrayHasKey('__time', $result[$loginId], "I expect array has '__time' key.");
         }
         $this->varDump($result);
+        $this->storage->deleteCredentials();
     }
 
 }

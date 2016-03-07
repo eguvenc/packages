@@ -385,7 +385,7 @@ class Cookie implements CookieInterface
     * @param string|array $name   cookie
     * @param string       $prefix custom prefix
     * 
-    * @return void
+    * @return boolean
     */
     public function delete($name = null, $prefix = null)
     {
@@ -405,6 +405,7 @@ class Cookie implements CookieInterface
             $this->prefix($prefix);
         }
         $this->value(null)->expire(-1)->prefix($prefix)->set();
+
         return $this->exists($this->id);
     }
 
@@ -419,29 +420,6 @@ class Cookie implements CookieInterface
     public function remove($name = null, $prefix = null)
     {
         return $this->delete($name, $prefix);
-    }
-
-    /**
-     * Removes cookie from response headers
-     * 
-     * @param string $name   cookie name
-     * @param string $prefix cookie name
-     * 
-     * @return void
-     */
-    public function removeHeader($name, $prefix = null)
-    {
-        $prefix = ($prefix == null) ? $this->config['cookie']['prefix'] : $prefix;
-
-        if (! empty($prefix)) {
-            $name = trim($prefix.$name);
-        }
-        foreach ($this->responseCookies as $id => $value) {
-            if ($name == $value['name'] && isset($this->headers[$id])) {
-                unset($this->headers[$id]);
-                unset($this->responseCookies[$id]);
-            }
-        }
     }
 
 }

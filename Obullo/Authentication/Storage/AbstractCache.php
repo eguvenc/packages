@@ -193,7 +193,19 @@ abstract class AbstractCache extends AbstractStorage implements StorageInterface
      */
     public function getMemoryBlockKey($block = '__temporary')
     {
-        return $this->cacheKey. ':' .$block. ':' .$this->getUserId();  // Create unique key
+        return $this->getCacheKey(). ':' .$block. ':' .$this->getUserId();  // Create unique key
+    }
+    
+    /**
+     * Returns to storage prefix key of identity data
+     *
+     * @param string $block memory block
+     * 
+     * @return string
+     */
+    public function getUserKey($block = '__temporary')
+    {
+        return $this->getCacheKey(). ':' .$block. ':'.$this->getUserId();
     }
 
     /**

@@ -41,13 +41,6 @@ class Identity extends AbstractIdentity
     protected $storage;
 
     /**
-     * Request
-     * 
-     * @var object
-     */
-    protected $request;
-
-    /**
      * Container
      * 
      * @var object
@@ -73,15 +66,15 @@ class Identity extends AbstractIdentity
      */
     public function __construct(Container $container, Request $request, Session $session, Storage $storage, array $params)
     {
+        $cookies = $request->getCookieParams();
         $this->params = $params;
         $this->request = $request;
         $this->session = $session;
         $this->storage = $storage;
         $this->container = $container;
-
         $this->initialize();
-
-        if ($rememberToken = $this->recallerExists()) {   // Remember the user if recaller cookie exists
+        
+        if ($rememberToken = $this->recallerExists($cookies)) {   // Remember the user if recaller cookie exists
             $recaller = new Recaller($container, $storage, $container->get('auth.model'), $this, $params);
             $recaller->recallUser($rememberToken);
             
@@ -137,16 +130,17 @@ class Identity extends AbstractIdentity
      * WARNING : To test this function remove "Auth/Identifier" value from session 
      * or use "$this->user->identity->destroy()" method.
      *
+     * @param array $cookies request cookies
+     * 
      * @return string|boolean false
      */
-    public function recallerExists()
+    public function recallerExists($cookies = array())
     {
         if ($this->session->get('Auth/IgnoreRecaller') == 1) {
             $this->session->remove('Auth/IgnoreRecaller');
             return false;
         }
         $name  = $this->params['login']['rememberMe']['cookie']['name'];
-        $cookies = $this->request->getCookieParams();
         $token = isset($cookies[$name]) ? $cookies[$name] : false;
 
         if ($this->guest() && ctype_alnum($token) && strlen($token) == 32) {  // Check recaller cookie value is alfanumeric
@@ -406,7 +400,7 @@ class Identity extends AbstractIdentity
      */
     public function forgetMe()
     {
-        return $this->container->get('cookie')->delete($this->params['login']['rememberMe']['cookie']['name']);  // Delete rememberMe cookie if exists
+        $this->container->get('cookie')->delete($this->params['login']['rememberMe']['cookie']['name']);  // Delete rememberMe cookie if exists
     }
 
     /**
