@@ -187,7 +187,7 @@ abstract class AbstractNull
      * 
      * @return string
      */
-    public function getKey($block = '__temporary')
+    public function getUserKey($block = '__temporary')
     {
         return $this->cacheKey. ':' .$block. ':'.$this->getUserId();
     }

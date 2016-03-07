@@ -13,7 +13,7 @@ Bir görünüm dosyası basitçe html başlık ve gövdesinden oluşan bütün b
             <li><a href="#load">$this->view->load()</a></li>
             <li><a href="#get">$this->view->get()</a></li>
             <li><a href="#withStream">$this->view->withStream()</a></li>
-            <li><a href="#withData">$this->view->withData()</a></li>
+            <li><a href="#withData">$this->view->assign()</a></li>
         </ul>
     </li>
     <li>
@@ -154,18 +154,18 @@ $body = $this->view->withStream("Example view")->get();
 
 <a name="withData"></a>
 
-#### $this->view->withData()
+#### $this->view->assign()
 
 Değişken atamak için diğer bir alternatiftir.
 
 ```php
-$this->view->withData('foo', 'bar');
+$this->view->assign('foo', 'bar');
 ```
 
 Görünüm dosyasına atanan değişkenleri gönderir.
 
 ```php
-$this->view->withData(
+$this->view->assign(
   [
      'key' => 'value'
   ]

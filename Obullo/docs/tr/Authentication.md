@@ -71,7 +71,6 @@ Yetki doğrulama,
 * Kimlikleri önbelleklenme
 * Kullanıcı sorgularını özelleştirebilme ( User Model )
 * Yetki doğrulama onaylandırma ( Verification )
-* Tarayıcı türünü doğrulama
 * Beni hatırla özelliği
 
 gibi özellikleri barındırır.

@@ -177,7 +177,7 @@ class Redis extends AbstractStorage implements StorageInterface
      */
     public function getAllKeys($block = '__permanent')
     {
-        $data = $this->cache->getAllKeys($this->getKey($block).':*');
+        $data = $this->cache->getAllKeys($this->getUserKey($block).':*');
         if (isset($data[0])) {
             return $data;
         }

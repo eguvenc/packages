@@ -170,10 +170,10 @@ abstract class AbstractStorage
 
         $agentStr  = isset($server['HTTP_USER_AGENT']) ? $server['HTTP_USER_AGENT'] : null;
         $userAgent = substr($agentStr, 0, 50);  // First 50 characters of the user agent
-        $id = hash('adler32', trim($userAgent));
+        $loginId   = md5(trim($userAgent).microtime(true));
 
-        $this->session->set($this->getCacheKey().'/LoginId', $id);
-        return $id;
+        $this->session->set($this->getCacheKey().'/LoginId', $loginId);
+        return $loginId;
     }
 
     /**
@@ -186,14 +186,14 @@ abstract class AbstractStorage
         return $this->cacheKey;
     }
 
-        /**
-     * Get valid memory segment
+    /**
+     * Get valid memory segment key
      * 
      * @param string $block name
      * 
      * @return string
      */
-    protected function getBlock($block)
+    public function getBlock($block)
     {
         return ($block == '__temporary' || $block == '__permanent') ? $this->getMemoryBlockKey($block) : $block;
     }
@@ -217,7 +217,7 @@ abstract class AbstractStorage
      * 
      * @return string
      */
-    public function getKey($block = '__temporary')
+    public function getUserKey($block = '__temporary')
     {
         return $this->cacheKey. ':' .$block. ':'.$this->getUserId();
     }
@@ -229,7 +229,7 @@ abstract class AbstractStorage
      * 
      * @return integer
      */
-    protected function getMemoryBlockLifetime($block = '__temporary')
+    public function getMemoryBlockLifetime($block = '__temporary')
     {
         if ($block == '__temporary') {
             return (int)$this->params['cache']['block']['temporary']['lifetime'];

@@ -227,7 +227,7 @@ class Router implements RouterInterface
         $primaryFolder = $this->getPrimaryFolder('/');
 
         if (empty($primaryFolder)) {
-            
+
             if (is_dir(FOLDERS .$this->getFolder().'/')) {
 
                 $resolver = new FolderResolver($this);
@@ -261,7 +261,7 @@ class Router implements RouterInterface
     protected function checkPrimaryFolder($segments)
     {
         if (! empty($segments[1])
-            && strtolower($segments[1]) != 'view'  // http://example/debugger/view/index bug fix
+            && strtolower($segments[1]) != 'views'  // http://example/debugger/view/index bug fix
             && is_dir(FOLDERS .$segments[0].'/'. $segments[1].'/')  // Detect primary folder and change folder !!
         ) {
             $this->setPrimaryFolder($segments[0]);
@@ -465,9 +465,13 @@ class Router implements RouterInterface
      */
     public function getNamespace()
     {
-        $namespace = $this->ucwordsUnderscore($this->getPrimaryFolder()).'\\'.$this->ucwordsUnderscore($this->getFolder());
+        $folder = $this->getFolder();
+        if (strpos($folder, "/") > 0) {  // Converts "Tests\Authentication/storage" to Tests\Authentication\Storage
+            $exp = explode("/", $folder);
+            $folder = $exp[0]."\\".ucfirst(end($exp));
+        }
+        $namespace = $this->ucwordsUnderscore($this->getPrimaryFolder()).'\\'.$this->ucwordsUnderscore($folder);
         $namespace = trim($namespace, '\\');
-
         return (empty($namespace)) ? '' : $namespace.'\\';
     }
 
@@ -497,15 +501,16 @@ class Router implements RouterInterface
      * Ucwords : widgets\Tutorials A
      * Final   : Widgets\Tutorials_A
      * 
-     * @param string $string namespace part
+     * @param string $string    namespace part
+     * @param string $delimiter default underscore "_"
      * 
      * @return void
      */
-    public function ucwordsUnderscore($string)
+    public function ucwordsUnderscore($string, $delimiter = "_")
     {
-        $str = str_replace('_', ' ', $string);
+        $str = str_replace($delimiter, ' ', $string);
         $str = ucwords($str);
-        return str_replace(' ', '_', $str);
+        return str_replace(' ', $delimiter, $str);
     }
 
     /**

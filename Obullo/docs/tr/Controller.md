@@ -109,7 +109,7 @@ Birincil klasörler, bir alt klasörü olan klasöre verilen addır.Örnek verir
 Bu dosyayı çözümlemek için ziyaret edeceğimiz adres aşağıdaki gibi olur.
 
 ```php
-http://framework/examples/captcha/ajax
+http://example.com/examples/captcha/ajax
 ```
 
 Bu çözümlemede en dıştaki klasör <kbd>birincil</kbd>, sonraki klasör ise alt klasördür.
@@ -131,13 +131,38 @@ class Ajax extends Controller
     }
 }
 ```
-Bir birincil klasör altına en fazla bir adet klasör açılabilir.
+
+Bir birincil klasör altına en fazla <kbd>iki</kbd> alt klasör açılabilir.
+
+```php
+http://example.com/tests/authentication/storage/redis
+```
+
+Aşağıdaki iki alt klasörü olan <kbd>tests</kbd> adlı birincil klasör örneği gösteriliyor.
+
+```php
+namespace Tests\Authentication\Storage;
+
+use Obullo\Http\TestController;
+
+class Redis extends TestController
+{
+    public function index()
+    {
+        echo $this->uri->segment(0);  // tests
+        echo $this->uri->segment(1);  // authentication
+
+        echo $this->router->getPrimaryFolder();  // tests
+        echo $this->router->getFolder();         // authentication/storage
+    }
+}
+```
 
 <a name="proxy-way"></a>
 
 ### Proxy Yöntemi Nedir ?
 
-Proxy yöntemi <kbd>$container->get()</kbd> yazımının kolaylaştırmak için kullanılır ve aşağıdaki gibi <kbd>$this</kbd> ile bir servise ulaşılmaya çalışıldığında devreye girer.
+Proxy yöntemi <kbd>$container->get()</kbd> yazımını kolaylaştırmak tasarlanmıştır ve aşağıdaki gibi <kbd>$this</kbd> yöntemi  ile kullanılır.
 
 ```php
 namespace Welcome;
@@ -147,8 +172,6 @@ class Welcome extends \Controller
     public function index()
     {
         echo $this->url->anchor("http://example.com/", "Hello World");
-
-        $this->view->load('welcome');
     }
 
 }
@@ -178,25 +201,27 @@ public function __get($class)
 Eğer adres satırında bir metot dan sonra gelen segmentler birden fazla ise bu segmentler metot argümanları olarak çözümlenir. Örneğin aşağıdaki gibi bir url adresimizin olduğunu varsayalım:
 
 ```php
-example.com/products/computer/index/desktop/123
+example.com/shop/products/computer/index/desktop/123
 ```
 
-Products klasörü altına Computer.php adlı bir sınıf oluşturun.
+<kbd>shop/products</kbd> klasörü altına <kbd>Computer.php</kbd> adlı bir sınıf oluşturun.
 
 ```php
 -  app
 -  folders
-    - products
-        Computer.php
+    - shop
+        - products
+            Computer.php
 ```
 
 Yukarıdaki url adresi tarayıcıda çalıştırıldığında URI sınıfı tarafından segmentler aşağıdaki gibi çözümlenirler.
 
-* products (0)
-* computer (1)
-* index (2)
-* desktop (3)
-* 123 (4)
+* shop (0)
+* products (1)
+* computer (2)
+* index (3)
+* desktop (4)
+* 123 (5)
 
 ```php
 namespace Products;
@@ -210,18 +235,19 @@ class Computer extends Controller
         echo $type;  // desktop
         echo $id;    // 123
         
-        echo $this->uri->segment(0);    // products
-        echo $this->uri->segment(1);    // computer
-        echo $this->uri->segment(2);    // index
-        echo $this->uri->segment(3);    // desktop
-        echo $this->uri->segment(4);    // 123
+        echo $this->uri->segment(0);    // shop
+        echo $this->uri->segment(1);    // products
+        echo $this->uri->segment(2);    // computer
+        echo $this->uri->segment(3);    // index
+        echo $this->uri->segment(4);    // desktop
+        echo $this->uri->segment(5);    // 123
 
         echo $this->router->getFolder();  // products
-        echo $this->router->getPrimaryFolder();  // null
+        echo $this->router->getPrimaryFolder();  // shop
     }
 }
 
-/* Location: .modules/products/computer.php */
+/* Location: .shop/products/computer.php */
 ```
 
 <a name="middlewares"></a>

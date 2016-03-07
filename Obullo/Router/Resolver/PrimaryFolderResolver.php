@@ -27,6 +27,13 @@ class PrimaryFolderResolver
     protected $segments;
 
     /**
+     * Argument factor
+     * 
+     * @var integer
+     */
+    protected $argumentFactor = 0;
+
+    /**
      * Constructor
      * 
      * @param Router $router router
@@ -54,22 +61,24 @@ class PrimaryFolderResolver
         if ($hasSegmentOne && is_file(FOLDERS .$primaryFolder.$folder.'/'.$this->router->ucwordsUnderscore($segments[1]).'.php')) {
 
             $this->segments = $segments;
-
             return $this;
 
-        } else {
-            
-            // Add index file support 
-            //  Rewrite /widgets/tutorials/tutorials/test to /widgets/tutorials/test
+        } elseif ($hasSegmentOne && isset($segments[2]) && is_dir(FOLDERS .$primaryFolder.$folder.'/'.$segments[1])) {
 
-            array_unshift($segments, $folder); 
+            $this->router->setFolder($folder.'/'.$segments[1]);
+            $this->argumentFactor = 1;
             $this->segments = $segments;
-
             return $this;
         }
 
-        $this->segments = $segments;
+        // Add index file support 
+        //  Rewrite /widgets/tutorials/tutorials/test to /widgets/tutorials/test
 
+        array_unshift($segments, $folder); 
+        $this->segments = $segments;
+        return $this;
+        
+        $this->segments = $segments;
         return $this;
     }
 
@@ -80,7 +89,7 @@ class PrimaryFolderResolver
      */
     public function getFactor()
     {
-        return 0;
+        return $this->argumentFactor;
     }
 
     /**
