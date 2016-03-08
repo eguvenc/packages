@@ -2,8 +2,6 @@
 
 namespace Obullo\Authentication\Model;
 
-use Interop\Container\ContainerInterface as Container;
-
 /**
  * Model Interface
  * 
@@ -12,14 +10,6 @@ use Interop\Container\ContainerInterface as Container;
  */
 interface ModelInterface
 {
-     /**
-     * Constructor
-     * 
-     * @param object $container container
-     * @param object $params    Auth configuration & service configuration parameters
-     */
-    public function __construct(Container $container, array $params);
-
     /**
      * Execute query
      *

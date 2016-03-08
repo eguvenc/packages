@@ -22,7 +22,7 @@ Router sınıfı uygulamanızda index.php dosyasına gelen istekleri <kbd>app/ro
         <li><a href="#parameters">Parametreler</a></li>
         <li><a href="#route-groups">Route Grupları</a></li>
         <li><a href="#sub-domains">Alt Alan Adları</a></li>
-        <li><a href="#uri-match">Match Komutu</a></li>
+        <li><a href="#folders">Dizinler</a></li>
     </ul>
 </li>
 <li>
@@ -311,15 +311,12 @@ shop.example.com/123/electronic/mp3_player
 Route grupları bir kurallar bütününü topluca yönetmenizi sağlar. Grup kuralları belirli <kbd>alt domainler</kbd> için çalıştırılabildiği gibi belirli <kbd>http katmanlarına</kbd> da tayin edilebilirler. Bunun için <kbd>$this->attach()</kbd> metodu ile katmanı istediğiniz URL adreslerine tuturmanız gerekir.
 
 ```php
-$router->group(
-    [
-        'middleware' => array('MethodNotAllowed')
-    ],
-    function () {
+$router->group(function () {
 
         $this->attach('welcome');
         $this->attach('welcome/test');
-    }
+    },
+    ['middleware' => array('MethodNotAllowed')]
 );
 ```
 
@@ -336,11 +333,7 @@ Http Error 405 Get method not allowed.
 Eğer bir gurubu belirli bir alt alan adına tayin ederseniz grup içerisindeki route kuralları yalnızca bu alan adı için geçerli olur.
 
 ```php
-$router->group(
-    [
-        'domain' => 'shop.example.com'
-    ], 
-    function () {
+$router->domain('shop.example.com')->group(function () {
 
         $this->defaultPage('welcome');
 
@@ -359,14 +352,7 @@ http://shop.example.com/product/123
 Aşağıda <kbd>account.example.com</kbd> adlı bir alt alan adı için kurallar tanımladık.
 
 ```php
-/**
- * User Accounts
- */
-$router->group(
-    [
-        'domain' => 'account.example.com'
-    ],
-    function () {
+$router->domain('account.example.com')->group(function () {
 
         $this->get(
             '{id}/{name}/{any}', 'user/account/$1/$2/$3',
@@ -380,7 +366,6 @@ $router->group(
 
 Tarayıcınızdan aşağıdaki gibi bir URL çağırdığınızda bu alt alan adı için yazılan kurallar çalışmış olur.
 
-
 ```php
 http://account.example.com/123/john/test
 ```
@@ -388,63 +373,43 @@ http://account.example.com/123/john/test
 Alt alan adlarınız eğer <kbd>sports19.example.com</kbd>, <kbd>sports20.example.com</kbd> gibi dinamik ise alan adı kısmında düzenli ifadeler de kullanabilirsiniz.
 
 ```php
-/**
- * Sub domains
- */
-$router->group(
-    [
-        'domain' => 'sports.*\d.example.com',
-        'middleware' => array('Maintenance')
-    ],
-    function ($subdomain) {
+$router->domain('sports.*\d.example.com')->group(function ($options) {
 
-        echo $subdomain;  // sports20
+        echo $options['subname'];  // sports20
 
         $this->defaultPage('welcome');
         $this->attach('.*');
-    }
+    },
+    ['middleware' => array('Maintenance')],
 );
 ```
 
-<a name="uri-match"></a>
+<a name="folders"></a>
 
-#### Match Komutu
+#### Dizinler
 
-Eğer bir grubun URL den çağırılan değer ile eşleşme olduğunda çalışmasını istiyorsanız <kbd>match</kbd> ifadesi kullanmanız gerekir.
+Eğer bir grubun URL den çağırılan değer ile eşleşme olduğunda çalışmasını istiyorsanız,
 
 ```php
-$router->group(
-    [
-        'match' => 'admin'
-    ],
-    function () {
+http://example.com/examples/forms
+```
 
-        // Admin birincil klasörüne ait kurallar
-    }
+Yukarıdaki gibi bir url için aşağıdaki gibi dizinlere göre iç içe route grupları da oluşturabilirsiniz.
+
+```php
+$router->group('examples/', function () {
+
+        // example directory routes
+
+        $this->group(
+            'forms/', function () {
+                
+                // forms directory routes
+            }
+        );
+    },
+    ['middleware' => array()]
 );
-```
-
-Aşağıdaki adresi ziyaret ettiğinizde birincil klasör route grupları çalışmış olur.
-
-```php
-http://example.com/admin/
-```
-
-Aynı anda uri ve domain eşleşmesi gerekiyorsa her iki ifadeyide kullanabilirsiniz.
-
-```php
-[
-    'match' => 'admin'
-    'domain' => 'example.com'
-]
-```
-
-Eğer düzenli bir ifade kullanmanız gerekiyorsa domain ifadesinde olduğu gibi <kbd>match</kbd> ifadesi de düzenli ifadeleri destekler.
-
-```php
-[
-    'match' => 'admin/[0-9]+/[a-z]+.*'
-]
 ```
 
 <a name="middlewares"></a>
@@ -476,18 +441,14 @@ $router->get('membership/restricted')->middleware(array('auth', 'guest'));
 Bir grup için oluşturulan katmanı grup fonksiyonu içerisinde çalıştırabilmek için <kbd>$this->attach()</kbd> metodu kullanılır.
 
 ```php
-$router->group(
-    [
-        'domain' => 'shop.example.com',
-        'middleware' => array('Https')
-    ], 
-    function () {
+$router->group(function () {
 
         $this->get('welcome/.+', 'home/index');
         $this->get('product/{id}', 'product/list/$1');
 
         $this->attach('.*');
-    }
+    },
+    ['middleware' => array('Https')],
 );
 ```
 
@@ -506,35 +467,21 @@ http://www.example.com/test/good_segment2
 Yukarıdaki örneğe benzer adreslerimiz olduğunu varsayarsak,
 
 ```php
-/**
- * Test
- */
-$router->group(
-    [
-        'domain' => 'example.com',
-        'middleware' => array('Test')
-    ],
-    function () {
+$router->group(function () {
 
         $this->attach('^(test/(?!bad_segment).*)$');
-    }
+    },
+    ['middleware' => array('Test')],
 );
 ```
 
 Yukarıdaki kural gurubu için <kbd>bad_segment</kbd> segmenti dışındaki tüm url adreslerinde <kbd>Test</kbd> katmanı çalışmış olur.
 
 ```php
-/**
- * Auth
- */
-$router->group(
-    [
-        'domain' => 'example.com',
-        'middleware' => ['Auth', 'Guest']
-    ],
-    function () {
+$router->group(function () {
         $this->attach('^(?!login|logout|test|cart|payment).*$');
-    }
+    },
+    ['middleware' => array('Auth', 'Guest')]
 );
 ```
 
@@ -573,6 +520,10 @@ Http PUT isteği türünde bir route kuralı oluşturur.
 ##### $router->delete(string $match, string $rewrite, $closure = null)
 
 Http DELETE isteği türünde bir route kuralı oluşturur.
+
+##### $router->domain($host);
+
+Bir route grubu için domain tayin eder.
 
 ##### $router->group(array $options, $closure);
 

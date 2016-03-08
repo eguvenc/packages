@@ -157,7 +157,8 @@ class Route
         $newArray = array();
         foreach ($replace as $key => $value) {
             if (substr($value, 0, 1) != '(') {      // If have not brackets
-                $newArray[$key] = '('.$value.')';   // Add brackets to regex for preg_replace() operation in router.php dispatchRouteMatches() func.
+                $newArray[$key] = '('.$value.')';   // Add brackets to regex for preg_replace() operation
+                                                    // in router.php dispatchRouteMatches() func.
             }
         }
         return $newArray;

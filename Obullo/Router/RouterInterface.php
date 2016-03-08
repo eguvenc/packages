@@ -113,12 +113,13 @@ interface RouterInterface
     /**
      * Create grouped routes
      * 
-     * @param array  $group   domain, directions and middleware name
+     * @param string $uri     match route
      * @param object $closure which contains $this->attach(); methods
+     * @param array  $group   domain, directions and middleware name
      * 
      * @return object
      */
-    public function group(array $group, Closure $closure);
+    public function group($uri, $closure = null, $group = array());
 
     /**
      * Creates http GET based route

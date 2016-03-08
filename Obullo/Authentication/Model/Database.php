@@ -4,6 +4,7 @@ namespace Obullo\Authentication\Model;
 
 use Pdo;
 use Obullo\Authentication\Model\ModelInterface;
+use League\Container\ImmutableContainerAwareTrait;
 use Interop\Container\ContainerInterface as Container;
 
 /**
@@ -14,6 +15,8 @@ use Interop\Container\ContainerInterface as Container;
  */
 class Database implements ModelInterface
 {
+    use ImmutableContainerAwareTrait;
+
     protected $db;                     // Database object
     protected $fields;                 // Selected fields
     protected $tablename;              // Users tablename
@@ -22,11 +25,11 @@ class Database implements ModelInterface
     protected $columnPassword;         // Password column name
     protected $columnRememberToken;    // Remember token column name
 
-     /**
+    /**
      * Constructor
      * 
-     * @param object $container container
-     * @param object $params    Auth configuration & service configuration parameters
+     * @param Container $container container
+     * @param array     $params    service params
      */
     public function __construct(Container $container, array $params)
     {
@@ -36,47 +39,88 @@ class Database implements ModelInterface
         $this->columnPassword      = $params['db.password'];
         $this->columnRememberToken = $params['db.rememberToken'];  // RememberMe token column name
 
-        $this->connect($container, $params);
+        $this->setContainer($container);
+        $this->connect();
+        $this->setFields();
     }
 
     /**
-     * Set database provider connection variable ( We don't open the db connection in here ) 
-     * 
-     * @param object $container container
-     * @param array  $params    service parameters
+     * Connect to database service
      * 
      * @return void
      */
-    public function connect(Container $container, array $params)
+    public function connect()
     {
-        $this->db = $container->get('database')->shared(
+        $this->db = $this->getContainer()->get('database')->shared(
             [
                 'connection' => 'default'
             ]
         );
-        $this->selectFields($params);
     }
 
     /**
      * Build select fields
-     *
-     * @param array $params parameters
      * 
      * @return void
      */
-    protected function selectFields(array $params)
+    public function setFields()
     {
-        $fields = array(
-            $this->columnId,
-            $this->columnIdentifier,
-            $this->columnPassword,
-            $this->columnRememberToken
+        $this->fields = array(
+            $this->getColumnId(),
+            $this->getColumnIdentifier(),
+            $this->getColumnPassword(),
+            $this->getColumnRememberToken()
         );
-        if (! empty($params['db.fields'])) {
-            $this->fields = implode(",", array_merge($fields, $params['db.fields']));
-        } else {
-            $this->fields = implode(",", $fields);
-        }
+    }
+
+    /**
+     * Returns to tablename
+     * 
+     * @return string
+     */
+    public function getTablename()
+    {
+        return $this->tablename;
+    }
+
+    /**
+     * Returns to column id name
+     * 
+     * @return string
+     */
+    public function getColumnId()
+    {
+        return $this->columnId;
+    }
+
+    /**
+     * Returns to column identifier name
+     * 
+     * @return string
+     */
+    public function getColumnIdentifier()
+    {
+        return $this->columnIdentifier;
+    }
+
+    /**
+     * Returns to column password name
+     * 
+     * @return string
+     */
+    public function getColumnPassword()
+    {
+        return $this->columnPassword;
+    }
+
+    /**
+     * Returns to column remember token name
+     * 
+     * @return string
+     */
+    public function getColumnRememberToken()
+    {
+        return $this->columnPassword;
     }
 
     /**
@@ -88,8 +132,8 @@ class Database implements ModelInterface
      */
     public function query(array $credentials)
     {
-        return $this->db->prepare(sprintf('SELECT %s FROM %s WHERE BINARY %s = ?', $this->fields, $this->tablename, $this->columnIdentifier))
-            ->bindValue(1, $credentials[$this->columnIdentifier], PDO::PARAM_STR)
+        return $this->db->prepare(sprintf('SELECT %s FROM %s WHERE BINARY %s = ?', $this->getFields(), $this->getTablename(), $this->getColumnIdentifier()))
+            ->bindValue(1, $credentials[$this->getColumnIdentifier()], PDO::PARAM_STR)
             ->execute()
             ->rowArray();
     }
@@ -103,7 +147,7 @@ class Database implements ModelInterface
      */
     public function recallerQuery($token)
     {
-        return $this->db->prepare(sprintf('SELECT %s FROM %s WHERE %s = ?', $this->fields, $this->tablename, $this->columnRememberToken))
+        return $this->db->prepare(sprintf('SELECT %s FROM %s WHERE %s = ?', $this->getFields(), $this->getTablename(), $this->getColumnRememberToken()))
             ->bindValue(1, $token, PDO::PARAM_STR)
             ->execute()
             ->rowArray();
@@ -119,9 +163,9 @@ class Database implements ModelInterface
      */
     public function updateRememberToken($token, array $credentials)
     {
-        return $this->db->prepare(sprintf('UPDATE %s SET %s = ? WHERE BINARY %s = ?', $this->tablename, $this->columnRememberToken, $this->columnIdentifier))
+        return $this->db->prepare(sprintf('UPDATE %s SET %s = ? WHERE BINARY %s = ?', $this->getTablename(), $this->getColumnRememberToken(), $this->getColumnIdentifier()))
             ->bindValue(1, $token, PDO::PARAM_STR)
-            ->bindValue(2, $credentials[$this->columnIdentifier], PDO::PARAM_STR)
+            ->bindValue(2, $credentials[$this->getColumnIdentifier()], PDO::PARAM_STR)
             ->execute();
     }
 }

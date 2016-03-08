@@ -129,7 +129,6 @@ class Database extends AbstractAdapter
         $identifier = $credentials[$this->columnIdentifier];
 
         if ($this->container->get('auth.identity')->guest() || $savedIdentifier != $identifier) {
-
             $this->storage->setIdentifier($identifier); // Set current identifier to storage
         }
         $this->results = array(

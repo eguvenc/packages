@@ -51,90 +51,43 @@ class Group
     /**
      * Create grouped routes
      * 
-     * @param array  $options domain, directions and middleware name ..
+     * @param route  $uri     route
      * @param object $closure which contains $this->attach(); methods
+     * @param array  $options domain, directions and middleware name
      * 
      * @return object
      */
-    public function add(array $options, Closure $closure)
+    public function add($uri, Closure $closure, $options = array())
     {
-        if (isset($options['match']) && ! $this->match($options)) {
+        if (! empty($uri) && ! $this->match($uri)) {
             return $this;
         }
         if (! $this->domain->match($options)) {  // When groups run, if domain not match with regex don't continue.
             return $this;                        // Forexample we define a sub domain but group domain does not match
         }                                        // so we need to stop the propagation.
         $this->options = $options;
-
         $closure = Closure::bind(
             $closure,
             $this->router,
             get_class($this->router)
         );
-        $subDomain = $this->getSubDomainValue($options);
-        $closure($subDomain);
+        $subname = $this->getSubDomainValue($options);
+        $closure(['subname' => $subname]);
 
         $this->reset();  // Reset group variable after foreach group definition
-    }
-
-    /**
-     * Detect class namespace
-     * 
-     * @param array $options array
-     * 
-     * @return bool
-     */
-    protected function match(array $options)
-    {
-        if ($this->hasMatch($options['match'])) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Does group has match ? ( ['match' => $regex] )
-     *
-     * @param string $match class namespace
-     * 
-     * @return bool
-     */
-    protected function hasMatch($match)
-    {
-        $uri = ltrim($this->uri->getPath(), '/');
-
-        if ($this->hasNaturalMatch($match, $uri)) {
-            return true;
-        }
-        if ($this->router->hasRegexMatch($match, $uri)) {
-            return true;
-        }
-        return false;
-
     }
 
     /**
      * Before regex check natural uri match 
      * 
      * @param string $match match url or regex
-     * @param string $uri   uri string
      * 
      * @return boolean
      */
-    protected function hasNaturalMatch($match, $uri)
+    protected function match($match)
     {
-        $exp = explode('/', $uri);
-        $uriStr = '';
-        $keyValues = array_keys(explode('/', $match));
-        foreach ($keyValues as $k) {
-            if (isset($exp[$k])) {
-                $uriStr.= strtolower($exp[$k]).'/';
-            }
-        }
-        if ($match == rtrim($uriStr, '/')) {
-            return true;
-        }
-        return false;
+        $exp = explode('/', trim($this->uri->getPath(), "/"));
+        return in_array(trim($match, "/"), $exp, true);
     }
 
     /**

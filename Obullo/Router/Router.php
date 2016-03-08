@@ -39,6 +39,7 @@ class Router implements RouterInterface
     protected $defaultController = '';       // Default controller name
     protected $argumentFactor;               // Argument slice factor
     protected $group;                        // Group object
+    PROTECTED $domainName;
 
     /**
      * Constructor
@@ -112,7 +113,10 @@ class Router implements RouterInterface
      */
     public function init()
     {
-        if ($this->uri->getPath() == '/') {     // Is there a URI string ? If not, the default controller specified in the "routes" file will be shown.
+        // Is there a URI string ? 
+        // If not, the default controller specified in the "routes" file will be shown.
+
+        if ($this->uri->getPath() == '/') {
             if (empty($this->defaultController)) {
                 return;
             }
@@ -514,20 +518,44 @@ class Router implements RouterInterface
     }
 
     /**
-     * Set grouped routes, options like middleware
+     * Set domain name for route group
      * 
-     * @param array  $options domain, directions and middleware name
-     * @param object $closure which contains $this->attach(); methods
+     * @param string $domain name
      * 
      * @return object
      */
-    public function group(array $options, Closure $closure)
+    public function domain($domain)
     {
+        $this->domainName = $domain;
+        return $this;
+    }
+
+    /**
+     * Set grouped routes, options like middleware
+     * 
+     * @param string $uri     match route
+     * @param object $closure which contains $this->attach(); methods
+     * @param array  $options domain, directions and middleware name
+     * 
+     * @return object of group
+     */
+    public function group($uri, $closure = null, $options = array())
+    {
+        if (is_callable($uri)) {
+            $options = $closure;
+            $closure = $uri;
+            $uri = null;
+        }
         if ($this->group == null) {
             $this->group = new Group($this, $this->uri);
         }
-        $this->group->add($options, $closure);
-        return $this;
+        if ($this->domainName != null) {
+            $options['domain'] = $this->domainName;
+        }
+        $this->group->add($uri, $closure, $options);
+        $this->domainName = null;  // Reset domain name
+
+        return $this->group;
     }
 
     /**
