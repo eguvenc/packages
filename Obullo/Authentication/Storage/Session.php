@@ -27,9 +27,10 @@ class Session extends AbstractNull implements StorageInterface
      * @param object $session   session
      * @param array  $params    parameters
      */
-    public function __construct(Container $container, Request $request, Session $session, array $params) 
+    public function __construct(Container $container, Request $request, SessionInterface $session, array $params) 
     {
         $container = null;
+        $this->params = $params;
         $this->request = $request;
         $this->cacheKey = (string)$params['cache']['key'];
         $this->session = $session;

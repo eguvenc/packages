@@ -184,7 +184,7 @@ class Database extends AbstractAdapter
 
             $plain = $credentials[$this->columnPassword];
             $hash  = $this->resultRowArray[$this->columnPassword];
-
+            
             if ($passwordNeedsRehash = $this->verifyPassword($plain, $hash)) {  // In here hash may cause performance bottleneck depending to passwordNeedHash "cost" value
                                                                                 // default is 6 for best performance. Set 10-12 for max security.
                 if ($login) {  // If login process allowed.

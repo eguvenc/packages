@@ -90,7 +90,7 @@ class Recaller
     {
         $resultRowArray = $this->model->recallerQuery($token);
 
-        if (! is_array($resultRowArray)) {            // If login query not success.
+        if (! is_array($resultRowArray) || empty($resultRowArray[$this->columnRememberToken])) {
             $this->storage->setIdentifier('Guest');   // Mark user as guest
             $this->identity->forgetMe();
             return;

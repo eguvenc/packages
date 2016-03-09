@@ -85,6 +85,7 @@ abstract class TestController extends Controller implements HttpTestInterface
             'newLoginRequest',
             'assertTrue',
             'assertFalse',
+            'assertNull',
             'assertEqual',
             'assertEmpty',
             'assertNotEmpty',
@@ -167,6 +168,24 @@ abstract class TestController extends Controller implements HttpTestInterface
     {
         $pass = false;
         if ($x === false) {
+            $pass = true;
+        }
+        $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
+    }
+
+    /**
+     * Assert null
+     * 
+     * @param mixed $x       value
+     * @param mixed $message message
+     * 
+     * @return boolean
+     */
+    public function assertNull($x, $message = "")
+    {
+        $pass = false;
+        if ($x === null) {
             $pass = true;
         }
         $this->__add(['pass' => $pass, 'message' => $message]);

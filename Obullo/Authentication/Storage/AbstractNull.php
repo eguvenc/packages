@@ -140,10 +140,10 @@ abstract class AbstractNull
 
         $agentStr  = isset($server['HTTP_USER_AGENT']) ? $server['HTTP_USER_AGENT'] : null;
         $userAgent = substr($agentStr, 0, 50);  // First 50 characters of the user agent
-        $id = hash('adler32', trim($userAgent));
+        $loginId   = md5(trim($userAgent).time());
 
-        $this->session->set($this->getCacheKey().'/LoginId', $id);
-        return $id;
+        $this->session->set($this->getCacheKey().'/LoginId', $loginId);
+        return $loginId;
     }
 
     /**
@@ -163,7 +163,7 @@ abstract class AbstractNull
      * 
      * @return string
      */
-    protected function getBlock($block)
+    public function getBlock($block)
     {
         return ($block == '__temporary' || $block == '__permanent') ? $this->getMemoryBlockKey($block) : $block;
     }
@@ -177,7 +177,7 @@ abstract class AbstractNull
      */
     public function getMemoryBlockKey($block = '__temporary')
     {
-        return $this->cacheKey. ':' .$block. ':' .$this->getIdentifier();  // Create unique key
+        return $this->getCacheKey(). ':' .$block. ':' .$this->getIdentifier();  // Create unique key
     }
 
     /**
@@ -189,7 +189,7 @@ abstract class AbstractNull
      */
     public function getUserKey($block = '__temporary')
     {
-        return $this->cacheKey. ':' .$block. ':'.$this->getUserId();
+        return $this->getCacheKey(). ':' .$block. ':'.$this->getUserId();
     }
 
     /**
@@ -199,7 +199,7 @@ abstract class AbstractNull
      * 
      * @return integer
      */
-    protected function getMemoryBlockLifetime($block = '__temporary')
+    public function getMemoryBlockLifetime($block = '__temporary')
     {
         if ($block == '__temporary') {
             return (int)$this->params['cache']['block']['temporary']['lifetime'];

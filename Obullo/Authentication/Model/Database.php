@@ -120,7 +120,7 @@ class Database implements ModelInterface
      */
     public function getColumnRememberToken()
     {
-        return $this->columnPassword;
+        return $this->columnRememberToken;
     }
 
     /**
