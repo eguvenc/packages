@@ -14,5 +14,5 @@ interface ControllerInterface
      * 
      * @return void
      */
-    public function setController(Controller $controller);
+    public function setController($controller);
 }

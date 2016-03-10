@@ -100,7 +100,8 @@ abstract class TestController extends Controller implements HttpTestInterface
             'assertNotInternalType',
             'assertNotType',
             'assertUnixTimeStamp',
-
+            'assertObjectHasAttribute',
+            'assertObjectNotHasAttribute',
         ];
         $disabledMethods = array_merge($disabledMethods, $this->_disabledMethods);
         $methods = array();
@@ -503,6 +504,38 @@ abstract class TestController extends Controller implements HttpTestInterface
             && ($timestamp <= PHP_INT_MAX)
             && ($timestamp >= ~PHP_INT_MAX);
 
+        $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
+    }
+
+    /**
+     * Assert has attribute
+     * 
+     * @param string $attribue attribute
+     * @param mixed  $object   class name or object
+     * @param string $message  message
+     * 
+     * @return boolean
+     */
+    public function assertObjectHasAttribute($attribue, $object, $message = "")
+    {
+        $pass = property_exists($object, $attribue); 
+        $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
+    }
+    
+    /**
+     * Assert has not attribute
+     * 
+     * @param string $attribue attribute
+     * @param mixed  $object   class name or object
+     * @param string $message  message
+     * 
+     * @return boolean
+     */
+    public function assertObjectNotHasAttribute($attribue, $object, $message = "")
+    {
+        $pass = property_exists($object, $attribue) ? false : true;
         $this->__add(['pass' => $pass, 'message' => $message]);
         return $pass;
     }

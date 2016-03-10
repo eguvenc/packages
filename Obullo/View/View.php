@@ -151,7 +151,7 @@ class View implements ViewInterface
      * 
      * @return object
      */
-    public function withData($key, $val = null)
+    public function assign($key, $val = null)
     {
         if (is_array($key)) {
             foreach ($key as $k => $v) {

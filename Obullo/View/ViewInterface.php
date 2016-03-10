@@ -64,7 +64,7 @@ interface ViewInterface
      * 
      * @return void
      */
-    public function withData($key, $val = null);
+    public function assign($key, $val = null);
 
     /**
      * Render view

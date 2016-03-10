@@ -53,9 +53,13 @@ class Session extends AbstractNull implements StorageInterface
      * 
      * @return bool
      */
-    public function isEmpty($block = '')
+    public function isEmpty($block = '__permanent')
     {
-        $block = null;
+        if ($block == '__permanent') {
+            if ($this->getCredentials('__permanent')) {
+                return false;
+            }
+        }
         return true;
     }
 

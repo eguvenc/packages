@@ -9,7 +9,6 @@ use Obullo\Container\ParamsAwareInterface;
 use League\Container\ContainerAwareInterface;
 use League\Container\ImmutableContainerAwareInterface;
 use Obullo\Http\Controller\ControllerAwareInterface;
-use Obullo\Http\Controller\ImmutableControllerAwareInterface;
 
 use ReflectionClass;
 use Obullo\Http\Tests\HttpTestInterface;
@@ -154,7 +153,7 @@ class Http extends Application
             if ($object instanceof ImmutableContainerAwareInterface || $object instanceof ContainerAwareInterface) {
                 $object->setContainer($this->getContainer());
             }
-            if ($this->controller != null && $object instanceof ImmutableControllerAwareInterface || $object instanceof ControllerAwareInterface) {
+            if ($this->controller != null && $object instanceof ControllerAwareInterface) {
                 $object->setController($this->controller);
             }
         }

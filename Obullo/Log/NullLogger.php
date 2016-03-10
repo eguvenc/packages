@@ -2,9 +2,6 @@
 
 namespace Obullo\Log;
 
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
-
 /**
  * Disable Logger Class
  * 
@@ -144,7 +141,7 @@ class NullLogger extends AbstractLogger implements LoggerInterface
      *  
      * @return void
      */
-    public function shutdown(Response $response = null)
+    public function shutdown($response = null)
     {
         return $response;
     }
