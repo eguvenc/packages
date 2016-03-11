@@ -75,6 +75,7 @@ class Validator implements ValidatorInterface
     public function clear()
     {
         $this->fieldData     = array();
+        $this->formErrors    = array();
         $this->errorArray    = array();
         $this->errorPrefix   = '';
         $this->errorSuffix   = '';
@@ -129,6 +130,7 @@ class Validator implements ValidatorInterface
                                         );
     }
 
+
     /**
      * Run the Validator
      *
@@ -138,7 +140,7 @@ class Validator implements ValidatorInterface
      */        
     public function isValid()
     {
-        if (count($this->requestParams) == 0) { // Do we even have any data to process ?
+        if (empty($this->requestParams)) { // Do we even have any data to process ?
             return false;
         }
         if (count($this->fieldData) == 0) {    // We're we able to set the rules correctly ?
@@ -154,7 +156,7 @@ class Validator implements ValidatorInterface
                 $this->execute($row);
             } 
         }
-        $totalErrors = sizeof($this->errorArray);         // Did we end up with any errors?
+        $totalErrors = count($this->errorArray) + count($this->formErrors);         // Did we end up with any errors?
         if ($totalErrors > 0) {
             $this->safeFormData = true;
         }
@@ -163,9 +165,6 @@ class Validator implements ValidatorInterface
         if ($totalErrors == 0) {    // No errors, validation passes !
             $this->validation = true;
             return true;
-        }
-        if ($this->container->hasShared('form')) {
-            $this->container->get('form')->setErrors($this);  // Assign validation errors to form object
         }
         return false;         // Validation fails
     }
@@ -445,6 +444,19 @@ class Validator implements ValidatorInterface
     public function getErrors()
     {    
         return $this->errorArray;
+    }
+
+    /**
+     * Returns to all output of validator
+     * 
+     * @return array
+     */
+    public function getOutputArray()
+    {
+        return [
+            'messages' =>  $this->getMessages(),
+            'errors' => $this->getErrors()
+        ];
     }
 
     /**

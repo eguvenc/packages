@@ -33,7 +33,6 @@ Composer projesi hakkında daha detaylı bilgi için <a href="http://getcomposer
             <li><a href="#vhost">Vhost Konfigürasyonu</a></li>
         </ul>
     </li>
-
 </ul>
 
 <a name='setup'></a>
