@@ -3,9 +3,7 @@
 namespace Obullo\Log;
 
 use Obullo\Log\LoggerInterface as Logger;
-
-use League\Container\ContainerAwareInterface;
-use League\Container\ImmutableContainerAwareInterface;
+use Obullo\Container\ContainerAwareInterface;
 
 /**
  * Log filter handler
@@ -32,11 +30,10 @@ class Filter
             $method = $value['method'];
 
             $filter = new $Class;  // Resolve components
-            if ($filter instanceof ImmutableContainerAwareInterface || $filter instanceof ContainerAwareInterface) {
+            if ($filter instanceof ContainerAwareInterface) {
                 global $container;
                 $filter->setContainer($container);
             }
-
             if (count($event['records']) > 0) {
                 $event['records'] = self::doFilter($event['records'], $filter, $method, $value['params']);
             }

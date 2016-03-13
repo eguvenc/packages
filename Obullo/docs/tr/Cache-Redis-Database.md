@@ -48,15 +48,15 @@ Bütün anahtarları dizi olarak döndürür.
 
 <a name="redis-getMultiple"></a>
 
-##### $this->cache->getMultiple(array $key)
+##### $this->cache->getItems(array $key)
 
 Tüm belirtilen anahtarların değerini dizi olarak döndürür. Bir yada daha fazla anahtar değeri bulunamaz ise bu anahtarların değeri <kbd>false</kbd> olarak dizide var olacaklardır.
 
 ```php
-$this->cache->set('key1', 'value1');
-$this->cache->set('key2', 'value2');
-$this->cache->set('key3', 'value3');
-$this->cache->getMultiple(array('key1', 'key2', 'key3')); 
+$this->cache->setItem('key1', 'value1');
+$this->cache->setItem('key2', 'value2');
+$this->cache->setItem('key3', 'value3');
+$this->cache->getItems(array('key1', 'key2', 'key3')); 
 ```
 <a name="redis-getLastError"></a>
 
@@ -105,7 +105,7 @@ $this->cache->hGet('h', 'key');   // key "h" tablosunda aranır
 Hash tablosundaki tüm değerleri bir dizi içerisinde verir.
 
 ```php
-$this->cache->remove('h');
+$this->cache->removeItem('h');
 $this->cache->hSet('h', 'a', 'x');
 $this->cache->hSet('h', 'b', 'y');
 
@@ -118,7 +118,7 @@ print_r($this->cache->hGetAll('h'));  // Çıktı array("x", "y");
 Hash tablosundaki değerlerin genişliğini rakam olarak döndürür.
 
 ```php
-$this->cache->remove('h');
+$this->cache->removeItem('h');
 $this->cache->hSet('h', 'key1', 'php');
 $this->cache->hSet('h', 'key2', 'obullo');
 print_r($this->cache->hLen('h')); // sonuç 2
@@ -140,7 +140,7 @@ $this->cache->hDel('h', 'key');
 Bir hash deki tüm anahtarları dizi olarak döndürür.
 
 ```php
-$this->cache->remove('h');
+$this->cache->removeItem('h');
 $this->cache->hSet('h', 'a', 'x');
 $this->cache->hSet('h', 'b', 'y');
 
@@ -153,7 +153,7 @@ print_r($this->cache->hKeys('h'));  // Çıktı  array("a", "b");
 Bir hash deki tüm değerleri dizi olarak döndürür.
 
 ```php
-$this->cache->remove('h');
+$this->cache->removeItem('h');
 $this->cache->hSet('h', 'a', 'x');
 $this->cache->hSet('h', 'b', 'y');
 
@@ -166,7 +166,7 @@ print_r($this->cache->hVals('h'));  // Çıktı array("x", "y");
 Bir hash üyesinin değerini belirli bir miktarda artırır, hIncrBy() metodunu kullanabilmek için serileştirme türü <kbd>none</kbd> olmalıdır.
 
 ```php
-$this->cache->remove('h');
+$this->cache->removeItem('h');
 $this->cache->hIncrBy('h', 'x', 2);  // Sonuç:  2 / yeni değer: h[x] = 2
 $this->cache->hIncrBy('h', 'x', 1);  // h[x] ← 2 + 1. sonuç 3
 ```
@@ -178,7 +178,7 @@ $this->cache->hIncrBy('h', 'x', 1);  // h[x] ← 2 + 1. sonuç 3
 Bir hash üyesinin değerini float (ondalıklı) değer olarak artırmayı sağlar, hIncrByFloat() metodunu kullanabilmek için serileştirme türü <kbd>none</kbd> olmalıdır.
 
 ```php
-$this->cache->remove('h');
+$this->cache->removeItem('h');
 $this->cache->hIncrByFloat('h','x', 1.5);   // Sonuç 1.5: h[x] = 1.5 now
 $this->cache->hIncrByFLoat('h', 'x', 1.5);  // Sonuç 3.0: h[x] = 3.0 now
 $this->cache->hIncrByFloat('h', 'x', -3.0); // Sonuç 0.0: h[x] = 0.0 now
@@ -191,7 +191,7 @@ $this->cache->hIncrByFloat('h', 'x', -3.0); // Sonuç 0.0: h[x] = 0.0 now
 Tüm hash değerlerini doldurur. String olmayan değerleri string türüne çevirir, bunuda standart string e dökme işlemini kullanarak yapar. Değeri <kbd>null</kbd> olarak saklanmış veriyi boş string olarak saklar.
 
 ```php
-$this->cache->remove('user:1');
+$this->cache->removeItem('user:1');
 $this->cache->hMset('user:1', array('ad' => 'Ali', 'maas' => 2000));
 $this->cache->hIncrBy('user:1', 'maas', 100);  // Ali'nin maaşını 100 birim arttırdık.
 ```
@@ -203,7 +203,7 @@ $this->cache->hIncrBy('user:1', 'maas', 100);  // Ali'nin maaşını 100 birim a
 Hash de özel tanımlanan alanların değerlerini dizi olarak getirir.
 
 ```php
-$this->cache->remove('h');
+$this->cache->removeItem('h');
 $this->cache->hSet('h', 'field1', 'value1');
 $this->cache->hSet('h', 'field2', 'value2');
 $this->cache->hmGet('h', array('field1', 'field2')); 
@@ -240,7 +240,7 @@ Saklanan değerleri parametreler doğrultusunda sıralar.
 Değerler:
 
 ```php
-$this->cache->remove('test');
+$this->cache->removeItem('test');
 $this->cache->sAdd('test', 2);
 $this->cache->sAdd('test', 1);
 $this->cache->sAdd('test', 3);
@@ -301,7 +301,7 @@ print_r($this->cache->sInter('key1', 'key2', 'key3'));  // Çıktı array('val4'
 Belirtilen anahtarın değerini bir dizi olarak döndürür.
 
 ```php
-$this->cache->remove('key');
+$this->cache->removeItem('key');
 $this->cache->sAdd('key', 'val1');
 $this->cache->sAdd('key', 'val2');
 $this->cache->sAdd('key', 'val1');

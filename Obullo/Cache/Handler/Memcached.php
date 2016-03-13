@@ -164,9 +164,25 @@ class Memcached implements CacheInterface
      * 
      * @return object
      */
-    public function get($key)
+    public function getItem($key)
     {
         return $this->memcached->get($key);
+    }
+
+    /**
+     * Get multiple items.
+     * 
+     * @param array $keys cache keys
+     * 
+     * @return array
+     */
+    public function getItems(array $keys)
+    {
+        $items = array();
+        foreach ($keys as $key) {
+            $items[] = $this->getItem($key);
+        }
+        return $items;
     }
 
     /**
@@ -196,7 +212,7 @@ class Memcached implements CacheInterface
      * 
      * @return boolean true or false
      */
-    public function has($key)
+    public function hasItem($key)
     {
         if ($this->memcached->get($key)) {
             return true;
@@ -213,7 +229,7 @@ class Memcached implements CacheInterface
      * 
      * @return boolean
      */
-    public function set($key, $data, $ttl = 60)
+    public function setItem($key, $data, $ttl = 60)
     {
         return $this->memcached->set($key, $data, time() + $ttl);
     }
@@ -238,7 +254,7 @@ class Memcached implements CacheInterface
      * 
      * @return boolean
      */
-    public function remove($key)
+    public function removeItem($key)
     {
         return $this->memcached->delete($key);
     }
@@ -265,7 +281,7 @@ class Memcached implements CacheInterface
      * 
      * @return boolean
      */
-    public function replace($key, $data, $ttl = 60)
+    public function replaceItem($key, $data, $ttl = 60)
     {
         return $this->memcached->replace($key, $data, time() + $ttl);
     }
@@ -288,7 +304,7 @@ class Memcached implements CacheInterface
      * 
      * @return object
      */
-    public function info()
+    public function getInfo()
     {
         return $this->memcached->getStats();
     }

@@ -94,7 +94,7 @@ class Cache implements SaveHandlerInterface
      */
     public function read($id)
     {
-        $result = $this->storage->get($this->key.$id);
+        $result = $this->storage->getItem($this->key.$id);
         return $result ?: null;
     }
  
@@ -111,7 +111,7 @@ class Cache implements SaveHandlerInterface
         if (empty($data)) { // If we have no session data don't write it.
             return false;
         }
-        $result = $this->storage->set($this->key.$id, $data, $this->getLifetime());
+        $result = $this->storage->setItem($this->key.$id, $data, $this->getLifetime());
         return $result ? true : false;
     }
  
@@ -124,7 +124,7 @@ class Cache implements SaveHandlerInterface
      */
     public function destroy($id)
     {
-        $result = $this->storage->remove($this->key.$id);
+        $result = $this->storage->removeItem($this->key.$id);
         return $result ? true : false;
     }
 

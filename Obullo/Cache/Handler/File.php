@@ -4,6 +4,8 @@ namespace Obullo\Cache\Handler;
 
 use RuntimeException;
 use Obullo\Cache\CacheInterface;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 
 /**
  * File Caching Class
@@ -88,7 +90,7 @@ class File implements CacheInterface
      * 
      * @return object
      */
-    public function get($key)
+    public function getItem($key)
     {
         if (! file_exists($this->filePath . $key)) {
             return false;
@@ -104,15 +106,31 @@ class File implements CacheInterface
     }
 
     /**
+     * Get multiple items.
+     * 
+     * @param array $keys cache keys
+     * 
+     * @return array
+     */
+    public function getItems(array $keys)
+    {
+        $items = array();
+        foreach ($keys as $key) {
+            $items[] = $this->getItem($key);
+        }
+        return $items;
+    }
+
+    /**
      * Verify if the specified key exists.
      * 
      * @param string $key storage key
      * 
      * @return boolean true or false
      */
-    public function has($key)
+    public function hasItem($key)
     {
-        if ($this->get($key) == false) {
+        if ($this->getItem($key) == false) {
             return false;
         }
         return true;
@@ -127,9 +145,9 @@ class File implements CacheInterface
      * 
      * @return boolean
      */
-    public function replace($key, $data, $ttl = 60)
+    public function replaceItem($key, $data, $ttl = 60)
     {
-        $this->remove($key);
+        $this->removeItem($key);
 
         $contents = array(
             'time' => time(),
@@ -157,7 +175,7 @@ class File implements CacheInterface
     }
 
     /**
-     * Save data
+     * Set item
      * 
      * @param string $key  cache key.
      * @param array  $data cache data.
@@ -165,7 +183,7 @@ class File implements CacheInterface
      * 
      * @return boolean
      */
-    public function set($key, $data, $ttl = 60)
+    public function setItem($key, $data, $ttl = 60)
     {
         $contents = array(
             'time' => time(),
@@ -193,13 +211,13 @@ class File implements CacheInterface
     }
 
     /**
-     * Delete
+     * Remove item
      * 
      * @param string $key cache key.
      * 
      * @return boolean
      */
-    public function remove($key)
+    public function removeItem($key)
     {
         if (file_exists($this->filePath . $key)) {
             return unlink($this->filePath . $key);
@@ -217,7 +235,7 @@ class File implements CacheInterface
     public function removeItems(array $keys)
     {
         foreach ($keys as $key) {
-            $this->remove($key);
+            $this->removeItem($key);
         }
         return;
     }
@@ -277,13 +295,21 @@ class File implements CacheInterface
     }
 
     /**
-     * Cache Info
+     * Returns to splFileInfo objects
      * 
      * @return array
      */
-    public function info()
+    public function getInfo()
     {
-        return scandir($this->filePath);
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($this->filePath, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+        $info = array();
+        foreach ($iterator as $splFileInfo) {
+            $info[] = $splFileInfo;
+        }
+        return $info;
     }
 
     /**

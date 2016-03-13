@@ -226,7 +226,7 @@ class Identity extends AbstractIdentity
      */
     public function getTime()
     {
-        return $this->get('__time');
+        return (int)$this->get('__time');
     }
 
     /**

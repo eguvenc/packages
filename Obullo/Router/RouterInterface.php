@@ -13,15 +13,6 @@ use Closure;
 interface RouterInterface
 {
     /**
-     * Configure router
-     * 
-     * @param array $params config params
-     * 
-     * @return void
-     */
-    public function configure(array $params);
-
-    /**
      * Set the route mapping
      * 
      * @return void
@@ -36,6 +27,15 @@ interface RouterInterface
      * @return object
      */
     public function defaultPage($page);
+
+    /**
+     * Set root domain
+     * 
+     * @param string $domain domain
+     * 
+     * @return void
+     */
+    public function domainRoot($domain);
 
     /**
      * Set the class name
@@ -71,16 +71,16 @@ interface RouterInterface
      *
      * @return void
      */
-    public function setPrimaryFolder($folder);
+    public function setAncestor($folder);
 
     /**
-     * Get module directory
+     * Get ancestor
      *
      * @param string $separator directory seperator
      * 
      * @return void
      */
-    public function getPrimaryFolder($separator = '');
+    public function getAncestor($separator = '');
 
     /**
      * Fetch the directory

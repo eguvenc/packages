@@ -1,6 +1,6 @@
 <?php
 
-namespace Obullo\Http\Tests;
+namespace Obullo\Tests;
 
 /**
  * LoginTrait for Http based tests.
@@ -13,11 +13,11 @@ trait LoginTrait
     /**
      * Create new login request
      *
-     * @param integer $rememberMe rememberMe option
+     * @param array $options login options (rememberMe = 1, regenerateSessionId = true)
      * 
      * @return void|string
      */
-    protected function newLoginRequest($rememberMe = 0)
+    protected function newLoginRequest($options = array())
     {
         $credentials = $this->config->load('tests')['login']['credentials'];
 
@@ -28,7 +28,7 @@ trait LoginTrait
                     'db.identifier' => $credentials['username'], 
                     'db.password'   => $credentials['password'],
                 ],
-                $rememberMe
+                $options
             );
             $results = $authResult->getArray();
 

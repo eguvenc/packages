@@ -10,13 +10,13 @@ Redis sürücüsü sunucunuzda php extension olarak kurulmayı gerektirir. Ubunt
 <li>
     <a href="#cache-reference">Redis Sürücü Referansı</a>
     <ul>
-        <li><a href="#redis-has">$this->cache->has()</a></li>
-        <li><a href="#redis-set">$this->cache->set()</a></li>
+        <li><a href="#redis-hasItem">$this->cache->hasItem()</a></li>
+        <li><a href="#redis-setItem">$this->cache->setItem()</a></li>
         <li><a href="#redis-setItems">$this->cache->setItems()</a></li>
-        <li><a href="#redis-get">$this->cache->get()</a></li>
-        <li><a href="#redis-remove">$this->cache->remove()</a></li>
+        <li><a href="#redis-getItem">$this->cache->getItem()</a></li>
+        <li><a href="#redis-removeItem">$this->cache->removeItem()</a></li>
         <li><a href="#redis-removeItems">$this->cache->removeItems()</a></li>
-        <li><a href="#redis-replace">$this->cache->replace()</a></li>
+        <li><a href="#redis-replaceItem">$this->cache->replaceItem()</a></li>
         <li><a href="#redis-replaceItems">$this->cache->replaceItems()</a></li>
         <li><a href="#redis-setSerializer">$this->cache->setSerializer()</a></li>
         <li><a href="#redis-getSerializer">$this->cache->getSerializer()</a></li>
@@ -114,15 +114,15 @@ Yukarıda görüldüğü gibi redis servis sağlayıcısı varsayılan cache ser
 
 Bu sınıf içerisinde tanımlı olmayan metotlar __call metodu ile php <kbd>Redis</kbd> sınıfından çağrılırlar. Anahtar içerisinde <kbd>:</kbd> karakterini kullanırsanız anahtarlar gruplanarak gösterilirler.
 
-<a name="redis-has"></a>
+<a name="redis-hasItem"></a>
 
-##### $this->cache->has(string $key)
+##### $this->cache->hasItem(string $key)
 
 Bir anahtarın var olup olmadığını kontrol eder. Anahtar mevcut ise <kbd>true</kbd> değilse <kbd>false</kbd> değerinde döner.
 
-<a name="redis-set"></a>
+<a name="redis-setItem"></a>
 
-##### $this->cache->set(mixed $key, mixed $data, int optional $expiration)
+##### $this->cache->setItem(mixed $key, mixed $data, int optional $expiration)
 
 Önbellek deposuna veri kaydeder. Kaydetme işlemlerinde <kbd>string</kbd> ve <kbd>array</kbd> türlerini kullanabilirsiniz Eğer ilk parametreye bir dizi gönderirseniz ikinci parametreyi artık sona erme süresi olarak kullanabilirsiniz.
 
@@ -132,20 +132,20 @@ Bir anahtarın var olup olmadığını kontrol eder. Anahtar mevcut ise <kbd>tru
 
 Önbellek deposuna girilen dizi türünü ayrıştırarak kaydeder.
 
-<a name="redis-get"></a>
+<a name="redis-getItem"></a>
 
-##### $this->cache->get($key)
+##### $this->cache->getItem($key)
 
 Önbellek deposundan veri okur. Okuma işlemlerinde string ve array türlerini kullanabilirsiniz. Anahtar içerisinde ":" karakterini kullanarak gruplanmış verilere ulaşabilirsiniz.
 
 ```php
-$this->cache->get('key');           // Çıktı value
-$this->cache->get('example:key');   // Çıktı value
+$this->cache->getItem('key');           // Çıktı value
+$this->cache->getItem('example:key');   // Çıktı value
 ```
 
 <a name="redis-replace"></a>
 
-##### $this->cache->replace(string $key, $value, $ttl = 60);
+##### $this->cache->replaceItem(string $key, $value, $ttl = 60);
 
 Varsayılan anahtara ait değeri yeni değer ile günceller.
 
@@ -155,9 +155,9 @@ Varsayılan anahtara ait değeri yeni değer ile günceller.
 
 Dizi türünde girilen yeni değerleri günceller.
 
-<a name="redis-remove"></a>
+<a name="redis-removeItem"></a>
 
-##### $this->cache->remove(string $key);
+##### $this->cache->removeItem(string $key);
 
 Girilen anahtarı önbellekten siler.
 

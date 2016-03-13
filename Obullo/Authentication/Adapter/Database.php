@@ -144,13 +144,14 @@ class Database extends AbstractAdapter
      *
      * @param array   $credentials username and plain password
      * @param boolean $login       whether to authenticate user
+     * @param array   $options     login options
      * 
      * @return object authResult
      */
-    public function login(array $credentials, $login = true)
+    public function login(array $credentials, $login = true, $options = array())
     {
         $this->initialize($credentials);
-        $this->authenticate($credentials, $login);  // Perform Query
+        $this->authenticate($credentials, $login, $options);  // Perform Query
         
         if (($authResult = $this->validateResultSet()) instanceof AuthResult) {
             return $authResult;  // If we have errors return to auth results.
@@ -168,13 +169,13 @@ class Database extends AbstractAdapter
      *
      * @param array   $credentials username and plain password
      * @param boolean $login       whether to authenticate user
+     * @param array   $options     login options
      * 
      * @return object
      */
-    public function authenticate(array $credentials, $login = true)
+    public function authenticate(array $credentials, $login = true, $options = array())
     {
-        $storageResult = $this->storage->query();  // First do query to permanent memory block if user exists return to cached auth
-
+        $storageResult = $this->storage->query();  // if identity exists return to cached data
         /**
          * If cached identity does not exist in memory do SQL query
          */
@@ -188,7 +189,7 @@ class Database extends AbstractAdapter
             if ($passwordNeedsRehash = $this->verifyPassword($plain, $hash)) {  // In here hash may cause performance bottleneck depending to passwordNeedHash "cost" value
                                                                                 // default is 6 for best performance. Set 10-12 for max security.
                 if ($login) {  // If login process allowed.
-                    $this->generateUser($credentials, $this->resultRowArray, $passwordNeedsRehash);
+                    $this->generateUser($credentials, $this->resultRowArray, $passwordNeedsRehash, $options);
                 }
                 return true;
             }
@@ -204,35 +205,39 @@ class Database extends AbstractAdapter
      * @param array $credentials         username and plain password
      * @param array $resultRowArray      success auth query user data
      * @param array $passwordNeedsRehash marks attribute if password needs rehash
+     * @param array $options             login options
      *
      * @return object
      */
-    public function generateUser(array $credentials, $resultRowArray, $passwordNeedsRehash = array())
+    public function generateUser(array $credentials, $resultRowArray, $passwordNeedsRehash = array(), $options = array())
     {
         $rememberMe = $credentials['__rememberMe'];
-
         $attributes = array(
             $this->columnIdentifier => $credentials[$this->columnIdentifier],
             $this->columnPassword => $resultRowArray[$this->columnPassword],
             '__rememberMe' => $rememberMe,
-            '__time' => ceil(microtime(true)),
+            '__time' => time(),
         );
         /**
          * Authenticate the user and fornat auth data
          */
         $attributes = $this->formatAttributes(array_merge($resultRowArray, $attributes), $passwordNeedsRehash);
+        /**
+         * Regenerate session id option
+         */
+        $regenerateSessionId = isset($options['regenerateSessionId']) ? $options['regenerateSessionId'] : true;
 
-        if ($this->params['session']['regenerateSessionId']) {
+        if ($regenerateSessionId) {
             $this->regenerateSessionId(true); // Delete old session after regenerate !
         }
         if ($rememberMe) {  // If user choosed remember feature
             $token = Token::getRememberToken($this->container->get('cookie'), $this->params);
             $this->container->get('auth.model')->updateRememberToken($token, $credentials); // refresh rememberToken
         }
-        if ($this->storage->isEmpty('__temporary')) {
+        if ($this->storage->isEmpty('__temporary')) {  // If user has NOT got a temporay identity
             $this->storage->createPermanent($attributes);
         } else {
-            $this->storage->createTemporary($attributes);
+            $this->storage->createTemporary($attributes); // If user has a temporay identity go on as temporary.
         }
     }
 

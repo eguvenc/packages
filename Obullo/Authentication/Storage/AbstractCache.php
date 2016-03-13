@@ -47,7 +47,7 @@ abstract class AbstractCache extends AbstractStorage implements StorageInterface
      */
     public function isEmpty($block = '__permanent')
     {
-        $exists = $this->cache->has($this->getBlock($block));
+        $exists = $this->cache->hasItem($this->getBlock($block));
         return ($exists) ? false : true;
     }
 
@@ -89,13 +89,13 @@ abstract class AbstractCache extends AbstractStorage implements StorageInterface
         if (! empty($pushData) && is_array($pushData)) {
             $this->data[$block] = array($this->getLoginId() => array_merge($credentials, $pushData));
         }
-        $allData = $this->cache->get($this->getMemoryBlockKey($block));  // Get all data
+        $allData = $this->cache->getItem($this->getMemoryBlockKey($block));  // Get all data
         $lifetime = ($ttl == null) ? $this->getMemoryBlockLifetime($block) : (int)$ttl;
 
         if ($allData == false) {
             $allData = array();
         }
-        return $this->cache->set($this->getMemoryBlockKey($block), array_merge($allData, $this->data[$block]), $lifetime);
+        return $this->cache->setItem($this->getMemoryBlockKey($block), array_merge($allData, $this->data[$block]), $lifetime);
     }
 
     /**
@@ -110,7 +110,7 @@ abstract class AbstractCache extends AbstractStorage implements StorageInterface
         if ($this->getIdentifier() == '__empty') {
             return false;
         }
-        $data = $this->cache->get($this->getBlock($block));
+        $data = $this->cache->getItem($this->getBlock($block));
         if (isset($data[$this->getLoginId()])) {
             return $data[$this->getLoginId()];
         }
@@ -127,17 +127,20 @@ abstract class AbstractCache extends AbstractStorage implements StorageInterface
     public function deleteCredentials($block = '__permanent')
     {
         $loginID = $this->getLoginId();
-        $credentials = $this->cache->get($this->getBlock($block));  // Don't do container cache
+        $credentials = $this->cache->getItem($this->getBlock($block));  // Don't do container cache
 
         if (! isset($credentials[$loginID])) {  // already removed
             return;
         }
         unset($credentials[$loginID]);
-        $this->cache->set($this->getMemoryBlockKey($block), $credentials, $this->getMemoryBlockLifetime($block));
-
-        $credentials = $this->cache->get($this->getBlock($block)); // Destroy auth block if its empty
+        $this->cache->setItem(
+            $this->getMemoryBlockKey($block),
+            $credentials,
+            $this->getMemoryBlockLifetime($block)
+        );
+        $credentials = $this->cache->getItem($this->getBlock($block)); // Destroy auth block if its empty
         if (empty($credentials)) {
-            $this->cache->remove($this->getBlock($block));
+            $this->cache->removeItem($this->getBlock($block));
         }
     }
 
@@ -181,7 +184,7 @@ abstract class AbstractCache extends AbstractStorage implements StorageInterface
      */
     public function getAllKeys($block = '__permanent')
     {
-        return $this->cache->get($this->getBlock($block));
+        return $this->cache->getItem($this->getBlock($block));
     }
 
     /**
@@ -216,7 +219,7 @@ abstract class AbstractCache extends AbstractStorage implements StorageInterface
     public function getUserSessions()
     {
         $sessions = array();
-        $dbSessions = $this->cache->get($this->getMemoryBlockKey('__permanent'));
+        $dbSessions = $this->cache->getItem($this->getMemoryBlockKey('__permanent'));
         if ($dbSessions == false) {
             return $sessions;
         }
@@ -240,9 +243,13 @@ abstract class AbstractCache extends AbstractStorage implements StorageInterface
      */
     public function killSession($loginID)
     {
-        $data = $this->cache->get($this->getMemoryBlockKey('__permanent'));
+        $data = $this->cache->getItem($this->getMemoryBlockKey('__permanent'));
         unset($data[$loginID]);
-        $this->cache->set($this->getMemoryBlockKey('__permanent'), $data, $this->getMemoryBlockLifetime('__permanent'));
+        $this->cache->setItem(
+            $this->getMemoryBlockKey('__permanent'),
+            $data,
+            $this->getMemoryBlockLifetime('__permanent')
+        );
     }
 
 }

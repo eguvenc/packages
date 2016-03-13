@@ -4,9 +4,9 @@ namespace Obullo\Validator\Rules;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+use Obullo\Container\ContainerAwareTrait;
+use Obullo\Container\ContainerAwareInterface;
 use Obullo\Validator\FieldInterface as Field;
-use League\Container\ImmutableContainerAwareTrait;
-use League\Container\ImmutableContainerAwareInterface;
 
 /**
  * Csrf form verify
@@ -14,9 +14,9 @@ use League\Container\ImmutableContainerAwareInterface;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Csrf implements ImmutableContainerAwareInterface
+class Csrf implements ContainerAwareInterface
 {
-    use ImmutableContainerAwareTrait;
+    use ContainerAwareTrait;
 
     /**
      * Call next

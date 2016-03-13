@@ -3,16 +3,16 @@
 namespace Obullo\View\Plates;
 
 use LogicException;
-use League\Container\ImmutableContainerAwareTrait;
-use League\Container\ImmutableContainerAwareInterface;
+use Obullo\Container\ContainerAwareTrait;
+use Obullo\Container\ContainerAwareInterface;
 use League\Plates\Template\Template as AbstractTemplate;
 
 /**
  * Container which holds template data and provides access to template functions.
  */
-class Template extends AbstractTemplate implements ImmutableContainerAwareInterface
+class Template extends AbstractTemplate implements ContainerAwareInterface
 {
-    use ImmutableContainerAwareTrait;
+    use ContainerAwareTrait;
 
     /**
      * Make available controller variables in view files

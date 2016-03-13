@@ -2,6 +2,8 @@
 
 namespace Obullo\Validator;
 
+use Obullo\Validator\ValidatorInterface as Validator;
+
 interface ValidatorAwareInterface
 {
     /**

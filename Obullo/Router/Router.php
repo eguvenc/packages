@@ -13,9 +13,8 @@ use Obullo\Router\Route\Route;
 use Obullo\Router\Route\Group;
 use Obullo\Router\Route\Attach;
 use Obullo\Router\Route\Parameters;
-
 use Obullo\Router\Resolver\FolderResolver;
-use Obullo\Router\Resolver\PrimaryFolderResolver;
+use Obullo\Router\Resolver\AncestorResolver;
 use Obullo\Router\Resolver\ClassResolver;
 
 /**
@@ -34,7 +33,7 @@ class Router implements RouterInterface
     protected $attach;                       // Attachment object
     protected $container;                    // Container
     protected $folder = '';                  // Folder name
-    protected $primaryFolder = '';           // Primary foldername
+    protected $ancestor = '';                // Ancestor foldername
     protected $method = 'index';             // Default method is index and its immutable !
     protected $defaultController = '';       // Default controller name
     protected $argumentFactor;               // Argument slice factor
@@ -72,25 +71,7 @@ class Router implements RouterInterface
         $this->uri = $this->container->get('request')->getUri();   // Reset cloned URI object.
         $this->class = '';
         $this->folder = '';
-        $this->primaryFolder = '';
-    }
-
-    /**
-     * Configure router
-     * 
-     * @param array $params config params
-     * 
-     * @return void
-     */
-    public function configure(array $params)
-    {
-        if (! isset($params['domain'])) {
-            throw new RuntimeException("Domain not configured in routes.php");
-        }
-        $name = trim($params['domain'], '.');
-        $this->domain->setName($name);
-        $this->domain->setImmutable($name);
-        $this->defaultController = $params['defaultPage'];
+        $this->ancestor = '';
     }
 
     /**
@@ -98,11 +79,24 @@ class Router implements RouterInterface
      * 
      * @param string $page uri
      * 
-     * @return object
+     * @return return object router
      */
     public function defaultPage($page)
     {
         $this->defaultController = $page;
+        return $this;
+    }
+
+    /**
+     * Set immutable root domain
+     * 
+     * @param string $domain name
+     * 
+     * @return return object router
+     */
+    public function domainRoot($domain)
+    {
+        $this->domain->setImmutable($domain);
         return $this;
     }
 
@@ -227,13 +221,12 @@ class Router implements RouterInterface
             return null;
         }
         $this->setFolder($segments[0]);      // Set first segment as default folder
-        $segments      = $this->checkPrimaryFolder($segments);
-        $primaryFolder = $this->getPrimaryFolder('/');
+        $segments = $this->checkAncestor($segments);
+        $ancestor = $this->getAncestor('/');
 
-        if (empty($primaryFolder)) {
+        if (empty($ancestor)) {
 
             if (is_dir(FOLDERS .$this->getFolder().'/')) {
-
                 $resolver = new FolderResolver($this);
                 return $resolver->resolve($segments);
             }
@@ -241,7 +234,7 @@ class Router implements RouterInterface
             $resolver = new ClassResolver($this);
             return $resolver->resolve($segments);
         }
-        $resolver = new PrimaryFolderResolver($this);
+        $resolver = new AncestorResolver($this);
         return $resolver->resolve($segments);
     }
 
@@ -256,19 +249,19 @@ class Router implements RouterInterface
     }
 
     /**
-     * Check first segment if have a primary folder & set it.
+     * Check first segment if have a ancestor folder & set it.
      * 
      * @param array $segments uri segments
      * 
      * @return array
      */
-    protected function checkPrimaryFolder($segments)
+    protected function checkAncestor($segments)
     {
         if (! empty($segments[1])
             && strtolower($segments[1]) != 'views'  // http://example/debugger/view/index bug fix
-            && is_dir(FOLDERS .$segments[0].'/'. $segments[1].'/')  // Detect primary folder and change folder !!
+            && is_dir(FOLDERS .$segments[0].'/'. $segments[1].'/')  // Detect ancestor folder and change folder !!
         ) {
-            $this->setPrimaryFolder($segments[0]);
+            $this->setAncestor($segments[0]);
             $this->setFolder($segments[1]);
             array_shift($segments);
         }
@@ -413,9 +406,9 @@ class Router implements RouterInterface
      *
      * @return void
      */
-    public function setPrimaryFolder($folder)
+    public function setAncestor($folder)
     {
-        $this->primaryFolder = strtolower($folder);
+        $this->ancestor = strtolower($folder);
     }
 
     /**
@@ -425,9 +418,9 @@ class Router implements RouterInterface
      * 
      * @return void
      */
-    public function getPrimaryFolder($separator = '')
+    public function getAncestor($separator = '')
     {
-        return (empty($this->primaryFolder)) ? '' : htmlspecialchars($this->primaryFolder).$separator;
+        return (empty($this->ancestor)) ? '' : htmlspecialchars($this->ancestor).$separator;
     }
 
     /**
@@ -474,7 +467,7 @@ class Router implements RouterInterface
             $exp = explode("/", $folder);
             $folder = $exp[0]."\\".ucfirst(end($exp));
         }
-        $namespace = $this->ucwordsUnderscore($this->getPrimaryFolder()).'\\'.$this->ucwordsUnderscore($folder);
+        $namespace = $this->ucwordsUnderscore($this->getAncestor()).'\\'.$this->ucwordsUnderscore($folder);
         $namespace = trim($namespace, '\\');
         return (empty($namespace)) ? '' : $namespace.'\\';
     }

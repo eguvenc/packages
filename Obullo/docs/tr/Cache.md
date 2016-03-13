@@ -12,13 +12,13 @@ Cache servisi sık kullanılan önbellekleme türleri için basit ve ortak bir a
         <li>
             <a href="#interface">Ortak Arayüz Metotları</a>
             <ul>
-                <li><a href="#common-has">$this->cache->has()</a></li>
-                <li><a href="#common-set">$this->cache->set()</a></li>
+                <li><a href="#common-hasItem">$this->cache->hasItem()</a></li>
+                <li><a href="#common-setItem">$this->cache->setItem()</a></li>
                 <li><a href="#common-setItems">$this->cache->setItems()</a></li>
-                <li><a href="#common-get">$this->cache->get()</a></li>
-                <li><a href="#common-remove">$this->cache->remove()</a></li>
+                <li><a href="#common-getItem">$this->cache->getItem()</a></li>
+                <li><a href="#common-removeItem">$this->cache->removeItem()</a></li>
                 <li><a href="#common-removeItems">$this->cache->removeItems()</a></li>
-                <li><a href="#common-replace">$this->cache->replace()</a></li>
+                <li><a href="#common-replaceItem">$this->cache->replaceItem()</a></li>
                 <li><a href="#common-replaceItems">$this->cache->replaceItems()</a></li>
                 <li><a href="#common-setSerializer">$this->cache->setSerializer()</a></li>
                 <li><a href="#common-getSerializer">$this->cache->getSerializer()</a></li>
@@ -108,27 +108,27 @@ Cache sürücüleri CacheInterface arayüzünü kullanırlar. Bu arayüz size ca
 ```php
 interface CacheInterface
 {
-    public function has($key);
-    public function set($key, $data, $ttl = 60);
+    public function hasItem($key);
+    public function setItem($key, $data, $ttl = 60);
     public function setItems(array $data, $ttl = 60);
-    public function get($key);
-    public function replace($key, $data, $ttl = 60);
+    public function getItem(string $key);
+    public function replaceItem($key, $data, $ttl = 60);
     public function replaceItems(array $data, $ttl = 60);
-    public function remove($key);
+    public function removeItem($key);
     public function removeItems(array $keys);
     public function flushAll();
 }
 ```
 
-<a name="common-has"></a>
+<a name="common-hasItem"></a>
 
-##### $this->cache->has(string $key);
+##### $this->cache->hasItem(string $key);
 
 Eğer girilen anahtar önbellekte mevcut ise <kbd>true</kbd> değerine aksi durumda <kbd>false</kbd> değerine döner.
 
-<a name="common-set"></a>
+<a name="common-setItem"></a>
 
-##### $this->cache->set(string $key, $value, $ttl = 60);
+##### $this->cache->setItem(string $key, $value, $ttl = 60);
 
 Önbellek deposuna veri kaydeder. Birinci parametre anahtar, ikici parametre değer, üçüncü parametre ise anahtara ait verinin yok olma süresidir. Üçüncü parametrenin varsayılan değeri <kbd>60</kbd> saniyedir. Eğer üçüncü parametreyi <kbd>0</kbd> olarak girerseniz önbelleğe kaydettiğiniz anahtar kalıcı olur.
 
@@ -138,15 +138,15 @@ Eğer girilen anahtar önbellekte mevcut ise <kbd>true</kbd> değerine aksi duru
 
 Önbellek deposuna girilen dizi türünü ayrıştırarak kaydeder. 
 
-<a name="common-get"></a>
+<a name="common-getItem"></a>
 
-##### $this->cache->get(string $key);
+##### $this->cache->getItem(string $key);
 
 Önbellek deposundan veri okur.
 
-<a name="common-remove"></a>
+<a name="common-removeItem"></a>
 
-##### $this->cache->remove(string $key);
+##### $this->cache->removeItem(string $key);
 
 Anahtarı ve bu anahtara kaydedilen değeri bütünüyle siler.
 
@@ -156,9 +156,9 @@ Anahtarı ve bu anahtara kaydedilen değeri bütünüyle siler.
 
 Dizi türünde girilen anahtarların tümünü siler.
 
-<a name="common-replace"></a>
+<a name="common-replaceItem"></a>
 
-##### $this->cache->replace(string $key, $value, $ttl = 60);
+##### $this->cache->replaceItem(string $key, $value, $ttl = 60);
 
 Varsayılan anahtara ait değeri yeni değer ile günceller.
 

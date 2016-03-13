@@ -66,7 +66,7 @@ class Date
      */
     protected function convertInteger($value)
     {
-        return date_create("@$value");
+        return date_create("$value");
     }
 
     /**

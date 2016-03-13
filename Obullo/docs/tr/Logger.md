@@ -159,12 +159,12 @@ Log filtreleri array türünde gelen log verilerini filtreden geçirirler. Bir l
 ```php
 namespace Obullo\Log\Filters;
 
-use League\Container\ImmutableContainerAwareTrait;
-use League\Container\ImmutableContainerAwareInterface;
+use Obullo\Container\ContainerAwareTrait;
+use Obullo\Container\ContainerAwareInterface;
 
-class HelloFilter extends implements ImmutableContainerAwareInterface
+class HelloFilter extends implements ContainerAwareInterface
 {
-    use ImmutableContainerAwareTrait;
+    use ContainerAwareTrait;
 
     public function method(array $record, $params = array())
     {

@@ -493,9 +493,9 @@ Yukarıdaki kural grubunda ise parentez içerisinde tanımlı sayfalar hariç t�
 
 ------
 
-##### $router->configure(array $params);
+##### $router->domainRoot($domain);
 
-Geçerli domain adresi, varsayılan açılış sayfasını ve 404 error sayfasını konfigüre eder.
+Geçerli ve <kbd>değişmez</kbd> kök domain adresini belirler.
 
 ##### $router->defaultPage($page);
 
@@ -549,7 +549,7 @@ Bir route kuralına girilen katmanları tayin eder.
 
 <kbd>app/routes.php</kbd> dosyası içerisinde tanımlanmış alan adına geri döner.
 
-##### $this->router->getPrimaryFolder();
+##### $this->router->getAncestor();
 
 Eğer alt klasörü olan birincil bir klasör varsa bu klasör ismine aksi durumda boş bir string '' değerine geri döner.
 

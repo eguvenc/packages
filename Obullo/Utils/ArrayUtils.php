@@ -196,6 +196,22 @@ abstract class ArrayUtils
     }
 
     /**
+     * Contains
+     * 
+     * @param array $needle   needle
+     * @param array $haystack haystack
+     * 
+     * @return boolean
+     */
+    public static function contains($needle, array $haystack)
+    {
+        if (count(array_intersect($needle, $haystack)) == count($needle)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Convert an iterator to an array.
      *
      * Converts an iterator to an array. The $recursive flag, on by default,

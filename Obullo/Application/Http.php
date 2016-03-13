@@ -6,12 +6,11 @@ use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
 use Obullo\Container\ParamsAwareInterface;
-use League\Container\ContainerAwareInterface;
-use League\Container\ImmutableContainerAwareInterface;
+use Obullo\Container\ContainerAwareInterface;
 use Obullo\Http\Controller\ControllerAwareInterface;
 
 use ReflectionClass;
-use Obullo\Http\Tests\HttpTestInterface;
+use Obullo\Tests\HttpTestInterface;
 use Obullo\Router\RouterInterface as Router;
 use Obullo\Application\MiddlewareStackInterface as Middleware;
 
@@ -80,7 +79,7 @@ class Http extends Application
     protected function boot(Router $router, Middleware $middleware)
     {
         $router->init();
-        include FOLDERS .$router->getPrimaryFolder('/').$router->getFolder('/').$router->getClass().'.php';
+        include FOLDERS .$router->getAncestor('/').$router->getFolder('/').$router->getClass().'.php';
 
         $className = '\\'.$router->getNamespace().$router->getClass();
         $method    = $router->getMethod();
@@ -150,7 +149,7 @@ class Http extends Application
     {
         foreach ($middleware->getNames() as $name) {
             $object = $middleware->get($name);
-            if ($object instanceof ImmutableContainerAwareInterface || $object instanceof ContainerAwareInterface) {
+            if ($object instanceof ContainerAwareInterface) {
                 $object->setContainer($this->getContainer());
             }
             if ($this->controller != null && $object instanceof ControllerAwareInterface) {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Obullo\Http\Tests;
+namespace Obullo\Tests;
 
 /**
  * Http test interface

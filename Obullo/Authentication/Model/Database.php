@@ -3,8 +3,8 @@
 namespace Obullo\Authentication\Model;
 
 use Pdo;
+use Obullo\Container\ContainerAwareTrait;
 use Obullo\Authentication\Model\ModelInterface;
-use League\Container\ImmutableContainerAwareTrait;
 use Interop\Container\ContainerInterface as Container;
 
 /**
@@ -15,7 +15,7 @@ use Interop\Container\ContainerInterface as Container;
  */
 class Database implements ModelInterface
 {
-    use ImmutableContainerAwareTrait;
+    use ContainerAwareTrait;
 
     protected $db;                     // Database object
     protected $fields;                 // Selected fields

@@ -173,9 +173,21 @@ class Redis implements CacheInterface
      * 
      * @return mix
      */
-    public function get($key)
+    public function getItem($key)
     {
         return $this->redis->get($key);
+    }
+
+    /**
+     * Get cache data.
+     * 
+     * @param string $key cache key.
+     * 
+     * @return mix
+     */
+    public function getItems(array $key)
+    {
+        return $this->redis->getMultiple($key);
     }
 
     /**
@@ -185,7 +197,7 @@ class Redis implements CacheInterface
      * 
      * @return boolean true or false
      */
-    public function has($key)
+    public function hasItem($key)
     {
         return $this->redis->exists($key);
     }
@@ -355,7 +367,7 @@ class Redis implements CacheInterface
      * 
      * @return boolean
      */
-    public function set($key, $data, $ttl = 60) // If empty $ttl default timeout unlimited
+    public function setItem($key, $data, $ttl = 60) // If empty $ttl default timeout unlimited
     {
         return $this->redis->set($key, $data, $ttl);
     }
@@ -380,7 +392,7 @@ class Redis implements CacheInterface
      * 
      * @return boolean
      */
-    public function remove($key)
+    public function removeItem($key)
     {
         return $this->redis->delete($key);
     }
@@ -409,7 +421,7 @@ class Redis implements CacheInterface
      * 
      * @return boolean
      */
-    public function replace($key, $data, $ttl = 60)
+    public function replaceItem($key, $data, $ttl = 60)
     {
         return $this->redis->set($key, $data, $ttl);
     }

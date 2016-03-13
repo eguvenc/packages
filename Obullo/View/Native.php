@@ -2,8 +2,8 @@
 
 namespace Obullo\View;
 
-use League\Container\ImmutableContainerAwareInterface;
-use League\Container\ImmutableContainerAwareTrait;
+use Obullo\Container\ContainerAwareTrait;
+use Obullo\Container\ContainerAwareInterface;
 
 /**
  * Default engine
@@ -11,9 +11,9 @@ use League\Container\ImmutableContainerAwareTrait;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Native implements ImmutableContainerAwareInterface
+class Native implements ContainerAwareInterface
 {
-    use ImmutableContainerAwareTrait;
+    use ContainerAwareTrait;
 
     /**
      * Default path

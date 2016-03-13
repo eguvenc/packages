@@ -6,7 +6,7 @@ Kontrolör sınıfı uygulamanın kalbidir ve uygulamaya gelen HTTP isteklerinin
 <ul>
     <li><a href="#controller">Kontrolör Nedir ?</a></li>
     <li><a href="#folders">Klasörler</a></li>
-    <li><a href="#primary-folders">Birincil Klasörler</a></li>
+    <li><a href="#primary-folders">Ata Klasör</a></li>
     <li><a href="#proxy-way">Proxy Yöntemi Nedir ?</a></li>
     <li><a href="#arguments">Argümanlar</a></li>
     <li><a href="#middlewares">Http Katmanları</a></li>
@@ -102,9 +102,9 @@ Dizin ve kontrolör adı aynı ise uygulama bu kontrolör dosyasını <kbd>index
 
 <a name="primary-folders"></a>
 
-### Birincil Klasörler
+### Ata Klasör
 
-Birincil klasörler, bir alt klasörü olan klasöre verilen addır.Örnek verirsek, uygulamanızda <kbd>app/folders/examples/captcha/</kbd> adlı bir dizin ve altında <kbd>Ajax.php</kbd> adlı bir kontrolörümüzün olduğunu varsayalım.
+Ata klasör, bir alt klasörü olan klasöre verilen addır.Örnek verirsek, uygulamanızda <kbd>app/folders/examples/captcha/</kbd> adlı bir dizin ve altında <kbd>Ajax.php</kbd> adlı bir kontrolörümüzün olduğunu varsayalım.
 
 Bu dosyayı çözümlemek için ziyaret edeceğimiz adres aşağıdaki gibi olur.
 
@@ -112,7 +112,7 @@ Bu dosyayı çözümlemek için ziyaret edeceğimiz adres aşağıdaki gibi olur
 http://example.com/examples/captcha/ajax
 ```
 
-Bu çözümlemede en dıştaki klasör <kbd>birincil</kbd>, sonraki klasör ise alt klasördür.
+Bu çözümlemede en dıştaki klasör <kbd>ata</kbd>, sonraki klasör ise alt klasördür.
 
 ```php
 namespace Examples\Captcha;
@@ -126,8 +126,8 @@ class Ajax extends Controller
         echo $this->uri->segment(0);  // examples
         echo $this->uri->segment(1);  // captcha
 
-        echo $this->router->getPrimaryFolder();  // examples
-        echo $this->router->getFolder();         // captcha
+        echo $this->router->getAncestor();  // examples
+        echo $this->router->getFolder();    // captcha
     }
 }
 ```
@@ -138,7 +138,7 @@ Bir birincil klasör altına en fazla <kbd>iki</kbd> alt klasör açılabilir.
 http://example.com/tests/authentication/storage/redis
 ```
 
-Aşağıdaki iki alt klasörü olan <kbd>tests</kbd> adlı birincil klasör örneği gösteriliyor.
+Aşağıdaki iki alt klasörü olan <kbd>tests</kbd> adlı ata klasör örneği gösteriliyor.
 
 ```php
 namespace Tests\Authentication\Storage;
@@ -152,7 +152,7 @@ class Redis extends TestController
         echo $this->uri->segment(0);  // tests
         echo $this->uri->segment(1);  // authentication
 
-        echo $this->router->getPrimaryFolder();  // tests
+        echo $this->router->getAncestor();  // tests
         echo $this->router->getFolder();         // authentication/storage
     }
 }
@@ -243,7 +243,7 @@ class Computer extends Controller
         echo $this->uri->segment(5);    // 123
 
         echo $this->router->getFolder();  // products
-        echo $this->router->getPrimaryFolder();  // shop
+        echo $this->router->getAncestor();  // shop
     }
 }
 
@@ -269,12 +269,7 @@ http://example.com/
 router sınıfı ilk açılış sayfası için varsayılan bir kontrolör tanımlamasına ihtiyaç duyar. Bu nedenle <kbd>app/routes.php</kbd> dosyanızı açıp varsayılan kontrolör adresinizi <kbd>defaultPage</kbd> anahtarından konfigüre etmeniz gerekir.
 
 ```php
-$router->configure(
-    [
-        'domain' => 'example.com',
-        'defaultPage' => 'welcome/index',
-    ]
-);
+$router->defaultPage('welcome');
 ```
 
 <a name="annotations"></a>

@@ -3,8 +3,7 @@
 namespace Obullo\Validator;
 
 use Closure;
-use League\Container\ImmutableContainerAwareInterface;
-use League\Container\ContainerAwareInterface;
+use Obullo\Container\ContainerAwareInterface;
 
 /**
  * Parse rule parameters
@@ -12,9 +11,9 @@ use League\Container\ContainerAwareInterface;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Next implements ImmutableValidatorAwareInterface
+class Next implements ValidatorAwareInterface
 {
-    use ImmutableValidatorAwareTrait;
+    use ValidatorAwareTrait;
 
     /**
      * Call next rule
@@ -88,7 +87,7 @@ class Next implements ImmutableValidatorAwareInterface
             $Class = "\\".trim($ruleNames[$ruleName], '\\');
             $nextRule = new $Class;
 
-            if ($nextRule instanceof ImmutableContainerAwareInterface || $nextRule instanceof ContainerAwareInterface) {
+            if ($nextRule instanceof ContainerAwareInterface) {
                 $nextRule->setContainer($this->getValidator()->getContainer());
             }
             return $nextRule($field, $this);

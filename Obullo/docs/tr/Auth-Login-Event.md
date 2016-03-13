@@ -10,8 +10,8 @@ namespace Event;
 
 use League\Event\Emitter;
 use League\Event\AbstractEvent;
+use Obullo\Container\ContainerAwareInterface;
 use Interop\Container\ContainerInterface as Container;
-use League\Container\ImmutableContainerAwareInterface;
 
 class LoginEvent extends AbstractEvent
 {
@@ -19,7 +19,7 @@ class LoginEvent extends AbstractEvent
     {
         $emitter = new Emitter;
 
-        if ($emitter instanceof ImmutableContainerAwareInterface) {
+        if ($emitter instanceof ContainerAwareInterface) {
             $emitter->setContainer($container);
         }
         $this->setEmitter($emitter);
@@ -40,12 +40,12 @@ use League\Event\AbstractListener;
 use League\Event\EventInterface as Event;
 
 use Obullo\Authentication\AuthResult;
-use League\Container\ImmutableContainerAwareTrait;
-use League\Container\ImmutableContainerAwareInterface;
+use Obullo\Container\ContainerAwareTrait;
+use Obullo\Container\ContainerAwareInterface;
 
-class LoginResultListener extends AbstractListener implements ImmutableContainerAwareInterface
+class LoginResultListener extends AbstractListener implements ContainerAwareInterface
 {
-    use ImmutableContainerAwareTrait;
+    use ContainerAwareTrait;
 
     public function handle(Event $event, AuthResult $authResult = null)
     {

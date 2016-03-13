@@ -198,7 +198,7 @@ class Layer
         $className = $router->getClass();
         $method    = $router->getMethod();
 
-        $class = FOLDERS .$router->getPrimaryFolder('/') .$directory.'/'.$className. '.php';
+        $class = FOLDERS .$router->getAncestor('/') .$directory.'/'.$className. '.php';
         $className = '\\'.$router->getNamespace().$className;
 
         if (! class_exists($className, false)) {

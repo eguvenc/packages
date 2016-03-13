@@ -4,8 +4,8 @@ namespace Obullo\Validator;
 
 use Closure;
 use RuntimeException;
-use League\Container\ImmutableContainerAwareTrait;
-use League\Container\ImmutableContainerAwareInterface;
+use Obullo\Container\ContainerAwareTrait;
+use Obullo\Container\ContainerAwareInterface;
 use Interop\Container\ContainerInterface as Container;
 
 /**
@@ -14,9 +14,9 @@ use Interop\Container\ContainerInterface as Container;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Field implements FieldInterface, ImmutableValidatorAwareInterface, ImmutableContainerAwareInterface
+class Field implements FieldInterface, ValidatorAwareInterface, ContainerAwareInterface
 {
-    use ImmutableContainerAwareTrait, ImmutableValidatorAwareTrait;
+    use ContainerAwareTrait, ValidatorAwareTrait;
 
     /**
      * Field name

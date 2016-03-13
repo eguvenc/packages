@@ -1,6 +1,8 @@
 <?php
 
-namespace Obullo\Log;
+namespace Obullo\Container;
+
+use Obullo\Log\LoggerInterface as Logger;
 
 /**
  * Inject parameters

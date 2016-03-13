@@ -10,13 +10,13 @@ Memcached sürücüsü sunucunuzda php extension olarak kurulmayı gerektirir. U
 <li>
     <a href="#memcached-reference">Memcached Sürücü Referansı</a>
     <ul>
-        <li><a href="#memcached-has">$this->cache->has()</a></li>
-        <li><a href="#memcached-set">$this->cache->set()</a></li>
+        <li><a href="#memcached-hasItem">$this->cache->hasItem()</a></li>
+        <li><a href="#memcached-setItem">$this->cache->setItem()</a></li>
         <li><a href="#memcached-setItems">$this->cache->setItems()</a></li>
-        <li><a href="#memcached-get">$this->cache->get()</a></li>
-        <li><a href="#memcached-replace">$this->cache->replace()</a></li>
+        <li><a href="#memcached-getItem">$this->cache->getItem()</a></li>
+        <li><a href="#memcached-replaceItem">$this->cache->replaceItem()</a></li>
         <li><a href="#memcached-replaceItems">$this->cache->replaceItems()</a></li>
-        <li><a href="#memcached-remove">$this->cache->remove()</a></li>
+        <li><a href="#memcached-removeItem">$this->cache->removeItem()</a></li>
         <li><a href="#memcached-removeItems">$this->cache->removeItems()</a></li>
         <li><a href="#memcached-setSerializer">$this->cache->setSerializer()</a></li>
         <li><a href="#memcached-getSerializer">$this->cache->getSerializer()</a></li>
@@ -108,15 +108,15 @@ Yukarıda görüldüğü gibi redis servis sağlayıcısı varsayılan cache ser
 
 Bu sınıf içerisinde tanımlı olmayan metotlar __call metodu ile php <kbd>Memcached</kbd> sınıfından çağrılırlar.
 
-<a name="memcached-has"></a>
+<a name="memcached-hasItem"></a>
 
-##### $this->cache->has(string $key)
+##### $this->cache->hasItem(string $key)
 
 Bir anahtarın var olup olmadığını kontrol eder. Anahtar mevcut ise <kbd>true</kbd> değilse <kbd>false</kbd> değerinde döner.
 
-<a name="memcached-set"></a>
+<a name="memcached-setItem"></a>
 
-##### $this->cache->set(string $key, mixed $data, int $ttl = 60);
+##### $this->cache->setItem(string $key, mixed $data, int $ttl = 60);
 
 Girilen anahtara veri kaydeder, son parametre sona erme süresine "0" girilirse veri siz silinceye kadar yok olmaz. Eğer ilk parametreye bir dizi gönderirseniz ikinci parametreyi artık sona erme süresi olarak kullanabilirsiniz.
 
@@ -126,15 +126,15 @@ Girilen anahtara veri kaydeder, son parametre sona erme süresine "0" girilirse 
 
 Önbellek deposuna girilen dizi türünü ayrıştırarak kaydeder.
 
-<a name="memcached-get"></a>
+<a name="memcached-getItem"></a>
 
-##### $this->cache->get(string $key);
+##### $this->cache->getItem(string $key);
 
 Anahtara atanmış değere geri döner. Anahtar mevcut değilse <kbd>false</kbd> değerine döner. Anahtar bir dizi de olabilir.
 
-<a name="memcached-replace"></a>
+<a name="memcached-replaceItem"></a>
 
-##### $this->cache->replace(string $key, $value, $ttl = 60);
+##### $this->cache->replaceItem(string $key, $value, $ttl = 60);
 
 Varsayılan anahtara ait değeri yeni değer ile günceller.
 
@@ -144,9 +144,9 @@ Varsayılan anahtara ait değeri yeni değer ile günceller.
 
 Dizi türünde girilen yeni değerleri günceller.
 
-<a name="memcached-remove"></a>
+<a name="memcached-removeItem"></a>
 
-##### $this->cache->remove(string $key);
+##### $this->cache->removeItem(string $key);
 
 Girilen anahtarı önbellekten siler.
 
@@ -190,6 +190,12 @@ manual/en/memcached.constants.php">bu adrese</a> bir gözatın.
 ##### $this->cache->getOption($option = 'OPT_SERIALIZER');
 
 Geçerli opsiyon değerine döner. Opsiyon sabitleri hakkında detaylı bilgi için <a href="http://www.php.net/manual/en/memcached.constants.php">bu adrese</a> bir gözatın.
+
+<a name="memcached-getInfo"></a>
+
+##### $this->cache->getInfo();
+
+Sunucu üzerinde memcached yazılımı hakkındaki bigilere geri döner.
 
 <a name="memcached-getAllKeys"></a>
 

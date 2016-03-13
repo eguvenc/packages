@@ -10,7 +10,7 @@ use Obullo\Router\RouterInterface as Router;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class PrimaryFolderResolver
+class AncestorResolver
 {
     /**
      * Router
@@ -52,18 +52,18 @@ class PrimaryFolderResolver
      */
     public function resolve(array $segments)
     {
-        $primaryFolder = $this->router->getPrimaryFolder('/');
+        $ancestor = $this->router->getAncestor('/');
         $folder = $this->router->getFolder();
         $hasSegmentOne = empty($segments[1]) ? false : true;
         
         // Add support e.g http://project/widgets/tutorials/helloWorld.php
 
-        if ($hasSegmentOne && is_file(FOLDERS .$primaryFolder.$folder.'/'.$this->router->ucwordsUnderscore($segments[1]).'.php')) {
+        if ($hasSegmentOne && is_file(FOLDERS .$ancestor.$folder.'/'.$this->router->ucwordsUnderscore($segments[1]).'.php')) {
 
             $this->segments = $segments;
             return $this;
 
-        } elseif ($hasSegmentOne && isset($segments[2]) && is_dir(FOLDERS .$primaryFolder.$folder.'/'.$segments[1])) {
+        } elseif ($hasSegmentOne && isset($segments[2]) && is_dir(FOLDERS .$ancestor.$folder.'/'.$segments[1])) {
 
             $this->router->setFolder($folder.'/'.$segments[1]);
             $this->argumentFactor = 1;

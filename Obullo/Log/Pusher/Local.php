@@ -3,8 +3,8 @@
 namespace Obullo\Log\Pusher;
 
 use Exception;
-use League\Container\ImmutableContainerAwareTrait;
-use League\Container\ImmutableContainerAwareInterface;
+use Obullo\Container\ContainerAwareTrait;
+use Obullo\Container\ContainerAwareInterface;
 
 /**
  * Send log data to "app/classes/Workers/Logger" class.
@@ -12,9 +12,9 @@ use League\Container\ImmutableContainerAwareInterface;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Local implements PusherInterface, ImmutableContainerAwareInterface
+class Local implements PusherInterface, ContainerAwareInterface
 {
-    use ImmutableContainerAwareTrait;
+    use ContainerAwareTrait;
 
     /**
      * Push the data

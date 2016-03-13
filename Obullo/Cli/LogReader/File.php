@@ -2,7 +2,7 @@
 
 namespace Obullo\Cli\LogReader;
 
-use League\Container\ImmutableContainerAwareTrait;
+use Obullo\Container\ContainerAwareTrait;
 
 /**
  * File reader
@@ -12,7 +12,7 @@ use League\Container\ImmutableContainerAwareTrait;
  */
 class File
 {
-    use ImmutableContainerAwareTrait;
+    use ContainerAwareTrait;
 
     /**
      * File paths

@@ -41,20 +41,19 @@ class Login
     /**
      * Start the Login Operation ( validate, authenticate, set failure object )
      * 
-     * @param array   $credentials user data
-     * @param boolean $rememberMe  remember me switch
+     * @param array $credentials user data
+     * @param array $options     login options
      * 
      * @return object AuthResult object
      */
-    public function attempt(array $credentials, $rememberMe = false)
+    public function attempt(array $credentials, $options = array())
     {
         $this->ignoreRecaller();  // Ignore recaller if user has remember cookie
         
         // We use ignore recaller for this situation :
         // if user has remember cookie and still try to login attempt.
 
-        $credentials['__rememberMe'] = ($rememberMe) ? 1 : 0;
-
+        $credentials['__rememberMe'] = isset($options['rememberMe']) ? $options['rememberMe'] : 0;
         $credentials = $this->formatCredentials($credentials);
 
         if ($credentials == false) {
@@ -71,9 +70,13 @@ class Login
             );
         }
         /**
+         * Login Query
+         */
+        $authResult = $this->container->get('auth.adapter')->login($credentials, true, $options);
+        /**
          * Create AuthResult Object
          */
-        return $this->createResults($credentials);
+        return $this->createResults($authResult);
     }
 
     /**
@@ -131,19 +134,12 @@ class Login
     /**
      * Create login attemtp and returns to auth result object
      * 
-     * @param array $credentials login credentials
+     * @param object $authResult object
      * 
      * @return object AuthResult
      */
-    protected function createResults(array $credentials)
+    protected function createResults($authResult)
     {
-        /**
-         * Login Query
-         * 
-         * @var object
-         */
-        $authResult = $this->container->get('auth.adapter')->login($credentials);
-
         /**
          * Generate User Identity
          */

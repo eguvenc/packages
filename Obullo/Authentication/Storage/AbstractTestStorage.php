@@ -2,7 +2,7 @@
 
 namespace Obullo\Authentication\Storage;
 
-use Obullo\Http\Tests\TestController;
+use Obullo\Tests\TestController;
 
 class AbstractTestStorage extends TestController
 {

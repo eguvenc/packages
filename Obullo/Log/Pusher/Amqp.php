@@ -5,8 +5,8 @@ namespace Obullo\Log\Pusher;
 use AMQPQueue;
 use AMQPChannel;
 use AMQPExchange;
-use League\Container\ImmutableContainerAwareTrait;
-use League\Container\ImmutableContainerAwareInterface;
+use Obullo\Container\ContainerAwareTrait;
+use Obullo\Container\ContainerAwareInterface;
 
 /**
  * Send log data to queue to listen log events from "app/classes/Workers/Logger" class.
@@ -14,9 +14,9 @@ use League\Container\ImmutableContainerAwareInterface;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Amqp implements PusherInterface, ImmutableContainerAwareInterface
+class Amqp implements PusherInterface, ContainerAwareInterface
 {
-    use ImmutableContainerAwareTrait;
+    use ContainerAwareTrait;
 
     /**
      * Push the data

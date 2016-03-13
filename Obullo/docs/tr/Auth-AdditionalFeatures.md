@@ -37,7 +37,10 @@ $authResult = $this->user->login->attempt(
         'db.identifier' => $this->validator->getValue('email'), 
         'db.password'   => $this->validator->getValue('password'),
     ],
-    $this->request->post('rememberMe')
+    [
+        'rememberMe' => $this->request->post('rememberMe'),
+        'regenerateSessionId' => true
+    ]
 );
 ```
 

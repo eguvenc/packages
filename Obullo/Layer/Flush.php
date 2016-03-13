@@ -55,8 +55,8 @@ class Flush
         }
         $KEY = $this->generateId($hashString);
 
-        if ($this->cache->has($KEY)) {
-            return $this->cache->remove($KEY);
+        if ($this->cache->hasItem($KEY)) {
+            return $this->cache->removeItem($KEY);
         }
         return false;
     }

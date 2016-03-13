@@ -52,13 +52,13 @@ class Apc implements CacheInterface
     }
 
     /**
-     * Get cache data.
+     * Get item.
      * 
      * @param string $key cache key
      * 
      * @return object
      */
-    public function get($key)
+    public function getItem($key)
     {
         $value = apc_fetch($key);
         if (is_array($value) && isset($value[0])) {
@@ -68,13 +68,29 @@ class Apc implements CacheInterface
     }
 
     /**
+     * Get multiple items.
+     * 
+     * @param array $keys cache keys
+     * 
+     * @return array
+     */
+    public function getItems(array $keys)
+    {
+        $items = array();
+        foreach ($keys as $key) {
+            $items[] = $this->getItem($key);
+        }
+        return $items;
+    }
+
+    /**
      * Verify if the specified key exists.
      * 
      * @param string $key cache key.
      * 
      * @return boolean true or false
      */
-    public function has($key)
+    public function hasItem($key)
     {
         return apc_exists($key);
     }
@@ -88,7 +104,7 @@ class Apc implements CacheInterface
      * 
      * @return array
      */
-    public function set($key, $data, $ttl = 60) 
+    public function setItem($key, $data, $ttl = 60) 
     {
         return apc_store($key, array($data, time(), $ttl), $ttl);
     }
@@ -113,7 +129,7 @@ class Apc implements CacheInterface
      * 
      * @return boolean
      */
-    public function remove($key)
+    public function removeItem($key)
     {
         return apc_delete($key);
     }
@@ -142,7 +158,7 @@ class Apc implements CacheInterface
      * 
      * @return boolean
      */
-    public function replace($key, $data, $ttl = 60) 
+    public function replaceItem($key, $data, $ttl = 60) 
     {
         $this->remove($key);
         return apc_store($key, array($data, time(), $ttl), $ttl);
@@ -156,7 +172,7 @@ class Apc implements CacheInterface
      * 
      * @return boolean
      */
-    public function replacteItems(array $data, $ttl = 60)
+    public function replaceItems(array $data, $ttl = 60)
     {
         return $this->setArray($data, $ttl);
     }

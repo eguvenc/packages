@@ -5,8 +5,8 @@ namespace Obullo\View\Plates;
 use Closure;
 use League\Plates\Engine;
 use Obullo\Log\LoggerInterface as Logger;
-use League\Container\ImmutableContainerAwareTrait;
-use League\Container\ImmutableContainerAwareInterface;
+use Obullo\Container\ContainerAwareTrait;
+use Obullo\Container\ContainerAwareInterface;
 
 /**
  * Plates engine - http://platesphp.com/
@@ -14,9 +14,9 @@ use League\Container\ImmutableContainerAwareInterface;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Plates extends Engine implements ImmutableContainerAwareInterface
+class Plates extends Engine implements ContainerAwareInterface
 {
-    use ImmutableContainerAwareTrait;
+    use ContainerAwareTrait;
 
     /**
      * Constructor

@@ -173,13 +173,12 @@ namespace Workers;
 
 use Obullo\Queue\Job;
 use Obullo\Queue\JobInterface;
+use Obullo\Container\ContainerAwareTrait;
+use Obullo\Container\ContainerAwareInterface;
 
-use League\Container\ImmutableContainerAwareTrait;
-use League\Container\ImmutableContainerAwareInterface;
-
-class Mailer implements JobInterface, ImmutableContainerAwareInterface
+class Mailer implements JobInterface, ContainerAwareInterface
 {
-    use ImmutableContainerAwareTrait;
+    use ContainerAwareTrait;
 
     public function fire($job, array $data)
     {

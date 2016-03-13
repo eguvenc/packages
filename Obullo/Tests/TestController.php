@@ -1,8 +1,13 @@
 <?php
 
-namespace Obullo\Http\Tests;
+namespace Obullo\Tests;
 
+use DateTime;
+use Traversable;
 use Obullo\Http\Controller;
+use Obullo\Utils\ArrayHelper;
+use Obullo\Tests\Constraint\StringContains;
+use Obullo\Tests\Constraint\TraversableContains;
 
 /**
  * AbstractController for Http based tests.
@@ -75,6 +80,7 @@ abstract class TestController extends Controller implements HttpTestInterface
             '__generateHtmlResponse',
             '__generateJsonResponse',
             '__getParsedCommandBody',
+            '__convertToDateTime',
             'getClassMethods',
             'getHtmlClassMethods',
             'generateTestResults',
@@ -99,9 +105,12 @@ abstract class TestController extends Controller implements HttpTestInterface
             'assertInternalType',
             'assertNotInternalType',
             'assertNotType',
-            'assertUnixTimeStamp',
             'assertObjectHasAttribute',
             'assertObjectNotHasAttribute',
+            'assertThat',
+            'assertArrayContains',
+            'assertStringContains',
+            'assertDate',
         ];
         $disabledMethods = array_merge($disabledMethods, $this->_disabledMethods);
         $methods = array();
@@ -299,13 +308,13 @@ abstract class TestController extends Controller implements HttpTestInterface
     /**
      * Assert contains
      * 
-     * @param string|array $needle   needle
-     * @param array        $haystack haystack
-     * @param string       $message  message 
+     * @param array  $needle   needle
+     * @param array  $haystack haystack
+     * @param string $message  message 
      * 
      * @return boolean
      */
-    public function assertContains($needle, array $haystack, $message = "")
+    public function assertArrayContains($needle, $haystack, $message = "")
     {
         $pass = false;
         if (is_string($needle) || is_object($needle)) {
@@ -314,7 +323,56 @@ abstract class TestController extends Controller implements HttpTestInterface
                 $pass = true;
             }
         }
-        if (is_array($needle) && count(array_intersect($needle, $haystack)) == count($needle)) {
+        if (is_object($haystack) && $haystack instanceof Traversable) {
+            $haystack = ArrayHelper::iteratorToArray($haystack);
+        }
+        if (is_array($needle)) {
+            if (ArrayHelper::contains($needle, $haystack)) {
+                $pass = true;
+            }
+        }
+        $this->__add(['pass' => $pass, 'message' => $message]);
+        return $pass;
+    }
+
+    /**
+     * Assert string contains
+     * 
+     * @param string $needle     needle
+     * @param array  $haystack   haystack
+     * @param string $message    message 
+     * @param boolea $ignoreCase ignore case sensitive for string contains
+     * 
+     * @return boolean
+     */
+    public function assertStringContains($needle, $haystack, $message = "", $ignoreCase = false)
+    {
+        if (!is_string($needle)) {
+            throw InvalidArgumentHelper::factory(
+                1,
+                'string'
+            );
+        }
+        $constraint = new StringContains(
+            $needle,
+            $ignoreCase
+        );
+        return $this->assertThat($haystack, $constraint, $message);
+    }
+
+    /**
+     * Evaluates a constraint matcher object.
+     *
+     * @param mixed      $value      value
+     * @param constraint $constraint constraint
+     * @param string     $message    message
+     *
+     * @return void
+     */
+    public function assertThat($value, $constraint, $message = '')
+    {
+        $pass = false;
+        if ($constraint->matches($value)) {
             $pass = true;
         }
         $this->__add(['pass' => $pass, 'message' => $message]);
@@ -489,23 +547,40 @@ abstract class TestController extends Controller implements HttpTestInterface
         $this->__add(['pass' => $pass, 'message' => $message]);
         return $pass;
     }
-
     /**
-     * Assert unix time stamp
+     * Assert date
      * 
-     * @param string|integer $timestamp value
-     * @param string         $message   message
+     * @param mixe   $date    value
+     * @param string $message message
      * 
      * @return bool
      */
-    public function assertUnixTimeStamp($timestamp, $message = "")
+    public function assertDate($date, $message = "")
     {
-        $pass = ((string) (int) $timestamp === $timestamp) 
-            && ($timestamp <= PHP_INT_MAX)
-            && ($timestamp >= ~PHP_INT_MAX);
-
+        $pass = false;
+        if ($this->__convertToDateTime($date)) {
+            $pass = true;
+        }
         $this->__add(['pass' => $pass, 'message' => $message]);
         return $pass;
+    }    
+
+     /**
+     * Attempts to convert an int, string, or array to a DateTime object
+     *
+     * @param string|int|array $value value
+     * 
+     * @return bool
+     */
+    protected function __convertToDateTime($value)
+    {
+        if ($value instanceof DateTime) {
+            return true;
+        }
+        if (is_integer($value)) {
+            $value = @date("Y-m-d H:i:s", $value);
+        }
+        return date_create("$value");
     }
 
     /**

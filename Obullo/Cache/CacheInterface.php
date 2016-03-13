@@ -17,7 +17,7 @@ interface CacheInterface
      * 
      * @return boolean true or false
      */
-    public function has($key);
+    public function hasItem($key);
 
     /**
      * Set cache data.
@@ -28,7 +28,7 @@ interface CacheInterface
      * 
      * @return boolean
      */
-    public function set($key, $data, $ttl = 60);
+    public function setItem($key, $data, $ttl = 60);
 
     /**
      * Set keys
@@ -47,7 +47,16 @@ interface CacheInterface
      * 
      * @return mix
      */
-    public function get($key);
+    public function getItem($key);
+
+    /**
+     * Get multiple items
+     * 
+     * @param string $key cache key
+     * 
+     * @return mix
+     */
+    public function getItems(array $key);
 
     /**
      * Replace cache data
@@ -58,7 +67,7 @@ interface CacheInterface
      * 
      * @return boolean
      */
-    public function replace($key, $data, $ttl = 60);
+    public function replaceItem($key, $data, $ttl = 60);
 
     /**
      * Replace data
@@ -77,7 +86,7 @@ interface CacheInterface
      * 
      * @return boolean
      */
-    public function remove($key);
+    public function removeItem($key);
 
     /**
      * Remove specified keys.

@@ -57,6 +57,7 @@ Yetki doğrulama paketi yetki adaptörleri ile birlikte çeşitli ortak senaryol
     <li><a href="#database-model">Veritabanı Sorgularını Özelleştirmek</a></li>
     <li><a href="#additional-features">Ek Özellikler</a></li>
     <li><a href="#login-event">Oturum Açma Olayı</a></li>
+    <li><a href="#admin-service">Admin Servisi</a></li>
 </ul>
 
 <a name="features"></a>
@@ -263,7 +264,10 @@ $auhtResult = $this->user->login->attempt(
         'db.identifier' => $this->request->post('email'), 
         'db.password' => $this->request->post('password')
     ],
-    $this->request->post('rememberMe')
+    [
+        'rememberMe' => $this->request->post('rememberMe'),
+        'regenerateSessionId' => true
+    ]
 );
 ```
 
@@ -575,9 +579,9 @@ Kimlik dizisinde varolan değeri siler.
 
 ------
 
-##### $this->user->login->attempt(array $credentials, $rememberMe = false);
+##### $this->user->login->attempt(array $credentials, $options = array());
 
-Bu fonksiyon kullanıcı oturumunu açmayı dener ve AuthResult nesnesine döner.
+Oturumunu açmayı dener ve AuthResult nesnesine döner. İkinci parametreden remeberMe ve sessionRegenerateId gibi opsiyonlar belirlenir.
 
 ##### $this->user->login->validate(array $credentials);
 
@@ -650,3 +654,34 @@ Auth paketi yetki doğrulama onayı bazı ek özellikler ile gelir. Bu türden �
 #### Oturum Açma Olayı
 
 Oturum açma işlemi olayına ilişkin bilgi için [Auth-Login-Event.md](Auth-Login-Event.md) dökümentasyonunu inceleyebilirsiniz.
+
+<a name="admin-service"></a>
+
+#### Admin Servisi
+
+Eğer auth paketini bir yönetim paneli için kullanıyorsanız <kbd>user</kbd> (Obullo\Container\ServiceProvider\User) servisini kopyalayın ve <kbd>admin</kbd> isimli yeni bir servis yaratın. Yarattığınız servis sağlayıcısını <kbd>app/providers.php</kbd> içerisine tanımlayın.
+
+```php
+$container->addServiceProvider('Obullo\Container\ServiceProvider\User');
+$container->addServiceProvider('ServiceProvider\Admin');
+```
+
+Servis sağlayıcısı içerisindeki konfigürasyon dosyasını admin olarak değiştirin.
+
+```php
+$params = $this->getConfiguration('admin')->getParams();
+```
+
+User servisi konfigürasyonunu kopyalarak oluşturduğunuz <kbd>local/providers/admin.php</kbd> dosyası içerisinde değişmesi gereken değerleri aşağıdaki gibi güncelleyin.
+
+```php
+'db.model' => 'Auth\Model\Admin',
+'db.tablename' => 'users',
+'db.id' => 'id',
+'db.identifier' => 'username',
+'db.password' => 'password',
+'db.rememberToken' => 'remember_token',
+'cache' => [
+    'key' => 'Admin.Auth',
+```
+
