@@ -216,9 +216,3 @@ Varsayılan önbellek sürücüsüdür ortak arayüz metotlarını kullanarak te
 #### Apc
 
 PECL eklentisi ile kurulum gerektirir ortak arayüz metotlarını kullanarak sunucu önbelleğine kayıt yapar. Kurulum ve sunucu gereksinimleri için <a href="http://php.net/manual/tr/book.apc.php">http://php.net/manual/tr/book.apc.php</a> adresini ziyaret ediniz.
-
-<a name="memcache"></a>
-
-#### Memcache
-
-Php eklentisi ile kurulum gerektirir ortak arayüz metotlarını kullanarak sunucu önbelleğine kayıt yapar. Kurulum ve sunucu gereksinimleri için <a href="http://php.net/manual/tr/book.memcache.php">http://php.net/manual/tr/book.memcache.php</a> adresini ziyaret ediniz.

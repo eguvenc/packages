@@ -144,7 +144,7 @@ class Apc implements CacheInterface
     public function removeItems(array $keys)
     {
         foreach ($keys as $key) {
-            $this->remove($key);
+            $this->removeItem($key);
         }
         return;
     }
@@ -160,7 +160,7 @@ class Apc implements CacheInterface
      */
     public function replaceItem($key, $data, $ttl = 60) 
     {
-        $this->remove($key);
+        $this->removeItem($key);
         return apc_store($key, array($data, time(), $ttl), $ttl);
     }
 
@@ -188,7 +188,7 @@ class Apc implements CacheInterface
      * 
      * @return array
      */
-    public function info($type = null)
+    public function getInfo($type = null)
     {
         return apc_cache_info($type);
     }
@@ -226,11 +226,39 @@ class Apc implements CacheInterface
     {
         if (is_array($data)) {
             foreach ($data as $k => $v) {
-                $this->set($k, $v, $ttl);
+                $this->setItem($k, $v, $ttl);
             }
             return true;
         }
         return false;
+    }
+
+    /**
+     * Get all keys
+     * 
+     * @return array
+     */
+    public function getAllKeys()
+    {
+        $keys = array();
+        foreach ($this->getInfo()['cache_list'] as $value) {
+            $keys[] = $value['key'];
+        };
+        return $keys;
+    }
+
+    /**
+     * Get all data
+     * 
+     * @return array
+     */
+    public function getAllData()
+    {
+        $data = array();
+        foreach ($this->getAllKeys() as $key) {
+            $data[$key] = $this->getItem($key);
+        }
+        return $data;
     }
 
     /**

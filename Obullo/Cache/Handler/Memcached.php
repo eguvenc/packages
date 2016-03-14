@@ -61,33 +61,8 @@ class Memcached implements CacheInterface
      */
     public function connect()
     {
-        $this->openNodeConnections();
         return true;
     }
-
-    /**
-     * Connect to memcached nodes
-     * 
-     * @return void
-     */
-    protected function openNodeConnections()
-    {
-        if (empty($this->params['nodes'][0]['host']) || empty($this->params['nodes'][0]['port'])) {  // If we have no slave servers
-            return;
-        }
-        foreach ($this->params['nodes'] as $servers) {
-            if (empty($servers['host']) || empty($servers['port'])) {
-                throw new RuntimeException(
-                    sprintf(
-                        ' %s node configuration error, host or port can\'t be empty.',
-                        get_class()
-                    )
-                );
-            }
-            $this->memcached->addServer($servers['host'], $servers['port'], $servers['weight']);
-        }
-    }
-
     /**
      * If method does not exist in this class call it from $this->memcached
      * 
@@ -202,7 +177,11 @@ class Memcached implements CacheInterface
      */
     public function getAllData()
     {
-        return $this->memcached->fetchAll();
+        $data = array();
+        foreach ($this->getAllKeys() as $key) {
+            $data[$key] = $this->getItem($key);
+        }
+        return $data;
     }
 
     /**
@@ -319,7 +298,7 @@ class Memcached implements CacheInterface
     public function getMetaData($key)
     {
         $stored = $this->memcached->get($key);
-        if (count($stored) !== 3) {
+        if (empty($stored)) {
             return false;
         }
         list($data, $time, $ttl) = $stored;

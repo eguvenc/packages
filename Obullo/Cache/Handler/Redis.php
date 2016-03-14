@@ -67,35 +67,10 @@ class Redis implements CacheInterface
      */
     public function connect()
     {
-        $this->openNodeConnections();
-
         if ($this->redis->isConnected()) {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Connect to redis nodes
-     * 
-     * @return void
-     */
-    protected function openNodeConnections()
-    {
-        if (empty($this->params['nodes'][0]['host']) || empty($this->params['nodes'][0]['port'])) {  // If we have no slave servers
-            return;
-        }
-        foreach ($this->params['nodes'] as $servers) {
-            if (empty($servers['host']) || empty($servers['port'])) {
-                throw new RuntimeException(
-                    sprintf(
-                        ' %s node configuration error, host or port can\'t be empty.',
-                        get_class()
-                    )
-                );
-            }
-            $this->redis->slaveof($servers['host'], $servers['port']);
-        }
     }
 
     /**
