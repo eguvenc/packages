@@ -36,13 +36,14 @@ Redis sürücüsü sunucunuzda php extension olarak kurulmayı gerektirir. Ubunt
 
 ```php
 $container->addServiceProvider('ServiceProvider\Connector\Redis');
-$container->addServiceProvider('ServiceProvider\Connector\CacheFactory');
 ```
 
 CacheFactory servis sağlayıcısı önbellekleme için ortak bir arayüz sağlar.
 
 ```php
-$cache = $this->container->get('cacheFactory')->shared(
+$cacheFactory = new CacheFactory;
+
+$cache = $cacheFactory->shared(
       [
         'driver' => 'redis', 
         'connection' => 'default'
@@ -94,14 +95,11 @@ $this->container->get('cache')->metod();
 Varsayılan sürücü türü <kbd>app/classes/ServiceProvider/Cache</kbd> servis sağlayıcısından yapılandırılır.
 
 ```php
+$cache = new CacheFactory($container);
+
 $container->share(
     'cache',
-    $container->get('cacheFactory')->shared(
-        [
-            'driver' => 'redis',
-            'connection' => 'default'
-        ]
-    )
+    $cache->shared(['driver' => 'redis', 'connection' => 'default'])
 );
 ```
 

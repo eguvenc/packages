@@ -321,9 +321,8 @@ Kullanmak istediğiniz konnektöre ait servis sağlayıcılarının <kbd>app/pro
 | Connectors
 |--------------------------------------------------------------------------
 */
-$container->addServiceProvider('ServiceProvider\Connector\Redis');
-$container->addServiceProvider('ServiceProvider\Connector\CacheFactory');
-$container->addServiceProvider('ServiceProvider\Connector\Memcached');
+$container->addServiceProvider('ServiceProvider\Redis');
+$container->addServiceProvider('ServiceProvider\Memcached');
 ```
 
 <a name="load-connector"></a>
@@ -364,16 +363,7 @@ return array(
         'second' => [
 
         ],
-
     ],
-
-    'nodes' => [
-        [
-            'host' => '',
-            'port' => 6379,
-        ]
-    ],
-
 );
 
 /* Location: .app/local/providers/redis.php */

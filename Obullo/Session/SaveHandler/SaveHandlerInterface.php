@@ -2,6 +2,7 @@
 
 namespace Obullo\Session\SaveHandler;
 
+use Obullo\Cache\CacheFactory;
 use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
 
 /**
@@ -15,10 +16,10 @@ interface SaveHandlerInterface
     /**
      * Constructor
      *
-     * @param object $provider \Obullo\Service\ServiceProviderInterface
-     * @param array  $params   service parameters
+     * @param object $cacheFactory cacheFactory
+     * @param array  $params       service parameters
      */
-    public function __construct(ServiceProvider $provider, array $params);
+    public function __construct(CacheFactory $cacheFactory, array $params);
 
     /**
     * Php5 session handler interface open function

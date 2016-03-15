@@ -1,27 +1,17 @@
 <?php
 
-namespace Obullo\Container\ServiceProvider\Connector;
+namespace Obullo\Cache;
 
-use RuntimeException;
-use Obullo\Config\ConfigInterface as Config;
-use Interop\Container\ContainerInterface as Container;
-use Obullo\Container\ServiceProvider\AbstractServiceProvider;
+use League\Container\ContainerInterface as Container;
 
 /**
- * Cache Service Provider
+ * Cache Factory
  * 
  * @copyright 2009-2015 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Cache extends AbstractServiceProvider
+class CacheFactory
 {
-    /**
-     * Config
-     * 
-     * @var object
-     */
-    protected $config;
-
     /**
      * Container
      * 
@@ -30,25 +20,20 @@ class Cache extends AbstractServiceProvider
     protected $container;
 
     /**
+     * Connection ids
+     * 
+     * @var array
+     */
+    protected $connections = array();
+
+    /**
      * Constructor
      * 
      * @param object $container container
-     * @param object $config    config
      */
-    public function __construct(Container $container, Config $config)
+    public function __construct(Container $container)
     {
         $this->container = $container;
-        $this->config = $config;
-    }
-
-    /**
-     * Register connections
-     * 
-     * @return void
-     */
-    public function register()
-    {
-        return;
     }
 
     /**
@@ -60,13 +45,16 @@ class Cache extends AbstractServiceProvider
      */
     public function shared($params = array())
     {
-        if (empty($params['driver']) || empty($params['connection'])) {
+        if (empty($params['driver'])) {
             throw new RuntimeException(
                 sprintf(
-                    "Cache provider requires driver and connection parameters. <pre>%s</pre>",
-                    "\$container->get('cacheFactory')->shared(['driver' => 'redis', 'connection' => 'default']);"
+                    "Cache provider requires driver parameters. <pre>%s</pre>",
+                    "\$cacheFactory->shared(['driver' => 'redis']);"
                 )
             );
+        }
+        if (empty($params['connection'])) {
+            $params['connection'] = 'default';
         }
         return $this->factory($params);
     }
@@ -116,14 +104,28 @@ class Cache extends AbstractServiceProvider
             return new $Class;
         }
         if ($driver == 'file') {
-            $options = (! empty($params['options'])) ? $params['options'] : array();
-            return new $Class($options);
+            return new $Class($params);
         }
-        $configParams = $this->config->load('providers::'.$driver);
+        $configParams = $this->container->get('config')->load('providers::'.$driver);
 
         return new $Class(
             $this->container->get($driver)->shared($params),
             $configParams
         );
+    }
+
+    /**
+     * Creates "Unique" connection id using serialized parameters
+     * 
+     * @param string $string serialized parameters
+     * 
+     * @return integer
+     */
+    protected function getConnectionId($string)
+    {
+        $prefix = get_class($this);
+        $connid = $prefix.'_'.sprintf("%u", crc32(serialize($string)));
+        $this->connections[$prefix][] = $connid;
+        return $connid;
     }
 }

@@ -6,6 +6,8 @@ use Obullo\Session\SessionInterface as Session;
 use Interop\Container\ContainerInterface as Container;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+use Obullo\Cache\CacheFactory;
+
 /**
  * Redis storage
  * 
@@ -48,7 +50,9 @@ class Redis extends AbstractStorage implements StorageInterface
      */
     public function connect(Container $container, array $params)
     {
-        $this->cache = $container->get('cacheFactory')->shared(
+        $cacheFactory = new CacheFactory($container);
+
+        $this->cache = $cacheFactory->shared(
             [
                 'driver' => 'redis',
                 'connection' => $params['cache']['provider']['connection']

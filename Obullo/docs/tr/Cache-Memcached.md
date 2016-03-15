@@ -31,17 +31,18 @@ Memcached sürücüsü sunucunuzda php extension olarak kurulmayı gerektirir. U
 
 #### Servis Sağlayıcısı
 
-<kbd>app/providers.php</kbd> dosyasında servis sağlayıcıların tanımlı olduğundan emin olun.
+<kbd>app/providers.php</kbd> dosyasında servis sağlayıcısının tanımlı olduğundan emin olun.
 
 ```php
 $container->addServiceProvider('ServiceProvider\Connector\Memcached');
-$container->addServiceProvider('ServiceProvider\Connector\CacheFactory');
 ```
 
 CacheFactory servis sağlayıcısı önbellekleme için ortak bir arayüz sağlar.
 
 ```php
-$cache = $this->container->get('cacheFactory')->shared(
+$cacheFactory = new CacheFactory;
+
+$cache = $cacheFactory->shared(
       [
         'driver' => 'memcached', 
         'connection' => 'default'
@@ -57,7 +58,6 @@ $cache->method();
 Servis sağlayıcısı <kbd>connection</kbd> anahtarındaki bağlantı değerlerini <kbd>providers/memcached.php</kbd> içerisinden alır.
 
 ```php
-
 return array(
 
     'connections' => 
@@ -87,20 +87,15 @@ $this->container->get('cache')->metod();
 Varsayılan sürücü türü <kbd>app/classes/ServiceProvider/Cache</kbd> servis sağlayıcısından yapılandırılır.
 
 ```php
+$cache = new CacheFactory($container);
+
 $container->share(
     'cache',
-    $container->get('cacheFactory')->shared(
-        [
-            'driver' => 'memcached',
-            'connection' => 'default'
-        ]
-    )
+    $cache->shared(['driver' => 'redis', 'connection' => 'default'])
 );
 ```
 
 Yukarıda görüldüğü gibi redis servis sağlayıcısı varsayılan cache servisi olarak tanımlanıyor.
-
-
 
 <a name="memcached-reference"></a>
 

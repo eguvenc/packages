@@ -2,6 +2,7 @@
 
 namespace Obullo\Session\SaveHandler;
 
+use Obullo\Cache\CacheFactory;
 use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
 
 /**
@@ -27,29 +28,36 @@ class Cache implements SaveHandlerInterface
     protected $storage;
 
     /**
-     * Redis key name
+     * Key name
      * 
      * @var string
      */
-    public $key = 'sessions:';
+    protected $key = 'sessions:';
 
     /**
      * Expiration time of current session
      * 
      * @var integer
      */
-    public $lifetime = 7200; // two hours
+    protected $lifetime = 7200; // two hours
  
+    /**
+     * Cache factory
+     * 
+     * @var object
+     */
+    protected $cacheFactory;
+
     /**
      * Constructor
      *
-     * @param object $provider provider
-     * @param array  $params   service parameters
+     * @param object $cacheFactory cache factory
+     * @param array  $params       service parameters
      */
-    public function __construct(ServiceProvider $provider, array $params)
+    public function __construct(CacheFactory $cacheFactory, array $params)
     {
         $this->params = $params;
-        $this->provider = $provider;
+        $this->cacheFactory = $cacheFactory;
         $this->key = $this->params['storage']['key'];
         $this->lifetime = $this->params['storage']['lifetime'];
     }
@@ -66,8 +74,8 @@ class Cache implements SaveHandlerInterface
     {
         $savePath = $sessionName = null;
 
-        $this->storage = $this->provider->shared(
-            [   
+        $this->storage = $this->cacheFactory->shared(
+            [
                 'driver' => $this->params['storage']['driver'],
                 'connection' => $this->params['provider']['connection']
             ]

@@ -118,12 +118,14 @@ Daha fazla örnek için <a href="https://github.com/videlalvaro/php-amqplib" tar
 
 #### CacheFactory
 
-<kbd>CacheFactory</kbd> paketindeki sürücüleri tek bir arayüz üzerinden kontrol etmek için yazılmış servis sağlayıcısıdır. Uygulamanızdaki seçilen sürücüye göre <kbd>providers/$sürücü.php</kbd> konfigürasyonunu kullanarak cache bağlantılarını yönetir.
+<kbd>CacheFactory</kbd> sınıfı paketindeki sürücüleri tek bir arayüz üzerinden kontrol eder. Uygulamanızdaki seçilen sürücüye göre <kbd>providers/$sürücü.php</kbd> konfigürasyonunu kullanarak cache bağlantılarını yönetir.
 
 Varolan bir önbellek bağlantısını almak için aşağıdaki yöntem izlenir.
 
 ```php
-$cache = $container->get('cacheFactory')->shared( 
+$cacheFactory = new Obullo\Cache\CacheFactory;
+
+$cache = $cacheFactory->shared( 
     [
         'driver' => 'redis',
         'connection' => 'default'
@@ -134,7 +136,7 @@ $cache = $container->get('cacheFactory')->shared(
 Konfigürasyonda olmayan yeni bir bağlantı yaratmak için factory metodu kullanılır.
 
 ```php
-$cache = $container->get('cacheFactory')->factory, 
+$cache = $cacheFactory->factory(
     [
         'driver' => 'redis',
         'options' => array(
@@ -163,7 +165,7 @@ $cache->method();
 Memcached sürücüsü için bir örnek.
 
 ```php
-$cache = $container->get('cacheFactory')->shared( 
+$cache = $cacheFactory->shared( 
     [
         'driver' => 'memcached',
         'connection' => 'default'
