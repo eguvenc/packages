@@ -7,7 +7,7 @@ use Obullo\Config\ConfigInterface as Config;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
 
-use Obullo\Cache\CacheFactory;
+use Obullo\Cache\CacheManager;
 
 /**
  * Session Class
@@ -50,22 +50,22 @@ class Session implements SessionInterface
      * 
      * @var object
      */
-    protected $cacheFactory;
+    protected $cacheManager;
 
     /**
      * Constructor
      * 
-     * @param object $cacheFactory cacheFactory
+     * @param object $cacheManager cache manager
      * @param object $config       config
      * @param object $request      \Psr\Http\Message\RequestInterface
      * @param object $logger       \Obullo\Log\LoggerInterface
      * @param array  $params       service parameters
      */
-    public function __construct(CacheFactory $cacheFactory, Config $config, Request $request, Logger $logger, array $params) 
+    public function __construct(CacheManager $cacheManager, Config $config, Request $request, Logger $logger, array $params) 
     {
         $this->config = $config;
         $this->params = $params;
-        $this->cacheFactory = $cacheFactory;
+        $this->cacheManager = $cacheManager;
 
         $this->server = $request->getServerParams();
         $this->cookie = $request->getCookieParams();
@@ -89,7 +89,7 @@ class Session implements SessionInterface
      */
     public function registerSaveHandler($handler)
     {
-        $this->saveHandler = new $handler($this->cacheFactory, $this->params);
+        $this->saveHandler = new $handler($this->cacheManager, $this->params);
 
         session_set_save_handler(
             array($this->saveHandler, 'open'),

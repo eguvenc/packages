@@ -2,7 +2,6 @@
 
 namespace Obullo\Authentication\Storage;
 
-use Obullo\Cache\CacheFactory;
 use Interop\Container\ContainerInterface as Container;
 
 /**
@@ -23,9 +22,7 @@ class Memcached extends AbstractCache
      */
     public function connect(Container $container, array $params)
     {
-        $cacheFactory = new CacheFactory($container);
-
-        $this->cache = $cacheFactory->shared(
+        $this->cache = $container->get('cacheManager')->shared(
             [
                 'driver' => 'memcached',
                 'connection' => $params['cache']['provider']['connection']

@@ -5,12 +5,12 @@ namespace Obullo\Cache;
 use League\Container\ContainerInterface as Container;
 
 /**
- * Cache Factory
+ * Cache manager
  * 
  * @copyright 2009-2015 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class CacheFactory
+class CacheManager
 {
     /**
      * Container
@@ -49,7 +49,7 @@ class CacheFactory
             throw new RuntimeException(
                 sprintf(
                     "Cache provider requires driver parameters. <pre>%s</pre>",
-                    "\$cacheFactory->shared(['driver' => 'redis']);"
+                    "\$cacheManager->shared(['driver' => 'redis']);"
                 )
             );
         }

@@ -9,15 +9,15 @@ Konnektörler bağlantı yönetimi ile ilgili servis sağlayıcılarıdır. Bir 
 | Connectors
 |--------------------------------------------------------------------------
 */
-$container->addServiceProvider('ServiceProvider\Connector\Redis');
-$container->addServiceProvider('ServiceProvider\Connector\CacheFactory');
-$container->addServiceProvider('ServiceProvider\Connector\Memcached');
+$container->addServiceProvider('ServiceProvider\Redis');
+$container->addServiceProvider('ServiceProvider\CacheManager');
+$container->addServiceProvider('ServiceProvider\Memcached');
 ```
 
 <ul>
     <li><a href="#amqp">Amqp</a> ( PECL )</li>
     <li><a href="#amqpLib">AmqpLib</a> ( videlalvaro/php-amqplib )</li>
-    <li><a href="#cacheFactory">CacheFactory</a></li>
+    <li><a href="#cacheManager">CacheManager</a></li>
     <li><a href="#database">Database</a></li>
     <li><a href="#doctrineDbal">DoctrineDBAL</a></li>
     <li><a href="#qb">Doctrine Query Builder</a></li>
@@ -116,16 +116,16 @@ Daha fazla örnek için <a href="https://github.com/videlalvaro/php-amqplib" tar
 
 <a name="cacheFactory"></a>
 
-#### CacheFactory
+#### CacheManager
 
-<kbd>CacheFactory</kbd> sınıfı paketindeki sürücüleri tek bir arayüz üzerinden kontrol eder. Uygulamanızdaki seçilen sürücüye göre <kbd>providers/$sürücü.php</kbd> konfigürasyonunu kullanarak cache bağlantılarını yönetir.
+<kbd>CacheManager</kbd> sınıfı paketindeki sürücüleri tek bir arayüz üzerinden kontrol eder. Uygulamanızdaki seçilen sürücüye göre <kbd>providers/$sürücü.php</kbd> konfigürasyonunu kullanarak cache bağlantılarını yönetir.
 
 Varolan bir önbellek bağlantısını almak için aşağıdaki yöntem izlenir.
 
 ```php
-$cacheFactory = new Obullo\Cache\CacheFactory;
+$cacheManager = $container->get('cacheManager');
 
-$cache = $cacheFactory->shared( 
+$cache = $cacheManager->shared( 
     [
         'driver' => 'redis',
         'connection' => 'default'
@@ -136,17 +136,17 @@ $cache = $cacheFactory->shared(
 Konfigürasyonda olmayan yeni bir bağlantı yaratmak için factory metodu kullanılır.
 
 ```php
-$cache = $cacheFactory->factory(
+$cache = $cacheManager->factory(
     [
         'driver' => 'redis',
         'options' => array(
             'host' => '127.0.0.1',
             'port' => 6379,
             'options' => array(
-                'auth' => '123456',    // Connection password
+                'auth' => '123456',   // Connection password
                 'timeout' => 30,
                 'persistent' => 0,
-                'reconnection.attemps' => 100,     // For persistent connections
+                'reconnection.attemps' => 100,    // For persistent connections
                 'serializer' => 'none',
                 'database' => null,
                 'prefix' => null,
@@ -226,9 +226,8 @@ $db = $container->get('database')->factory(
 );
 ```
 
-Bir başka veritabanı kullanmak istiyorsanız aşağıda başka bir veritabanına ait yapılandırılma gösteriliyor.
+PostgreSQL veritabanı için bir örnek.
 
-PostgreSQL
 
 ```php
 pgsql:host=127.0.0.1;port=5432;dbname=anydb

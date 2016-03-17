@@ -2,7 +2,7 @@
 
 namespace Obullo\Container\ServiceProvider;
 
-class Session extends AbstractServiceProvider
+class CacheManager extends AbstractServiceProvider
 {
     /**
      * The provides array is a way to let the container
@@ -14,7 +14,7 @@ class Session extends AbstractServiceProvider
      * @var array
      */
     protected $provides = [
-        'session'
+        'cacheManager'
     ];
 
     /**
@@ -28,22 +28,8 @@ class Session extends AbstractServiceProvider
     public function register()
     {
         $container = $this->getContainer();
-        $config    = $this->getConfiguration('session');
 
-        $session = $container->share('session', 'Obullo\Session\Session')
-            ->withArgument($container->get('cacheManager'))
-            ->withArgument($container->get('config'))
-            ->withArgument($container->get('request'))
-            ->withArgument($container->get('logger'))
-            ->withArgument($config->getParams());
-
-        foreach ($config->getMethods() as $method) {
-            
-            $session->withMethodCall(
-                $method['name'],
-                $method['argument']
-            );
-        }
-
+        $container->share('cacheManager', 'Obullo\Cache\CacheManager')
+            ->withArgument($container);
     }
 }

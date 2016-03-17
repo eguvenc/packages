@@ -95,17 +95,14 @@ class Config implements ConfigInterface
 
         $isEnvFile = false;
         if (is_file($envFile)) {   // Do we able to locate environment file ?
-            
             $isEnvFile = true;
             $file = $envFile;
         }
         $config = include $file;
 
         if (self::$env != 'local' && $isEnvFile) { // Merge config variables if env not local.
-
             $localConfig = include $this->local . $filename .'.php';
             return $this->array[$filename] = array_replace_recursive($localConfig, $config);
-
         } else {
             $this->array[$filename] = $config;
         }

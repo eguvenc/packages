@@ -2,6 +2,8 @@
 
 namespace Obullo\Config;
 
+use Obullo\Config\ConfigInterface as Config;
+
 /**
  * Config Aware Interface
  * 

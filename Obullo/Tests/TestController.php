@@ -736,6 +736,25 @@ abstract class TestController extends Controller implements HttpTestInterface
         }
         $this->view->load('tests::result', ['dump' => $this->_varDump, 'results' => $results]);
     }
+
+    /**
+     * Generates console output
+     * 
+     * @return void
+     */
+    protected function __generateCliResponse()
+    {
+        // $results = '';
+        // foreach ($this->_data as $data) {
+        //     if ($data['pass']) {
+        //         $results.= $this->view->get('tests::pass', ['message' => $data['message']]);
+        //     } else {
+        //         $results.= $this->view->get('tests::fail', ['message' => $data['message']]);
+        //     }
+        // }
+        // $this->view->load('tests::result', ['dump' => $this->_varDump, 'results' => $results]);
+    }
+
     /**
      * Generates json response
      * 

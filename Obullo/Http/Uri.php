@@ -85,13 +85,6 @@ class Uri implements UriInterface
     //-------------- OBULLO VARIABLES ----------------//
     
     /**
-     * Obullo Uri string
-     * 
-     * @var string
-     */
-    private $uriPath = '';
-
-    /**
      * Url segments
      * 
      * @var array

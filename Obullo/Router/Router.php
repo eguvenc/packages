@@ -306,13 +306,9 @@ class Router implements RouterInterface
     protected function dispatchRouteMatches($uri, $val, $parameters)
     {
         if (count($val['when']) > 0) {  //  Dynamically add method not allowed middleware
-
-            $this->container->get('middleware')
-                ->add('NotAllowed')
-                ->setParams($val['when']);
+            $this->container->get('middleware')->add('NotAllowed')->setParams($val['when']);
         }
         // Do we have a back-reference ?
-
         if (! empty($val['rewrite']) && strpos($val['rewrite'], '$') !== false 
             && strpos($val['match'], '(') !== false
         ) {

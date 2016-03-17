@@ -2,7 +2,7 @@
 
 namespace Obullo\Session\SaveHandler;
 
-use Obullo\Cache\CacheFactory;
+use Obullo\Cache\CacheManager;
 use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
 
 /**
@@ -46,18 +46,18 @@ class Cache implements SaveHandlerInterface
      * 
      * @var object
      */
-    protected $cacheFactory;
+    protected $cacheManager;
 
     /**
      * Constructor
      *
-     * @param object $cacheFactory cache factory
+     * @param object $cacheManager cache factory
      * @param array  $params       service parameters
      */
-    public function __construct(CacheFactory $cacheFactory, array $params)
+    public function __construct(CacheManager $cacheManager, array $params)
     {
         $this->params = $params;
-        $this->cacheFactory = $cacheFactory;
+        $this->cacheManager = $cacheManager;
         $this->key = $this->params['storage']['key'];
         $this->lifetime = $this->params['storage']['lifetime'];
     }
@@ -74,7 +74,7 @@ class Cache implements SaveHandlerInterface
     {
         $savePath = $sessionName = null;
 
-        $this->storage = $this->cacheFactory->shared(
+        $this->storage = $this->cacheManager->shared(
             [
                 'driver' => $this->params['storage']['driver'],
                 'connection' => $this->params['provider']['connection']

@@ -2,8 +2,6 @@
 
 namespace Obullo\Router;
 
-use Obullo\Router\RouterInterface as Router;
-
 /**
  * Domain properties
  * 
