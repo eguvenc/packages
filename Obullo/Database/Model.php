@@ -19,14 +19,26 @@ class Model
      */
     public function __get($key)
     {
-        if ((PHP_SAPI === 'cli' || defined('STDIN'))) {
-            $object = \Obullo\Cli\Controller::$instance->container->get($key);
-        } else {
-            $object = \Obullo\Http\Controller::$instance->container->get($key);
-        }
+        $object = $this->getContainer()->get($key);
+
         if (is_object($object)) {
             return $object;
         }
         return;
     }
+
+    /**
+     * Returns to container
+     * 
+     * @return object
+     */
+    public function getContainer()
+    {
+        if (defined('STDIN') && ! empty($_SERVER['argv'][0]) && $_SERVER['argv'][0] == 'task') {
+            return \Obullo\Cli\Controller::$instance->container->get($key);
+        } else {
+            return \Obullo\Http\Controller::$instance->container->get($key);
+        }
+    }
+
 }

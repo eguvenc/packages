@@ -1,5 +1,12 @@
 <?php
-
+register_shutdown_function(
+    function () {
+        $error = error_get_last();
+        if (! empty($error)) {
+            echo $error['message']." File: ".$error['file']." Line : ".$error['line'];
+        }
+    }
+);
 /**
  * Detect environment
  * 

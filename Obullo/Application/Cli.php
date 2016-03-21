@@ -69,7 +69,7 @@ class Cli extends Application
         }
         $controller = new $className($this->container);  // Call the controller
         $controller->container = $this->container;
-        
+
         if (! method_exists($className, $router->getMethod())) {
             $this->router->methodNotFound();
         }

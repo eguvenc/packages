@@ -289,27 +289,6 @@ class Memcached implements CacheInterface
     }
 
     /**
-     * Get Meta Data
-     * 
-     * @param string $key cache key.
-     * 
-     * @return object
-     */
-    public function getMetaData($key)
-    {
-        $stored = $this->memcached->get($key);
-        if (empty($stored)) {
-            return false;
-        }
-        list($data, $time, $ttl) = $stored;
-        return array(
-            'expire' => $time + $ttl,
-            'mtime'  => $time,
-            'data'   => $data
-        );
-    }
-
-    /**
      * Set Array
      * 
      * @param array $data cache data

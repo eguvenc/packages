@@ -105,9 +105,8 @@ class Router
     public function init()
     {   
         if ($this->getPath() == '') {     // Is there a URI string ? // If not, the default controller specified in the "routes" file will be shown.
-            $segments = $this->validateRequest(explode('/', $this->defaultController));  // Turn the default route into an array.
-            $this->setClass($segments[0]);
-            $this->setMethod('index');
+
+            $this->setRequest(array('welcome')); // Turn the default route into an array.
             $this->logger->debug('No URI present. Default controller set.');
             return;
         }
@@ -203,7 +202,8 @@ class Router
      */
     public function classNotFound()
     {
-        die('[Error]: The task command ' .$this->getNamespace(). ' not found.'."\n");
+        echo Console::fail('The task command "' .$this->getNamespace(). '" not found.');
+        die;
     }
 
     /**
@@ -213,9 +213,9 @@ class Router
      */
     public function methodNotFound()
     {
-        die('[Error]: The method ' .$this->getMethod(). ' not found in '.$this->getClass()." task.\n");
+        echo Console::fail('The method "' .$this->getMethod(). '" not found.');
+        die;
     }
-
 
     /**
      * Set the class name

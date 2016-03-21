@@ -64,7 +64,6 @@ class Http extends Application
         $router = $container->get('router');
 
         include APP .'routes.php';
-
         $this->boot($router, $middleware);
     }
 
@@ -88,6 +87,7 @@ class Http extends Application
             $router->clear();  // Fix layer errors.
             $this->error = true;
         } else {
+
             $this->controller = new $className($this->container);
             $this->controller->container = $this->container;
 
