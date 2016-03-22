@@ -1,6 +1,6 @@
 <?php
 
-namespace Obullo\Tests;
+namespace Obullo\Tests\Util;
 
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;

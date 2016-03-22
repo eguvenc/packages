@@ -47,7 +47,7 @@ abstract class AbstractCache extends AbstractStorage implements StorageInterface
      */
     public function isEmpty($block = '__permanent')
     {
-        $exists = $this->cache->hasItem($this->getBlock($block));
+        $exists = $this->getCredentials($block);
         return ($exists) ? false : true;
     }
 
@@ -60,9 +60,9 @@ abstract class AbstractCache extends AbstractStorage implements StorageInterface
     {
         if (! $this->isEmpty('__permanent')) {  // If user has cached auth return to data otherwise false
 
-            $data = $this->getCredentials($this->getMemoryBlockKey('__permanent'));
+            $data = $this->getCredentials();
 
-            if (count($data) == 0 || ! isset($data['__isAuthenticated']) ) {
+            if ($data == false || count($data) == 0 || ! isset($data['__isAuthenticated']) ) {
                 return false;
             }
             return $data;

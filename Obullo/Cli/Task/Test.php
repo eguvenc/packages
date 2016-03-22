@@ -4,7 +4,7 @@ namespace Obullo\Cli\Task;
 
 use Obullo\Cli\Console;
 use Obullo\Cli\Controller;
-use Obullo\Tests\Directory;
+use Obullo\Tests\Util\Directory;
 use Obullo\Utils\Process\Process;
 
 class Test extends Controller
@@ -61,12 +61,13 @@ class Test extends Controller
             $p += $m["passes"];
             $f += $m["failures"];
         }
-
         echo Console::text("--------------------------------------------- ", "yellow");
         echo Console::newline(1);
-        echo Console::text("Total: $a ", "yellow");
-        echo Console::text("Passes: $p ", "green");
-        echo Console::text("Failures: $f ", "red");
+        echo Console::text("Total    : $a ", "yellow");
+        echo Console::newline(1);
+        echo Console::text("Passes   : $p ", "green");
+        echo Console::newline(1);
+        echo Console::text("Failures : $f ", "red");
         echo Console::newline(2);
     }
 
@@ -133,9 +134,11 @@ class Test extends Controller
             }
             echo Console::text("--------------------------------------------- ", "yellow");
             echo Console::newline(1);
-            echo Console::text("Total: $ta ", "yellow");
-            echo Console::text("Passes: $tp ", "green");
-            echo Console::text("Failures: $tf ", "red");
+            echo Console::text("Total    : $ta ", "yellow");
+            echo Console::newline(1);
+            echo Console::text("Passes   : $tp ", "green");
+            echo Console::newline(1);
+            echo Console::text("Failures : $tf ", "red");
             echo Console::newline(2);
 
         } else {

@@ -2,6 +2,7 @@
 
 namespace Obullo\Authentication\Storage;
 
+use Obullo\Tests\TestOutput;
 use Obullo\Tests\TestController;
 
 class AbstractTestStorage extends TestController
@@ -266,8 +267,12 @@ class AbstractTestStorage extends TestController
             'password' => '12346',
         ];
         $this->storage->createPermanent($credentials);
+
         $this->assertFalse($this->storage->isEmpty(), "I login and i expect that the value is false.");
+
         $this->storage->deleteCredentials();
+        $credentials = $this->storage->getCredentials();
+        
         $this->assertTrue($this->storage->isEmpty(), "I delete user credentials and i expect that the value is true.");
     }
 
@@ -300,7 +305,7 @@ class AbstractTestStorage extends TestController
         if ($this->assertArrayHasKey($password, $result, "I expect identity array has '$password' key.")) {
             $this->assertEqual($result['password'], $credentials['password'], "I expect that the value is equal to ".$credentials['password'].".");
         }
-        $this->varDump($result);
+        TestOutput::varDump($result);
         $this->storage->deleteCredentials();
     }
 
@@ -445,7 +450,7 @@ class AbstractTestStorage extends TestController
             $this->assertEqual($cacheIdentifier, $this->storage->getMemoryBlockKey('__permanent'), "I expect that the value of cache identifier is equal to $cacheIdentifier.");
             $this->assertArrayHasKey('__time', $result[$loginId], "I expect array has '__time' key.");
         }
-        $this->varDump($result);
+        TestOutput::varDump($result);
         $this->storage->deleteCredentials();
     }
 

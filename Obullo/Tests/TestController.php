@@ -18,13 +18,6 @@ use Obullo\Tests\Constraint\TraversableContains;
  */
 abstract class TestController extends Controller implements HttpTestInterface
 {
-    protected $_data = array();     // View data
-    protected $_varDump = null;     // Var dump variable
-    protected $_errors = array();   // Login trait errors
-    protected $_commands = array(); // Method commands
-    protected $_disabledMethods = array();  // Disabled method array
-    protected $_disableConsole = false;
-
     /**
      * Index
      * 
@@ -32,22 +25,12 @@ abstract class TestController extends Controller implements HttpTestInterface
      */
     public function index()
     {
-        $contentType = $this->__getContentType();
+        $contentType = TestHelper::getContentType($this->request);
 
         if ($contentType == 'html') {
             $this->view->load(
                 'tests::index',
-                ['content' => $this->getHtmlClassMethods()]
-            );
-        }
-        if ($contentType == 'json') {
-            return $this->response->json(
-                array(
-                    'class' => [
-                        'name' => $this->router->getNamespace().$this->router->getClass(),
-                        'methods' => $this->getClassMethods()
-                    ]
-                )
+                ['content' => TestHelper::getHtmlClassMethods($this, $this->container)]
             );
         }
         if ($contentType == 'console') {
@@ -58,152 +41,15 @@ abstract class TestController extends Controller implements HttpTestInterface
              */
             if (! empty($queryParams['suite'])) {
                 $results = [
-                    'disabled' => $this->checkConsoleAccess(),
+                    'disabled' => TestPreferences::isIgnored('console'),
                     'class' => rtrim($this->request->getUri()->getPath(), "/"),
-                    'methods' => $this->getClassMethods(),
+                    'methods' => TestHelper::getClassMethods($this),
                 ];
                 return $this->response->json($results);
             }
-            /**
-             * Single mode
-             */
-            echo Console::logo("Welcome to Test Manager (c) 2016");
-            echo Console::newline(2);
-
-            $Class = $this->url->anchor("tests/", ucfirst($this->router->getClass()));
-
-            echo Console::text(strip_tags($Class). " Class", "yellow");
-            echo Console::newline(2);
-
-            $content = str_replace(array("<br >", "<br>", "<br />"), "\n", $this->getHtmlClassMethods());
-            $methods = explode("\n", strip_tags(trim($content, "\n")));
-
-            foreach ($methods as $value) {
-                echo Console::text("- ".$value, "yellow");
-                echo Console::newline(1);
-            }
-            echo Console::newline(1);
+            TestOutput::generateConsoleFileView($this, $this->container);
             return;
         }
-    }
-
-    /**
-     * Disabled console
-     * 
-     * @return void
-     */
-    public function disableConsole()
-    {
-        $this->_disableConsole = true;
-    }
-
-    /**
-     * Check console access
-     * 
-     * @return bool
-     */
-    public function checkConsoleAccess()
-    {
-        return $this->_disableConsole;
-    }
-
-    /**
-     * Disabled methods
-     * 
-     * @param array $methods methods
-     *
-     * @return void
-     */
-    public function setDisabledMethods(array $methods)
-    {
-        $this->_disabledMethods = $methods;
-    }
-
-    /**
-     * Returns to class methods
-     * 
-     * @return array
-     */
-    public function getClassMethods()
-    {
-        $disabledMethods = [
-            'index',
-            '__construct',
-            '__get',
-            '__set',
-            '__add',
-            '__checkType',
-            '__getContentType',
-            '__generateHtmlResponse',
-            '__generateJsonResponse',
-            '__generateConsoleResponse',
-            '__getParsedCommandBody',
-            '__convertToDateTime',
-            'getClassMethods',
-            'getHtmlClassMethods',
-            'generateTestResults',
-            'varDump',
-            'setError',
-            'setDisabledMethods',
-            'setCommandRefresh',
-            'newLoginRequest',
-            'assertTrue',
-            'assertFalse',
-            'assertNull',
-            'assertEqual',
-            'assertEmpty',
-            'assertNotEmpty',
-            'assertNotEqual',
-            'assertInstanceOf',
-            'assertArrayHasKey',
-            'assertArrayNotHasKey',
-            'assertContains',
-            'assertGreaterThan',
-            'assertLessThan',
-            'assertInternalType',
-            'assertNotInternalType',
-            'assertNotType',
-            'assertObjectHasAttribute',
-            'assertObjectNotHasAttribute',
-            'assertThat',
-            'assertArrayContains',
-            'assertStringContains',
-            'assertDate',
-        ];
-        $disabledMethods = array_merge($disabledMethods, $this->_disabledMethods);
-        $methods = array();
-        foreach (get_class_methods($this) as $name) {
-            if (! in_array($name, $disabledMethods))
-            $methods[] = $name;
-        }
-        return $methods;
-    }
-
-    /**
-     * Get class methods as html
-     * 
-     * @return string|array
-     */
-    public function getHtmlClassMethods()
-    {
-        $html = "";
-        foreach ($this->getClassMethods() as $name) {
-            $html.= $this->url->anchor(rtrim($this->request->getUri()->getPath(), "/")."/".$name, $name)."<br>";
-        }
-        return $html;
-    }
-
-    /**
-     * Set http test errors then we send them as json response
-     * 
-     * @param string $error  error
-     * @param string $header error header
-     *
-     * @return void
-     */
-    public function setError($error, $header = "Test")
-    {
-        $this->_errors[] = array('message' => $error, 'header' => $header);
     }
 
     /**
@@ -220,7 +66,7 @@ abstract class TestController extends Controller implements HttpTestInterface
         if ($x === true) {
             $pass = true;
         }
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
     }
 
@@ -238,7 +84,7 @@ abstract class TestController extends Controller implements HttpTestInterface
         if ($x === false) {
             $pass = true;
         }
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
     }
 
@@ -256,7 +102,7 @@ abstract class TestController extends Controller implements HttpTestInterface
         if ($x === null) {
             $pass = true;
         }
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
     }
 
@@ -275,7 +121,7 @@ abstract class TestController extends Controller implements HttpTestInterface
         if ($x == $y) {
             $pass = true;
         }
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
     }
 
@@ -294,7 +140,7 @@ abstract class TestController extends Controller implements HttpTestInterface
         if ($x != $y) {
             $pass = true;
         }
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
     }
 
@@ -313,7 +159,7 @@ abstract class TestController extends Controller implements HttpTestInterface
         if ($y instanceof $x) {
             $pass = true;
         }
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
     }
 
@@ -336,7 +182,7 @@ abstract class TestController extends Controller implements HttpTestInterface
         ) {
             $pass = true;
         }
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
     }
 
@@ -359,7 +205,7 @@ abstract class TestController extends Controller implements HttpTestInterface
         ) {
             $pass = true;
         }
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
     }
 
@@ -377,7 +223,7 @@ abstract class TestController extends Controller implements HttpTestInterface
         $pass = false;
         if (is_string($needle) || is_object($needle)) {
             if (in_array($needle, $haystack, true)) {
-                $this->__add(['pass' => true, 'message' => $message]);
+                TestOutput::setData(['pass' => true, 'message' => $message]);
                 $pass = true;
             }
         }
@@ -389,7 +235,7 @@ abstract class TestController extends Controller implements HttpTestInterface
                 $pass = true;
             }
         }
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
     }
 
@@ -433,7 +279,7 @@ abstract class TestController extends Controller implements HttpTestInterface
         if ($constraint->matches($value)) {
             $pass = true;
         }
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
     }
 
@@ -452,7 +298,7 @@ abstract class TestController extends Controller implements HttpTestInterface
         if ($x > $y) {
             $pass = true;
         }
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
     } 
 
@@ -471,7 +317,7 @@ abstract class TestController extends Controller implements HttpTestInterface
         if ($x < $y) {
             $pass = true;
         }
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
     }
 
@@ -489,7 +335,7 @@ abstract class TestController extends Controller implements HttpTestInterface
         if (empty($x)) {
             $pass = true;
         }
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
     } 
 
@@ -507,72 +353,9 @@ abstract class TestController extends Controller implements HttpTestInterface
         if (! empty($x)) {
             $pass = true;
         }
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
     } 
-
-    /**
-     * Get internal type
-     * 
-     * @param string $expected value
-     * @param mixed  $actual   value
-     * 
-     * @return boolean
-     */
-    protected function __checkType($expected, $actual)
-    {
-        switch ($expected) {
-        case ($expected == 'integer' || $expected == 'int'):
-            $pass = is_int($actual);
-            break;
-        case ($expected == 'boolean' || $expected == 'bool'):
-            $pass = is_bool($actual);
-            break;
-        case ($expected == 'string'):
-            $pass = is_string($actual);
-            break;
-        case ($expected == 'object'):
-            $pass = is_object($actual);
-            break;    
-        case ($expected == 'float'):
-            $pass = is_float($actual);
-            break;
-        case ($expected == 'double'):
-            $pass = is_double($actual);
-            break;
-        case ($expected == 'resource'):
-            $pass = is_resource($actual);
-            break;
-        case ($expected == 'null'):
-            $pass = is_null($actual);
-            break;
-        case ($expected == 'numeric'):
-            $pass = is_numeric($actual);
-            break;
-        case ($expected == 'scalar'):
-            $pass = is_scalar($actual);
-            break;
-        case ($expected == 'alpha'):
-            $pass = ctype_alpha($actual);
-            break;
-        // case ($expected == 'alphaunicode'):
-        //     $pass = "";
-        //     break;
-        case ($expected == 'alnum'):
-            $pass = ctype_alnum($actual);
-            break;
-        // case ($expected == 'alnumunicode'):
-        //     $pass = '';
-        //     break;
-        // case ($expected == 'digitunicode'):
-        //     $pass = '';
-        //     break;
-        case ($expected == 'lower'):
-            $pass = ctype_lower($actual);
-            break;
-        }
-        return $pass;
-    }
 
     /**
      * Assert internal type
@@ -589,7 +372,7 @@ abstract class TestController extends Controller implements HttpTestInterface
         if ($this->__checkType($expected, $actual)) {
             $pass = true;
         }
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
     }
 
@@ -608,7 +391,7 @@ abstract class TestController extends Controller implements HttpTestInterface
         if (false == $this->__checkType($expected, $actual)) {
             $pass = true;
         }
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
     }
     /**
@@ -622,29 +405,11 @@ abstract class TestController extends Controller implements HttpTestInterface
     public function assertDate($date, $message = "")
     {
         $pass = false;
-        if ($this->__convertToDateTime($date)) {
+        if (TestHelper::convertToDateTime($date)) {
             $pass = true;
         }
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
-    }    
-
-     /**
-     * Attempts to convert an int, string, or array to a DateTime object
-     *
-     * @param string|int|array $value value
-     * 
-     * @return bool
-     */
-    protected function __convertToDateTime($value)
-    {
-        if ($value instanceof DateTime) {
-            return true;
-        }
-        if (is_integer($value)) {
-            $value = @date("Y-m-d H:i:s", $value);
-        }
-        return date_create("$value");
     }
 
     /**
@@ -659,7 +424,7 @@ abstract class TestController extends Controller implements HttpTestInterface
     public function assertObjectHasAttribute($attribue, $object, $message = "")
     {
         $pass = property_exists($object, $attribue); 
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
     }
     
@@ -675,32 +440,8 @@ abstract class TestController extends Controller implements HttpTestInterface
     public function assertObjectNotHasAttribute($attribue, $object, $message = "")
     {
         $pass = property_exists($object, $attribue) ? false : true;
-        $this->__add(['pass' => $pass, 'message' => $message]);
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
-    }
-
-    /**
-     * Dump output
-     *
-     * @param mixed $value dump value
-     * 
-     * @return string
-     */
-    public function varDump($value)
-    {
-        $this->_varDump = $value;
-    }
-
-    /**
-     * Add view data
-     * 
-     * @param array $data data
-     * 
-     * @return void
-     */
-    protected function __add($data = array())
-    {
-        $this->_data[] = $data;
     }
 
     /**
@@ -708,31 +449,28 @@ abstract class TestController extends Controller implements HttpTestInterface
      * 
      * @return void
      */
-    public function generateTestResults()
+    public function __generateTestResults()
     {
-        $contentType = $this->__getContentType();
+        $contentType = TestHelper::getContentType($this->request);
 
         switch ($contentType) {
-        case 'json':
-            if (! empty($this->_errors)) {
-                return $this->response->json(array('errors' => $this->_errors));
-            }
-            return $this->__generateJsonResponse();
-            break;
         case 'console':
-            if (! empty($this->_errors)) {
-                // var_dump($this->errors);
+            if (TestOutput::hasError()) {
+                foreach (TestOutput::getErrors() as $error) {
+                    echo Console::fail($error);
+                    echo Console::newline(1);
+                }
             }
             return $this->__generateConsoleResponse();
             break;
         default:
-            if (! empty($this->_errors)) {
-                foreach ($this->_errors as $error) {
+            if (TestOutput::hasError()) {
+                foreach (TestOutput::getErrors() as $error) {
                     $this->view->load(
                         'templates::error',
                         [
-                            'header' => $error['header'].' Error',
-                            'error' => $error['message']
+                            'header' => 'Test Error',
+                            'error' => $error
                         ]
                     );
                 }
@@ -744,22 +482,6 @@ abstract class TestController extends Controller implements HttpTestInterface
     }
 
     /**
-     * Returns to content type (console, json, html)
-     * 
-     * @return string
-     */
-    protected function __getContentType()
-    {
-        $query  = $this->request->getQueryParams();
-        $server = $this->request->getServerParams();
-
-        if (defined('STDIN') && ! empty($server['argv'][0]) && strpos($server['argv'][0], "test") === 0) {
-            return 'console';
-        }
-        return isset($query['response']) ? $query['response'] : 'html';
-    }
-
-    /**
      * Generates html content
      * 
      * @return void
@@ -767,14 +489,14 @@ abstract class TestController extends Controller implements HttpTestInterface
     protected function __generateHtmlResponse()
     {
         $results = '';
-        foreach ($this->_data as $data) {
+        foreach (TestOutput::getData() as $data) {
             if ($data['pass']) {
                 $results.= $this->view->get('tests::pass', ['message' => $data['message']]);
             } else {
                 $results.= $this->view->get('tests::fail', ['message' => $data['message']]);
             }
         }
-        $this->view->load('tests::result', ['dump' => $this->_varDump, 'results' => $results]);
+        $this->view->load('tests::result', ['dump' => TestOutput::getVarDumpArray(), 'results' => $results]);
     }
 
     /**
@@ -793,7 +515,8 @@ abstract class TestController extends Controller implements HttpTestInterface
         $passes = 0;
         $failures = 0;
         $results = array();
-        foreach ($this->_data as $data) {
+        foreach (TestOutput::getData() as $data) {
+
             if ($data['pass']) {
                 ++$passes;
                 $results[] = array(
@@ -808,7 +531,7 @@ abstract class TestController extends Controller implements HttpTestInterface
                 );
             }
         }
-        $assertions = count($this->_data);
+        $assertions = count(TestOutput::getData());
         $completed  = $passes + $failures;
 
         if (! empty($queryParams['suite'])) {
@@ -820,70 +543,14 @@ abstract class TestController extends Controller implements HttpTestInterface
                 ]
             );
         }
-        echo Console::logo("Welcome to Test Manager (c) 2016");
-        echo Console::newline(2);
-        echo Console::text(
-            'Results of "'. $ancestor.'/'.$folder.'/'.lcfirst($class).'->'.$method.'()"',
-            "yellow"
-        );
-        echo Console::newline(2);
-
-        foreach ($this->_data as $data) {
-            if ($data['pass']) {
-                echo Console::text("* ".$data['message'], "yellow");
-                echo Console::newline(1);
-                echo Console::text("Pass", "green");
-                echo Console::newline(1);
-            } else {
-                echo Console::text("*".$data['message'], "yellow");
-                echo Console::newline(1);
-                echo Console::text("Fail", "red");
-                echo Console::newline(1);
-            }
-        }
-        echo Console::newline(1);
-        echo Console::text("$assertions/$completed tests complete: ", "yellow", true);
-        echo Console::text("$passes passes and $failures fails.", "yellow");
-        echo Console::newline(2);
-    }
-
-    /**
-     * Generates json response
-     * 
-     * @return void
-     */
-    protected function __generateJsonResponse()
-    {
-        $passes = 0;
-        $failures = 0;
-        $results = array();
-        foreach ($this->_data as $data) {
-            if ($data['pass']) {
-                ++$passes;
-                $results[] = array(
-                    'message' => $data['message'],
-                    'pass' => true,
-                );
-            } else {
-                ++$failures;
-                $results[] = array(
-                    'message' => $data['message'],
-                    'pass' => false,
-                );
-            }
-        }
-        return $this->response->json(
-            array(
-                'results' => $results,
-                'dump'  => $this->_varDump,
-                'commands' => $this->_commands,
-                'total' => [
-                    'passes' => $passes,
-                    'fails' => $failures,
-                    'assertions' => count($this->_data),
-                ]
-            )
-        );
+        $class = $ancestor.'/'.$folder.'/'.lcfirst($class).'->'.$method.'()';
+        $stats = [
+            'c' => $completed,
+            'a' => $assertions,
+            'p' => $passes,
+            'f' => $failures
+        ];
+        TestOutput::generateConsoleView($data, $class, $stats);
     }
 
 }

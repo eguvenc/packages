@@ -78,9 +78,9 @@ class Redis extends AbstractStorage implements StorageInterface
     {
         if (! $this->isEmpty('__permanent')) {  // If user has cached auth return to data otherwise false
 
-            $data = $this->getCredentials($this->getMemoryBlockKey('__permanent'));
+            $data = $this->getCredentials('__permanent');
 
-            if (count($data) == 0 || ! isset($data['__isAuthenticated']) ) {
+            if ($data == false || count($data) == 0 || ! isset($data['__isAuthenticated']) ) {
                 return false;
             }
             return $data;

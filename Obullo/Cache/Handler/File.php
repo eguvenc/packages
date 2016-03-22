@@ -313,34 +313,6 @@ class File implements CacheInterface
     }
 
     /**
-     * Get Meta Data
-     * 
-     * @param string $key cache key.
-     * 
-     * @return array otherwise boolean
-     */
-    public function getMetaData($key)
-    {
-        if (! file_exists($this->filePath . $key)) {
-            return false;
-        }
-        $data = file_get_contents($this->filePath . $key);
-        $data = unserialize($data);
-
-        if (is_array($data)) {
-            $mtime = filemtime($this->filePath . $key);
-            if (! isset($data['ttl'])) {
-                return false;
-            }
-            return array(
-                'expire' => $mtime + $data['ttl'],
-                'mtime' => $mtime
-            );
-        }
-        return false;
-    }
-
-    /**
      * Set Array
      * 
      * @param array $data data

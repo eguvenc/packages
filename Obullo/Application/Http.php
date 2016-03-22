@@ -205,7 +205,7 @@ class Http extends Application
             array_slice($this->controller->request->getUri()->getRoutedSegments(), $router->getArgumentFactor())
         );
         if ($router->getMethod() != 'index' && $this->controller instanceof HttpTestInterface) {
-            $result = $this->controller->generateTestResults();
+            $result = $this->controller->__generateTestResults();
         }
         if ($result instanceof Response) {
             $response = $result;

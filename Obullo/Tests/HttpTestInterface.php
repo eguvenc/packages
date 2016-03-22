@@ -15,5 +15,5 @@ interface HttpTestInterface
      * 
      * @return void
      */
-    public function generateTestResults();
+    public function __generateTestResults();
 }
