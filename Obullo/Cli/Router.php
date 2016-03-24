@@ -172,17 +172,17 @@ class Router
         }
         $Class = self::ucwordsUnderscore($segments[0]);
 
-        if (! empty($segments[0]) && file_exists(TASKS .$Class.'.php')) {
+        if (! empty($segments[0]) && is_file(TASKS .$Class.'.php')) {
             $this->classNamespace = '\\Tasks\\'.$Class;
             include_once TASKS .$Class.'.php';
             return $segments;
         }
-        if (! empty($segments[0]) && file_exists(OBULLO .'Cli/Task/'.$Class.'.php')) {
+        if (! empty($segments[0]) && is_file(OBULLO .'Cli/Task/'.$Class.'.php')) {
             $this->classNamespace = '\\Obullo\Cli\Task\\'.$Class;
             include_once OBULLO.'Cli/Task/'.$Class.'.php';
             return $segments;
         }
-        return $this->classNotFound();
+        return $this->classNotFound($segments);
     }
 
     /**
@@ -202,7 +202,7 @@ class Router
      */
     public function classNotFound()
     {
-        echo Console::fail('The task command "' .$this->getNamespace(). '" not found.');
+        echo Console::fail('The task command not found.');
         die;
     }
 

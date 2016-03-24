@@ -24,7 +24,7 @@ class TestHelper
         $query  = $request->getQueryParams();
         $server = $request->getServerParams();
 
-        if (defined('STDIN') && ! empty($server['argv'][0]) && strpos($server['argv'][0], "test") === 0) {
+        if (defined('STDIN') && ! empty($server['argv'][0]) && strpos($server['argv'][0], "public/index.php") === 0) {
             return 'console';
         }
         return isset($query['response']) ? $query['response'] : 'html';

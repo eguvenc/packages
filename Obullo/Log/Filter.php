@@ -2,7 +2,6 @@
 
 namespace Obullo\Log;
 
-use Obullo\Log\LoggerInterface as Logger;
 use Obullo\Container\ContainerAwareInterface;
 
 /**

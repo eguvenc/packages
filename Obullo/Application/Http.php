@@ -45,11 +45,7 @@ class Http extends Application
     {
         $container = $this->getContainer();  // Make global
         $app = $container->get('app');
-
-        include APP .'errors.php';
-
-        $this->registerErrorHandlers();
-
+        
         include APP .'providers.php';
 
         $container->share('router', 'Obullo\Router\Router')
@@ -78,16 +74,16 @@ class Http extends Application
     protected function boot(Router $router, Middleware $middleware)
     {
         $router->init();
-        include FOLDERS .$router->getAncestor('/').$router->getFolder('/').$router->getClass().'.php';
+        $file = FOLDERS .$router->getAncestor('/').$router->getFolder('/').$router->getClass().'.php';
 
         $className = '\\'.$router->getNamespace().$router->getClass();
         $method    = $router->getMethod();
 
-        if (! class_exists($className, false)) {
+        if (! is_file($file)) {
             $router->clear();  // Fix layer errors.
             $this->error = true;
         } else {
-
+            include $file;
             $this->controller = new $className($this->container);
             $this->controller->container = $this->container;
 

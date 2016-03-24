@@ -2,6 +2,9 @@
 
 namespace Obullo\Application;
 
+use Exception;
+use ErrorException;
+
 /**
  * Run Cli Application ( Warning : Http middlewares & Layers disabled in Cli mode.)
  * 
@@ -20,10 +23,6 @@ class Cli extends Application
         $container = $this->getContainer();
         $app = $container->get('app');
 
-        include APP .'errors.php';
-
-        $this->registerErrorHandlers();
-
         include APP .'providers.php';
 
         $logger  = $container->get('logger');
@@ -37,12 +36,50 @@ class Cli extends Application
             $translator = $container->get('translator');
             $translator->setLocale($translator->getDefault());  // Set default translation
         }
+        set_error_handler(array($this, 'handleError'));
+        set_exception_handler(array($this, 'handleException'));
         register_shutdown_function(
             function () use ($logger) {
-                $this->registerFatalError();
+                $this->handleFatalError();
                 $logger->shutdown();
             }
         );
+    }
+
+    /**
+     * Error handler, convert all errors to exceptions
+     * 
+     * @param integer $level   name
+     * @param string  $message error message
+     * @param string  $file    file
+     * @param integer $line    line
+     * 
+     * @return boolean whether to continue displaying php errors
+     */
+    public function handleError($level, $message, $file = '', $line = 0)
+    {
+        $e = new ErrorException($message, $level, 0, $file, $line);
+        $exception = new \Obullo\Error\Exception;
+        echo $exception->make($e);
+
+        $log = new \Obullo\Error\Log($this->getContainer()->get('logger'));
+        $log->error($e);
+    }
+
+    /**
+     * Exception error handler
+     * 
+     * @param Exception $e exception class
+     * 
+     * @return boolean
+     */
+    public function handleException(Exception $e)
+    {
+        $exception = new \Obullo\Error\Exception;
+        echo $exception->make($e);
+
+        $log = new \Obullo\Error\Log($this->getContainer()->get('logger'));
+        $log->error($e);
     }
 
     /**
@@ -63,10 +100,7 @@ class Cli extends Application
 
         $router->init();
         $className = $router->getNamespace();
-
-        if (! class_exists($className, false)) {
-            $this->router->classNotFound();
-        }
+        
         $controller = new $className($this->container);  // Call the controller
         $controller->container = $this->container;
 
@@ -86,6 +120,20 @@ class Cli extends Application
         );
         if (isset($_SERVER['argv'])) {
             $logger->debug('php '.implode(' ', $_SERVER['argv']));
+        }
+    }
+
+    /**
+     * Handle fatal errors
+     * 
+     * @return mixed
+     */
+    public function handleFatalError()
+    {   
+        if (null != $error = error_get_last()) {
+            $e = new ErrorException($error['message'], $error['type'], 0, $error['file'], $error['line']);
+            $exception = new \Obullo\Error\Exception;
+            echo $exception->make($e);
         }
     }
 

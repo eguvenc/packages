@@ -70,10 +70,16 @@
     <?php 
     $code = $e->getCode();
     switch ($code) {
+    case 0:
+        echo 'Exception';
+        break;
     case E_PARSE:
         echo 'Syntax Error';
         break;
-    case E_COMPILE_ERROR | E_CORE_ERROR:
+    case E_ERROR:
+    case E_COMPILE_ERROR:
+    case E_CORE_ERROR:
+    case E_RECOVERABLE_ERROR:
         echo 'Fatal Error';
         break;
     case E_STRICT:

@@ -41,7 +41,6 @@ class Exception
         if (! $this->isDisplayable($e)) {
             return;
         }
-
         return $this->display($e);
     }
 
@@ -55,28 +54,10 @@ class Exception
      */
     public function isDisplayable($e)
     {
-        if (self::hasPerformanceBoostErrors($e)) {  // Disable http controller file_exists errors.
-            return false;
-        }
         if (strpos($e->getMessage(), 'shmop_') === 0) {  // Disable shmop function errors.
             return false;
         }
         if (strpos($e->getMessage(), 'socket_connect') === 0) {  // Disable debugger socket connection errors.
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Check exception is catchable from app/errors.php
-     *
-     * @param object $e exception object
-     * 
-     * @return boolean
-     */
-    public function isCatchable($e)
-    {
-        if (self::hasPerformanceBoostErrors($e)) {  // Disable http controller file_exists errors.
             return false;
         }
         return true;
@@ -111,24 +92,6 @@ class Exception
     }
 
     /**
-     * Disable include 404 include file errors
-     * 
-     * @param \Exception $e exception
-     * 
-     * @return boolean
-     */
-    protected static function hasPerformanceBoostErrors($e)
-    {
-        if ($e->getCode() == 2 
-            && substr($e->getFile(), -9) == 'Layer.php' 
-            || substr($e->getFile(), -20) == 'Application/Http.php'
-        ) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Load exception view
      * 
      * @param string $file content
@@ -139,7 +102,7 @@ class Exception
     protected function view($file, $e)
     {   
         ob_start();
-        include OBULLO . 'Error/view/' .$file . '.php';
+        include OBULLO . 'Error/view/' .$file .'.php';
         return ob_get_clean();
     }
 

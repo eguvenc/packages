@@ -25,8 +25,8 @@ class Queue extends Controller
      */
     public function logo()
     {
-        echo Console::logo("Welcome to Queue Manager (c) 2015");
-        echo Console::description("You are running \$php task queue command. For help type php task queue --help.");
+        echo Console::logo("Welcome to Queue Manager (c) 2016");
+        echo Console::newline(2);
     }
 
     /**
@@ -39,7 +39,6 @@ class Queue extends Controller
         $this->logo();
 
 echo Console::help("Help:", true);
-echo Console::newline(1);
 echo Console::help("
 
 Available Commands

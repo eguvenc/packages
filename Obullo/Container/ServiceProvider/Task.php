@@ -29,7 +29,7 @@ class Task extends AbstractServiceProvider
     {
         $container = $this->getContainer();
         
-        $container->share('task', 'Obullo\Cli\Task\Task')
+        $container->share('task', 'Obullo\Cli\Task')
             ->withArgument($container->get('request'))
             ->withArgument($container->get('logger'));
     }

@@ -1,12 +1,4 @@
 <?php
-register_shutdown_function(
-    function () {
-        $error = error_get_last();
-        if (! empty($error)) {
-            echo $error['message']." File: ".$error['file']." Line : ".$error['line'];
-        }
-    }
-);
 /**
  * Detect environment
  * 
@@ -48,6 +40,12 @@ $container->share('app', 'Obullo\Application\Http')->withArgument($container);
 $container->share('middleware', 'Obullo\Application\MiddlewareStack')->withArgument($container);
 
 /**
+ * Create test environments
+ */
+if (defined('STDIN') && ! empty($_SERVER['argv'][0])) {
+    Obullo\Tests\TestEnvironment::createServer();
+}
+/**
  * Create Server Request
  */
 $request = Obullo\Http\ServerRequestFactory::fromGlobals(
@@ -57,7 +55,6 @@ $request = Obullo\Http\ServerRequestFactory::fromGlobals(
     $_COOKIE,
     $_FILES
 );
-
 /**
  * Register core components
  */

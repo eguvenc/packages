@@ -24,8 +24,8 @@ class App extends Controller
      */
     public function logo()
     {
-        echo Console::logo("Welcome to Application Manager (c) 2015");
-        echo Console::description("You are running \$php task app command. For help type php task app help");
+        echo Console::logo("Welcome to Application Manager (c) 2016");
+        echo Console::newline(1);
     }
 
     /**
@@ -98,6 +98,7 @@ class App extends Controller
     {
         $this->logo();
 
+echo Console::newline(1);
 echo Console::help("Help:", true);
 echo Console::newline(1);
 echo Console::help("
@@ -108,7 +109,7 @@ Available Commands
 
 Available Arguments
 
-    --name   : Sets domain name."
+    name   : Sets domain name."
 );
 echo Console::newline(2);
 echo Console::help("Usage:", true);
@@ -117,7 +118,7 @@ echo Console::help("php task app [command] name");
 echo Console::newline(2);
 echo Console::help("Description:", true);
 echo Console::newline(2);
-echo Console::help("Manages domain features which are defined in your maintenance.php config file.");
+echo Console::help("Manages domain maintenances which are defined in your maintenance.php file.");
 echo Console::newline(2);
     }
 }

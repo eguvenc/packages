@@ -2,6 +2,7 @@
 
 namespace Obullo\Cli\LogReader;
 
+use Obullo\Cli\Console;
 use Obullo\Container\ContainerAwareTrait;
 
 /**
@@ -50,22 +51,29 @@ class File
     /**
      * Follow logs
      * 
-     * @param string $dir   sections ( http, ajax, cli )
-     * @param string $table tablename
+     * @param string $dir sections ( http, ajax, cli )
      * 
      * @return void
      */
-    public function follow($dir = 'http', $table = null)
+    public function follow($dir = 'http')
     {
-        $table = null;  // Unused variables
         $directions = static::getPathArray();
 
         if (! isset($directions[$dir])) {
-            echo("\n\n\033[1;31mPath Error: $dir item not defined in ".__CLASS__." \033[0m\n");
+            Console::fail("Path Error: $dir item not defined in ".__CLASS__);
+            Console::newline(1);
             exit;
         }
         $file = ROOT .$directions[$dir];
-        echo "\n\33[0;37mFollowing File Handler ".ucfirst($dir)." Logs ...\33[0m\n";
+
+        echo Console::newline(1);
+        echo Console::text("Following ".ucfirst($dir)." Log Messages ...", "yellow");
+        
+        $newline = 1;
+        if ($dir == 'cli') {
+            $newline = 2;
+        }
+        echo Console::newline($newline);
 
         $size = 0;
         while (true) {
@@ -79,7 +87,10 @@ class File
                 continue;
             }
             if (! $fh = fopen($file, 'rb')) {
-                echo("\n\n\033[1;31mPermission Error: You need to have root access or log folder has not got write permission.\033[0m\n");
+                Console::fail(
+                    "Permission Error: You haven't got a write permission to data folder."
+                );
+                Console::newline(2);
                 die;
             }
             fseek($fh, $size);

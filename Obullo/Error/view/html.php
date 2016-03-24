@@ -38,14 +38,22 @@ $traceID = md5($e->getFile().$e->getLine().$e->getCode().$e->getMessage());
 <?php
 global $container;
 
+$fatalErrors = [
+    E_ERROR,
+    E_COMPILE_ERROR,
+    E_CORE_ERROR,
+    E_RECOVERABLE_ERROR
+];
 if ($container->has('config') 
     && $container->get('config')['extra']['debugger'] == false
     && $container->get('config')['extra']['debug_backtrace'] == true
 ) {  // disable backtrace if websocket enabled otherwise we get memory error.
 
-    if ($e->getCode() != E_NOTICE) {
+    if (! in_array($e->getCode(), $fatalErrors)) {
         $debugTraces = $getTrace($e);
-        echo '<h1><a href="javascript:void(0);" onclick="TraceToggle(\''.$traceID.'\')">debug_backtrace ('.sizeof($debugTraces).')</a></h1>';
+        if (! empty($debugTraces)) {
+            echo '<h1><a href="javascript:void(0);" onclick="TraceToggle(\''.$traceID.'\')">debug_backtrace ('.sizeof($debugTraces).')</a></h1>';
+        }
     }
 }
 ?>

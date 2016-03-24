@@ -96,8 +96,8 @@ class Log extends Controller
      */
     public function logo() 
     {
-        echo Console::logo("Welcome to Log Manager (c) 2015");
-        echo Console::description("You are displaying log data. For more help type \$php task log help.");
+        echo Console::logo("Welcome to Log Manager (c) 2016");
+        echo Console::newline(1);
     }
 
     /**
@@ -108,7 +108,8 @@ class Log extends Controller
     public function help()
     {
         $this->logo();
-
+        
+echo Console::newline(1);
 echo Console::help("Help:", true);
 echo Console::newline(2);
 echo Console::help(

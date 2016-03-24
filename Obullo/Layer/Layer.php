@@ -204,7 +204,7 @@ class Layer
         if (! class_exists($className, false)) {
             include $class;
         }
-        if (! class_exists($className, false)) {
+        if (! is_file($class)) {
             return $this->show404($method);
         }
         $controller = new $className;

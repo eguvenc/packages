@@ -1,6 +1,6 @@
 <?php
 
-namespace Obullo\Cli\Task;
+namespace Obullo\Cli;
 
 use Obullo\Log\LoggerInterface as Logger;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -60,7 +60,7 @@ class Task
         $server = $this->request->getServerParams();
 
         $host  = isset($server['HTTP_HOST']) ? '--host='.$server['HTTP_HOST'] : '';  // Add http host variable if request comes from http
-        $shell = PHP_PATH .' '. FPATH .'/'. TASK_FILE .' '.$directory.' '. implode('/', $segments).' '. $host;
+        $shell = PHP_PATH .' '.ROOT .'/'. TASK_FILE .' '.$directory.' '. implode('/', $segments).' '. $host;
 
         if ($debug) {  // Enable debug output to log folder.
             $output = preg_replace(array('/\033\[36m/', '/\033\[31m/', '/\033\[0m/'), array('', '', ''), shell_exec($shell)); // Clean cli color codes

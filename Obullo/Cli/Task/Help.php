@@ -14,16 +14,18 @@ class Help extends Controller
      */
     public function index()
     {
-        echo Console::logo("Welcome to Task Manager (c) 2015");
-        echo Console::description("You are running \$php task help command. For more help type php task [command] help.");
+        echo Console::logo("Welcome to Task Manager (c) 2016");
+        echo Console::newline(1);
 
 echo Console::help("Available commands:", true);
 echo Console::newline(2);
 echo Console::help("
-log        : Follow the application log file.
+log        : Follow the http log file.
+log ajax   : Follow the ajax log file.
+log cli    : Follow the cli log file.
 log clear  : Clear all log data.
-queue      : Queue control functions.
-domain     : Domain maintenance control.
+queue      : Queue control features.
+app        : Domain maintenance control.
 help       : See list all of available commands."
 );
 echo Console::newline(2);

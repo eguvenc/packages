@@ -25,7 +25,7 @@ class Debugger extends Controller
      */
     public function __construct($container)
     {
-        self::registerErrorHandler();     // We disable errors otherwise we get socket write errors in ajax response
+        self::registerErrorHandler(); // We disable errors otherwise we get socket write errors in ajax response
         self::registerExceptionHandler();
 
         $this->debugger = $container->get('config')->load('debugger');
@@ -38,9 +38,9 @@ class Debugger extends Controller
      */
     public function logo()
     {
-        echo Console::logo("Welcome to Debug Manager (c) 2015");
-        echo Console::description("You are running \$php task debugger command. For help type php task debugger help");
-        echo Console::text('running ...');
+        echo Console::logo("Welcome to Debug Server (c) 2016");
+        echo Console::newline(2);
+        echo Console::text('running ...', 'yellow');
     }
 
     /**

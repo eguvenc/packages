@@ -30,18 +30,27 @@ $debugTraces = array();
 
 global $container;
 
+$fatalErrors = [
+    E_ERROR,
+    E_COMPILE_ERROR,
+    E_CORE_ERROR,
+    E_RECOVERABLE_ERROR
+];
+
 if ($container->has('config') 
     && $container->get('config')['extra']['debugger'] == false
     && $container->get('config')['extra']['debug_backtrace'] == true
 ) {  // disable backtrace if websocket enabled otherwise we get memory error.
 
-    foreach ($fullTraces as $key => $val) {
-        if (isset($val['file']) && isset($val['line'])) {
-            $debugTraces[] = $val;
+    if (! in_array($e->getCode(), $fatalErrors)) {
+        foreach ($fullTraces as $key => $val) {
+            if (isset($val['file']) && isset($val['line'])) {
+                $debugTraces[] = $val;
+            }
         }
     }
 }
-if (isset($debugTraces[0]['file']) && isset($debugTraces[0]['line'])) {
+if (! empty($debugTraces) && isset($debugTraces[0]['file']) && isset($debugTraces[0]['line'])) {
 
     if (isset($debugTraces[1]['file']) && isset($debugTraces[1]['line'])) {    
         $output = '';

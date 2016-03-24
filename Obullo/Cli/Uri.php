@@ -179,4 +179,14 @@ class Uri implements UriInterface
         return static::$shortcuts;
     }
 
+    /**
+     * Returns to cli host
+     * 
+     * @return void
+     */
+    public function getHost()
+    {
+        return null;
+    }
+
 }

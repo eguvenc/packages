@@ -19,7 +19,7 @@
 define('APP',  ROOT .'app/');
 define('CONFIG', APP);
 define('RESOURCES',  ROOT .'resources/');
-define('ASSETS',  ROOT. 'public/assets/');
+define('ASSETS',  ROOT .'public/assets/');
 define('DATA',  RESOURCES .'data/');
 define('TRANSLATIONS',  RESOURCES .'translations/');
 define('CLASSES',  APP .'classes/');
