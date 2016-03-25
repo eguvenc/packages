@@ -2,6 +2,7 @@
 
 namespace Obullo\Http;
 
+use SplFileInfo;
 use InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
@@ -199,7 +200,19 @@ class UploadedFile implements UploadedFileInterface
     {
         return $this->clientFilename;
     }
-
+    
+    /**
+     * {@inheritdoc}
+     *
+     * @return string|null The filename sent by the client or null if none
+     *     was provided.
+     */
+    public function getExtension()
+    {
+        $info = new SplFileInfo($this->getClientFilename());
+        return $info->getExtension();
+    }
+    
     /**
      * {@inheritdoc}
      */
