@@ -73,6 +73,19 @@ class Exception
     protected function display($e)
     {
         if (defined('STDIN')) {
+
+            global $container;  // Test package support
+            $queryParams = $container->get('request')->getQueryParams();
+
+            if (! empty($queryParams['suite'])) {
+                return json_encode(
+                    [
+                        'message' => $e->getMessage(),
+                        'line' => $e->getLine(),
+                        'file' => $e->getFile(),
+                    ]
+                );
+            }
             return $this->view('console', $e);
         }
         $HTTP_X_REQUESTED_WITH = filter_input(INPUT_SERVER, 'HTTP_X_REQUESTED_WITH');

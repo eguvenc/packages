@@ -17,7 +17,7 @@ class TestEnvironment
      */
     public static function createServer()
     {
-        if ($_SERVER['argv'][0] == 'public/index.php') {
+        if ($_SERVER['SCRIPT_FILENAME'] == 'public/index.php') {
 
             $_SERVER['SERVER_NAME'] = "PHP_TEST";
             $_SERVER['HTTP_USER_AGENT'] = 'Cli Php Test';  // Define cli headers for any possible isset errors.

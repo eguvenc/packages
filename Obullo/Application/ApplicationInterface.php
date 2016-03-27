@@ -11,13 +11,6 @@ namespace Obullo\Application;
 interface ApplicationInterface
 {
     /**
-     * Returns to detected environment
-     * 
-     * @return string
-     */
-    public function getEnv();
-
-    /**
      * Returns current version of Obullo
      * 
      * @return string

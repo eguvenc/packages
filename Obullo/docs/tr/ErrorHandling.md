@@ -34,22 +34,13 @@ Uygulamada evrensel hata yönetimi <kbd>app/errors.php</kbd> dosyasından kontro
 
 ### Php Hataları
 
- Uygulama içerisinde oluşan tüm <kbd>php hataları</kbd> application sınıfı <kbd>handleError</kbd> metodu tarafından exception nesnesine dönüştürülerek evrensel hata yakalama için <kbd>app/errors.php</kbd> dosyasına gönderilir.
+ Uygulama içerisinde oluşan tüm <kbd>php hataları</kbd> app http katmanı <kbd>handleError</kbd> metodu tarafından exception nesnesine dönüştürülür.
 
 ```php
-public function handleError($level, $message, $file = '', $line = 0)
-{
-    $exception = new \Obullo\Error\Exception;
-    $e = new ErrorException($message, $level, 0, $file, $line);
-
-    if ($this->getEnv() != 'production') {
-        echo $exception->make($e);
-    }
-    return $this->exceptionError($e);
-}
+public function handleError($level, $message, $file = '', $line = 0);
 ```
 
-<kbd>production</kbd> çevre ortamı haricindeki tüm çevre ortamları için hata mesajları, hata ayıklama için ekrana yazdırılır. Aşağıda Http İstekleri için oluşmuş örnek bir hata çıktısı görüyorsunuz.
+<kbd>production</kbd> çevre ortamı haricindeki tüm çevre ortamları için hata mesajları ekrana yazdırılır. Aşağıda Http İstekleri için oluşmuş örnek bir hata çıktısı görüyorsunuz.
 
 ```php
 NOTICE

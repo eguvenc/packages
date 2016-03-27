@@ -215,7 +215,7 @@ class Database extends AbstractAdapter
         $attributes = array(
             $this->columnIdentifier => $credentials[$this->columnIdentifier],
             $this->columnPassword => $resultRowArray[$this->columnPassword],
-            '__rememberMe' => $rememberMe,
+            '__rememberMe' => ($rememberMe) ? $rememberMe : 0,
             '__time' => time(),
         );
         /**

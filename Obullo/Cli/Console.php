@@ -17,7 +17,7 @@ class Console
      * 
      * @return string
      */
-    public static function logo($info = 'Welcome to Task Manager (c) 2015')
+    public static function logo($info = 'Welcome to Task Manager (c) 2016')
     {
         $logo = "\33[1;31m
                 _           _ _       
@@ -134,9 +134,9 @@ class Console
      */
     public static function success($text)
     {
-        return "\33[1;32m".$text."\33[1;32m\33[0m\n";
+        return "\33[0;32m".$text."\33[0;32m\33[0m\n";
     }
-
+    
     /**
      * Get default text color
      *
@@ -146,7 +146,7 @@ class Console
      */
     public static function fail($text)
     {
-        return "\33[1;31m".$text."\33[1;31m\33[0m\n";
+        return "\33[0;31m".$text."\33[0;31m\33[0m\n";
     }
 
     /**
@@ -154,18 +154,21 @@ class Console
      * 
      * @param string $text            text
      * @param string $foregroundColor available colors "red" or "green"
+     * @param string $bold            bold option
      * 
      * @return string
      */
-    public static function foreground($text = '', $foregroundColor = 'red')
+    public static function foreground($text = '', $foregroundColor = 'red', $bold = false)
     {
+        $bold = ($bold) ? 1 : 0;
+
         $foregroundColorCode = "\33[41m";
-        $color ="\33[1;31m";
+        $color ="\33[$bold;31m";
         if ($foregroundColor == 'green') {
             $foregroundColorCode = "\33[42m";
-            $color ="\33[1;32m";
+            $color ="\33[$bold;32m";
         }
-        return "\33[1;37m$foregroundColorCode".$text."\33[0m".$color;
+        return "\33[$bold;37m$foregroundColorCode".$text."\33[0m".$color;
     }
 
 }

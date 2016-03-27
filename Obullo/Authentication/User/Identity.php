@@ -56,6 +56,13 @@ class Identity extends AbstractIdentity
     protected $killSignal = array();
 
     /**
+     * Memory block
+     * 
+     * @var string
+     */
+    protected $block;
+
+    /**
      * Constructor
      *
      * @param object $container container
@@ -89,11 +96,11 @@ class Identity extends AbstractIdentity
      */
     public function initialize()
     {
-        if ($this->attributes = $this->storage->getCredentials('__permanent')) {
-            $this->setCredentials($this->attributes);
+        if ($this->storage->getCredentials('__permanent')) {
+            $this->block = '__permanent';
             return;
         }
-        $this->attributes = $this->storage->getCredentials('__temporary');
+        $this->block = '__temporary';
     }
 
     /**
@@ -194,6 +201,7 @@ class Identity extends AbstractIdentity
     public function makeTemporary() 
     {
         $this->storage->makeTemporary();
+        $this->block = '__temporary';
     }
 
     /**
@@ -204,6 +212,7 @@ class Identity extends AbstractIdentity
     public function makePermanent() 
     {
         $this->storage->makePermanent();
+        $this->block = '__permanent';
     }
 
     /**
@@ -213,7 +222,7 @@ class Identity extends AbstractIdentity
      */
     public function exists()
     {
-        if ($this->has('__isAuthenticated') !== false) {
+        if ($this->get('__isAuthenticated') !== false) {
             return true;
         }
         return false;
@@ -230,36 +239,15 @@ class Identity extends AbstractIdentity
     }
 
     /**
-     * Get all identity attributes
-     *
-     * @return array
-     */
-    public function getArray()
-    {
-        if (is_array($this->attributes)) {
-            ksort($this->attributes);
-        }
-        return $this->attributes;
-    }
-
-    /**
      * Get the password needs rehash array.
      *
      * @return boolean
      */
     public function getPasswordNeedsReHash()
     {
-        return $this->has('__passwordNeedsRehash') ? true : false;
-    }
+        $passwordNeedsRehash = $this->get('__passwordNeedsRehash');
 
-    /**
-     * Returns to "1" user if used remember me
-     *
-     * @return integer
-     */
-    public function getRememberMe()
-    {
-        return $this->has('__rememberMe') ? $this->get('__rememberMe') : 0;
+        return $passwordNeedsRehash ? true : false;
     }
 
     /**
@@ -269,7 +257,7 @@ class Identity extends AbstractIdentity
      */
     public function getRememberToken()
     {
-        return $this->has('__rememberToken') ? $this->get('__rememberToken') : false;
+        return $this->get($this->params['db.rememberToken']);
     }
 
     /**
@@ -293,8 +281,8 @@ class Identity extends AbstractIdentity
     public function logout()
     {
         if ($this->check()) {
-            $this->storage->update('__isAuthenticated', 0);
             $this->updateRememberToken();
+            $this->storage->update('__isAuthenticated', 0);
             
             // Do not remove identifier otherwise we can't get
             // user data using $this->user->identity->getArray().
@@ -366,16 +354,12 @@ class Identity extends AbstractIdentity
     public function updateRememberToken()
     {
         if ($this->getRememberMe() == 1) {  // If user checked rememberMe option
-
-            $rememberMeCookie = $this->params['login']['rememberMe']['cookie'];
-            $rememberToken    = $this->container->get('cookie')->get($rememberMeCookie['name'], $rememberMeCookie['prefix']);
-
             $credentials = [
                 $this->params['db.identifier'] => $this->getIdentifier(),
-                '__rememberToken' => $rememberToken
             ];
-            $this->setCredentials($credentials);
-            return $this->refreshRememberToken($credentials);
+            $token = $this->refreshRememberToken($credentials);
+            $this->set($this->params['db.rememberToken'], $token);
+            return;
         }
     }
 
@@ -384,13 +368,15 @@ class Identity extends AbstractIdentity
      *
      * @param array $credentials credentials
      *
-     * @return int|boolean
+     * @return string
      */
     public function refreshRememberToken(array $credentials)
     {
         $token = Token::getRememberToken($this->container->get('cookie'), $this->params);
 
-        return $this->container->get('auth.model')->updateRememberToken($token, $credentials); // refresh rememberToken
+        $this->container->get('auth.model')->updateRememberToken($token, $credentials); // refresh rememberToken
+
+        return $token;
     }
 
     /**

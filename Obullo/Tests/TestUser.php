@@ -2,29 +2,30 @@
 
 namespace Obullo\Tests;
 
+use DateTime;
 use Interop\Container\ContainerInterface as Container;
 
 /**
- * Login class for tests. 
+ * Test user
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class TestLogin
+class TestUser
 {
-    /**
-     * Errors
-     * 
-     * @var array
-     */
-    protected $errors = array();
-
     /**
      * Container
      * 
      * @var object
      */
     protected $container;
+
+    /**
+     * Errors
+     * 
+     * @var array
+     */
+    protected $errors = array();
 
     /**
      * Constructor
@@ -34,6 +35,24 @@ class TestLogin
     public function __construct(Container $container)
     {
         $this->container = $container;
+
+        $container->get('user')->identity->initialize();
+    }
+
+    /**
+     * Login
+     * 
+     * @param array $options login options (rememberMe = 1, regenerateSessionId = true)
+     * 
+     * @return void
+     */
+    public function login($options = array())
+    {
+        $this->attempt($options);
+
+        if ($this->hasError()) {
+            TestOutput::error($this->getErrors());
+        }
     }
 
     /**
@@ -100,6 +119,41 @@ class TestLogin
     public function getErrors()
     {
         return $this->errors;
+    }
+
+    /**
+     * Logout test user
+     * 
+     * @return void
+     */
+    public function logout()
+    {
+        $user = $this->container->get('user');
+        $user->identity->logout();
+    }
+
+    /**
+     * Destroy identity
+     * 
+     * @return void
+     */
+    public function destroy()
+    {
+        $user = $this->container->get('user');
+        $user->identity->destroy();
+        $this->container->get('session')->destroy();  // Kill sessions.
+    }
+
+    /**
+     * Call user class methods
+     * 
+     * @param string $key key
+     * 
+     * @return object
+     */
+    public function __get($key)
+    {
+        return $this->container->get('user')->{$key};
     }
 
 }

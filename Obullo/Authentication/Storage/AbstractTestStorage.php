@@ -18,6 +18,7 @@ class AbstractTestStorage extends TestController
         $test = 'test@example.com:'.$this->storage->getLoginId();
         $this->assertEqual($this->storage->getIdentifier(), $test, "I set a fake identifier then i expect that the value is '$test'.");
         $this->storage->unsetIdentifier('test@example.com');
+        $this->session->destroy();
     }
 
     /**
@@ -31,6 +32,7 @@ class AbstractTestStorage extends TestController
         $test = 'test@example.com:'.$this->storage->getLoginId();
         $this->assertEqual($this->storage->getIdentifier(), $test, "I set a fake identifier then i expect that the value is '$test'.");
         $this->storage->unsetIdentifier('test@example.com');
+        $this->session->destroy();
     }
 
     /**
@@ -43,6 +45,7 @@ class AbstractTestStorage extends TestController
         $this->storage->setIdentifier('test@example.com');
         $this->storage->unsetIdentifier('test@example.com');
         $this->assertEqual($this->storage->getIdentifier(), '__empty', "I set a fake identifier then i remove it and i expect that the value is '__empty'.");
+        $this->session->destroy();
     }
 
     /**
@@ -56,6 +59,7 @@ class AbstractTestStorage extends TestController
         $this->assertTrue($this->storage->hasIdentifier(), "I set a fake identifier and i expect that the value is true.");
         $this->storage->unsetIdentifier('test@example.com');
         $this->assertFalse($this->storage->hasIdentifier(), "I remove the fake identifier and i expect that the value is false.");
+        $this->session->destroy();
     }
 
     /**
@@ -79,6 +83,7 @@ class AbstractTestStorage extends TestController
             $this->assertEqual($result['__isTemporary'], 1, "I expect that the value is 1.");
         }
         $this->storage->deleteCredentials('__temporary');
+        $this->session->destroy();
     }
 
     /**
@@ -102,6 +107,7 @@ class AbstractTestStorage extends TestController
             $this->assertEqual($result['__isTemporary'], 0, "I expect that the value is 0.");
         }
         $this->storage->deleteCredentials();
+        $this->session->destroy();
     }
 
     /**
@@ -126,6 +132,7 @@ class AbstractTestStorage extends TestController
             $this->assertEqual($result['__isTemporary'], 0, "I expect that the value is 0.");
         }
         $this->storage->deleteCredentials();
+        $this->session->destroy();
     }
 
     /**
@@ -150,6 +157,7 @@ class AbstractTestStorage extends TestController
             $this->assertEqual($result['__isTemporary'], 1, "I expect that the value is 1.");
         }
         $this->storage->deleteCredentials('__temporary');
+        $this->session->destroy();
     }
 
     /**
@@ -160,6 +168,7 @@ class AbstractTestStorage extends TestController
     public function getUserId()
     {   
         $this->assertEqual($this->storage->getUserId(), "user@example.com", "I expect that the value is user@example.com.");
+        $this->session->destroy();
     }
 
     /**
@@ -178,6 +187,7 @@ class AbstractTestStorage extends TestController
         $loginId   = md5(trim($userAgent).time());
 
         $this->assertEqual($loginId, $expected, "I expect that the value is $loginId.");
+        $this->session->destroy();
     }
 
     /**
@@ -188,6 +198,7 @@ class AbstractTestStorage extends TestController
     public function setLoginId()
     {
         $this->getLoginId();
+        $this->session->destroy();
     }
 
     /**
@@ -199,6 +210,7 @@ class AbstractTestStorage extends TestController
     {
         $paramsKey = $this->container->get('user.params')['cache']['key'];
         $this->assertEqual($paramsKey, $this->storage->getCacheKey(), "I expect the storage key equals to the service configuration key '$paramsKey'.");
+        $this->session->destroy();
     }
 
     /**
@@ -210,6 +222,7 @@ class AbstractTestStorage extends TestController
     {
         $block = $this->storage->getCacheKey(). ':__permanent:' .$this->storage->getIdentifier();
         $this->assertEqual($block, $this->storage->getBlock('__permanent'), "I expect the block key equals to key '$block'.");
+        $this->session->destroy();
     }
 
     /**
@@ -221,6 +234,7 @@ class AbstractTestStorage extends TestController
     {
         $block = $this->storage->getCacheKey(). ':__temporary:' .$this->storage->getIdentifier();
         $this->assertEqual($block, $this->storage->getBlock('__temporary'), "I expect the block key equals to key '$block'.");
+        $this->session->destroy();
     }
 
     /**
@@ -232,6 +246,7 @@ class AbstractTestStorage extends TestController
     {
         $block = $this->storage->getCacheKey(). ':__permanent:' .$this->storage->getUserId();
         $this->assertEqual($block, $this->storage->getUserKey('__permanent'), "I expect the block key equals to key '$block'.");
+        $this->session->destroy();
     }
 
     /**
@@ -253,6 +268,7 @@ class AbstractTestStorage extends TestController
             $this->storage->getMemoryBlockLifetime('__temporary'),
             "I expect the temporary block lifetime equals to service configuration lifetime value."
         );
+        $this->session->destroy();
     }
 
     /**
@@ -274,6 +290,7 @@ class AbstractTestStorage extends TestController
         $credentials = $this->storage->getCredentials();
         
         $this->assertTrue($this->storage->isEmpty(), "I delete user credentials and i expect that the value is true.");
+        $this->session->destroy();
     }
 
     /**
@@ -307,6 +324,7 @@ class AbstractTestStorage extends TestController
         }
         TestOutput::varDump($result);
         $this->storage->deleteCredentials();
+        $this->session->destroy();
     }
 
     /**
@@ -343,6 +361,7 @@ class AbstractTestStorage extends TestController
             $this->assertEqual($result['password'], $credentials['password'], "I expect that the value is equal to ".$credentials['password'].".");
         }
         $this->storage->deleteCredentials();
+        $this->session->destroy();
     }
 
     /**
@@ -369,6 +388,7 @@ class AbstractTestStorage extends TestController
             $this->assertEqual($result['password'], $credentials['password'], "I expect that the value is equal to ".$credentials['password'].".");
         }
         $this->storage->deleteCredentials();
+        $this->session->destroy();
     }
 
     /**
@@ -387,6 +407,7 @@ class AbstractTestStorage extends TestController
         $result = $this->storage->getCredentials();
 
         $this->assertEmpty($result, "I create fake credentials then i delete them and i expect that the value is true.");
+        $this->session->destroy();
     }
 
     /**
@@ -408,6 +429,7 @@ class AbstractTestStorage extends TestController
             $this->assertEqual('test@example.com', $result['username'], "I update username value as 'test@example.com' and i expect that the value is equal to 'test@example.com'.");
         }
         $this->storage->deleteCredentials();
+        $this->session->destroy();
     }
 
     /**
@@ -427,6 +449,7 @@ class AbstractTestStorage extends TestController
 
         $this->assertArrayNotHasKey('username', $result, "I create fake credentials then i remove username key and i expect array has not 'username' key.");
         $this->storage->deleteCredentials();
+        $this->session->destroy();
     }
 
     /**
@@ -452,6 +475,7 @@ class AbstractTestStorage extends TestController
         }
         TestOutput::varDump($result);
         $this->storage->deleteCredentials();
+        $this->session->destroy();
     }
 
 }

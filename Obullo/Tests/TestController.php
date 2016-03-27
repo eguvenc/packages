@@ -369,7 +369,7 @@ abstract class TestController extends Controller implements HttpTestInterface
     public function assertInternalType($expected, $actual, $message = "")
     {
         $pass = false;
-        if ($this->__checkType($expected, $actual)) {
+        if (TestHelper::checkType($expected, $actual)) {
             $pass = true;
         }
         TestOutput::setData(['pass' => $pass, 'message' => $message]);
@@ -388,7 +388,7 @@ abstract class TestController extends Controller implements HttpTestInterface
     public function assertNotInternalType($expected, $actual, $message = "")
     {
         $pass = false;
-        if (false == $this->__checkType($expected, $actual)) {
+        if (false == TestHelper::checkType($expected, $actual)) {
             $pass = true;
         }
         TestOutput::setData(['pass' => $pass, 'message' => $message]);

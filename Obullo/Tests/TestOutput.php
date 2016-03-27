@@ -170,6 +170,5 @@ class TestOutput
         echo Console::text($stats['p']." passes and ".$stats['f']." fails.", "yellow");
         echo Console::newline(2);
     }
-
-
+    
 }

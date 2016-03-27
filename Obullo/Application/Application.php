@@ -36,16 +36,6 @@ class Application implements ApplicationInterface
     }
     
     /**
-     * Returns to detected environment
-     * 
-     * @return string
-     */
-    public function getEnv()
-    {
-        return $this->container->get('env')->getValue();
-    }
-
-    /**
      * Returns to current version of Obullo
      * 
      * @return string

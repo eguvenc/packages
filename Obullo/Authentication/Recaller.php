@@ -103,7 +103,7 @@ class Recaller
             '__rememberMe' => 1,
             '__rememberToken' => $resultRowArray[$this->columnRememberToken]
         ];
-        $this->identity->setCredentials($credentials);
+        $this->storage->setCredentials($credentials, null, '__permanent');
         
         $this->container->get('auth.adapter')->generateUser($credentials, $resultRowArray);  // Generate authenticated user without validation
         $this->removeInactiveSessions(); // Kill all inactive sessions of current user

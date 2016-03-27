@@ -24,7 +24,7 @@ Uygulama sınıfı, ortam değişkenini elde etme, çerçeve versiyonu, hata tan
  Uygulama ortam değişkeni olmadan çalışamaz ve bu nedenle ortam çözümlemesi ilk yüklenme seviyesinde <kbd>app/environments.php</kbd> dosyası okunarak gerçekleşir ve ortam değişkenine,
 
 ```php
-$container->get('app')->getEnv()
+$container->get('env')->getValue()
 ```
 
 metodu ile uygulamanın her yerinden ulaşılabilir.
@@ -89,14 +89,6 @@ Http katmanları uygulamayı etkilemek, analiz etmek, <kbd>request</kbd> ve <kbd
 
 ### Application Sınıfı Referansı
 
-##### $this->app->getEnv();
-
-Geçerli ortam değişkenine döner. Ortam değişkeni <kbd>app/environments.php</kbd> dosyasından kontrol edilir ve ortam bu dosyaya göre belirlenir. Konfigürasyon dosyaları ortam değişkenine duyarlıdır. Daha fazla bilgi için [Environments.md ](Environments.md) dökümentasyonunu ziyaret edin.
-
-```php
-echo $this->app->getEnv();  // local
-```
-
 ##### $this->app->getVersion();
 
 Mevcut çerçeve sürümüne geri döner.
@@ -108,18 +100,6 @@ $this->app->getVersion(); // 1.0
 ##### $this->app->getContainer();
 
 Konteyner nesnesini verir.
-
-##### $this->app->error(Callback $closure);
-
-<kbd>app/errors.php</kbd> dosyası içerisinde uygulamaya ait evrensel php hatalarını ayrıştırmak amacıyla kullanılır.
-
-##### $this->app->fatal(Callback $closure);
-
-<kbd>app/errors.php</kbd> dosyası içerisinde uygulamaya ait evrensel ölümcül php hatalarını ayrıştırmak amacıyla kullanılır.
-
-##### $this->app->exceptionError($e);
-
-Bir istisnai hatayı <kbd>app/errors.php</kbd> dosyasındaki küresel hata yakalayıcısına gönderir.
 
 ##### $this->app->x();
 

@@ -484,31 +484,15 @@ Beni hatırla çerezini yenileyerek veritabanı ve çereze kaydeder.
 
 Sisteme giriş yapmış kullanıcı kimliğine ait oturum açma bilgilerini dışarıdan gelen yeni bilgiler ile karşılaştırır bilgiler doğru ise <kbd>true</kbd> aksi durumda <kbd>false</kbd> değerine geri döner.
 
-##### $this->user->identity->initialize();
-
-Kimlik içerisinde yapılan değişiklikler her sayfa ziyaretinde bir dizi içerisine kaydedilirler. Eğer yapılan bir değişikliğin sayfa yenilemesi gerektirmeden hemen sonraki satırda etkin olması isteniyorsa değişiklikten hemen sonra initialize metodu kullanılmalıdır.
-
-```php
-var_dump($this->user->identity->guest());  // false
-$this->user->identity->logout();
-var_dump($this->user->identity->guest());  // false
-$this->user->identity->initialize();
-var_dump($this->user->identity->guest());  // true
-```
-
 <a name="identity-get-methods"></a>
 
 #### Identity "Get" Metotları
 
 ------
 
-##### $this->user->identity->has($key);
-
-Kimlik dizisinde girilen anahtarın varolup olmadığını kontrol eder.
-
 ##### $this->user->identity->get($key);
 
-Kimlik dizisinden girilen anahtara ait değere geri döner.
+Kimlik dizisinden girilen anahtara ait değere geri döner. Anahtar yoksa false değerine döner.
 
 ##### $this->user->identity->getIdentifier();
 
@@ -549,11 +533,11 @@ if ($this->user->identity->getPasswordNeedsReHash()) {
 
 ##### $this->user->identity->getRememberToken();
 
-Beni hatırla çerezine döner.
+Beni hatırla çerezi değerine döner.
 
 ##### $this->user->identity->getLoginId();
 
-Bir kullanıcıya ait bir veya birden fazla oturum tarayıcıya göre numaralandırılır. Giriş yapmış kullanıcıya ait oturum numarasına aksi durumda false değerine döner.
+Bir veya birden fazla oturumlar numaralandırılır. Giriş yapmış kullanıcıya ait oturum numarasına aksi durumda false değerine döner.
 
 ##### $this->user->identity->getArray()
 

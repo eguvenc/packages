@@ -10,7 +10,7 @@ use Interop\Container\ContainerInterface as Container;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Memcached extends AbstractCache
+class Memcached extends AbstractCache implements StorageInterface
 {
     /**
      * Connect to cache provider

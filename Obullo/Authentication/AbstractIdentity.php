@@ -11,13 +11,6 @@ namespace Obullo\Authentication;
 abstract class AbstractIdentity implements IdentityInterface
 {
     /**
-     * Credentials
-     * 
-     * @var array
-     */
-    protected $attributes = array();
-
-    /**
      * Get the identifier column value
      *
      * @return mixed
@@ -42,18 +35,6 @@ abstract class AbstractIdentity implements IdentityInterface
     }
     
     /**
-     * Set credentials
-     * 
-     * @param array $credentials credentials
-     * 
-     * @return void
-     */
-    public function setCredentials($credentials = array())
-    {
-        $this->attributes = $credentials;
-    }
-
-    /**
      * Get identifier column
      * 
      * @return string
@@ -75,14 +56,16 @@ abstract class AbstractIdentity implements IdentityInterface
 
     /**
      * Returns to "1" user if used remember me
-     * 
+     *
      * @return integer
      */
-    public function getRememberMe() 
+    public function getRememberMe()
     {
-        return $this->get('__rememberMe');
+        $rememberMe = $this->get('__rememberMe');
+
+        return $rememberMe ? (int)$rememberMe : 0;
     }
-    
+
     /**
      * Get all attributes
      * 
@@ -90,7 +73,7 @@ abstract class AbstractIdentity implements IdentityInterface
      */
     public function getArray()
     {
-        return $this->attributes;
+        return $this->storage->getCredentials($this->block);
     }
 
     /**
@@ -102,7 +85,9 @@ abstract class AbstractIdentity implements IdentityInterface
      */
     public function get($key)
     {
-        return isset($this->attributes[$key]) ? $this->attributes[$key] : false;
+        $attributes = $this->getArray();
+
+        return isset($attributes[$key]) ? $attributes[$key] : false;
     }
 
     /**
@@ -115,22 +100,12 @@ abstract class AbstractIdentity implements IdentityInterface
      */
     public function set($key, $val)
     {
-        if ($this->get('__isAuthenticated') == 1) {     // Check user has auth
-            $this->storage->update($key, $val);  // then accept update operation
+        if ($this->get('__isAuthenticated') == 1) {   // Check user has auth
+            $this->storage->update($key, $val);       // then accept update operation
         }
-        return $this->attributes[$key] = $val;
-    }
-
-    /**
-     * Check if a value is exists on the identity data.
-     *
-     * @param string $key key
-     * 
-     * @return bool
-     */
-    public function has($key)
-    {
-        return isset($this->attributes[$key]);
+        if ($this->get('__isTemporary')) {
+            $this->storage->updateTemporary($key, $val);
+        }
     }
 
     /**
@@ -145,7 +120,6 @@ abstract class AbstractIdentity implements IdentityInterface
         if ($this->get('__isAuthenticated') == 1) {
             $this->storage->remove($key);
         }
-        unset($this->attributes[$key]);
     }
 
 }

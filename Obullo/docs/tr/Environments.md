@@ -3,6 +3,25 @@
 
 Uygulamanız <kbd>local</kbd>, <kbd>test</kbd>, <kbd>production</kbd> veya yeni eklenen bir çevre ortamına göre farklı davranışlar sergileyebilir. 
 
+<a name="env-variable"></a>
+
+##### $container->get('env')->getValue();
+
+Geçerli ortam değişkenine döner. Ortam değişkeni <kbd>app/environments.php</kbd> dosyasından kontrol edilir ve ortam bu dosyaya göre belirlenir. Konfigürasyon dosyaları ortam değişkenine duyarlıdır. Daha fazla bilgi için [Environments.md ](Environments.md) dökümentasyonunu ziyaret edin.
+
+```php
+echo $container->get('env')->getValue();  // Çıktı  local
+```
+
+Varsayılan ortam türleri aşağıda listelenmiştir.
+
+* <b>Local</b> : Yerel sunucu ortamıdır, geliştiriciler tarafından uygulama bu ortam altında geliştirilir, her bir geliştiricinin bir defalığına <kbd>app/environments.php</kbd> dosyası içerisine kendi bilgisayarına ait ismi tanımlaması gereklidir.
+
+* <b>Test</b> : Test sunucu ortamıdır, geliştiriciler tarafından uygulama bu ortamda test edilir sonuçlar başarılı ise prodüksiyon ortamında uygulama yayına alınır, test sunucu isimlerinin bir defalığına <kbd>app/environments.php</kbd> dosyası içerisine tanımlaması gereklidir.
+
+* <b>Production</b> : Prodüksiyon sunucu ortamıdır, geliştiriciler tarafından testleri geçmiş başarılı uygulama prodüksiyon ortamında yayına alınır, prodüksiyon sunucu isimlerinin bir defalığına <kbd>app/environments.php</kbd>  dosyası içerisine tanımlaması gereklidir.
+
+
 <a name="environments"></a>
 
 #### Ortam Konfigürasyonu
@@ -38,24 +57,6 @@ Prodüksiyon veya test gibi ortamlarda çalışmaya hazırlık için sunucu isim
 ```
 We could not detect your application environment, please correct your app/environments.php file.
 ```
-
-<a name="env-variable"></a>
-
-#### Ortam Değişkeni
-
-Geçerli ortam değişkenine,
-
-```php
-echo $container->get('app')->getEnv();  // Çıktı  local
-```
-
-metodu ile ulaşılır. Varsayılan ortam türleri aşağıda listelenmiştir.
-
-* <b>Local</b> : Yerel sunucu ortamıdır, geliştiriciler tarafından uygulama bu ortam altında geliştirilir, her bir geliştiricinin bir defalığına <kbd>app/environments.php</kbd> dosyası içerisine kendi bilgisayarına ait ismi tanımlaması gereklidir.
-
-* <b>Test</b> : Test sunucu ortamıdır, geliştiriciler tarafından uygulama bu ortamda test edilir sonuçlar başarılı ise prodüksiyon ortamında uygulama yayına alınır, test sunucu isimlerinin bir defalığına <kbd>app/environments.php</kbd> dosyası içerisine tanımlaması gereklidir.
-
-* <b>Production</b> : Prodüksiyon sunucu ortamıdır, geliştiriciler tarafından testleri geçmiş başarılı uygulama prodüksiyon ortamında yayına alınır, prodüksiyon sunucu isimlerinin bir defalığına <kbd>app/environments.php</kbd>  dosyası içerisine tanımlaması gereklidir.
 
 
 <a name="creating-environment-config"></a>
