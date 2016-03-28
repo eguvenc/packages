@@ -39,6 +39,7 @@ $traceID = md5($e->getFile().$e->getLine().$e->getCode().$e->getMessage());
 global $container;
 
 $fatalErrors = [
+    E_NOTICE,
     E_ERROR,
     E_COMPILE_ERROR,
     E_CORE_ERROR,

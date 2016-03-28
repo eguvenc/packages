@@ -9,6 +9,8 @@ use Obullo\Container\ParamsAwareInterface;
 use Obullo\Container\ContainerAwareInterface;
 use Obullo\Http\Controller\ControllerAwareInterface;
 
+use Exception;
+use ErrorException;
 use ReflectionClass;
 use Obullo\Tests\HttpTestInterface;
 use Obullo\Router\RouterInterface as Router;
@@ -43,6 +45,9 @@ class Http extends Application
      */
     public function init()
     {
+        set_exception_handler(array($this, 'handleException'));
+        register_shutdown_function(array($this, 'handleFatalError'));
+
         $container = $this->getContainer();  // Make global
         $app = $container->get('app');
         
@@ -60,7 +65,50 @@ class Http extends Application
         $router = $container->get('router');
 
         include APP .'routes.php';
+
         $this->boot($router, $middleware);
+    }
+
+    /**
+     * Exception error handler
+     * 
+     * @param Exception $e exception class
+     * 
+     * @return boolean
+     */
+    public function handleException(Exception $e)
+    {
+        self::showException($e);
+    }
+
+    /**
+     * Handle fatal errors
+     * 
+     * @return mixed
+     */
+    public function handleFatalError()
+    {   
+        if (null != $error = error_get_last()) {
+            $e = new \ErrorException($error['message'], $error['type'], 0, $error['file'], $error['line']);
+            self::showException($e);
+        }
+    }
+
+    /**
+     * Show exception
+     * 
+     * @param Exception $e object
+     * 
+     * @return void
+     */
+    protected static function showException(Exception $e)
+    {
+        $exception = new \Obullo\Error\Exception;
+        global $container;
+        $env = $container->get('env')->getValue();
+        if ($env != 'production') {
+            echo $exception->make($e);
+        }
     }
 
     /**

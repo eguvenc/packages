@@ -31,6 +31,7 @@ $debugTraces = array();
 global $container;
 
 $fatalErrors = [
+    E_NOTICE,
     E_ERROR,
     E_COMPILE_ERROR,
     E_CORE_ERROR,
