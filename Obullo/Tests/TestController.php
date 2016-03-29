@@ -484,11 +484,11 @@ abstract class TestController extends Controller implements HttpTestInterface
     /**
      * Generates html content
      * 
-     * @return void
+     * @return object
      */
     protected function __generateHtmlResponse()
     {
-        $results = '';
+        $results = "";
         foreach (TestOutput::getData() as $data) {
             if ($data['pass']) {
                 $results.= $this->view->get('tests::pass', ['message' => $data['message']]);
@@ -496,7 +496,7 @@ abstract class TestController extends Controller implements HttpTestInterface
                 $results.= $this->view->get('tests::fail', ['message' => $data['message']]);
             }
         }
-        $this->view->load('tests::result', ['dump' => TestOutput::getVarDumpArray(), 'results' => $results]);
+        return $this->view->load('tests::result', ['dump' => TestOutput::getVarDumpArray(), 'results' => $results]);
     }
 
     /**

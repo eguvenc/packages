@@ -37,6 +37,9 @@ class TestSuite
             }
             return;
         } else {
+
+            var_dump($object);
+
             if (empty($object['methods']) || empty($object['class'])) {
                 echo Console::text("File not found.", "red");
                 echo Console::newline(2);

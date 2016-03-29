@@ -204,7 +204,7 @@ class View implements ViewInterface
      * @param mixed   $data     array data
      * @param boolean $include  fetch as string or return
      * 
-     * @return string                      
+     * @return object Stream or Response                     
      */
     protected function renderNestedView($filename, $data = array(), $include = true)
     {
@@ -234,6 +234,7 @@ class View implements ViewInterface
         }
         $response = $this->container->get('response');
         $response->getBody()->write($body);
+
         return $response;
     }
 

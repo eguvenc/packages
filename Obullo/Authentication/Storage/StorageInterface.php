@@ -15,16 +15,6 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 interface StorageInterface
 {
     /**
-     * Constructor
-     * 
-     * @param object $container $container
-     * @param object $request   $request
-     * @param object $session   session
-     * @param array  $params    parameters
-     */
-    public function __construct(Container $container, Request $request, Session $session, array $params);
-
-    /**
      * Returns true if temporary credentials "not" exists
      *
      * @param string $block __temporary or __permanent | full key

@@ -45,6 +45,7 @@ class Http extends Application
      */
     public function init()
     {
+        set_error_handler(array($this, 'handleError'));
         set_exception_handler(array($this, 'handleException'));
         register_shutdown_function(array($this, 'handleFatalError'));
 
@@ -70,6 +71,22 @@ class Http extends Application
     }
 
     /**
+     * Error handler, convert all errors to exceptions
+     * 
+     * @param integer $level   name
+     * @param string  $message error message
+     * @param string  $file    file
+     * @param integer $line    line
+     * 
+     * @return boolean whether to continue displaying php errors
+     */
+    public function handleError($level, $message, $file = '', $line = 0)
+    {
+        $e = new ErrorException($message, $level, 0, $file, $line);
+        $this->showException($e);
+    }
+
+    /**
      * Exception error handler
      * 
      * @param Exception $e exception class
@@ -78,7 +95,7 @@ class Http extends Application
      */
     public function handleException(Exception $e)
     {
-        self::showException($e);
+        $this->showException($e);
     }
 
     /**
@@ -89,8 +106,8 @@ class Http extends Application
     public function handleFatalError()
     {   
         if (null != $error = error_get_last()) {
-            $e = new \ErrorException($error['message'], $error['type'], 0, $error['file'], $error['line']);
-            self::showException($e);
+            $e = new ErrorException($error['message'], $error['type'], 0, $error['file'], $error['line']);
+            $this->showException($e);
         }
     }
 
@@ -101,14 +118,14 @@ class Http extends Application
      * 
      * @return void
      */
-    protected static function showException(Exception $e)
+    protected function showException(Exception $e)
     {
-        $exception = new \Obullo\Error\Exception;
-        global $container;
-        $env = $container->get('env')->getValue();
-        if ($env != 'production') {
-            echo $exception->make($e);
-        }
+        $container = $this->getContainer();
+
+        $error = $container->get('middleware')->add('Error');
+        $error->setContainer($container);
+
+        $error($e, $container->get('request'), $container->get('response'));
     }
 
     /**
@@ -248,11 +265,12 @@ class Http extends Application
             ),
             array_slice($this->controller->request->getUri()->getRoutedSegments(), $router->getArgumentFactor())
         );
+
         if ($router->getMethod() != 'index' && $this->controller instanceof HttpTestInterface) {
             $result = $this->controller->__generateTestResults();
         }
         if ($result instanceof Response) {
-            $response = $result;
+            return $result;
         }
         return $response;   
     }

@@ -2,6 +2,7 @@
 
 namespace Obullo\Cache;
 
+use RuntimeException;
 use League\Container\ContainerInterface as Container;
 
 /**
