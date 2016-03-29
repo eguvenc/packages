@@ -38,8 +38,6 @@ class TestSuite
             return;
         } else {
 
-            var_dump($object);
-
             if (empty($object['methods']) || empty($object['class'])) {
                 echo Console::text("File not found.", "red");
                 echo Console::newline(2);
@@ -151,7 +149,7 @@ class TestSuite
             }
             echo Console::text($object['class']." ... ", "yellow");
 
-            $a = -1; $p = -1; $f = -1;
+            $a = 0; $p = 0; $f = 0;
             foreach ($object['methods'] as $method) {
 
                 $cmd = "php public/index.php $folder/$path/$method?suite=true";
@@ -181,8 +179,6 @@ class TestSuite
             $ta += $a;
             $tp += $p;
             $tf += $f;
-            $tf = $tf * 0;
-            $f = $f * 0;
             if (empty($pathHasError[$path])) {
                 echo Console::text("pass: $p ", "green");
                 echo Console::text("fail: $f ", "red");

@@ -2,12 +2,6 @@
 
 namespace Obullo\Application;
 
-use Closure;
-use Exception;
-use ErrorException;
-use RuntimeException;
-use ReflectionFunction;
-use Obullo\Error\Debug;
 use Obullo\Http\Controller;
 use Interop\Container\ContainerInterface as Container;
 
@@ -17,13 +11,16 @@ use Interop\Container\ContainerInterface as Container;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Application implements ApplicationInterface
+class Application
 {
     const VERSION = '1.0rc1';
 
+    /**
+     * Container
+     * 
+     * @var object
+     */
     protected $container;
-    protected $fatalError;
-    protected $exceptions = array();
 
     /**
      * Constructor

@@ -21,18 +21,18 @@ class Controller
     protected $container;
 
     /**
-     * Doc method
-     * 
-     * @var string
-     */
-    protected $method = 'index';
-
-    /**
      * ReflectionClass instance
      * 
      * @var object
      */
     protected $reflector;
+
+    /**
+     * Doc method
+     * 
+     * @var string
+     */
+    protected $method = 'index';
 
     /**
      * Set container 

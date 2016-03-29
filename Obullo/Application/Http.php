@@ -121,10 +121,9 @@ class Http extends Application
     protected function showException(Exception $e)
     {
         $container = $this->getContainer();
-
+        
         $error = $container->get('middleware')->add('Error');
         $error->setContainer($container);
-
         $error($e, $container->get('request'), $container->get('response'));
     }
 
