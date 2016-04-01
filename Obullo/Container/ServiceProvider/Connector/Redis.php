@@ -2,6 +2,7 @@
 
 namespace Obullo\Container\ServiceProvider\Connector;
 
+use ReflectionClass;
 use RuntimeException;
 use UnexpectedValueException;
 use Interop\Container\ContainerInterface as Container;
@@ -135,10 +136,15 @@ class Redis extends AbstractServiceProvider
         if ($database) {
             $this->redis->select($database);
         }
+
         if ($serializer == 'php') {
             $this->redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_PHP);
         }
         if ($serializer == 'igbinary') {
+            $class = new ReflectionClass("Redis");
+            if (! $class->hasConstant("SERIALIZER_IGBINARY")) {
+                throw new RuntimeException("Igbinary is not enabled on your redis installation.");
+            }
             $this->redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_IGBINARY);
         }
         if ($prefix) {

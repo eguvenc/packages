@@ -9,8 +9,8 @@ use Obullo\Captcha\CaptchaInterface;
 
 use Obullo\Url\UrlInterface as Url;
 use Obullo\Log\LoggerInterface as Logger;
+use Obullo\Translation\TranslatorAwareTrait;
 use Obullo\Session\SessionInterface as Session;
-use Obullo\Translation\TranslatorInterface as Translator;
 
 use Psr\Http\Message\UriInterface as Uri;
 use Psr\Http\Message\RequestInterface as Request;
@@ -23,6 +23,8 @@ use Psr\Http\Message\RequestInterface as Request;
  */
 class Image extends AbstractProvider implements CaptchaInterface
 {
+    use TranslatorAwareTrait;
+
     protected $url;
     protected $request;
     protected $params = array();
@@ -30,7 +32,6 @@ class Image extends AbstractProvider implements CaptchaInterface
     protected $session;
     protected $logger;
     protected $captcha;
-    protected $translator;
     protected $html = '';         // Captcha html
     protected $config = array();  // Configuration data
     protected $imageId = '';      // Image unique id
@@ -54,29 +55,35 @@ class Image extends AbstractProvider implements CaptchaInterface
     /**
      * Constructor
      * 
-     * @param object $url        \Obullo\Url\UrlInterface
-     * @param object $request    \Psr\Http\Message\RequestInterface
-     * @param object $session    \Obullo\Session\SessionInterface
-     * @param object $translator \Obullo\Translation\TranslatorInterface
-     * @param object $logger     \Obullo\Log\LoggerInterface
-     * @param array  $params     service parameters
+     * @param object $url     \Obullo\Url\UrlInterface
+     * @param object $request \Psr\Http\Message\RequestInterface
+     * @param object $session \Obullo\Session\SessionInterface
+     * @param object $logger  \Obullo\Log\LoggerInterface
+     * @param array  $params  service parameters
      */
     public function __construct(
         Url $url,
         Request $request,
         Session $session,
-        Translator $translator,
         Logger $logger,
         array $params
     ) {
         $this->url = $url;
-        $this->request = $request;
         $this->params = $params;
         $this->logger = $logger;
+        $this->request = $request;
         $this->session = $session;
-        $this->translator = $translator;
+
         $this->params['background'] = 'none';
         $this->defaultFontPath = RESOURCES .'fonts/';
+        
+        $this->translator['OBULLO:VALIDATOR:CAPTCHA:LABEL'] = "Captcha";
+        $this->translator['OBULLO:VALIDATOR:CAPTCHA:NOT_FOUND'] = "The captcha failure code not found.";
+        $this->translator['OBULLO:VALIDATOR:CAPTCHA:EXPIRED'] = "The captcha code has been expired.";
+        $this->translator['OBULLO:VALIDATOR:CAPTCHA:INVALID'] = "Invalid captcha code.";
+        $this->translator['OBULLO:VALIDATOR:CAPTCHA:SUCCESS'] = "Captcha code verified.";
+        $this->translator['OBULLO:VALIDATOR:CAPTCHA:VALIDATION'] = "The captcha field validation is wrong.";
+        $this->translator['OBULLO:VALIDATOR:CAPTCHA:REFRESH_BUTTON_LABEL'] = "Refresh Captcha";
         
         $this->logger->debug('Captcha Class Initialized');
     }
@@ -88,7 +95,7 @@ class Image extends AbstractProvider implements CaptchaInterface
      */
     public function init()
     {
-        $this->imageUrl = $this->url->basePath($this->params['form']['img']['attributes']['src']); // add Directory Seperator ( / )
+        $this->imageUrl = $this->url->basePath($this->params['form']['img']['attributes']['src']); // add Directory Seperator ( / )   
     }
 
     /**
@@ -98,7 +105,7 @@ class Image extends AbstractProvider implements CaptchaInterface
      *
      * @return void
      */
-    public function setCharset($charset = 'UTF8')
+    public function setCharset($charset = 'UTF-8')
     {
         $this->charset = strtoupper($charset);
     }
@@ -168,7 +175,7 @@ class Image extends AbstractProvider implements CaptchaInterface
     public function setNoiseColor($color)
     {
         $validColors = $this->isValidColors($color);
-        $this->params['text']['colors']['noise'] = $validColors;
+        $this->params['image']['colors']['noise'] = $validColors;
         return $this;
     }
 
@@ -183,7 +190,7 @@ class Image extends AbstractProvider implements CaptchaInterface
     public function setColor($color)
     {
         $validColors = $this->isValidColors($color);
-        $this->params['text']['colors']['text'] = $validColors;
+        $this->params['image']['colors']['text'] = $validColors;
         return $this;
     }
 
@@ -196,7 +203,7 @@ class Image extends AbstractProvider implements CaptchaInterface
      */
     public function setTrueColor($bool)
     {
-        $this->params['image']['trueColor'] = $bool;
+        $this->params['image']['truecolor'] = $bool;
     }
 
     /**
@@ -267,18 +274,6 @@ class Image extends AbstractProvider implements CaptchaInterface
     }
 
     /**
-     * Set the code generated for CAPTCHA.
-     * 
-     * @param string $code generated code.
-     * 
-     * @return string
-     */
-    protected  function setCode($code)
-    {
-        $this->code = $code;
-    }
-
-    /**
      * Set font
      * 
      * @param mixed $font font name
@@ -291,7 +286,7 @@ class Image extends AbstractProvider implements CaptchaInterface
             $str  = str_replace('.ttf', '', $font); // Remove the .ttf extension.
             $font = array($str => $str);
         }
-        $this->fonts = array_keys($font);
+        $this->fonts = array_values($font);
         return $this;
     }
 
@@ -346,6 +341,30 @@ class Image extends AbstractProvider implements CaptchaInterface
     }
 
     /**
+     * Returns to property value
+     * 
+     * @param string $property property
+     * 
+     * @return mixed
+     */
+    public function getProperty($property)
+    {
+        return $this->{$property};
+    }
+
+    /**
+     * Set the code generated for CAPTCHA.
+     * 
+     * @param string $code generated code.
+     * 
+     * @return string
+     */
+    protected function setCode($code)
+    {
+        $this->code = $code;
+    }
+
+    /**
      * Colors validation
      * 
      * @param mix $colors colors
@@ -377,9 +396,9 @@ class Image extends AbstractProvider implements CaptchaInterface
     /**
      * Generate image code
      * 
-     * @return void
+     * @return string code
      */
-    protected function generateCode()
+    public function generateCode()
     {
         $code  = '';
         $defaultPool = $this->params['characters']['default']['pool'];
@@ -392,6 +411,7 @@ class Image extends AbstractProvider implements CaptchaInterface
             );
         }
         $this->setCode($code);
+        return $code;
     }
 
     /**
@@ -403,6 +423,7 @@ class Image extends AbstractProvider implements CaptchaInterface
     public function create()
     {
         $this->generateCode();  // generate captcha code
+
         $this->imageCreate();
         $this->filledEllipse();
 
@@ -429,12 +450,13 @@ class Image extends AbstractProvider implements CaptchaInterface
      */
     protected function imageCreate()
     {
-        $randTextColor  = $this->params['text']['colors']['text'][array_rand($this->params['text']['colors']['text'])];
-        $randNoiseColor = $this->params['text']['colors']['noise'][array_rand($this->params['text']['colors']['noise'])];
+        $randTextColor  = $this->params['image']['colors']['text'][array_rand($this->params['image']['colors']['text'])];
+        $randNoiseColor = $this->params['image']['colors']['noise'][array_rand($this->params['image']['colors']['noise'])];
         $this->calculateWidth();
+
         // PHP.net recommends imagecreatetruecolor()
         // but it isn't always available
-        if (function_exists('imagecreatetruecolor') && $this->params['image']['trueColor']) {
+        if (function_exists('imagecreatetruecolor') && $this->params['image']['truecolor']) {
             $this->image = imagecreatetruecolor($this->width, $this->params['image']['height']);
         } else {
             $this->image = imagecreate($this->width, $this->params['image']['height']) or die('Cannot initialize new GD image stream');
@@ -488,6 +510,8 @@ class Image extends AbstractProvider implements CaptchaInterface
             throw new RuntimeException('Image CAPTCHA requires fonts.');
         }
         $randFont = array_rand($fonts);
+
+
         $fontPath = $this->defaultFontPath . $fonts[$randFont].'.ttf';
 
         if ($this->params['background'] != 'none') {

@@ -20,6 +20,8 @@ Redis sürücüsü sunucunuzda php extension olarak kurulmayı gerektirir. Ubunt
         <li><a href="#redis-replaceItems">$this->cache->replaceItems()</a></li>
         <li><a href="#redis-setSerializer">$this->cache->setSerializer()</a></li>
         <li><a href="#redis-getSerializer">$this->cache->getSerializer()</a></li>
+        <li><a href="#redis-setOption">$this->cache->setOption()</a></li>
+        <li><a href="#redis-getOption">$this->cache->getOption()</a></li>
         <li><a href="#redis-flushAll">$this->cache->flushAll()</a></li>
     </ul>
 </li>
@@ -165,7 +167,7 @@ Dizi türünde girilen anahtarların tümünü siler.
 
 <a name="redis-setSerializer"></a>
 
-##### $this->cache->setSerializer(string $serializer);
+##### $this->cache->setSerializer(string|constant $serializer);
 
 Encode ve decode işlemleri için serileştirici türünü seçer.
 
@@ -179,6 +181,18 @@ Encode ve decode işlemleri için serileştirici türünü seçer.
 ##### $this->cache->getSerializer();
 
 Geçerli serileştirici türüne geri döner.
+
+<a name="redis-setOption"></a>
+
+##### $this->cache->setOption(string|constant $option = 'OPT_SERIALIZER', string|constant $value = 'SERIALIZER_NONE')
+
+Bir opsiyon tanımlar. Birer sabit olan opsiyonlar parametrelerden string olarak kabul edilir. Sabitler hakkında daha detaylı bilgi için <a href="https://github.com/phpredis/phpredis#setoption">Redis setOption</a> metoduna bir gözatın.
+
+<a name="redis-getOption"></a>
+
+##### $this->cache->getOption(string|constant $option = 'OPT_SERIALIZER');
+
+Geçerli opsiyon değerine döner. Daha detaylı bilgi için <a href="https://github.com/phpredis/phpredis#getoption">Redis getOption</a> metoduna bir gözatın.
 
 <a name="redis-flushAll"></a>
 

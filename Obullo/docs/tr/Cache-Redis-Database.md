@@ -11,13 +11,13 @@ Eğer yetkilendirme konfigürasyon dosyasından yapılmıyorsa bu fonksiyon ile 
 
 <a name="redis-setOption"></a>
 
-##### $this->cache->setOption($option = 'OPT_SERIALIZER', $value = 'SERIALIZER_NONE')
+##### $this->cache->setOption(string|constant $option = 'OPT_SERIALIZER', string|constant $value = 'SERIALIZER_NONE')
 
 Redis için bir opsiyon tanımlar. Birer sabit olan opsiyonlar parametrelerden string olarak kabul edilir. Sabitler hakkında daha detaylı bilgi için <a href="https://github.com/phpredis/phpredis#setoption">Redis setOption</a> metoduna bir gözatın.
 
 <a name="redis-getOption"></a>
 
-##### $this->cache->getOption($option = 'OPT_SERIALIZER');
+##### $this->cache->getOption(string|constant $option = 'OPT_SERIALIZER');
 
 Geçerli opsiyon değerine döner. Daha detaylı bilgi için <a href="https://github.com/phpredis/phpredis#getoption">Redis getOption</a> metoduna bir gözatın.
 
@@ -28,11 +28,6 @@ Geçerli opsiyon değerine döner. Daha detaylı bilgi için <a href="https://gi
 
 Daha önce değer atanmış bir anahtara yeni değer ekler. Yeni atanan değer önceki değer ile string biçiminde birleştirilir.
 
-<a name="redis-renameKey"></a>
-
-##### $this->cache->renameKey(string $key, string $newKey);
-
-Mevcut bir anahtarı yeni bir anahtar ile değiştirme imkanı sağlar. Değiştirilmek istenen anahtar var ise işlem sonucu <kbd>true</kbd> yok ise <kbd>false</kbd> değerine dönecektir. Yeni anahtar daha önce tanımlanmış ise yeni anahtar bir öncekinin üzerine yazılır.
 
 <a name="redis-setTimeout"></a>
 
@@ -80,7 +75,7 @@ Girilen anahtarın redis türünden biçimine döner bu biçimlerden bazıları 
 
 ##### $this->cache->hSet(string $key, string $hashKey, mixed $value);
 
-Belirtilen anahtarın alt anahtarına ( hashKey ) bir değer ekler.Metot eğer anahtara ait bir veri yoksa yani insert işleminde <kbd>true</kbd> değerine anahtara ait bir veri varsa yani replace işleminde <kbd>false</kbd> değerine döner.
+Belirtilen anahtarın alt anahtarına ( hashKey ) bir değer ekler. Metot eğer anahtara ait bir veri yoksa yani insert işleminde <kbd>true</kbd> değerine anahtara ait bir veri varsa yani replace işleminde <kbd>false</kbd> değerine döner.
 
 ```php
 $this->cache->hSet('h', 'key1', 'merhaba'); // Sonuç true
@@ -184,6 +179,33 @@ $this->cache->hIncrByFLoat('h', 'x', 1.5);  // Sonuç 3.0: h[x] = 3.0 now
 $this->cache->hIncrByFloat('h', 'x', -3.0); // Sonuç 0.0: h[x] = 0.0 now
 ```
 
+<a name="redis-hSet"></a>
+
+##### $this->cache->hSet($key, $hashKey, $data, $ttl = 0);
+
+Bir diziye (hash tablosuna) ait anahtarın değerini değiştirir yada diziye yeni değeri ekler.
+
+```php
+$this->cache->removeItem('h')
+$this->cache->hSet('h', 'key1', 'hello');
+$this->cache->hGet('h', 'key1'); /* Çıktı "hello" */
+
+$this->cache->hSet('h', 'key1', 'plop'); /* 0, değer değiştirildi. */
+$this->cache->hGet('h', 'key1');  /* Çıktı "plop" */
+```
+
+<a name="redis-hGet"></a>
+
+##### $this->cache->hGet(string $key);
+
+Hash tablosunda varolan anahtarın değerine döner anahtar yoksa <kbd>false</kbd> değerine döner.
+
+```php
+$this->cache->removeItem('h')
+$this->cache->hSet('h', 'key1', 'hello');
+$this->cache->hGet('h', 'key1'); /* Çıktı "hello" */
+```
+
 <a name="redis-hMSet"></a>
 
 ##### $this->cache->hMSet(string $key, array $members);
@@ -209,26 +231,6 @@ $this->cache->hSet('h', 'field2', 'value2');
 $this->cache->hmGet('h', array('field1', 'field2')); 
 
 // Sonuç: array('field1' => 'value1', 'field2' => 'value2')
-```
-
-<a name="redis-sAdd"></a>
-
-##### $this->cache->sAdd(string $key, string or array $value);
-
-Belirtilen değere bir değer ekler. Eğer değer zaten eklenmiş ise işlem sonucu <kbd>false</kbd> değerine döner.
-
-```php
-$this->cache->sAdd('key1', 'value1'); 
-
-// 1, 'key1' => {'value1'}
-
-$this->cache->sAdd('key1', array('value2', 'value3'));
-
-// 2, 'key1' => {'value1', 'value2', 'value3'}
-
-$this->cache->sAdd('key1', 'value2');
-
-// 0, 'key1' => {'value1', 'value2', 'value3'}
 ```
 
 <a name="redis-sort"></a>
@@ -296,7 +298,7 @@ print_r($this->cache->sInter('key1', 'key2', 'key3'));  // Çıktı array('val4'
 
 <a name="redis-sGetMembers"></a>
 
-##### $this->cache->sGetMembers(string $key)
+##### $this->cache->sMembers(string $key)
 
 Belirtilen anahtarın değerini bir dizi olarak döndürür.
 
@@ -309,7 +311,7 @@ $this->cache->sAdd('key', 'val3');
 ```
 
 ```php
-print_r($this->cache->sGetMembers('key'));  // Çıktı array('val3', 'val2', 'val1');
+print_r($this->cache->sMembers('key'));  // Çıktı array('val3', 'val2', 'val1');
 ```
 
 Php Redis sınıfı hakkında daha detaylı dökümentasyona <a href="https://github.com/phpredis/phpredis" target="_blank">buradan</a> ulaşabilirsiniz.

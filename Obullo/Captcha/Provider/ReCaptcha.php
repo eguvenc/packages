@@ -86,28 +86,26 @@ class ReCaptcha extends AbstractProvider implements CaptchaInterface
     /**
      * Constructor
      * 
-     * @param object $request    \Psr\Http\Message\RequestInterface
-     * @param object $translator \Obullo\Translation\TranslatorInterface
-     * @param object $logger     \Obullo\Log\LoggerInterface
-     * @param array  $params     service parameters
+     * @param object $request \Psr\Http\Message\RequestInterface
+     * @param object $logger  \Obullo\Log\LoggerInterface
+     * @param array  $params  service parameters
      */
     public function __construct(
         Request $request,
-        Translator $translator,
         Logger $logger,
         array $params
     ) {
         $this->params = $params;
         $this->request = $request;
-        $this->translator = $translator;
         $this->logger = $logger;
 
-        $this->errorCodes = array(
-            self::FAILURE_MISSING_INPUT_SECRET   => $this->translator['OBULLO:VALIDATOR:RECAPTCHA:MISSING_INPUT_SECRET'],
-            self::FAILURE_INVALID_INPUT_SECRET   => $this->translator['OBULLO:VALIDATOR:RECAPTCHA:INVALID_INPUT_SECRET'],
-            self::FAILURE_MISSING_INPUT_RESPONSE => $this->translator['OBULLO:VALIDATOR:RECAPTCHA:MISSING_INPUT_RESPONSE'],
-            self::FAILURE_INVALID_INPUT_RESPONSE => $this->translator['OBULLO:VALIDATOR:RECAPTCHA:INVALID_INPUT_RESPONSE']
-        );
+        $this->translator['OBULLO:VALIDATOR:RECAPTCHA:SUCCESS'] = "ReCaptcha code verified.";
+        $this->translator['OBULLO:VALIDATOR:RECAPTCHA:NOT_FOUND'] = "The captcha failure code not found.";
+        $this->translator['OBULLO:VALIDATOR:RECAPTCHA:MISSING_INPUT_SECRET'] = "The secret parameter is missing.";
+        $this->translator['OBULLO:VALIDATOR:RECAPTCHA:INVALID_INPUT_SECRET'] = "The secret parameter is invalid or malformed.";
+        $this->translator['OBULLO:VALIDATOR:RECAPTCHA:MISSING_INPUT_RESPONSE'] = "The response parameter is missing.";
+        $this->translator['OBULLO:VALIDATOR:RECAPTCHA:INVALID_INPUT_RESPONSE'] = "The response parameter is invalid or malformed.";
+
         $this->init();
         $this->logger->debug('ReCaptcha Class Initialized');
     }
@@ -119,10 +117,43 @@ class ReCaptcha extends AbstractProvider implements CaptchaInterface
      */
     public function init()
     {
+        $this->setErrorCodes();
         if ($this->params['user']['autoSendIp']) {
             $this->setUserIp($this->request->getIpAddress());
         }
         $this->buildHtml();
+    }
+
+    /**
+     * Set error code translations
+     *
+     * @return void
+     */
+    protected function setErrorCodes()
+    {
+        $this->errorCodes = array(
+            self::FAILURE_MISSING_INPUT_SECRET   => $this->translator['OBULLO:VALIDATOR:RECAPTCHA:MISSING_INPUT_SECRET'],
+            self::FAILURE_INVALID_INPUT_SECRET   => $this->translator['OBULLO:VALIDATOR:RECAPTCHA:INVALID_INPUT_SECRET'],
+            self::FAILURE_MISSING_INPUT_RESPONSE => $this->translator['OBULLO:VALIDATOR:RECAPTCHA:MISSING_INPUT_RESPONSE'],
+            self::FAILURE_INVALID_INPUT_RESPONSE => $this->translator['OBULLO:VALIDATOR:RECAPTCHA:INVALID_INPUT_RESPONSE']
+        );
+    }
+
+    /**
+     * Set translator object if you need multi languages
+     * 
+     * @param Translator $translator translator
+     *
+     * @return void
+     */
+    public function setTranslator(Translator $translator)
+    {
+        $this->translator = null;  // Reset default translations.
+        $this->translator = $translator;
+        /**
+         * Re init error codes
+         */
+        $this->setErrorCodes();
     }
 
     /**
@@ -306,12 +337,12 @@ class ReCaptcha extends AbstractProvider implements CaptchaInterface
             }
             if ($response['success'] === true) {
                 $this->result['code'] = CaptchaResult::SUCCESS;
-                $this->result['messages'][] = $this->translator['OBULLO:VALIDATOR:CAPTCHA:SUCCESS'];
+                $this->result['messages'][] = $this->translator['OBULLO:VALIDATOR:RECAPTCHA:SUCCESS'];
                 return $this->createResult();
             }
         }
         $this->result['code'] = CaptchaResult::FAILURE_CAPTCHA_NOT_FOUND;
-        $this->result['messages'][] = $this->translator['OBULLO:VALIDATOR:CAPTCHA:NOT_FOUND'];
+        $this->result['messages'][] = $this->translator['OBULLO:VALIDATOR:RECAPTCHA:NOT_FOUND'];
         return $this->createResult();
     }
 

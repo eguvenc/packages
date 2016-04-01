@@ -151,7 +151,7 @@ Dizi türünde girilen anahtarların tümünü siler.
 
 <a name="memcached-setSerializer"></a>
 
-##### $this->cache->setSerializer($serializer = 'php');
+##### $this->cache->setSerializer(string|constant $serializer = 'php');
 
 Geçerli serileştirici türünü seçer. Serileştirici tipleri : <kbd>php</kbd>, <kbd>igbinary</kbd> ve <kbd>json</kbd> dır.
 
@@ -173,14 +173,14 @@ Geçerli veritabanından tüm anahtarları siler.
 
 <a name="memcached-setOption"></a>
 
-##### $this->cache->setOption($option = 'OPT_SERIALIZER', $value = 'SERIALIZER_PHP');
+##### $this->cache->setOption(string|constant $option = 'OPT_SERIALIZER', string|constant $value = 'SERIALIZER_PHP');
 
 Memcached için bir opsiyon tanımlar. Birer sabit olan opsiyonlar parametrelerden string olarak kabul edilir. Sabitler hakkında daha detaylı bilgi için <a href="http://www.php.net/
 manual/en/memcached.constants.php">bu adrese</a> bir gözatın.
 
 <a name="memcached-getOption"></a>
 
-##### $this->cache->getOption($option = 'OPT_SERIALIZER');
+##### $this->cache->getOption(string|constant $option = 'OPT_SERIALIZER');
 
 Geçerli opsiyon değerine döner. Opsiyon sabitleri hakkında detaylı bilgi için <a href="http://www.php.net/manual/en/memcached.constants.php">bu adrese</a> bir gözatın.
 

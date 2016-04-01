@@ -34,9 +34,9 @@ class Redis implements CacheInterface
      * @var array
      */
     public $serializers = array(
-        0 => 'none',
-        1 => 'php',
-        2 => 'igbinary'
+        'none' => \Redis::SERIALIZER_NONE,
+        'php' => \Redis::SERIALIZER_PHP,
+        'igbinary' => 2  // IGBINARY constant is not available some times.
     );
 
     /**
@@ -94,8 +94,8 @@ class Redis implements CacheInterface
     public function getSerializer()
     {
         $number = $this->getOption('OPT_SERIALIZER');
-
-        return $this->serializers[$number];
+        $serializers = array_flip($this->serializers);
+        return $serializers[$number];
     }
 
     /**
@@ -107,12 +107,20 @@ class Redis implements CacheInterface
      */
     public function setSerializer($serializer = 'php')
     {
-        $this->redis->setOption(Redis::OPT_SERIALIZER, $this->serializers[$serializer]);
+        if ($serializer == 'igbinary') {
+            $class = new ReflectionClass("Redis");
+            if (! $class->hasConstant("SERIALIZER_IGBINARY")) {
+                throw new RuntimeException("Igbinary is not enabled on your redis installation.");
+            }
+            $this->redis->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_IGBINARY);
+        }
+        $this->redis->setOption(\Redis::OPT_SERIALIZER, $this->serializers[$serializer]); 
     }
 
     /**
      * Get client option.
-     *
+     * http://www.php.net/manual/en/memcached.constants.php
+     * 
      * @param string $option option constant
      * 
      * @return string value
@@ -120,24 +128,31 @@ class Redis implements CacheInterface
     public function getOption($option = 'OPT_SERIALIZER')
     {
         $obj = new ReflectionClass('Redis');
-        $constant = $obj->getconstant($option);
-        return $this->redis->getOption($constant);
+        
+        if (is_string($option)) {
+            $option = $obj->getconstant($option);
+        }
+        return $this->redis->getOption($option);
     }
 
     /**
      * Set option
      * 
-     * @param string $option constant name
-     * @param string $value  constant value name
+     * @param mixed $option integer option or string constant name
+     * @param mixed $value  mixed   value or constant name
      *
      * @return void
      */
-    public function setOption($option = 'OPT_SERIALIZER', $value = 'SERIALIZER_NONE')
+    public function setOption($option = 'OPT_SERIALIZER', $value = 'SERIALIZER_PHP')
     {
-        $obj    = new ReflectionClass('Redis');
-        $option = $obj->getconstant($option);
-        $value  = $obj->getconstant($value);
+        $obj = new ReflectionClass('Redis');
 
+        if (is_string($option)) {
+            $option = $obj->getconstant($option);
+        }
+        if ($obj->getconstant($value)) {
+            $value = $obj->getconstant($value);
+        }
         $this->redis->setOption($option, $value); 
     }
 
@@ -178,19 +193,6 @@ class Redis implements CacheInterface
     }
 
     /**
-     * Renames a key.
-     * 
-     * @param string $key    cache key.
-     * @param string $newKey cache key.
-     * 
-     * @return boolean true or false
-     */
-    public function renameKey($key, $newKey)
-    {
-        return $this->redis->rename($key, $newKey);
-    }
-
-    /**
      * Returns the keys that match a certain pattern.
      * 
      * @param string $pattern pattern symbol
@@ -221,79 +223,6 @@ class Redis implements CacheInterface
             $data[$v] = $getData;
         }
         return $data;
-    }
-
-    /**
-     * Sort the elements in a list, set or sorted set.
-     * 
-     * @param string $key  cache key.
-     * @param array  $sort optional
-     * 
-     * @return array the keys that match a certain pattern.
-     */
-    public function sort($key, $sort = array())
-    {
-        if (count($sort) > 0) {
-            return $this->redis->sort($key, $sort);
-        }
-        return $this->redis->sort($key);
-    }
-
-    /**
-     * Adds a value to the set value stored at key. If this value is already in the set, FALSE is returned.
-     * 
-     * @param string $key  cache key.
-     * @param string $data cache data.
-     * 
-     * @return long the number of elements added to the set.
-     */
-    public function sAdd($key, $data)
-    {
-        if (is_array($data)) {
-            $data = "'" . implode("','", $data) . "'";
-        }
-        return $this->redis->sAdd($key, $data);
-    }
-
-    /**
-     * Returns the cardinality of the set identified by key.
-     * 
-     * @param string $key cache key.
-     * 
-     * @return long the cardinality of the set identified by key, 0 if the set doesn't exist.
-     */
-    public function sSize($key)
-    {
-        return $this->redis->sCard($key);
-    }
-
-    /**
-     * Returns the members of a set resulting from the intersection of all the sets held at the specified keys.
-     * 
-     * @param array $keys cache keys.
-     * 
-     * @return array contain the result of the intersection between those keys.
-     * If the intersection beteen the different sets is empty,
-     * the return value will be empty array.
-     */
-    public function sInter($keys = array())
-    {
-        if (count($keys) > 0 && is_array($keys)) {
-            return $this->redis->sInter("'" . implode("','", $keys) . "'");
-        }
-        return false;
-    }
-
-    /**
-     * Returns the contents of a set.
-     * 
-     * @param string $key cache key.
-     * 
-     * @return array of elements, the contents of the set.
-     */
-    public function sGetMembers($key)
-    {
-        return $this->redis->sMembers($key);
     }
 
     /**
@@ -382,7 +311,7 @@ class Redis implements CacheInterface
     public function removeItems(array $keys)
     {
         foreach ($keys as $key) {
-            $this->remove($key);
+            $this->removeItem($key);
         }
         return;
     }
@@ -412,6 +341,16 @@ class Redis implements CacheInterface
     public function replaceItems(array $data, $ttl = 60)
     {
         return $this->setArray($data, $ttl);
+    }
+
+    /**
+     * Get software information installed on your server.
+     * 
+     * @return object
+     */
+    public function getInfo()
+    {
+        return $this->redis->info();
     }
 
     /**

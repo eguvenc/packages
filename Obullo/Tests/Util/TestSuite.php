@@ -37,8 +37,13 @@ class TestSuite
             }
             return;
         } else {
-
             if (empty($object['methods']) || empty($object['class'])) {
+                if (! empty($object['message'])) {
+                    $errorText = "Exception: ".$object['message']."\nFile: ".$object['file']." Line: ".$object['line'];
+                    echo Console::text($errorText, "red");
+                    echo Console::newline(2);
+                    return;
+                }
                 echo Console::text("File not found.", "red");
                 echo Console::newline(2);
                 return;

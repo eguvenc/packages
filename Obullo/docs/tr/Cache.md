@@ -166,7 +166,7 @@ Dizi türünde girilen yeni değerleri günceller.
 
 <a name="common-setSerializer"></a>
 
-##### $this->cache->setSerializer($serializer = null);
+##### $this->cache->setSerializer(string|constant $serializer = null);
 
 Varsa sürücünüzün desteklediği serileştirici türünü seçer.
 
@@ -175,6 +175,18 @@ Varsa sürücünüzün desteklediği serileştirici türünü seçer.
 ##### $this->cache->getSerializer();
 
 Geçerli serileştirici türüne geri döner.
+
+<a name="redis-setOption"></a>
+
+##### $this->cache->setOption(string|constant $option = 'OPT_SERIALIZER', string|constant $value = 'SERIALIZER_NONE')
+
+Redis ve Memcached sürücüleri için bir opsiyon tanımlar. Birer sabit olan opsiyonlar parametrelerden string olarak kabul edilir. Sabitler hakkında daha detaylı bilgi için <a href="https://github.com/phpredis/phpredis#setoption">Redis setOption</a> metoduna bir gözatın.
+
+<a name="redis-getOption"></a>
+
+##### $this->cache->getOption(string|constant $option = 'OPT_SERIALIZER');
+
+Redis ve Memcached sürücüleri için geçerli opsiyon değerine döner. Daha detaylı bilgi için <a href="https://github.com/phpredis/phpredis#getoption">Redis getOption</a> metoduna bir gözatın.
 
 <a name="common-flushAll"></a>
 

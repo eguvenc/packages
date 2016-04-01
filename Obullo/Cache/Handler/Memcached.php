@@ -34,12 +34,11 @@ class Memcached implements CacheInterface
      * @var array
      */
     public $serializers = array(
-        0 => 'none',
-        1 => 'php',         // Memcached::SERIALIZER_PHP
-        2 => 'igbinary',    // Memcached::SERIALIZER_IGBINARY
-        3 => 'json',        // Memcached::SERIALIZER_JSON
+        'php' => \Memcached::SERIALIZER_PHP,         // Memcached::SERIALIZER_PHP
+        'igbinary' => \Memcached::SERIALIZER_IGBINARY,    // Memcached::SERIALIZER_IGBINARY
+        'json' => \Memcached::SERIALIZER_JSON
     );
-    
+
     /**
      * Constructor
      * 
@@ -63,6 +62,7 @@ class Memcached implements CacheInterface
     {
         return true;
     }
+
     /**
      * If method does not exist in this class call it from $this->memcached
      * 
@@ -84,8 +84,8 @@ class Memcached implements CacheInterface
     public function getSerializer()
     {
         $number = $this->getOption('OPT_SERIALIZER');
-
-        return $this->serializers[$number];
+        $serializers = array_flip($this->serializers);
+        return $serializers[$number];
     }
 
     /**
@@ -97,7 +97,7 @@ class Memcached implements CacheInterface
      */
     public function setSerializer($serializer = 'php')
     {
-        $this->memcached->setOption(\Memcached::OPT_SERIALIZER, $this->serializers[$serializer]);
+        $this->memcached->setOption(\Memcached::OPT_SERIALIZER, $this->serializers[$serializer]); 
     }
 
     /**
@@ -111,25 +111,32 @@ class Memcached implements CacheInterface
     public function getOption($option = 'OPT_SERIALIZER')
     {
         $obj = new ReflectionClass('Memcached');
-        $constant = $obj->getconstant($option);
-        return $this->memcached->getOption($constant);
+        
+        if (is_string($option)) {
+            $option = $obj->getconstant($option);
+        }
+        return $this->memcached->getOption($option);
     }
 
     /**
      * Set option
      * 
-     * @param string $option constant name
-     * @param string $value  constant value name
+     * @param mixed $option integer option or string constant name
+     * @param mixed $value  mixed value or constant name
      *
      * @return void
      */
     public function setOption($option = 'OPT_SERIALIZER', $value = 'SERIALIZER_PHP')
     {
-        $obj    = new ReflectionClass('Memcached');
-        $option = $obj->getconstant($option);
-        $value  = $obj->getconstant($value);
+        $obj = new ReflectionClass('Memcached');
 
-        $this->redis->setOption($option, $value); 
+        if (is_string($option)) {
+            $option = $obj->getconstant($option);
+        }
+        if ($obj->getconstant($value)) {
+            $value = $obj->getconstant($value);
+        }
+        $this->memcached->setOption($option, $value); 
     }
 
     /**
