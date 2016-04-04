@@ -7,6 +7,7 @@ use Obullo\Captcha\AbstractProvider;
 use Obullo\Captcha\CaptchaInterface;
 
 use Obullo\Log\LoggerInterface as Logger;
+use Obullo\Translation\TranslatorAwareTrait;
 use Psr\Http\Message\RequestInterface as Request;
 use Obullo\Translation\TranslatorInterface as Translator;
 
@@ -18,6 +19,8 @@ use Obullo\Translation\TranslatorInterface as Translator;
  */
 class ReCaptcha extends AbstractProvider implements CaptchaInterface
 {
+    use TranslatorAwareTrait;
+
     /**
      * Api data
      */
@@ -53,13 +56,6 @@ class ReCaptcha extends AbstractProvider implements CaptchaInterface
      * @var string
      */
     protected $userIp;
-
-    /**
-     * Translator
-     * 
-     * @var object
-     */
-    protected $translator;
 
     /**
      * Error codes
@@ -99,6 +95,7 @@ class ReCaptcha extends AbstractProvider implements CaptchaInterface
         $this->request = $request;
         $this->logger = $logger;
 
+        $this->translator = array();
         $this->translator['OBULLO:VALIDATOR:RECAPTCHA:SUCCESS'] = "ReCaptcha code verified.";
         $this->translator['OBULLO:VALIDATOR:RECAPTCHA:NOT_FOUND'] = "The captcha failure code not found.";
         $this->translator['OBULLO:VALIDATOR:RECAPTCHA:MISSING_INPUT_SECRET'] = "The secret parameter is missing.";

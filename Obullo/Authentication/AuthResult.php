@@ -79,7 +79,7 @@ class AuthResult
      */
     public function isValid()
     {
-        return ($this->code > 0) ? true : false;
+        return ($this->getCode() > 0) ? true : false;
     }
 
     /**

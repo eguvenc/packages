@@ -7,6 +7,7 @@ use Traversable;
 use Obullo\Cli\Console;
 use Obullo\Http\Controller;
 use Obullo\Utils\ArrayHelper;
+use Obullo\Tests\Constraint\PCREMatch;
 use Obullo\Tests\Constraint\StringContains;
 use Obullo\Tests\Constraint\TraversableContains;
 
@@ -442,6 +443,33 @@ abstract class TestController extends Controller implements HttpTestInterface
         $pass = property_exists($object, $attribue) ? false : true;
         TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
+    }
+
+    /**
+     * Assert regexp
+     * 
+     * @param string $pattern pattern
+     * @param string $string  string
+     * @param string $message message
+     * 
+     * @return void
+     */
+    public function assertRegExp($pattern, $string, $message = "")
+    {
+        if (!is_string($pattern)) {
+            throw InvalidArgumentHelper::factory(
+                1,
+                'string'
+            );
+        }
+        if (!is_string($string)) {
+            throw InvalidArgumentHelper::factory(
+                2,
+                'string'
+            );
+        }
+        $constraint = new PCREMatch($pattern);
+        return $this->assertThat($string, $constraint, $message);
     }
 
     /**

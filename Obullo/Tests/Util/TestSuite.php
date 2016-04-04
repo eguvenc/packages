@@ -161,6 +161,7 @@ class TestSuite
                 $process = new Process($cmd, ROOT, null, null, 0);
                 $process->run();
 
+
                 if (! $process->isSuccessful()) {
                     $error = json_decode($process->getOutput(), true);
                     if ($error != null && is_array($error)) {
@@ -175,6 +176,12 @@ class TestSuite
             
                 $method = json_decode($process->getOutput(), true);
 
+                if (! empty($method['message'])) {
+                    $e = $e + 1;
+                    $errorText = "Exception: ".$method['message']."\nFile: ".$method['file']." Line: ".$method['line'];
+                    echo Console::text($errorText, "red");
+                    echo Console::newline(1);
+                }
                 if (! empty($method['assertions'])) {
                     $a += $method["assertions"];
                     $p += $method["passes"];

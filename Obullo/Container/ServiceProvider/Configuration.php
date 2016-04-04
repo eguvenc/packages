@@ -54,14 +54,8 @@ class Configuration
             foreach ($this->params['methods'] as $key => $method) {
                 
                 foreach ($method['argument'] as $k => $v) {
-
                     if (is_string($v)) {
-                        
-                        if (substr($v, 0, 1) !== '@') {
-                            $method['argument'][$k] = new RawArgument($v);
-                        } else {
-                            $method['argument'][$k] = ltrim($v, '@');
-                        }
+                        $method['argument'][$k] = new RawArgument($v);  // Convert strings to raw objects.
                     }
                 }
                 $this->params['methods'][$key] = $method;

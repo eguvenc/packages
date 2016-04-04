@@ -69,6 +69,7 @@ class TestHelper
             'assertArrayContains',
             'assertStringContains',
             'assertDate',
+            'assertRegExp',
         ];
         $disabledMethods = array_merge($disabledMethods, TestPreferences::getIgnoredMethods());
         $methods = array();

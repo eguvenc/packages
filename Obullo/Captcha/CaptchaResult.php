@@ -58,7 +58,7 @@ class CaptchaResult
     public function __construct($code, $messages)
     {
         $this->code = (int)$code;
-        $this->messages = $messages;
+        $this->messages = (array)$messages;
     }
 
     /**
@@ -68,7 +68,7 @@ class CaptchaResult
      */
     public function isValid()
     {
-        return ($this->code > 0) ? true : false;
+        return ($this->getCode() > 0) ? true : false;
     }
 
     /**
