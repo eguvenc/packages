@@ -39,6 +39,13 @@ class Http extends Application
     protected $controller;
 
     /**
+     * Http test interface errors
+     * 
+     * @var array
+     */
+    protected $testExceptions = [];
+
+    /**
      * Constructor
      *
      * @return void
@@ -109,6 +116,15 @@ class Http extends Application
             $e = new ErrorException($error['message'], $error['type'], 0, $error['file'], $error['line']);
             $this->showException($e);
         }
+        $container = $this->getContainer();
+        /**
+         * Http test inteface support
+         * We show exceptions per one http request.
+         */
+        $server = $container->get('request')->getServerParams();
+        if (defined('STDIN') && ! empty($server['SERVER_NAME']) && $server['SERVER_NAME'] == 'PHP_TEST' && ! empty($this->testExceptions)) {
+            echo json_encode($this->testExceptions[0]);
+        }
     }
 
     /**
@@ -121,7 +137,23 @@ class Http extends Application
     protected function showException(Exception $e)
     {
         $container = $this->getContainer();
-        
+        /**
+         * Http test inteface support
+         * We show exceptions per one http request.
+         */
+        $server = $container->get('request')->getServerParams();
+        if (defined('STDIN') && ! empty($server['SERVER_NAME']) && $server['SERVER_NAME'] == 'PHP_TEST') {
+            $queryParams = $container->get('request')->getQueryParams();
+
+            if (! empty($queryParams['suite'])) {
+                $this->testExceptions[] = [
+                    'message' => $e->getMessage(),
+                    'line' => $e->getLine(),
+                    'file' => $e->getFile(),
+                ];
+            }
+            return;
+        }
         $error = $container->get('middleware')->add('Error');
         $error->setContainer($container);
         $error($e, $container->get('request'), $container->get('response'));

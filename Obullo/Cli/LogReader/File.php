@@ -105,7 +105,6 @@ class File
             clearstatcache();
             $size = $currentSize;
         }
-
     }
 
 }

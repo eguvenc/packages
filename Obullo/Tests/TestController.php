@@ -473,6 +473,42 @@ abstract class TestController extends Controller implements HttpTestInterface
     }
 
     /**
+     * Assert file exists
+     * 
+     * @param string $file    path
+     * @param string $message message
+     * 
+     * @return boolean
+     */
+    public function assertFileExists($file, $message = "")
+    {
+        $pass = false;
+        if (file_exists($file)) {
+            $pass = true;
+        }
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
+        return $pass;
+    } 
+
+    /**
+     * Assert file Not exists
+     * 
+     * @param string $file    path
+     * @param string $message message
+     * 
+     * @return boolean
+     */
+    public function assertFileNotExists($file, $message = "")
+    {
+        $pass = false;
+        if (! file_exists($file)) {
+            $pass = true;
+        }
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
+        return $pass;
+    }
+    
+    /**
      * Generate test results
      * 
      * @return void

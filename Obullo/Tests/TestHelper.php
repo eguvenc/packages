@@ -70,6 +70,8 @@ class TestHelper
             'assertStringContains',
             'assertDate',
             'assertRegExp',
+            'assertFileExists',
+            'assertFileNotExists',
         ];
         $disabledMethods = array_merge($disabledMethods, TestPreferences::getIgnoredMethods());
         $methods = array();
