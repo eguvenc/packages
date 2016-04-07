@@ -29,37 +29,29 @@ class Amqp implements PusherInterface, ContainerAwareInterface
     {
         // http://php.net/manual/pl/amqp.constants.php
 
-        try {
-
-            $container  = $this->getContainer();
-            $connection = $container->get('amqp')->shared(['connection' => 'default']);
-            
-            $params     = $container->get('logger.params');
-            $routingKey = $params['queue']['job'];
-            $payload    = json_encode(array('job' => $routingKey, 'data' => $data));
-
-            $channel = new AMQPChannel($connection);
-
-            $exchangeName = 'Workers@Logger';
-            $exchange = new AMQPExchange($channel);
-            $exchange->setType(AMQP_EX_TYPE_DIRECT);
-            $exchange->setName($exchangeName);
-            $exchange->declareExchange();
-
-            $queue = new AMQPQueue($channel);
-            $queue->setFlags(AMQP_DURABLE);
-            $queue->setName($routingKey);
-            $queue->declareQueue();
-            $queue->bind($exchangeName, $routingKey);
-            $exchange->publish($payload, $routingKey, AMQP_MANDATORY);
-
-            $connection->disconnect();
+        $container  = $this->getContainer();
+        $connection = $container->get('amqp')->shared(['connection' => 'default']);
         
-        } catch (Exception $e) {
+        $params     = $container->get('logger.params');
+        $routingKey = $params['queue']['job'];
+        $payload    = json_encode(array('job' => $routingKey, 'data' => $data));
 
-            $exception = new \Obullo\Error\Exception;
-            echo $exception->make($e);
-        }
+        $channel = new AMQPChannel($connection);
+
+        $exchangeName = 'Workers@Logger';
+        $exchange = new AMQPExchange($channel);
+        $exchange->setType(AMQP_EX_TYPE_DIRECT);
+        $exchange->setName($exchangeName);
+        $exchange->declareExchange();
+
+        $queue = new AMQPQueue($channel);
+        $queue->setFlags(AMQP_DURABLE);
+        $queue->setName($routingKey);
+        $queue->declareQueue();
+        $queue->bind($exchangeName, $routingKey);
+        $exchange->publish($payload, $routingKey, AMQP_MANDATORY);
+
+        $connection->disconnect();
 
     }
 

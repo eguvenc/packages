@@ -46,20 +46,40 @@ class MiddlewarePipe implements MiddlewareInterface
     protected $pipeline;
 
     /**
-     * Constructor
+     * Benchmark option
      * 
+     * @var boolean
+     */
+    protected $benchmark = false;
+
+    /**
+     * Constructor
+     *
      * @param Container $container container
      */
     public function __construct(Container $container)
     {
         $this->container = $container;
         $this->pipeline = new SplQueue;
+        
         $middleware = $this->container->get('middleware');
         $middleware->add('Error')->setContainer($container);  // Error middleware must be defined end of the queue.
 
-        foreach ($middleware ->getQueue() as $middleware) {
+        foreach ($middleware->getQueue() as $middleware) {
             $this->pipe($middleware);
         }
+    }
+
+    /**
+     * Set benchmark
+     * 
+     * @param bool $bool boolean
+     * 
+     * @return void
+     */
+    public function benchmark($bool)
+    {
+        $this->benchmark = $bool;
     }
 
     /**
@@ -69,6 +89,9 @@ class MiddlewarePipe implements MiddlewareInterface
      */
     public function getRequest()
     {
+        if ($this->benchmark) {
+            return \Obullo\Log\Benchmark::start($this->container->get('request'));
+        }
         return $this->container->get('request');
     }
 

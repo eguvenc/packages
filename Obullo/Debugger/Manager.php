@@ -44,8 +44,8 @@ class Manager
     {
         $this->container = $container;
         $this->logger = $container->get('logger');
-        $this->config = $container->get('config')->load('providers::logger');
-        $this->debugger = $container->get('config')->load('debugger');
+        $this->config = $container->get('config')->get('providers::logger');
+        $this->debugger = $container->get('config')->get('debugger');
     }
 
     /**
@@ -61,7 +61,7 @@ class Manager
          * @var string
          */
         $websocketUrl = $this->debugger['socket'];
-        $debuggerOff  = (int)$this->container->get('config')['extra']['debugger'];
+        $debuggerOff  = (int)$this->container->get('config')->get('config')['extra']['debugger'];
         $debuggerUrl  = $this->container->get('url')->basePath(INDEX_PHP.'/debugger/body');
 
         $env = new Environment(

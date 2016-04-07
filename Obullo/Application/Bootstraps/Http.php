@@ -40,13 +40,15 @@ $container->share('app', 'Obullo\Application\Http')->withArgument($container);
 $container->share('middleware', 'Obullo\Application\MiddlewareStack')->withArgument($container);
 
 /**
- * Create test environments
+ * Create test environment
  */
-if (defined('STDIN') && ! empty($_SERVER['argv'][0])) {
-    Obullo\Tests\TestEnvironment::createServer();
+$testEnvironment = null;
+if (defined('STDIN') && ! empty($_SERVER['argv'][0]) && $_SERVER['SCRIPT_FILENAME'] == 'public/index.php') {
+    $testEnvironment = new Obullo\Tests\TestEnvironment;
+    $testEnvironment->createServer();
 }
 /**
- * Create Server Request
+ * Create http server request
  */
 $request = Obullo\Http\ServerRequestFactory::fromGlobals(
     $_SERVER,
@@ -60,7 +62,12 @@ $request = Obullo\Http\ServerRequestFactory::fromGlobals(
  */
 $container->share('request', $request);
 $container->share('response', 'Obullo\Http\Response');
-
+/**
+ * Set container to test environment if its available
+ */
+if ($testEnvironment) {
+    $testEnvironment->setContainer($container);
+}
 /**
  * Initialize to application
  */

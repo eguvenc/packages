@@ -25,23 +25,15 @@ class Queue implements PusherInterface, ContainerAwareInterface
      */
     public function push(array $data)
     {
-        try {
+        $container = $this->getContainer();
+        $params = $container->get('logger.params');
 
-            $container = $this->getContainer();
-            $params = $container->get('logger.params');
-
-            $container->get('queue')->push(
-                'Workers@Logger',
-                $params['queue']['job'],
-                $data,
-                $params['queue']['delay']
-            );
-        
-        } catch (Exception $e) {
-
-            $exception = new \Obullo\Error\Exception;
-            echo $exception->make($e);
-        }
+        $container->get('queue')->push(
+            'Workers@Logger',
+            $params['queue']['job'],
+            $data,
+            $params['queue']['delay']
+        );
     }
 
 }

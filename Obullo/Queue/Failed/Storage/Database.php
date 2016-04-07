@@ -41,7 +41,7 @@ class Database implements StorageInterface
      */
     public function __construct(Config $config, ServiceProvider $provider, array $params)
     {
-        $database   = $config->load('providers::database')['params'];
+        $database   = $config->get('providers::database')['params'];
         $connection = $params['job']['saveFailures']['provider']['connection'];
 
         if (! isset($database['connections'][$connection])) {

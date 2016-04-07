@@ -64,7 +64,7 @@ class TestUser
      */
     public function attempt($options = array())
     {
-        $credentials = $this->container->get('config')->load('tests')['login']['credentials'];
+        $credentials = $this->container->get('config')->get('tests')['login']['credentials'];
 
         $user = $this->container->get('user');
 

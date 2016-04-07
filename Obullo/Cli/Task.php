@@ -15,13 +15,6 @@ class Task
     protected $logger;
 
     /**
-     * Logger exist variable
-     * 
-     * @var null|boolean
-     */
-    protected $exist;
-
-    /**
      * Constructor
      *
      * @param object $request ServerRequestInterface
@@ -33,9 +26,8 @@ class Task
     {
         $this->request = $request;
         $this->logger  = $logger;
-        $this->loggerExists();
 
-        if ($this->exist) {
+        if ($this->loggerExists()) {
             $this->logger->debug('Cli Task Class Initialized');
         }
     }
@@ -75,7 +67,7 @@ class Task
             }
             return $output;
         }
-        if ($this->exist) {
+        if ($this->loggerExists()) {
             $this->logger->debug(
                 'Cli task executed', 
                 array('shell' => $shell)
@@ -136,9 +128,9 @@ class Task
     protected function loggerExists()
     {
         if (is_object($this->logger) && method_exists($this->logger, 'debug')) {
-            return $this->exist = true;
+            return true;
         }
-        return $this->exist = false;
+        return false;
     }
 
 }

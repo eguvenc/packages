@@ -46,7 +46,7 @@ class Element
      */
     public function __construct(Container $container, Request $request, Config $config, Logger $logger)
     {
-        $this->config = $config;
+        $this->config = $config->get('config');
         $this->request = $request;
         $this->container = $container;
 
@@ -73,7 +73,7 @@ class Element
         $form .= $this->attributesToString($attributes, true);
         $form .= '>';
 
-        $csrf = $this->config->load('providers::csrf')['params'];
+        $csrf = $this->config->get('providers::csrf')['params'];
 
         $form = str_replace(array('"method=\'get\'"', "method=\'GET\'"), 'method="get"', $form);
 

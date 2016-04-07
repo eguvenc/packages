@@ -25,6 +25,13 @@ class Session implements SessionInterface
     protected $name;
 
     /**
+     * Config
+     * 
+     * @var object
+     */
+    protected $config;
+
+    /**
      * Service parameters
      * 
      * @var array
@@ -63,8 +70,8 @@ class Session implements SessionInterface
      */
     public function __construct(CacheManager $cacheManager, Config $config, Request $request, Logger $logger, array $params) 
     {
-        $this->config = $config;
         $this->params = $params;
+        $this->config = $config->get('config');
         $this->cacheManager = $cacheManager;
 
         $this->server = $request->getServerParams();

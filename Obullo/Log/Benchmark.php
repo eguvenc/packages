@@ -2,6 +2,7 @@
 
 namespace Obullo\Log;
 
+use Interop\Container\ContainerInterface as Container;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 class Benchmark
@@ -35,7 +36,7 @@ class Benchmark
         global $container;
         
         $logger = $container->get('logger');
-        $config = $container->get('config');
+        $config = $container->get('config')->get('config');
 
         $time  = ($request == null) ? self::$time : $request->getAttribute('REQUEST_TIME_START');
 

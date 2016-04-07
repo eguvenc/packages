@@ -59,11 +59,7 @@ class Cli extends Application
     public function handleError($level, $message, $file = '', $line = 0)
     {
         $e = new ErrorException($message, $level, 0, $file, $line);
-        $exception = new \Obullo\Error\Exception;
-        echo $exception->make($e);
-
-        $log = new \Obullo\Error\Log($this->getContainer()->get('logger'));
-        $log->error($e);
+        $this->printError($e);
     }
 
     /**
@@ -75,13 +71,43 @@ class Cli extends Application
      */
     public function handleException(Exception $e)
     {
-        $exception = new \Obullo\Error\Exception;
-        echo $exception->make($e);
-
-        $log = new \Obullo\Error\Log($this->getContainer()->get('logger'));
-        $log->error($e);
+        $this->printError($e);
     }
 
+    /**
+     * Handle fatal errors
+     * 
+     * @return mixed
+     */
+    public function handleFatalError()
+    {   
+        if (null != $error = error_get_last()) {
+            $e = new ErrorException($error['message'], $error['type'], 0, $error['file'], $error['line']);
+            $this->printError($e);
+        }
+    }
+
+    /**
+     * Print exceptions
+     * 
+     * @param object $e exception
+     * 
+     * @return void
+     */
+    protected function printError($e)
+    {
+        /**
+         * Log error message
+         */
+        $container = $this->getContainer();
+        $log = new \Log\Error($container->get('logger'));
+        $log->message($e);
+
+        echo "\33[1;31mException Error\n". $e->getMessage()."\33[0m\n";
+        echo "\33[0;31m".$e->getCode().' '.$e->getFile(). ' Line : ' . $e->getLine() ."\33[0m\n";
+        echo "\33[0m";
+    }
+    
     /**
      * Run
      *
@@ -120,20 +146,6 @@ class Cli extends Application
         );
         if (isset($_SERVER['argv'])) {
             $logger->debug('php '.implode(' ', $_SERVER['argv']));
-        }
-    }
-
-    /**
-     * Handle fatal errors
-     * 
-     * @return mixed
-     */
-    public function handleFatalError()
-    {   
-        if (null != $error = error_get_last()) {
-            $e = new ErrorException($error['message'], $error['type'], 0, $error['file'], $error['line']);
-            $exception = new \Obullo\Error\Exception;
-            echo $exception->make($e);
         }
     }
 

@@ -107,7 +107,7 @@ class CacheManager
         if ($driver == 'file') {
             return new $Class($params);
         }
-        $configParams = $this->container->get('config')->load('providers::'.$driver);
+        $configParams = $this->container->get('config')->get('providers::'.$driver);
 
         return new $Class(
             $this->container->get($driver)->shared($params),

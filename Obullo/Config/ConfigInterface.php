@@ -2,15 +2,13 @@
 
 namespace Obullo\Config;
 
-use ArrayAccess;
-
 /**
  * ConfigInterface Class
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-interface ConfigInterface extends ArrayAccess
+interface ConfigInterface
 {
     /**
      * Load Config File
@@ -19,7 +17,7 @@ interface ConfigInterface extends ArrayAccess
      * 
      * @return array if the file was loaded correctly
      */
-    public function load($filename);
+    public function get($filename);
 
     /**
      * Save array data config file

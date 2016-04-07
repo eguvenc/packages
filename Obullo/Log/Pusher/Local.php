@@ -25,19 +25,11 @@ class Local implements PusherInterface, ContainerAwareInterface
      */
     public function push(array $data)
     {
-        try {
+        $container = $this->getContainer();
 
-            $container = $this->getContainer();
-
-            $worker = new \Workers\Logger;
-            $worker->setContainer($container);
-            $worker->fire($data);
-
-        } catch (Exception $e) {
-            
-            $exception = new \Obullo\Error\Exception;
-            echo $exception->make($e);
-        }
+        $worker = new \Workers\Logger;
+        $worker->setContainer($container);
+        $worker->fire($data);
     }
 
 }

@@ -5,6 +5,7 @@ namespace Obullo\Http\Zend\Stratigility;
 use Obullo\Http\Middleware\MiddlewareInterface;
 use Obullo\Http\Middleware\ErrorMiddlewareInterface;
 
+use Throwable;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -69,19 +70,23 @@ class Dispatch
         // @todo Trigger event with Route, original URL from request?
 
         try {
-            
+
             if ($hasError && $arity === 4) {
-                return call_user_func($handler, $err, $request, $response, $next);
+                return $handler($err, $request, $response, $next);
             }
-
             if (! $hasError && $arity < 4) {
-                return call_user_func($handler, $request, $response, $next);
+                return $handler($request, $response, $next);
             }
-            
-        } catch (Exception $e) {
 
-            $err = $e;
+        } catch (Throwable $throwable) { // PHP 7 + throwable error support
+            
+            return $next($request, $response, $throwable);
+
+        } catch (Exception $exception) {
+
+            return $next($request, $response, $exception);
         }
+
         return $next($request, $response, $err);
     }
 }

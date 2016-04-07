@@ -69,7 +69,7 @@ class Cookie implements CookieInterface
     public function __construct(Request $request, Config $config, Logger $logger)
     {
         $this->requestCookies = $request->getCookieParams();
-        $this->config = $config;
+        $this->config = $config->get('config');
         $this->logger = $logger;
         $this->logger->debug('Cookie Class Initialized');
     }

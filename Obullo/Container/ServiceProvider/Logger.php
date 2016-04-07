@@ -30,7 +30,7 @@ class Logger extends AbstractServiceProvider
         $container = $this->getContainer();
         $config    = $this->getConfiguration('logger');
 
-        if (false == $container->get('config')['log']['enabled']) {
+        if (false == $container->get('config')->get('config')['log']['enabled']) {
             $container->share('logger', 'Obullo\Log\NullLogger');
             return;
         }

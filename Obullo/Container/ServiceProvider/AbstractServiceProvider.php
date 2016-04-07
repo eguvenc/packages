@@ -35,7 +35,7 @@ abstract class AbstractServiceProvider extends LeagueAbstractServiceProvider imp
             $name = strtolower($name);
         }
         $container  = $this->getContainer();
-        $parameters = $container->get('config')->load('providers::'.$name);
+        $parameters = $container->get('config')->get('providers::'.$name);
 
         if (is_array($parameters)) {
 

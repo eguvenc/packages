@@ -9,8 +9,6 @@ use Obullo\Container\ParamsAwareInterface;
 use Obullo\Container\ContainerAwareInterface;
 use Obullo\Http\Controller\ControllerAwareInterface;
 
-use Exception;
-use ErrorException;
 use ReflectionClass;
 use Obullo\Tests\HttpTestInterface;
 use Obullo\Router\RouterInterface as Router;
@@ -39,23 +37,12 @@ class Http extends Application
     protected $controller;
 
     /**
-     * Http test interface errors
-     * 
-     * @var array
-     */
-    protected $testExceptions = [];
-
-    /**
      * Constructor
      *
      * @return void
      */
     public function init()
     {
-        set_error_handler(array($this, 'handleError'));
-        set_exception_handler(array($this, 'handleException'));
-        register_shutdown_function(array($this, 'handleFatalError'));
-
         $container = $this->getContainer();  // Make global
         $app = $container->get('app');
         
@@ -75,88 +62,6 @@ class Http extends Application
         include APP .'routes.php';
 
         $this->boot($router, $middleware);
-    }
-
-    /**
-     * Error handler, convert all errors to exceptions
-     * 
-     * @param integer $level   name
-     * @param string  $message error message
-     * @param string  $file    file
-     * @param integer $line    line
-     * 
-     * @return boolean whether to continue displaying php errors
-     */
-    public function handleError($level, $message, $file = '', $line = 0)
-    {
-        $e = new ErrorException($message, $level, 0, $file, $line);
-        $this->showException($e);
-    }
-
-    /**
-     * Exception error handler
-     * 
-     * @param Exception $e exception class
-     * 
-     * @return boolean
-     */
-    public function handleException(Exception $e)
-    {
-        $this->showException($e);
-    }
-
-    /**
-     * Handle fatal errors
-     * 
-     * @return mixed
-     */
-    public function handleFatalError()
-    {   
-        if (null != $error = error_get_last()) {
-            $e = new ErrorException($error['message'], $error['type'], 0, $error['file'], $error['line']);
-            $this->showException($e);
-        }
-        $container = $this->getContainer();
-        /**
-         * Http test inteface support
-         * We show exceptions per one http request.
-         */
-        $server = $container->get('request')->getServerParams();
-        if (defined('STDIN') && ! empty($server['SERVER_NAME']) && $server['SERVER_NAME'] == 'PHP_TEST' && ! empty($this->testExceptions)) {
-            echo json_encode($this->testExceptions[0]);
-        }
-    }
-
-    /**
-     * Show exception
-     * 
-     * @param Exception $e object
-     * 
-     * @return void
-     */
-    protected function showException(Exception $e)
-    {
-        $container = $this->getContainer();
-        /**
-         * Http test inteface support
-         * We show exceptions per one http request.
-         */
-        $server = $container->get('request')->getServerParams();
-        if (defined('STDIN') && ! empty($server['SERVER_NAME']) && $server['SERVER_NAME'] == 'PHP_TEST') {
-            $queryParams = $container->get('request')->getQueryParams();
-
-            if (! empty($queryParams['suite'])) {
-                $this->testExceptions[] = [
-                    'message' => $e->getMessage(),
-                    'line' => $e->getLine(),
-                    'file' => $e->getFile(),
-                ];
-            }
-            return;
-        }
-        $error = $container->get('middleware')->add('Error');
-        $error->setContainer($container);
-        $error($e, $container->get('request'), $container->get('response'));
     }
 
     /**
@@ -224,7 +129,7 @@ class Http extends Application
                 }
             }
         }
-        if ($this->container->get('config')['extra']['debugger']) {  // Boot debugger
+        if ($this->container->get('config')->get('config')['extra']['debugger']) {  // Boot debugger
             $middleware->add('Debugger');
         }
         $this->inject($middleware);
@@ -259,7 +164,7 @@ class Http extends Application
      */
     protected function bootAnnotations($method)
     {
-        if ($this->container->get('config')['extra']['annotations'] && $this->controller != null) {
+        if ($this->container->get('config')->get('config')['extra']['annotations'] && $this->controller != null) {
             $reflector = new ReflectionClass($this->controller);
             if ($reflector->hasMethod($method)) {
                 $docs = new \Obullo\Application\Annotations\Controller;
@@ -296,7 +201,6 @@ class Http extends Application
             ),
             array_slice($this->controller->request->getUri()->getRoutedSegments(), $router->getArgumentFactor())
         );
-
         if ($router->getMethod() != 'index' && $this->controller instanceof HttpTestInterface) {
             $result = $this->controller->__generateTestResults();
         }

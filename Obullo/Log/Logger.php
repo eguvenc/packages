@@ -60,7 +60,7 @@ class Logger extends AbstractLogger implements LoggerInterface
         $this->params = $params;
         $this->container = $container;
         $this->request = $request;
-        $this->enabled = $config['log']['enabled'];
+        $this->enabled = $config->get('config')['log']['enabled'];
         
         $this->initialize();
     }

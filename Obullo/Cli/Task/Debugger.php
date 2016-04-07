@@ -28,7 +28,7 @@ class Debugger extends Controller
         self::registerErrorHandler(); // We disable errors otherwise we get socket write errors in ajax response
         self::registerExceptionHandler();
 
-        $this->debugger = $container->get('config')->load('debugger');
+        $this->debugger = $container->get('config')->get('debugger');
     }
 
     /**
@@ -60,7 +60,7 @@ class Debugger extends Controller
         /**
          * Enable websocket
          */
-        $newArray = $this->config->load('config');
+        $newArray = $this->config->get('config');
         $newArray['extra']['debugger'] = true;
 
         $this->config->write('config', $newArray);

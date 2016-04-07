@@ -41,7 +41,7 @@ class App extends Controller
         $name = (empty($name)) ? $uri->argument('name', 'root') : $name;
         $this->isEmpty($name);
 
-        $newArray = $this->config['maintenance'];
+        $newArray = $this->config->get('maintenance');
         $newArray[$name]['maintenance'] = 'down';
 
         $this->config->write('maintenance', $newArray);
@@ -62,7 +62,7 @@ class App extends Controller
         $name = (empty($name)) ? $uri->argument('name', 'root') : $name;
         $this->isEmpty($name);
 
-        $newArray = $this->config['maintenance'];
+        $newArray = $this->config->get('maintenance');
         $newArray[$name]['maintenance'] = 'up';
 
         $this->config->write('maintenance', $newArray);
@@ -83,7 +83,8 @@ class App extends Controller
             echo Console::fail('Application "--name" can\'t be empty.');
             exit;
         }
-        if (! isset($this->config['maintenance'][$name])) {
+        $maintenance = $this->config->get('maintenance');
+        if (! isset($maintenance[$name])) {
             echo Console::fail('Application name "'.ucfirst($name).'" must be defined in your maintenance.php config file.');
             die;
         }

@@ -432,7 +432,7 @@ class Worker
         // Worker does not well catch failed job exceptions because of we
         // use this function in exception handler.Thats the point why we need to try catch block.
 
-        $params = $this->config->load('providers::queue')['params'];
+        $params = $this->config->get('providers::queue')['params'];
         
         if (! $params['job']['saveFailures']['enabled']) {
             return;
