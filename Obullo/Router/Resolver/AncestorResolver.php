@@ -20,18 +20,18 @@ class AncestorResolver
     protected $router;
 
     /**
+     * Argument slice
+     * 
+     * @var integer
+     */
+    protected $arity = 0;
+
+    /**
      * Segments
      * 
      * @var array
      */
     protected $segments;
-
-    /**
-     * Argument factor
-     * 
-     * @var integer
-     */
-    protected $arity = 0;
 
     /**
      * Constructor
@@ -53,37 +53,39 @@ class AncestorResolver
     public function resolve(array $segments)
     {
         $ancestor = $this->router->getAncestor('/');
-        $folders  = $this->getSubFolders($ancestor, $segments);
+        $folders  = $this->getSubfolders($ancestor, $segments);
 
-        $this->router->setFolderArray($folders);
         $this->router->setFolder(implode("/", $folders));
 
         $folder = $this->router->getFolder();
         $arity  = count($folders) -1;
-        $hasSegmentOne = empty($segments[1]) ? false : true;
+
+        // Rewrite support "/examples/forms" to "/examples/forms/forms"
         
-        // Add support e.g http://project/widgets/tutorials/helloWorld.php
+        if (empty($segments[1])) {
+            $segments[1] = $folder;
+        }
+        $file = FOLDERS .$ancestor.$folder.'/'.$this->router->ucwordsUnderscore($segments[1]).'.php';
 
-        if ($hasSegmentOne && is_file(FOLDERS .$ancestor.$folder.'/'.$this->router->ucwordsUnderscore($segments[1]).'.php')) {
-
+        // Support for e.g "/examples/forms/Ajax"
+    
+        if (is_file($file)) {
             $this->segments = $segments;
             return $this;
+        } elseif ($segments[1] == $folder) {
+            unset($segments[1]);  // Remove segment[1] before we added it for url rewriting
         }
-        if ($hasSegmentOne && isset($segments[2]) && is_dir(FOLDERS .$ancestor.$folder)) {
 
+        // Support for unlimited subfolders
+
+        if (isset($segments[2]) && is_dir(FOLDERS .$ancestor.$folder)) {
             $this->arity = $arity;
             $this->segments = $segments;
             return $this;
         }
-
-        // Add index file support 
-        //  Rewrite /widgets/tutorials/tutorials/test to /widgets/tutorials/test
-
-        array_unshift($segments, $folder); 
         $this->segments = $segments;
         return $this;
     }
-
 
     /**
      * Returns to sub folders if they exist
@@ -93,13 +95,13 @@ class AncestorResolver
      * 
      * @return array
      */
-    protected function getSubFolders($ancestor, $segments)
+    protected function getSubfolders($ancestor, $segments)
     {
         $append  = "";
         $temp = [];
         foreach ($segments as $key => $folder) {
 
-            if ($key > 3) {  // Subfolder level limit
+            if ($key > $this->router->getSubfolderLevel()) {  // Subfolder level limit
                 continue;
             }
             if (isset($temp[$key - 1])) {

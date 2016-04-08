@@ -38,7 +38,8 @@ class Router implements RouterInterface
     protected $defaultController = '';       // Default controller name
     protected $arity;                        // Argument slice factor
     protected $group;                        // Group object
-    PROTECTED $domainName;
+    protected $domainName;                   // Group domain name
+    protected $subfolderLevel;               // Subfolder level
 
     /**
      * Constructor
@@ -81,7 +82,7 @@ class Router implements RouterInterface
      * 
      * @return return object router
      */
-    public function defaultPage($page)
+    public function setDefaultPage($page)
     {
         $this->defaultController = $page;
         return $this;
@@ -94,9 +95,22 @@ class Router implements RouterInterface
      * 
      * @return return object router
      */
-    public function domainRoot($domain)
+    public function setDomainRoot($domain)
     {
         $this->domain->setImmutable($domain);
+        return $this;
+    }
+
+    /**
+     * Set sub directory level
+     * 
+     * @param int $level level
+     *
+     * @return object
+     */
+    public function setSubfolderLevel($level)
+    {
+        $this->subfolderLevel = (int)$level;
         return $this;
     }
 
@@ -114,7 +128,7 @@ class Router implements RouterInterface
             if (empty($this->defaultController)) {
                 return;
             }
-            $resolver = $this->resolve(explode('/', $this->defaultController));  // Turn the default route into an array.
+            $resolver = $this->resolve(explode('/', $this->defaultController));  // Run default route
             $segments = $resolver->getSegments();
             $class    = empty($segments[1]) ? $segments[0] : $segments[1];
 
@@ -124,7 +138,7 @@ class Router implements RouterInterface
             $this->logger->debug('No URI present. Default controller set.');
             return;
         }
-        $this->dispatch();
+        $this->execute();
     }
 
     /**
@@ -162,7 +176,7 @@ class Router implements RouterInterface
      * 
      * @return void
      */
-    protected function dispatch()
+    protected function execute()
     {
         $this->uri->parseSegments();   // Compile the segments into an array 
 
@@ -228,23 +242,13 @@ class Router implements RouterInterface
             $resolver = new AncestorResolver($this);
             return $resolver->resolve($segments);
         }
-        if (is_dir(FOLDERS .$this->getFolder().'/')) {
+        if (is_dir(FOLDERS .$this->getFolder())) {
             $resolver = new FolderResolver($this);
             return $resolver->resolve($segments);
         }
         $this->setFolder(null);
         $resolver = new ClassResolver($this);
         return $resolver->resolve($segments);
-    }
-
-    /**
-     * Returns to arity
-     * 
-     * @return integer
-     */
-    public function getArity()
-    {
-        return $this->arity;
     }
 
     /**
@@ -394,18 +398,6 @@ class Router implements RouterInterface
     }
 
     /**
-     * Set folder path as array
-     * 
-     * @param array $folders folders
-     *
-     * @return void
-     */
-    public function setFolderArray($folders)
-    {
-        $this->folders = $folders;
-    }
-
-    /**
      * Sets top folder http://example.com/api/user/delete/4
      * 
      * @param string $folder sets top folder
@@ -442,13 +434,23 @@ class Router implements RouterInterface
     }
 
     /**
-     * Get folder array
-     *
-     * @return array
+     * Returns to subfolder level
+     * 
+     * @return int
      */
-    public function getFolderArray()
+    public function getSubfolderLevel()
     {
-        return $this->folders;
+        return $this->subfolderLevel;
+    }
+
+    /**
+     * Returns to arity
+     * 
+     * @return integer
+     */
+    public function getArity()
+    {
+        return $this->arity;
     }
 
     /**
@@ -481,7 +483,6 @@ class Router implements RouterInterface
         $folder = $this->getFolder();
         if (strpos($folder, "/") > 0) {  // Converts "Tests\Authentication/storage" to Tests\Authentication\Storage
             $exp = explode("/", $folder);
-            // echo count($exp);
             $folder = trim(implode("\\", $exp), "\\");
         }
         $namespace = $this->ucwordsUnderscore($this->getAncestor()).'\\'.$this->ucwordsUnderscore($folder);
