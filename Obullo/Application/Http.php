@@ -80,6 +80,9 @@ class Http extends Application
         $className = '\\'.$router->getNamespace().$router->getClass();
         $method    = $router->getMethod();
 
+        // echo $router->getFolder();
+        // echo $className;
+
         if (! is_file($file)) {
             $router->clear();  // Fix layer errors.
             $this->error = true;
@@ -199,7 +202,7 @@ class Http extends Application
                 $this->controller,
                 $router->getMethod()
             ),
-            array_slice($this->controller->request->getUri()->getRoutedSegments(), $router->getArgumentFactor())
+            array_slice($this->controller->request->getUri()->getRoutedSegments(), $router->getArity())
         );
         if ($router->getMethod() != 'index' && $this->controller instanceof HttpTestInterface) {
             $result = $this->controller->__generateTestResults();

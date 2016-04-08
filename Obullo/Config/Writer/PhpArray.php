@@ -81,7 +81,7 @@ class PhpArray extends AbstractWriter
             throw new RuntimeException(
                 sprintf(
                     '%s file is not writable.', 
-                    $this->file
+                    $filename
                 )
             );
         }

@@ -23,6 +23,13 @@ class Element
     protected $config;
 
     /**
+     * Charset
+     * 
+     * @var string
+     */
+    protected $charset;
+
+    /**
      * Request
      * 
      * @var object
@@ -46,9 +53,10 @@ class Element
      */
     public function __construct(Container $container, Request $request, Config $config, Logger $logger)
     {
-        $this->config = $config->get('config');
+        $this->config = $config;
         $this->request = $request;
         $this->container = $container;
+        $this->charset = $config->get('config')['locale']['charset'];
 
         $logger->debug('Form Element Class Initialized');
     }
@@ -411,7 +419,7 @@ class Element
         if (isset($preppedFields[$field])) {  // We've already prepped a field with this name
             return $str;
         }
-        $str = htmlspecialchars($str, ENT_QUOTES, $this->config['locale']['charset'], false);
+        $str = htmlspecialchars($str, ENT_QUOTES, $this->charset, false);
         if ($field != '') {
             $preppedFields[$field] = $field;
         }
@@ -573,7 +581,7 @@ class Element
                 $attributes.= ' method="post"';
             }
             if (strpos($attributes, 'accept-charset=') === false) {
-                $attributes.= ' accept-charset="'.strtolower($this->config['locale']['charset']).'"';
+                $attributes.= ' accept-charset="'.strtolower($this->charset).'"';
             }
             return ' '.ltrim($attributes);
         }
@@ -588,7 +596,7 @@ class Element
                 $atts.= ' method="post"';
             }
             if (! isset($attributes['accept-charset'])) {
-                $atts.= ' accept-charset="'.strtolower($this->config['locale']['charset']).'"';
+                $atts.= ' accept-charset="'.strtolower($this->charset).'"';
             }
             foreach ($attributes as $key => $val) {
                 $atts.= ' '.$key.'="'.$val.'"';

@@ -4,26 +4,17 @@
  * 
  * @return array
  */
-$detectEnvironment = function () {
-    static $env = null;
-    if ($env != null) {
-        return $env;
+$env = null;
+$environments = include ROOT .'app/environments.php';
+foreach (array_keys($environments) as $current) {
+    if (in_array(gethostname(), $environments[$current])) {
+        $env = $current;
+        break;
     }
-    $hostname = gethostname();
-    $envArray = include ROOT .'app/environments.php';
-    foreach (array_keys($envArray) as $current) {
-        if (in_array($hostname, $envArray[$current])) {
-            $env = $current;
-            break;
-        }
-    }
-    if ($env == null) {
-        die('We could not detect your application environment, please correct your app/environments.php file.');
-    }
-    return $env;
-};
-$env = $detectEnvironment();
-
+}
+if ($env == null) {
+    die('We could not detect your application environment, please correct your app/environments.php file.');
+}
 $container = new League\Container\Container;
 $container->add('env', new League\Container\Argument\RawArgument($env));
 

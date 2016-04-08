@@ -19,13 +19,6 @@ class Config implements ConfigInterface
     const FOLDER_SEPARATOR = '::';
 
     /**
-     * Current config folder
-     * 
-     * @var string
-     */
-    protected $path;
-
-    /**
      * Container
      * 
      * @var object
@@ -49,18 +42,6 @@ class Config implements ConfigInterface
     public function __construct(Container $container)
     {
         $this->container = $container;
-        $env = $container->get('env')->getValue();
-        
-        $this->path  = CONFIG .$env.'/';
-        $this->local = CONFIG .'local/';
-        $this->array['config'] = include $this->local .'config.php';  // Load current environment config variables 
-
-        if ($env != 'local') {
-            
-            $envConfig   = include $this->path .'config.php';
-            $this->array['config'] = array_replace_recursive($this->array['config'], $envConfig);  // Merge config variables if env not local.
-        }
-        $this->array['maintenance'] = include $this->path .'maintenance.php';
     }
 
     /**
@@ -78,8 +59,8 @@ class Config implements ConfigInterface
         if (isset($this->array[$filename])) {   // Is file loaded before ?
             return $this->array[$filename];
         }
-        $envFile = $this->path . $filename.'.php';
-        $file    = $this->local . $filename.'.php';  // Default config path
+        $envFile = CONFIG .$container->get('env')->getValue().'/' . $filename.'.php';
+        $file    = CONFIG .'local/' . $filename.'.php';
 
         $isEnvFile = false;
         if (is_file($envFile)) {   // Do we able to locate environment file ?
@@ -87,10 +68,11 @@ class Config implements ConfigInterface
             $file = $envFile;
         }
         $config = include $file;
-
-        if ($container->get('env')->getValue() != 'local' && $isEnvFile) { // Merge config variables if env not local.
-            $localConfig = include $this->local . $filename .'.php';
-            return $this->array[$filename] = array_replace_recursive($localConfig, $config);
+        /**
+         * Merge config variables if env not local.
+         */
+        if ($container->get('env')->getValue() != 'local' && $isEnvFile) {
+            return $this->array[$filename] = array_replace_recursive(include CONFIG .'local/' . $filename .'.php', $config);
         } else {
             $this->array[$filename] = $config;
         }
@@ -103,7 +85,7 @@ class Config implements ConfigInterface
      * @param string $filename full path of the file
      * @param array  $data     config data
      * 
-     * @return void
+     * @return array data
      */
     public function write($filename, array $data)
     {
@@ -112,6 +94,10 @@ class Config implements ConfigInterface
 
         $writer = new PhpArray;
         $writer->toFile($fullpath . $filename.'.php', $data);
+
+        unset($this->array[$filename]); // Remove cache to reload file again.
+
+        return $data;
     }
 
     /**

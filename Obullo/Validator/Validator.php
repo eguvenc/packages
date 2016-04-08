@@ -54,7 +54,7 @@ class Validator implements ValidatorInterface
         Logger $logger,
         array $params
     ) {    
-        mb_internal_encoding($config['locale']['charset']);
+        mb_internal_encoding($config->get('config')['locale']['charset']);
         
         $this->container = $container;
         $this->requestParams = $request->getParsedBody();

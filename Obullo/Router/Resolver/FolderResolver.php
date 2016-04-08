@@ -58,12 +58,9 @@ class FolderResolver
                 array_unshift($segments, $folder);
             }
             $this->segments = $segments;
-
             return $this;
         }
-
         $this->segments = $segments;
-
         return $this;
     }
 
@@ -72,7 +69,7 @@ class FolderResolver
      * 
      * @return int
      */
-    public function getFactor()
+    public function getArity()
     {
         return 0;
     }

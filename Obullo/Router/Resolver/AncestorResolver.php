@@ -31,7 +31,7 @@ class AncestorResolver
      * 
      * @var integer
      */
-    protected $argumentFactor = 0;
+    protected $arity = 0;
 
     /**
      * Constructor
@@ -53,7 +53,13 @@ class AncestorResolver
     public function resolve(array $segments)
     {
         $ancestor = $this->router->getAncestor('/');
+        $folders  = $this->getSubFolders($ancestor, $segments);
+
+        $this->router->setFolderArray($folders);
+        $this->router->setFolder(implode("/", $folders));
+
         $folder = $this->router->getFolder();
+        $arity  = count($folders) -1;
         $hasSegmentOne = empty($segments[1]) ? false : true;
         
         // Add support e.g http://project/widgets/tutorials/helloWorld.php
@@ -62,11 +68,10 @@ class AncestorResolver
 
             $this->segments = $segments;
             return $this;
+        }
+        if ($hasSegmentOne && isset($segments[2]) && is_dir(FOLDERS .$ancestor.$folder)) {
 
-        } elseif ($hasSegmentOne && isset($segments[2]) && is_dir(FOLDERS .$ancestor.$folder.'/'.$segments[1])) {
-
-            $this->router->setFolder($folder.'/'.$segments[1]);
-            $this->argumentFactor = 1;
+            $this->arity = $arity;
             $this->segments = $segments;
             return $this;
         }
@@ -77,19 +82,45 @@ class AncestorResolver
         array_unshift($segments, $folder); 
         $this->segments = $segments;
         return $this;
-        
-        $this->segments = $segments;
-        return $this;
+    }
+
+
+    /**
+     * Returns to sub folders if they exist
+     * 
+     * @param string $ancestor ancestor folder
+     * @param array  $segments uri segments
+     * 
+     * @return array
+     */
+    protected function getSubFolders($ancestor, $segments)
+    {
+        $append  = "";
+        $temp = [];
+        foreach ($segments as $key => $folder) {
+
+            if ($key > 3) {  // Subfolder level limit
+                continue;
+            }
+            if (isset($temp[$key - 1])) {
+                $append = $temp[$key - 1];
+            }
+            if (is_dir(FOLDERS .$ancestor.$append."/".$folder)) {
+                $temp[$key]    = $append."/".$folder;
+                $folders[$key] = $folder;
+            }
+        }
+        return $folders;
     }
 
     /**
-     * Get segment factor
+     * Get arity
      * 
      * @return int
      */
-    public function getFactor()
+    public function getArity()
     {
-        return $this->argumentFactor;
+        return $this->arity;
     }
 
     /**

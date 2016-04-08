@@ -102,7 +102,7 @@ return array(
     ],
 );
 
-/* Location: .app/production/config.php */
+/* Location: .app/config/production/config.php */
 ```
 
 <a name="create-a-new-env-variable"></a>
@@ -127,10 +127,11 @@ Local çevre ortamından yeni yaratılan ortama konfigürasyon dosyalarını kop
 
 ```php
 - app
-    - local
-        config.php
-        database.php
-    - qa
-        config.php
-        database.php
+    - config
+        - local
+            config.php
+            database.php
+        - qa
+            config.php
+            database.php
 ```

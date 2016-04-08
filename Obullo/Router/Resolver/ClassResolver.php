@@ -54,7 +54,7 @@ class ClassResolver
      * 
      * @return int
      */
-    public function getFactor()
+    public function getArity()
     {
         return -1;
     }

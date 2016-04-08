@@ -36,7 +36,7 @@ class Router implements RouterInterface
     protected $ancestor = '';                // Ancestor foldername
     protected $method = 'index';             // Default method is index and its immutable !
     protected $defaultController = '';       // Default controller name
-    protected $argumentFactor;               // Argument slice factor
+    protected $arity;                        // Argument slice factor
     protected $group;                        // Group object
     PROTECTED $domainName;
 
@@ -189,22 +189,22 @@ class Router implements RouterInterface
         if ($resolver == null) {
             return;
         }
-        $factor   = $resolver->getFactor();
+        $arity    = $resolver->getArity();
         $segments = $resolver->getSegments();
 
-        $one = 1 + $factor;
-        $two = 2 + $factor;
+        $class  = 1 + $arity;
+        $method = 2 + $arity;
 
-        if (! empty($segments[$one])) {
-            $this->setClass($segments[$one]);
+        if (! empty($segments[$class])) {
+            $this->setClass($segments[$class]);
         }
-        if (! empty($segments[$two])) {
-            $this->setMethod($segments[$two]); // A standard method request
+        if (! empty($segments[$method])) {
+            $this->setMethod($segments[$method]); // A standard method request
         } else {
-            $segments[$two] = 'index';         // This lets the "routed" segment array identify that the default index method is being used.
+            $segments[$method] = 'index';         // This lets the "routed" segment array identify that the default index method is being used.
             $this->setMethod('index');
         }
-        $this->argumentFactor = (3 + $factor);
+        $this->arity = (3 + $arity);
         $this->uri->setRoutedSegments($segments);  // Update our "routed" segment array to contain the segments.
     }
 
@@ -224,28 +224,27 @@ class Router implements RouterInterface
         $segments = $this->checkAncestor($segments);
         $ancestor = $this->getAncestor('/');
 
-        if (empty($ancestor)) {
-
-            if (is_dir(FOLDERS .$this->getFolder().'/')) {
-                $resolver = new FolderResolver($this);
-                return $resolver->resolve($segments);
-            }
-            $this->setFolder(null);
-            $resolver = new ClassResolver($this);
+        if (! empty($ancestor)) {
+            $resolver = new AncestorResolver($this);
             return $resolver->resolve($segments);
         }
-        $resolver = new AncestorResolver($this);
+        if (is_dir(FOLDERS .$this->getFolder().'/')) {
+            $resolver = new FolderResolver($this);
+            return $resolver->resolve($segments);
+        }
+        $this->setFolder(null);
+        $resolver = new ClassResolver($this);
         return $resolver->resolve($segments);
     }
 
     /**
-     * Returns to argument slice factor
+     * Returns to arity
      * 
      * @return integer
      */
-    public function getArgumentFactor()
+    public function getArity()
     {
-        return $this->argumentFactor;
+        return $this->arity;
     }
 
     /**
@@ -262,7 +261,6 @@ class Router implements RouterInterface
             && is_dir(FOLDERS .$segments[0].'/'. $segments[1].'/')  // Detect ancestor folder and change folder !!
         ) {
             $this->setAncestor($segments[0]);
-            $this->setFolder($segments[1]);
             array_shift($segments);
         }
         return $segments;
@@ -391,8 +389,20 @@ class Router implements RouterInterface
      */
     public function setFolder($folder)
     {
-        $this->folder = strtolower($folder);
+        $this->folder = $folder;
         return $this;
+    }
+
+    /**
+     * Set folder path as array
+     * 
+     * @param array $folders folders
+     *
+     * @return void
+     */
+    public function setFolderArray($folders)
+    {
+        $this->folders = $folders;
     }
 
     /**
@@ -404,7 +414,7 @@ class Router implements RouterInterface
      */
     public function setAncestor($folder)
     {
-        $this->ancestor = strtolower($folder);
+        $this->ancestor = $folder;
     }
 
     /**
@@ -429,6 +439,16 @@ class Router implements RouterInterface
     public function getFolder($separator = '')
     {
         return (empty($this->folder)) ? '' : htmlspecialchars($this->folder).$separator;
+    }
+
+    /**
+     * Get folder array
+     *
+     * @return array
+     */
+    public function getFolderArray()
+    {
+        return $this->folders;
     }
 
     /**
@@ -461,7 +481,8 @@ class Router implements RouterInterface
         $folder = $this->getFolder();
         if (strpos($folder, "/") > 0) {  // Converts "Tests\Authentication/storage" to Tests\Authentication\Storage
             $exp = explode("/", $folder);
-            $folder = $exp[0]."\\".ucfirst(end($exp));
+            // echo count($exp);
+            $folder = trim(implode("\\", $exp), "\\");
         }
         $namespace = $this->ucwordsUnderscore($this->getAncestor()).'\\'.$this->ucwordsUnderscore($folder);
         $namespace = trim($namespace, '\\');
