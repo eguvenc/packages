@@ -27,13 +27,6 @@ class Attach
     protected $domain;
 
     /**
-     * Current domain name
-     * 
-     * @var string
-     */
-    protected $domainName;
-
-    /**
      * Group data
      * 
      * @var array
@@ -62,27 +55,31 @@ class Attach
     /**
      * Add middleware to current route
      * 
-     * @param string $route current uri
+     * @param array|string $routes current uri
      *
      * @return void
      */
-    public function add($route)
+    public function toGroup($routes)
     {
+        $routes  = (array)$routes;
         $options = $this->group->getOptions();
-        $match   = $this->domain->match($options);
-                                                      // Domain Regex Support, if we have defined domain and not match with host don't run the middleware.
-        if (isset($options['domain']) && ! $match) {  // If we have defined domain and not match with host don't run the middleware.
+
+        // If we have not middlewares or no domain matches stop the run.
+        // 
+        if (empty($options['middleware']) || ! $this->domain->match($options)) { 
             return;
         }
-        // Attach Regex Support
 
+        // Attach Regex Support
+        // 
         $host = str_replace(
             $this->domain->getSubName($this->domain->getName()),
             '',
             $this->domain->getHost()
         );
         if (! $this->domain->isSub($this->domain->getName()) && $this->domain->isSub($this->domain->getHost())) {
-            $host = $this->domain->getHost();  // We have a problem when the host is subdomain but config domain not. This fix the isssue.
+            $host = $this->domain->getHost();  // We have a problem when the host is subdomain 
+                                               // but config domain not. This fix the isssue.
         }
         if ($this->domain->getName() != $host) {
             return;
@@ -90,14 +87,14 @@ class Attach
         if (! isset($options['domain'])) {
             $options['domain'] = $this->domain->getImmutable();
         }
-        if (isset($options['middleware'])) {
-
+        foreach ($routes as $route) {
             $this->toAttach(
                 $options['middleware'],
                 $route,
                 $options
             );
         }
+        $this->group->clear();
     }
 
     /**
@@ -111,11 +108,9 @@ class Attach
     {
         $routes = $this->router->getRoute()->getArray();
         $lastRoute = end($routes);
-        $route = $lastRoute['match'];
-
         $this->toAttach(
             $middlewares,
-            $route
+            $lastRoute['match']
         );
     }
 
@@ -130,10 +125,7 @@ class Attach
      */
     public function toAttach($middlewares, $route, $options = array())
     {
-        $middlewares = (array)$middlewares;
-
-        foreach ($middlewares as $middleware) {
-
+        foreach ((array)$middlewares as $middleware) {
             $this->attach[$this->domain->getName()][] = array(
                 'name' => $middleware,
                 'options' => $options,

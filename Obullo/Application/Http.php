@@ -79,10 +79,7 @@ class Http extends Application
 
         $className = '\\'.$router->getNamespace().$router->getClass();
         $method    = $router->getMethod();
-
-        // echo $router->getFolder();
-        // echo $className;
-
+        
         if (! is_file($file)) {
             $router->clear();  // Fix layer errors.
             $this->error = true;

@@ -115,7 +115,7 @@ class Domain
     {
         $name = $this->getHost();
 
-        if (isset($options['domain'])) {
+        if (! empty($options['domain'])) {
             $name = $options['domain'];
         }
         if ($match = $this->hasMatch($name)) { // If host matched with $options['domain'] assign domain as $options['domain']

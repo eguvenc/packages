@@ -3,6 +3,7 @@
 namespace Obullo\Router\Route;
 
 use Closure;
+use Obullo\Router\Route\Attach;
 use Psr\Http\Message\UriInterface as Uri;
 use Obullo\Router\RouterInterface as Router;
 
@@ -55,16 +56,17 @@ class Group
      * @param object $closure which contains $this->attach(); methods
      * @param array  $options domain, directions and middleware name
      * 
-     * @return object
+     * @return bool|void
      */
-    public function add($uri, Closure $closure, $options = array())
+    public function addGroup($uri, Closure $closure, $options = array())
     {
-        if (! empty($uri) && ! $this->match($uri)) {
-            return $this;
+        if (! empty($uri) && ! $this->uriMatch($uri)) {
+            return;
         }
         if (! $this->domain->match($options)) {  // When groups run, if domain not match with regex don't continue.
-            return $this;                        // Forexample we define a sub domain but group domain does not match
-        }                                        // so we need to stop the propagation.
+            return false;                        // Forexample we define a sub domain but group 
+                                                 // domain doesn't match we need to stop the propagation.
+        }
         $this->options = $options;
         $closure = Closure::bind(
             $closure,
@@ -73,18 +75,56 @@ class Group
         );
         $subname = $this->getSubDomainValue($options);
         $closure(['subname' => $subname]);
-
-        $this->reset();  // Reset group variable after foreach group definition
     }
 
     /**
-     * Before regex check natural uri match 
+     * Add middleware
+     * 
+     * @param array $middleware middleware
+     *
+     * @return void
+     */
+    public function add($middleware)
+    {
+        if (is_string($middleware)) {
+            $this->options['middleware'] = (array)$middleware;
+            return $this;
+        }
+        $this->options['middleware'] = $middleware;
+        return $this;
+    }
+
+    /**
+     * Attach route to middleware
+     * 
+     * @param string $route middleware route
+     * 
+     * @return object
+     */
+    public function attach($route = ".*")
+    {
+        $this->router->getAttach()->toGroup($route);
+        return $this;
+    }
+
+    /**
+     * Todo
+     * 
+     * @return [type] [description]
+     */
+    public function attachNot()
+    {
+
+    }
+
+    /**
+     * Check uri match 
      * 
      * @param string $match match url or regex
      * 
      * @return boolean
      */
-    protected function match($match)
+    protected function uriMatch($match)
     {
         $exp = explode('/', trim($this->uri->getPath(), "/"));
         return in_array(trim($match, "/"), $exp, true);
@@ -100,7 +140,7 @@ class Group
     protected function getSubDomainValue(array $options)
     {
         $matches = $this->domain->getMatches();
-        $domainName = (isset($options['domain'])) ? $options['domain'] : null;
+        $domainName = (empty($options['domain'])) ? null : $options['domain'];
 
         $sub = false;
         if (isset($matches[$domainName])) {
@@ -114,9 +154,9 @@ class Group
      * 
      * @return void
      */
-    public function reset()
+    public function clear()
     {
-        $this->options = array('name' => 'UNNAMED', 'domain' => null);
+        $this->options = array('domain' => null);
     }
 
     /**

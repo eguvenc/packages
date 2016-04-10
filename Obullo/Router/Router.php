@@ -546,43 +546,26 @@ class Router implements RouterInterface
      * 
      * @param string $uri     match route
      * @param object $closure which contains $this->attach(); methods
-     * @param array  $options domain, directions and middleware name
      * 
      * @return object of group
      */
-    public function group($uri, $closure = null, $options = array())
+    public function group($uri, $closure = null)
     {
         if (is_callable($uri)) {
-            $options = $closure;
             $closure = $uri;
             $uri = null;
         }
         if ($this->group == null) {
             $this->group = new Group($this, $this->uri);
         }
+        $options = array();
         if ($this->domainName != null) {
             $options['domain'] = $this->domainName;
         }
-        $this->group->add($uri, $closure, $options);
+        $this->group->addGroup($uri, $closure, $options);
         $this->domainName = null;  // Reset domain name
 
         return $this->group;
-    }
-
-    /**
-     * Attach route to middleware
-     * 
-     * @param string $route middleware route
-     * 
-     * @return object
-     */
-    public function attach($route)
-    {
-        if ($this->attach == null) {
-            $this->attach = new Attach($this);
-        }
-        $this->attach->add($route);
-        return $this;
     }
 
     /**
@@ -592,12 +575,9 @@ class Router implements RouterInterface
      * 
      * @return object
      */
-    public function middleware($middlewares)
+    public function add($middlewares)
     {
-        if ($this->attach == null) {
-            $this->attach = new Attach($this);
-        }
-        $this->attach->toRoute($middlewares);
+        $this->getAttach()->toRoute($middlewares);
         return $this;
     }
 
@@ -608,6 +588,9 @@ class Router implements RouterInterface
      */
     public function getAttach()
     {
+        if ($this->attach == null) {
+            $this->attach = new Attach($this);
+        }
         return $this->attach;
     }
 

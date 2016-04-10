@@ -17,11 +17,10 @@ interface RouterInterface
      * 
      * @param string $uri     match route
      * @param object $closure which contains $this->attach(); methods
-     * @param array  $group   domain, directions and middleware name
      * 
      * @return object
      */
-    public function group($uri, $closure = null, $group = array());
+    public function group($uri, $closure = null);
 
     /**
      * Creates http GET based route
