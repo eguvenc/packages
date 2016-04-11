@@ -35,10 +35,8 @@ class Router implements RouterInterface
     protected $folder = '';                  // Folder name
     protected $ancestor = '';                // Ancestor foldername
     protected $method = 'index';             // Default method is index and its immutable !
-    protected $defaultController = '';       // Default controller name
     protected $arity;                        // Argument slice factor
     protected $group;                        // Group object
-    protected $domainName;                   // Group domain name
     protected $subfolderLevel;               // Subfolder level
 
     /**
@@ -76,19 +74,6 @@ class Router implements RouterInterface
     }
 
     /**
-     * Sets default page controller
-     * 
-     * @param string $page uri
-     * 
-     * @return return object router
-     */
-    public function setDefaultPage($page)
-    {
-        $this->defaultController = $page;
-        return $this;
-    }
-
-    /**
      * Set immutable root domain
      * 
      * @param string $domain name
@@ -98,6 +83,7 @@ class Router implements RouterInterface
     public function setDomainRoot($domain)
     {
         $this->domain->setImmutable($domain);
+        $this->domain->setName($domain);
         return $this;
     }
 
@@ -121,24 +107,13 @@ class Router implements RouterInterface
      */
     public function init()
     {
-        // Is there a URI string ? 
-        // If not, the default controller specified in the "routes" file will be shown.
+        $this->uri->parseSegments();   // Compile the segments into an array 
 
-        if ($this->uri->getPath() == '/') {
-            if (empty($this->defaultController)) {
-                return;
-            }
-            $resolver = $this->resolve(explode('/', $this->defaultController));  // Run default route
-            $segments = $resolver->getSegments();
-            $class    = empty($segments[1]) ? $segments[0] : $segments[1];
-
-            $this->setClass($class);
-            $this->setMethod('index');
-            $this->uri->setRoutedSegments($segments);  // Assign the segments to the URI class
-            $this->logger->debug('No URI present. Default controller set.');
+        if (! is_null($this->route) && $this->route->isEmpty()) {
+            $this->setRequest($this->uri->getSegments());
             return;
         }
-        $this->execute();
+        $this->parseRoutes();            // Parse any custom routing that may exist
     }
 
     /**
@@ -153,11 +128,9 @@ class Router implements RouterInterface
      */
     protected function route($methods, $match, $rewrite = null, $closure = null)
     {
-        if (is_object($this->group)) {
-            $options = $this->group->getOptions();
-            if ($this->domain->match($options) === false && $options['domain'] !== null) {
-                return;
-            }
+        if (is_callable($rewrite)) {
+            $closure = $rewrite;
+            $rewrite = null;
         }
         if ($this->route == null) {
             $this->route = new Route($this);
@@ -169,22 +142,6 @@ class Router implements RouterInterface
             $closure
         );
         return $this;
-    }
-
-    /**
-     * Dispatch routes if we have no errors
-     * 
-     * @return void
-     */
-    protected function execute()
-    {
-        $this->uri->parseSegments();   // Compile the segments into an array 
-
-        if (! is_null($this->route) && $this->route->isEmpty()) {
-            $this->setRequest($this->uri->getSegments());
-            return;
-        }
-        $this->parseRoutes();            // Parse any custom routing that may exist
     }
 
     /**
@@ -280,7 +237,7 @@ class Router implements RouterInterface
      */
     protected function parseRoutes()
     {
-        $uri = ltrim($this->uri->getPath(), '/'); // fix route errors with trim()
+        $uri = $this->uri->getPath(); // fix route errors with trim()
 
         if (is_object($this->route) && $routes = $this->route->getArray()) {
             foreach ($routes as $val) {   // Loop through the route array looking for wild-cards
@@ -529,15 +486,38 @@ class Router implements RouterInterface
     }
 
     /**
-     * Set domain name for route group
-     * 
-     * @param string $domain name
+     * Begin operation for a route group
      * 
      * @return object
      */
-    public function domain($domain)
+    public function begin()
     {
-        $this->domainName = $domain;
+        return $this;
+    }
+
+    /**
+     * Reset group options
+     * 
+     * @return void
+     */
+    public function end()
+    {
+        $this->domain->setName($this->domain->getImmutable());
+    }
+
+    /**
+     * Set a sub domain
+     * 
+     * @param string $domain [description]
+     * 
+     * @return object
+     */
+    public function domain($domain = null)
+    {
+        if ($domain == null) {
+            $domain = $this->domain->getImmutable();
+        }
+        $this->domain->setName($domain);
         return $this;
     }
 
@@ -558,12 +538,8 @@ class Router implements RouterInterface
         if ($this->group == null) {
             $this->group = new Group($this, $this->uri);
         }
-        $options = array();
-        if ($this->domainName != null) {
-            $options['domain'] = $this->domainName;
-        }
+        $options['domain'] = $this->domain->getName();
         $this->group->addGroup($uri, $closure, $options);
-        $this->domainName = null;  // Reset domain name
 
         return $this->group;
     }
@@ -622,16 +598,6 @@ class Router implements RouterInterface
     public function getDomain()
     {
         return $this->domain;
-    }
-
-    /**
-     * Returns to default contoller configured in router middleware
-     * 
-     * @return string
-     */
-    public function getDefaultPage()
-    {
-        return $this->defaultController;
     }
 
     /**

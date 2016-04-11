@@ -63,38 +63,30 @@ class Attach
     {
         $routes  = (array)$routes;
         $options = $this->group->getOptions();
+        $domain  = $this->domain->getName();
 
         // If we have not middlewares or no domain matches stop the run.
         // 
-        if (empty($options['middleware']) || ! $this->domain->match($options)) { 
+        if (empty($options['middleware']) || ! $this->domain->match()) {
             return;
         }
-
         // Attach Regex Support
         // 
         $host = str_replace(
-            $this->domain->getSubName($this->domain->getName()),
+            $this->domain->getSubName($domain),
             '',
             $this->domain->getHost()
         );
-        if (! $this->domain->isSub($this->domain->getName()) && $this->domain->isSub($this->domain->getHost())) {
+        if (! $this->domain->isSub($domain) && $this->domain->isSub($this->domain->getHost())) {
             $host = $this->domain->getHost();  // We have a problem when the host is subdomain 
                                                // but config domain not. This fix the isssue.
         }
-        if ($this->domain->getName() != $host) {
+        if ($domain != $host) {
             return;
         }
-        if (! isset($options['domain'])) {
-            $options['domain'] = $this->domain->getImmutable();
-        }
         foreach ($routes as $route) {
-            $this->toAttach(
-                $options['middleware'],
-                $route,
-                $options
-            );
+            $this->toAttach($options['middleware'], $route, $options);
         }
-        $this->group->clear();
     }
 
     /**
@@ -108,10 +100,7 @@ class Attach
     {
         $routes = $this->router->getRoute()->getArray();
         $lastRoute = end($routes);
-        $this->toAttach(
-            $middlewares,
-            $lastRoute['match']
-        );
+        $this->toAttach($middlewares, $lastRoute['match']);
     }
 
     /**
@@ -129,8 +118,8 @@ class Attach
             $this->attach[$this->domain->getName()][] = array(
                 'name' => $middleware,
                 'options' => $options,
-                'route' => trim($route, '/'), 
-                'attach' => trim($route)
+                'route' => $route, 
+                'attach' => $route
             );
         }
     }
@@ -142,10 +131,10 @@ class Attach
      */
     public function getArray()
     {
-        if (! isset($this->attach[$this->domain->getName()])) {  // Check first
+        if (! isset($this->attach[$this->domain->getHost()])) {  // Check first
             return array();
         }
-        return $this->attach[$this->domain->getName()];
+        return $this->attach[$this->domain->getHost()];
     }
 
 }

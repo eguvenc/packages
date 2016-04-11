@@ -215,7 +215,7 @@ class Layer
             return $this->show404($method);
         }
         ob_start();
-        call_user_func_array(array($controller, $method), array_slice($uri->getRoutedSegments(), $router->getArgumentFactor()));
+        call_user_func_array(array($controller, $method), array_slice($uri->getRoutedSegments(), $router->getArity()));
         
         return ob_get_clean();
     }

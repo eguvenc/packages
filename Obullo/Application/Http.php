@@ -114,7 +114,7 @@ class Http extends Application
         $uriString = $request->getUri()->getPath();
 
         if ($attach = $router->getAttach()) {
-
+            
             foreach ($attach->getArray() as $value) {
 
                 $attachRegex = str_replace('#', '\#', $value['attach']);  // Ignore delimiter

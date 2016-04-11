@@ -13,7 +13,7 @@ use Interop\Container\ContainerInterface as Container;
  */
 class Application
 {
-    const VERSION = '1.0rc1';
+    const VERSION = '2.0';
 
     /**
      * Container

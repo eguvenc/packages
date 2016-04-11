@@ -63,7 +63,7 @@ class Group
         if (! empty($uri) && ! $this->uriMatch($uri)) {
             return;
         }
-        if (! $this->domain->match($options)) {  // When groups run, if domain not match with regex don't continue.
+        if (! $this->domain->match()) {  // When groups run, if domain not match with regex don't continue.
             return false;                        // Forexample we define a sub domain but group 
                                                  // domain doesn't match we need to stop the propagation.
         }
@@ -73,7 +73,7 @@ class Group
             $this->router,
             get_class($this->router)
         );
-        $subname = $this->getSubDomainValue($options);
+        $subname = $this->getSubDomainValue();
         $closure(['subname' => $subname]);
     }
 
@@ -101,20 +101,23 @@ class Group
      * 
      * @return object
      */
-    public function attach($route = ".*")
+    public function attach($route = "*")
     {
         $this->router->getAttach()->toGroup($route);
         return $this;
     }
 
     /**
-     * Todo
+     * Attach route to middleware with regex
+     * 
+     * @param string $route middleware route
      * 
      * @return [type] [description]
      */
-    public function attachNot()
+    public function attachRegexp($route = ".*")
     {
-
+        $this->router->getAttach()->toGroup($route);
+        return $this;
     }
 
     /**
@@ -132,15 +135,13 @@ class Group
 
     /**
      * Get subdomain value
-     *
-     * @param array $options group data
      * 
      * @return string
      */
-    protected function getSubDomainValue(array $options)
+    protected function getSubDomainValue()
     {
         $matches = $this->domain->getMatches();
-        $domainName = (empty($options['domain'])) ? null : $options['domain'];
+        $domainName =  $this->domain->getName(); // (empty($options['domain'])) ? null : $options['domain'];
 
         $sub = false;
         if (isset($matches[$domainName])) {
@@ -154,9 +155,10 @@ class Group
      * 
      * @return void
      */
-    public function clear()
+    public function end()
     {
-        $this->options = array('domain' => null);
+        $this->domain->setName($this->domain->getImmutable());
+        $this->options = array();
     }
 
     /**

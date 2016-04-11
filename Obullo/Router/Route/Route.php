@@ -28,13 +28,6 @@ class Route
     protected $domain;
 
     /**
-     * Domain name
-     * 
-     * @var string
-     */
-    protected $domainName;
-
-    /**
      * Route rules
      * 
      * @var array
@@ -50,7 +43,6 @@ class Route
     {
         $this->router = $router;
         $this->domain = $router->getDomain();
-        $this->domainName = $this->domain->getName();
     }
 
     /**
@@ -67,12 +59,11 @@ class Route
     {
         $options = ($this->router->getGroup()) ? $this->router->getGroup()->getOptions() : array();
 
-        $this->routes[$this->domainName][] = array(
-            'group' => $this->_getGroupNameValue($options),
-            'sub.domain' => $this->_getSubDomainValue($this->domainName, $options),
+        $this->routes[$this->domain->getName()][] = array(
+            'sub.domain' => $this->_getSubDomainValue($this->domain->getName(), $options),
             'when' => $methods, 
-            'match' => trim($match, '/'),
-            'rewrite' => trim($rewrite, '/'),
+            'match' => $match,
+            'rewrite' => $rewrite,
             'scheme' => $this->_getSchemeValue($match),
             'closure' => $closure,
         );
@@ -95,7 +86,7 @@ class Route
      */
     public function getArray()
     {
-        return (empty($this->routes[$this->domainName])) ? false : $this->routes[$this->domainName];
+        return (empty($this->routes[$this->domain->getName()])) ? false : $this->routes[$this->domain->getName()];
     }
 
     /**
@@ -121,12 +112,13 @@ class Route
         if ($count == -1) {
             return;
         };
-        $configDomain = $this->domain->getImmutable();
+        $domain     = $this->domain->getName();
+        $immutable  = $this->domain->getImmutable();
 
-        if (! empty($this->routes[$this->domainName][$count]['sub.domain'])) {
-            $configDomain = $this->routes[$this->domainName][$count]['sub.domain'];
+        if (! empty($this->routes[$domain][$count]['sub.domain'])) {
+            $immutable = $this->routes[$domain][$count]['sub.domain'];
         }
-        if ($this->domainName == $configDomain) {
+        if ($domain == $immutable) {
 
             $replace = $this->addBrackets($replace); // support for 
                                                      // ->where(array('id' => '[0-9]+', 'name' => '[a-z]+', 'any' => '.*'));
@@ -134,14 +126,14 @@ class Route
             $scheme = str_replace(
                 array_keys($replace),
                 array_values($replace),
-                $this->routes[$this->domainName][$count]['scheme']
+                $this->routes[$domain][$count]['scheme']
             );
             $scheme = str_replace(
                 array('{','}'),
                 array('',''),
                 $scheme
             );
-            $this->routes[$this->domainName][$count]['match'] = $scheme;
+            $this->routes[$domain][$count]['match'] = $scheme;
         }
     }
 
@@ -165,32 +157,16 @@ class Route
     }
 
     /**
-     * Get group value
-     *
-     * @param null|array $options group data
-     * 
-     * @return string
-     */
-    private function _getGroupNameValue($options = null)
-    {
-        if (! isset($options['name'])) {
-            $options['name'] = 'UNNAMED';
-        }
-        return $options['name'];
-    }
-
-    /**
      * Get subdomain value
      *
-     * @param string     $domain  name
-     * @param null|array $options group data
+     * @param string $domain name
      * 
      * @return mixed
      */
-    private function _getSubDomainValue($domain, $options = null)
+    private function _getSubDomainValue($domain)
     {
         if ($this->domain->isSub($domain)) {
-            return $options['domain'];
+            return $domain;
         }
         return null;
     }
