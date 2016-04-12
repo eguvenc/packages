@@ -4,7 +4,6 @@ namespace Obullo\Debugger;
 
 use DOMDocument;
 use RuntimeException;
-use Obullo\Log\Handler\Debugger;
 use Interop\Container\ContainerInterface as Container;
 
 /**
@@ -76,11 +75,9 @@ class Websocket
      * 
      * @param container $container app
      * @param array     $config    config
-     * @param array     $params    logger params
      */
-    public function __construct(Container $container, array $config, array $params)
+    public function __construct(Container $container, array $config)
     {
-        $this->params = $params;
         $this->container = $container;
         $this->uriString = $container->get('app')->request->getUri()->getPath();
 
@@ -134,17 +131,10 @@ class Websocket
     public function emit($output = null, $payload = array())
     {
         $this->output = $output;
-        $primary = max(array_keys($payload['writers']));
-        $data = $payload['writers'][$primary];
 
-        foreach ($payload['writers'] as $value) {
-            if ($value['type'] == 'handler') {
-                $data['record'] = array_merge($data['record'], $value['record']);  // Merge handlers and primary writer record
-            }
-        }
-        $handler = new Debugger($this->params);      // Log debug handler
-        $this->lines = $handler->write($data);
-        
+        $formatter = new LogFormatter();      // Log debug handler
+        $this->lines = $formatter->format($payload);
+
         if ($this->container->get('app')->request->isAjax()) {
 
             $cookies = $this->container->get('app')->request->getCookieParams();
@@ -155,7 +145,7 @@ class Websocket
                 setcookie('o_debugger_active_tab', "obulloDebugger-ajax-log", 0, '/'); 
             }
             $this->handshake('Ajax');
-        } elseif ($this->container->get('app')->request->isCli()) { 
+        } elseif (defined('STDIN')) { 
             $this->handshake('Cli');
         } else {
             $this->handshake('Http');

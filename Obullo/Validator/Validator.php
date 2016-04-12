@@ -5,7 +5,7 @@ namespace Obullo\Validator;
 use Closure;
 use RuntimeException;
 use Obullo\Http\Controller;
-use Obullo\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface as Logger;
 use Obullo\Config\ConfigInterface as Config;
 use Interop\Container\ContainerInterface as Container;
 use Obullo\Translation\TranslatorInterface as Translator;

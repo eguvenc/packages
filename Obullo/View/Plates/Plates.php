@@ -4,7 +4,7 @@ namespace Obullo\View\Plates;
 
 use Closure;
 use League\Plates\Engine;
-use Obullo\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface as Logger;
 use Obullo\Container\ContainerAwareTrait;
 use Obullo\Container\ContainerAwareInterface;
 

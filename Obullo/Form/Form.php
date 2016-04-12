@@ -2,7 +2,7 @@
 
 namespace Obullo\Form;
 
-use Obullo\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface as Logger;
 use Interop\Container\ContainerInterface as Container;
 use Obullo\Validator\ValidatorInterface as Validator;
 

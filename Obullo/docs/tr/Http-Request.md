@@ -47,7 +47,6 @@ Http request sınıfı gelen istek türü, bağlantının güvenli olup olmadı�
     <li>
     	<a href="#filters">İstekleri Filtrelemek</a>
     	<ul>
-            <li><a href="#isCli">$this->request->isCli()</a></li>
     		<li><a href="#isAjax">$this->request->isAjax()</a></li>
     		<li><a href="#isSecure">$this->request->isSecure()</a></li>
     		<li><a href="#isLayer">$this->request->isLayer()</a></li>
@@ -397,12 +396,6 @@ Girilen HTTP protokol versiyonu ile birlikte http nesnesine geri döner. Versiyo
 ### İstekleri Filtrelemek
 
 Aşağıdaki yardımcı metotlar http isteklerini filtreleyebilmek amacıyla eklenmiştir.
-
-<a name="isCli"></a>
-
-##### $this->request->isCli()
-
-Uygulama gelen istek eğer bir <kbd>konsol</kbd> isteği ise true değerine aksi durumda false değerine geri döner.
 
 <a name="isAjax"></a>
 

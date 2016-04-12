@@ -8,7 +8,7 @@ use Obullo\Captcha\AbstractProvider;
 use Obullo\Captcha\CaptchaInterface;
 
 use Obullo\Url\UrlInterface as Url;
-use Obullo\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface as Logger;
 use Obullo\Translation\TranslatorAwareTrait;
 use Obullo\Session\SessionInterface as Session;
 

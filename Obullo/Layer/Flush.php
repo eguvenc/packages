@@ -2,7 +2,7 @@
 
 namespace Obullo\Layer;
 
-use Obullo\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface as Logger;
 use Obullo\Cache\CacheInterface as Cache;
 
 /**

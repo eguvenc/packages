@@ -35,6 +35,20 @@ class Controller
     protected $method = 'index';
 
     /**
+     * Constructor
+     * 
+     * @param Container       $container container
+     * @param ReflectionClass $reflector reflection class
+     * @param string          $method    method
+     */
+    public function __construct(Container $container, ReflectionClass $reflector, $method)
+    {
+        $this->setContainer($container);
+        $this->setReflectionClass($reflector);
+        $this->setMethod($method);
+    }
+
+    /**
      * Set container 
      * 
      * @param Container $container container

@@ -2,7 +2,7 @@
 
 namespace Obullo\Security;
 
-use Obullo\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface as Logger;
 use Obullo\Session\SessionInterface as Session;
 
 use Obullo\Utils\Random;
@@ -103,8 +103,7 @@ class Csrf implements CsrfInterface
 
         $this->setSalt();
 
-        $this->logger->channel('security');
-        $this->logger->debug('Csrf Class Initialized');
+        $this->logger->withName('security')->debug('Csrf Class Initialized');
     }
 
     /**

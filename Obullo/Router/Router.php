@@ -5,7 +5,7 @@ namespace Obullo\Router;
 use Closure;
 use LogicException;
 use Obullo\Http\Controller;
-use Obullo\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface as Logger;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Interop\Container\ContainerInterface as Container;
 

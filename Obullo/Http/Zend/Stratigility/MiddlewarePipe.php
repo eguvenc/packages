@@ -6,6 +6,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 use SplQueue;
+use Obullo\Utils\Benchmark;
 use InvalidArgumentException;
 use Obullo\Http\Middleware\MiddlewareInterface;
 use Interop\Container\ContainerInterface as Container;
@@ -71,15 +72,23 @@ class MiddlewarePipe implements MiddlewareInterface
     }
 
     /**
-     * Set benchmark
-     * 
-     * @param bool $bool boolean
+     * Start benchmark
      * 
      * @return void
      */
-    public function benchmark($bool)
+    public function benchmarkStart()
     {
-        $this->benchmark = $bool;
+        $this->benchmark = true;
+    }
+
+    /**
+     * End benchmark
+     * 
+     * @return void
+     */
+    public function benchmarkEnd()
+    {
+        Benchmark::end($this->container->get('request'));
     }
 
     /**
@@ -90,7 +99,7 @@ class MiddlewarePipe implements MiddlewareInterface
     public function getRequest()
     {
         if ($this->benchmark) {
-            return \Obullo\Log\Benchmark::start($this->container->get('request'));
+            return Benchmark::start($this->container->get('request'));
         }
         return $this->container->get('request');
     }

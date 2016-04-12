@@ -6,7 +6,7 @@ use Closure;
 use Obullo\Http\Stream;
 use Obullo\Http\Controller;
 use Psr\Http\Message\StreamInterface;
-use Obullo\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface as Logger;
 use Interop\Container\ContainerInterface as Container;
 
 /**

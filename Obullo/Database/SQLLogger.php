@@ -3,7 +3,7 @@
 namespace Obullo\Database;
 
 use PDO;
-use Obullo\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface as Logger;
 
 /**
  * SQLLogger for Obullo Pdo

@@ -59,7 +59,7 @@ class Output
             $line = preg_replace('/\s+/', ' ', $line);
             $line = preg_replace('/\[/', "[", $line);  // Do some cleaning
 
-            if ($this->has('$_LAYER')) {
+            if ($this->has('$_layer')) {
                 $line = "\033[0;37m".strip_tags($line)."\033[0m";
             } else {
                 $line = "\033[0;37m".$line."\033[0m";
@@ -77,7 +77,7 @@ class Output
      */
     protected function writeBody($line)
     {        
-        if ($this->has('$_TASK')) {
+        if ($this->has('$_task')) {
             $line = "\033[0;37m".$line."\033[0m";
         }
         if ($this->has('loaded:')) {
@@ -95,7 +95,7 @@ class Output
      */
     protected function writeSQL($line)
     {
-        if ($this->has('$_SQL')) {   // Remove unnecessary spaces from sql output
+        if ($this->has('$_sql')) {   // Remove unnecessary spaces from sql output
             $line = "\033[1;32m".preg_replace('/[\s]+/', ' ', $line)."\033[0m";
             $line = preg_replace('/[\r\n]/', "\n", $line);
         }
@@ -112,10 +112,10 @@ class Output
     protected function writeFinalOutput($line)
     {
         if ($this->has('debug:')) {   // Do not write two times
-            if ($this->has('--> Final output sent')) {
+            if ($this->has('Final output sent')) {
                 $line = "\033[0m"."\033[0;37m".$line."\033[0m";
             }
-            if ($this->has('--> Redirect header')) {
+            if ($this->has('Redirect header')) {
                 $line = "\033[0m"."\033[0;37m".$line."\033[0m";
             }
             $line = "\033[0;37m".$line."\033[0m";
@@ -165,7 +165,7 @@ class Output
      */
     protected function has($string)
     {
-        if (strpos($this->message, $string) !== false) {
+        if (stripos($this->message, $string) !== false) {
             return true;
         }
         return false;

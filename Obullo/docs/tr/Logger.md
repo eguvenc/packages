@@ -336,8 +336,7 @@ $this->logger->notice(string $message, $context = array(), $priority = 0);
 Aşağıdaki gibi oluşturulan bir log mesajı tanımlı log yazıcılarına gönderilir. Log mesajından önce bir kanal açmanız tavsiye edilir sonra bir log seviyesi seçip birinci parametreden log mesajını, opsiyonel olarak ikinci parametreden ise mesaja bağlı özel verilerinizi gönderebilirsiniz.
 
 ```php
-$this->logger->channel('security');
-$this->logger->alert('Possible hacking attempt !', array('username' => $username));
+$this->logger->withName('security')->alert('Possible hacking attempt !', array('username' => $username));
 ```
 
 Diğer bir opsiyonel parametre olan üçüncü parametreden ise log mesajının önem seviyesi ( kaydedilme önceliği ) belirlenebilir. Önem seviyesi büyük olan log mesajı önce kaydedilecektir.
@@ -355,10 +354,11 @@ $this->logger->notice('Another Notice', array('username' => $username), 1);
 Bir log yazıcısına log verileri gönderilmek isteniyorsa load ve push metotları kullanılır.
 
 ```php
-$this->logger->load('mongo');
-$this->logger->channel('security');               
-$this->logger->alert('Possible hacking attempt !', array('username' => $username));
-$this->logger->push();
+$mongoClient = $container->get('mongo')->shared(['connection' => 'default'])
+$mongodb = new Monolog\Handler\MongoDBHandler($mongoClient, "db", "logs");
+
+$this->logger->pushHandler($mongodb);
+$this->logger->withName('security')->alert('Possible hacking attempt !', array('username' => $username));
 ```
 
 Birden fazla log yazıcısı da aynı anda yüklenebilir.
@@ -367,13 +367,11 @@ Birden fazla log yazıcısı da aynı anda yüklenebilir.
 $this->logger->load('email');
 $this->logger->load('mongo');  
 
-$this->logger->channel('security');
-$this->logger->alert('Something went wrong !', array('username' => $username));
+$this->logger->withName('security')
+    ->alert('Something went wrong !', array('username' => $username));
 
-$this->logger->channel('test');
-$this->logger->info('User login attempt', array('username' => $username));
-
-$this->logger->push();
+$this->logger->withName('test')
+    ->info('User login attempt', array('username' => $username));
 ```
 
 Log yazıcıları yüklendiğinde load ve push metotları arasında kullanılan log metotlarına ait tüm veriler push metodu aracılığı ile yüklenen yazıcılara gönderilir. Load metodundan önceki ve push metodundan sonraki loglamalar varsayılan log yazıcılarına gönderilir.
@@ -703,50 +701,14 @@ Web arayüzü Debugger paketi ile oluşturulur, daha fazla bilgi için [Debugger
 
 ## Log Sınıfı Referansı
 
-##### $this->logger->enable();
+##### $this->logger->withName($name);
 
-Loglamayı açık hale getirir.
+Bir log kanalı belirleyerek yeni bir log nesnesine geri döner.
 
-##### $this->logger->disable();
+##### $this->logger->pushHandler($handler);
 
-Loglamayı kapalı hale getirir.
 
-##### $this->logger->isEnabled();
-
-Loglamayı açık ise true değerine aksi durumda false değerine geri döner.
-
-##### $this->logger->load(string $handler = 'email');
-
-Farklı bir log yazıcısına log göndermek için bir log yazıcısını yükler. Push metodu ile birlikte kullanılır.
-
-##### $this->logger->setWriter(string $name);
-
-Ana log yazıcısını tanımlar.
-
-##### $this->logger->getWriter();
-
-Ana log yazıcısı ismine geri döner.
-
-##### $this->logger->registerFilter(string $name, string $namespace);
-
-Bir log filtresi tanımlar. Birinci parametreye filtre adı ikinci parametreye filtre sınıfına ait yol girilir.
-
-##### $this->logger->registerHandler(integer $priority, string $name);
-
-Bir log sürücüsü tanımlar. Birinci parametreye sürücü önem derecesi girilir, ikinci parametreye ise sürücü adı girilir. Eğer özel bir sürücü tanımlanmak isteniyorsa herhangi bir isim girilir ve bu isim <kbd>Workers@Logger</kbd> sınıfına geldiğinde ilgili kullanmak istediğiniz özel sürücü sınıfı ilan edilir.
-
-##### $this->logger->filter(string $name, $params = array());
-
-RegisterFilter metodu ile tanımlı olan bir log filtresinin çalıştırılmasına ait isteği log olayına işler.
-
-##### $this->logger->channel(string $channel);
-
-Bir log kanalı belirler.
 
 ##### $this->logger->$seviye(string $message = '', $context = array(), integer $priority = 0);
 
 <a href="#messages">Seviye tablosunda</a> gösterilen loglama seviyelerine göre bir log mesajı oluşturur.
-
-##### $this->logger->push();
-
-Load metodu ile yüklenen bir log yazıcısına ait log verilerini log olayına işler.

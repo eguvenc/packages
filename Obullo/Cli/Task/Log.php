@@ -17,16 +17,9 @@ class Log extends Controller
     public function index($direction = 'http') 
     {
         $this->logo();
-
         $this->uri = $this->request->getUri();
-        $reader = ucfirst($this->logger->getWriter());
 
-        if ($reader == 'Null') {
-            echo Console::text("Logging feature disabled from your config.", 'yellow');
-            echo Console::newline(2);
-            return;
-        }
-        $Class = '\\Obullo\Cli\LogReader\\'.$reader;
+        $Class = '\\Obullo\Cli\LogReader\\File';
         $class = new $Class;
         $class->setContainer($this->container);
         $class->follow($direction);

@@ -108,19 +108,6 @@ class Group
     }
 
     /**
-     * Attach route to middleware with regex
-     * 
-     * @param string $route middleware route
-     * 
-     * @return [type] [description]
-     */
-    public function attachRegexp($route = ".*")
-    {
-        $this->router->getAttach()->toGroup($route);
-        return $this;
-    }
-
-    /**
      * Check uri match 
      * 
      * @param string $match match url or regex

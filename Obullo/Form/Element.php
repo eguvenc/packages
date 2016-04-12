@@ -2,7 +2,7 @@
 
 namespace Obullo\Form;
 
-use Obullo\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface as Logger;
 use Obullo\Config\ConfigInterface as Config;
 use Interop\Container\ContainerInterface as Container;
 use Psr\Http\Message\ServerRequestInterface as Request;

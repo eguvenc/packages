@@ -7,7 +7,7 @@ use ErrorException;
 use Obullo\Queue\Job;
 use Obullo\Cli\Console;
 use Obullo\Cli\UriInterface as Uri;
-use Obullo\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface as Logger;
 use Obullo\Queue\QueueInterface as Queue;
 use Obullo\Config\ConfigInterface as Config;
 
@@ -270,8 +270,7 @@ class Worker
     {
         if ($this->attempt > 0 && $this->job->getAttempts() > $this->attempt) {
             $this->job->delete();
-            $this->logger->channel('queue');
-            $this->logger->warning(
+            $this->logger->withName('queue')->warning(
                 'The job failed and deleted from queue.', 
                 array(
                     'job' => $this->job->getName(), 

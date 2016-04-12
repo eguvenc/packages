@@ -3,7 +3,7 @@
 namespace Obullo\Cli;
 
 use Obullo\Cli\UriInterface as Uri;
-use Obullo\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface as Logger;
 
 /**
  * Cli Router Class ( ! Warning : Midllewares & Layers Disabled in CLI mode )

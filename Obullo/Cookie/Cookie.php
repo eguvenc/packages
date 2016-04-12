@@ -6,7 +6,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 use RuntimeException;
 use InvalidArgumentException;
-use Obullo\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface as Logger;
 use Obullo\Config\ConfigInterface as Config;
 
 /**

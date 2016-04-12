@@ -75,6 +75,7 @@ class Http extends Application
     protected function boot(Router $router, Middleware $middleware)
     {
         $router->init();
+
         $file = FOLDERS .$router->getAncestor('/').$router->getFolder('/').$router->getClass().'.php';
 
         $className = '\\'.$router->getNamespace().$router->getClass();
@@ -165,12 +166,11 @@ class Http extends Application
     protected function bootAnnotations($method)
     {
         if ($this->container->get('config')->get('config')['extra']['annotations'] && $this->controller != null) {
+
             $reflector = new ReflectionClass($this->controller);
+            
             if ($reflector->hasMethod($method)) {
-                $docs = new \Obullo\Application\Annotations\Controller;
-                $docs->setContainer($this->getContainer());
-                $docs->setReflectionClass($reflector);
-                $docs->setMethod($method);
+                $docs = new \Obullo\Application\Annotations\Controller($this->getContainer(), $reflector, $method);
                 $docs->parse();
             }
         }

@@ -1,10 +1,16 @@
 <?php
 
-namespace Obullo\Log;
+namespace Obullo\Utils;
 
 use Interop\Container\ContainerInterface as Container;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+/**
+ * Benchmark helper
+ * 
+ * @copyright 2009-2016 Obullo
+ * @license   http://opensource.org/licenses/MIT MIT license
+ */
 class Benchmark
 {
     protected static $time;
