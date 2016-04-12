@@ -65,27 +65,51 @@ class Directory
      */
     protected static function scanResults(array $folders)
     {
+        // print_r($folders);
+
         $files = array();
         foreach ($folders as $folder => $filename) {
 
             if (is_array($filename)) {
+
                 $subfolder = "";
                 foreach ($filename as $key => $value) {
+
                     if (! is_numeric($key)) {
+
+                        // Unix directories does not support uppercase characters 
+                        // we force to all directory names to lowercase
+
                         $subfolder = $key;
-                        foreach ($value as $file) {
-                            $files[] = strtolower($folder)."/".$subfolder."/".strtolower(substr($file, 0, -4));
+                        foreach ($value as $k => $file) {
+
+                            if (is_array($file)) {
+                                $subfolder = $key;
+                                $subfolder = $subfolder.'/'.ucfirst($k);
+                                foreach ($file as $v) {
+                                    $files[] = strtolower($folder)."/".strtolower($subfolder)."/".substr($v, 0, -4);
+                                }
+
+                            } else {
+                                $files[] = strtolower($folder)."/".strtolower($subfolder)."/".substr($file, 0, -4);
+                            }
                         }
+
                     } elseif (is_numeric($key)) {
-                        $files[] = strtolower($folder)."/".substr(lcfirst($value), 0, -4);
+
+                        $files[] = strtolower($folder)."/".substr($value, 0, -4);
                     }
                 }
             } else {  // filename is string
+
                 if ($filename != 'Tests.php') {
-                    $files[] = substr(lcfirst($filename), 0, -4);
+                    $files[] = substr($filename, 0, -4);
                 }
             }
         }
+
+        // print_r($files);
+
         return $files;
     }
 

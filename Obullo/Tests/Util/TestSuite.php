@@ -111,6 +111,7 @@ class TestSuite
             echo Console::newline(1);
             return;
         }
+
         $folder = trim($folder, "/");         // Kill extra slash
         if (! is_dir(FOLDERS .$folder)) {
             echo Console::fail("Test folder not found.");
@@ -122,6 +123,7 @@ class TestSuite
             echo Console::fail("The path '".$folder."' is not a valid folder.");
             return;
         }
+
         $ta = 0; $tp = 0; $tf = 0; $e = 0;
         $pathHasError = array();
         foreach ($paths as $path) {
