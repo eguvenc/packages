@@ -52,6 +52,8 @@ class Dispatch
         ResponseInterface $response,
         callable $next
     ) {
+        global $testEnvironment;
+
         $handler  = $route->handler;
         $hasError = (null !== $err);
 
@@ -72,6 +74,11 @@ class Dispatch
         try {
 
             if ($hasError && $arity === 4) {
+
+                if ($testEnvironment != null) {
+                    return $this->unitTestError($exception, $response);
+                }
+
                 return $handler($err, $request, $response, $next);
             }
             if (! $hasError && $arity < 4) {
@@ -80,13 +87,38 @@ class Dispatch
 
         } catch (Throwable $throwable) { // PHP 7 + throwable error support
             
+            if ($testEnvironment != null) {
+                return $this->unitTestError($exception, $response);
+            }
+
             return $next($request, $response, $throwable);
 
         } catch (Exception $exception) {
+
+            if ($testEnvironment != null) {
+                return $this->unitTestError($exception, $response);
+            }
 
             return $next($request, $response, $exception);
         }
 
         return $next($request, $response, $err);
     }
+
+    /**
+     * Display unit test errors
+     * 
+     * @param mixed  $error    error
+     * @param object $response response
+     * 
+     * @return void
+     */
+    protected function unitTestError($error, $response)
+    {
+        if (is_object($error) && $error instanceof Exception) {
+            return $response->json(array('message' => $error->getMessage(), 'file' => $error->getFile(), 'line' => $error->getLine()), 500);
+        }
+        return $response->json(array('message' => $error, 'file' => 0, 'line' => 0), 500);
+    }
+
 }

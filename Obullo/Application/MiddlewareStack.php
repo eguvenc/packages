@@ -67,7 +67,6 @@ class MiddlewareStack implements MiddlewareStackInterface
      */
     public function register(array $array)
     {
-        $array['App'] = 'Http\Middlewares\App';
         $this->registered = $array;
         return $this;
     }
@@ -81,9 +80,6 @@ class MiddlewareStack implements MiddlewareStackInterface
      */
     public function init(array $names)
     {
-        array_push($names, "App");  // Add application middleware
-                                    // it must be at the end otherwise parsedBody
-                                    // middleware does not work.
         foreach ($names as $key) {
             $this->queueMiddleware($key);
         }

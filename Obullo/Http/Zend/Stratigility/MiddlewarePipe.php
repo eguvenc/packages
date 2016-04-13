@@ -63,12 +63,32 @@ class MiddlewarePipe implements MiddlewareInterface
         $this->container = $container;
         $this->pipeline = new SplQueue;
         
-        $middleware = $this->container->get('middleware');
-        $middleware->add('Error')->setContainer($container);  // Error middleware must be defined end of the queue.
+        foreach ($this->container->get('middleware')->getQueue() as $middleware) {  // Inject burada olmalı.. !!
 
-        foreach ($middleware->getQueue() as $middleware) {
             $this->pipe($middleware);
         }
+        /**
+         * App middleware must be at the end otherwise parsedBody
+         * middleware does not work.
+         */
+        $app = function ($request, $response) {
+
+            $result = $this->container->get('app')->call($request, $response);
+
+            if (! $result) {
+                
+                $body = $this->container
+                    ->get('view')
+                    ->withStream()
+                    ->get('templates::404');
+
+                return $response->withStatus(404)
+                    ->withHeader('Content-Type', 'text/html')
+                    ->withBody($body);
+            }
+            return $result;
+        };
+        $this->pipe($app);
     }
 
     /**

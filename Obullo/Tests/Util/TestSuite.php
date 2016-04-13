@@ -30,6 +30,7 @@ class TestSuite
         $object = json_decode($process->getOutput(), true);
 
         if (! $process->isSuccessful()) {
+
             if ($object != null && is_array($object)) {
                 $errorText = "Exception: ".$object['message']."\nFile: ".$object['file']." Line: ".$object['line'];
                 echo Console::text($errorText, "red");
@@ -37,7 +38,8 @@ class TestSuite
             }
             return;
         } else {
-            if (empty($object['methods']) || empty($object['class'])) {
+            if (empty($object['methods']) || empty($object['class'])) { 
+
                 if (! empty($object['message'])) {
                     $errorText = "Exception: ".$object['message']."\nFile: ".$object['file']." Line: ".$object['line'];
                     echo Console::text($errorText, "red");
@@ -54,12 +56,12 @@ class TestSuite
                 $process = new Process($cmd, ROOT, null, null, 0);
                 $process->run();
 
-                $error = json_decode($process->getOutput(), true);
+                $result = json_decode($process->getOutput(), true);
                 echo Console::text($object['class']."/".$method." ... ", "yellow");
 
-                if (! $process->isSuccessful() || ! empty($error['message'])) {
+                if (! $process->isSuccessful() || ! empty($result['message'])) {
                     $e = $e + 1;
-                    $errorText = "Exception: ".$error['message']."\nFile: ".$error['file']." Line: ".$error['line'];
+                    $errorText = "Exception: ".$result['message']."\nFile: ".$result['file']." Line: ".$result['line'];
                     echo Console::text($errorText, "red");
                 }
                 $m = json_decode($process->getOutput(), true); // {"assertions":1,"passes":1,"failures":0}
@@ -162,7 +164,6 @@ class TestSuite
                 $cmd = "php public/index.php $folder/$path/$method?suite=true";
                 $process = new Process($cmd, ROOT, null, null, 0);
                 $process->run();
-
 
                 if (! $process->isSuccessful()) {
                     $error = json_decode($process->getOutput(), true);

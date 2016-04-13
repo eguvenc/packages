@@ -8,6 +8,7 @@ use Obullo\Cli\Console;
 use Obullo\Http\Controller;
 use Obullo\Utils\ArrayHelper;
 use Obullo\Tests\Constraint\PCREMatch;
+use Obullo\Tests\Constraint\IsIdentical;
 use Obullo\Tests\Constraint\StringContains;
 use Obullo\Tests\Constraint\TraversableContains;
 
@@ -108,6 +109,25 @@ abstract class TestController extends Controller implements HttpTestInterface
     }
 
     /**
+     * Assert NOT null
+     * 
+     * @param mixed $x       value
+     * @param mixed $message message
+     * 
+     * @return boolean
+     */
+    public function assertNotNull($x, $message = "")
+    {
+        $pass = false;
+        if ($x !== null) {
+            $pass = true;
+        }
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
+        return $pass;
+    }
+
+
+    /**
      * Assert equal
      * 
      * @param mixed $x       value
@@ -158,6 +178,25 @@ abstract class TestController extends Controller implements HttpTestInterface
     {
         $pass = false;
         if ($y instanceof $x) {
+            $pass = true;
+        }
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
+        return $pass;
+    }
+
+    /**
+     * Assert instance of
+     * 
+     * @param string $x       class name
+     * @param object $y       object
+     * @param string $message message 
+     * 
+     * @return boolean
+     */
+    public function assertNotInstanceOf($x, $y, $message = "")
+    {
+        $pass = false;
+        if (! $y instanceof $x) {
             $pass = true;
         }
         TestOutput::setData(['pass' => $pass, 'message' => $message]);
@@ -241,6 +280,36 @@ abstract class TestController extends Controller implements HttpTestInterface
     }
 
     /**
+     * Assert NOT contains
+     * 
+     * @param array  $needle   needle
+     * @param array  $haystack haystack
+     * @param string $message  message 
+     * 
+     * @return boolean
+     */
+    public function assertArrayNotContains($needle, $haystack, $message = "")
+    {
+        $pass = false;
+        if (is_string($needle) || is_object($needle)) {
+            if (! in_array($needle, $haystack, true)) {
+                TestOutput::setData(['pass' => true, 'message' => $message]);
+                $pass = true;
+            }
+        }
+        if (is_object($haystack) && $haystack instanceof Traversable) {
+            $haystack = ArrayHelper::iteratorToArray($haystack);
+        }
+        if (is_array($needle)) {
+            if (! ArrayHelper::contains($needle, $haystack)) {
+                $pass = true;
+            }
+        }
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
+        return $pass;
+    }
+
+    /**
      * Assert string contains
      * 
      * @param string $needle     needle
@@ -266,6 +335,31 @@ abstract class TestController extends Controller implements HttpTestInterface
     }
 
     /**
+     * Assert NOT string contains
+     * 
+     * @param string $needle     needle
+     * @param array  $haystack   haystack
+     * @param string $message    message 
+     * @param boolea $ignoreCase ignore case sensitive for string contains
+     * 
+     * @return boolean
+     */
+    public function assertStringNotContains($needle, $haystack, $message = "", $ignoreCase = false)
+    {
+        if (!is_string($needle)) {
+            throw InvalidArgumentHelper::factory(
+                1,
+                'string'
+            );
+        }
+        $constraint = new StringContains(
+            $needle,
+            $ignoreCase
+        );
+        return $this->assertNotThat($haystack, $constraint, $message);
+    }
+
+    /**
      * Evaluates a constraint matcher object.
      *
      * @param mixed      $value      value
@@ -278,6 +372,25 @@ abstract class TestController extends Controller implements HttpTestInterface
     {
         $pass = false;
         if ($constraint->matches($value)) {
+            $pass = true;
+        }
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
+        return $pass;
+    }
+
+    /**
+     * Evaluates a constraint matcher object.
+     *
+     * @param mixed      $value      value
+     * @param constraint $constraint constraint
+     * @param string     $message    message
+     *
+     * @return void
+     */
+    public function assertNotThat($value, $constraint, $message = '')
+    {
+        $pass = false;
+        if (! $constraint->matches($value)) {
             $pass = true;
         }
         TestOutput::setData(['pass' => $pass, 'message' => $message]);
@@ -395,6 +508,7 @@ abstract class TestController extends Controller implements HttpTestInterface
         TestOutput::setData(['pass' => $pass, 'message' => $message]);
         return $pass;
     }
+
     /**
      * Assert date
      * 
@@ -407,6 +521,24 @@ abstract class TestController extends Controller implements HttpTestInterface
     {
         $pass = false;
         if (TestHelper::convertToDateTime($date)) {
+            $pass = true;
+        }
+        TestOutput::setData(['pass' => $pass, 'message' => $message]);
+        return $pass;
+    }
+
+    /**
+     * Assert NOT date
+     * 
+     * @param mixe   $date    value
+     * @param string $message message
+     * 
+     * @return bool
+     */
+    public function assertNotDate($date, $message = "")
+    {
+        $pass = false;
+        if (! TestHelper::convertToDateTime($date)) {
             $pass = true;
         }
         TestOutput::setData(['pass' => $pass, 'message' => $message]);
@@ -471,6 +603,32 @@ abstract class TestController extends Controller implements HttpTestInterface
         $constraint = new PCREMatch($pattern);
         return $this->assertThat($string, $constraint, $message);
     }
+    /**
+     * Assert NOT regexp match
+     * 
+     * @param string $pattern pattern
+     * @param string $string  string
+     * @param string $message message
+     * 
+     * @return void
+     */
+    public function assertNotRegExp($pattern, $string, $message = "")
+    {
+        if (!is_string($pattern)) {
+            throw InvalidArgumentHelper::factory(
+                1,
+                'string'
+            );
+        }
+        if (!is_string($string)) {
+            throw InvalidArgumentHelper::factory(
+                2,
+                'string'
+            );
+        }
+        $constraint = new PCREMatch($pattern);
+        return $this->assertNotThat($string, $constraint, $message);
+    }
 
     /**
      * Assert file exists
@@ -508,6 +666,48 @@ abstract class TestController extends Controller implements HttpTestInterface
         return $pass;
     }
     
+    /**
+     * Asserts that two variables have the same type and value.
+     * Used on objects, it asserts that two variables reference
+     * the same object.
+     *
+     * @param mixed  $expected expected value
+     * @param mixed  $actual   actual value
+     * @param string $message  message
+     *
+     * @return boolean
+     */
+    public function assertSame($expected, $actual, $message = "")
+    {
+        if (is_bool($expected) && is_bool($actual)) {
+            return $this->assertEqual($expected, $actual, $message);
+        } else {
+            $constraint = new IsIdentical($expected);
+            return $this->assertThat($actual, $constraint, $message);
+        }
+    }
+
+    /**
+     * Asserts that two variables have NOT the same type and value.
+     * Used on objects, it asserts that two variables reference
+     * the NOT same object.
+     *
+     * @param mixed  $expected expected value
+     * @param mixed  $actual   actual value
+     * @param string $message  message
+     *
+     * @return boolean
+     */
+    public function assertNotSame($expected, $actual, $message = "")
+    {
+        if (is_bool($expected) && is_bool($actual)) {
+            return $this->assertNotEqual($expected, $actual, $message);
+        } else {
+            $constraint = new IsIdentical($expected);
+            return $this->assertNotThat($actual, $constraint, $message);
+        }
+    }
+
     /**
      * Generate test results
      * 

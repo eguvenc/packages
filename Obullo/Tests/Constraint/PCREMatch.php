@@ -6,7 +6,6 @@ namespace Obullo\Tests\Constraint;
  * This file borrowed from PHPUnit framework.
  */
 
-
 /**
  * Constraint that asserts that the string it is evaluated for matches
  * a regular expression.

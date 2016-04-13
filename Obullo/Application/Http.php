@@ -43,8 +43,9 @@ class Http extends Application
      */
     public function init()
     {
-        $container = $this->getContainer();  // Make global
-        $app = $container->get('app');
+        $container = $this->getContainer(); // Make global
+
+        $app = $container->get('app');  // Make global
         
         include APP .'providers.php';
 
@@ -53,65 +54,31 @@ class Http extends Application
             ->withArgument($container->get('request'))
             ->withArgument($container->get('logger'));
 
-        $middleware = $container->get('middleware');
+        $middleware = $container->get('middleware'); // Make global
 
         include APP .'middlewares.php';
 
-        $router = $container->get('router');
+        $router = $container->get('router'); // Make global
 
         include APP .'routes.php';
 
-        $this->boot($router, $middleware);
-    }
+        $container->get('router')->init();
 
-    /**
-     * Register assigned middlewares
-     *
-     * @param object $router     router
-     * @param object $middleware middleware
-     * 
-     * @return void
-     */
-    protected function boot(Router $router, Middleware $middleware)
-    {
-        $router->init();
-
-        $file = FOLDERS .$router->getAncestor('/').$router->getFolder('/').$router->getClass().'.php';
-
-        $className = '\\'.$router->getNamespace().$router->getClass();
-        $method    = $router->getMethod();
-        
-        if (! is_file($file)) {
-            $router->clear();  // Fix layer errors.
-            $this->error = true;
-        } else {
-            include $file;
-            $this->controller = new $className($this->container);
-            $this->controller->container = $this->container;
-
-            if (! method_exists($this->controller, $method)
-                || substr($method, 0, 1) == '_'
-            ) {
-                $router->clear();  // Fix layer errors.
-                $this->error = true;
-            }
-        }
-        $this->bootAnnotations($method);
-        $this->bootMiddlewares($router, $middleware);
+        $this->bootMiddlewares();
     }
 
     /**
      * Boot middlewares
      * 
-     * @param object $router     router
-     * @param object $middleware middleware
-     * 
      * @return void
      */
-    protected function bootMiddlewares(Router $router, Middleware $middleware)
+    protected function bootMiddlewares()
     {
         $object = null;
-        $request = $this->container->get('request');
+        $request    = $this->container->get('request');
+        $router     = $this->container->get('router');
+        $middleware = $this->container->get('middleware');
+
         $uriString = $request->getUri()->getPath();
 
         if ($attach = $router->getAttach()) {
@@ -133,7 +100,6 @@ class Http extends Application
         if ($this->container->get('config')->get('config')['extra']['debugger']) {  // Boot debugger
             $middleware->add('Debugger');
         }
-        $this->inject($middleware);
     }
 
     /**
@@ -150,24 +116,25 @@ class Http extends Application
             if ($object instanceof ContainerAwareInterface) {
                 $object->setContainer($this->getContainer());
             }
-            if ($this->controller != null && $object instanceof ControllerAwareInterface) {
-                $object->setController($this->controller);
-            }
+            // if ($this->controller != null && $object instanceof ControllerAwareInterface) {
+            //     $object->setController($this->controller);
+            // }
         }
     }
 
     /**
      * Read controller annotations
      * 
-     * @param string $method method
+     * @param object $controller controller
+     * @param string $method     method
      * 
      * @return void
      */
-    protected function bootAnnotations($method)
+    protected function bootAnnotations($controller, $method)
     {
-        if ($this->container->get('config')->get('config')['extra']['annotations'] && $this->controller != null) {
+        if ($this->container->get('config')->get('config')['extra']['annotations'] && $controller != null) {
 
-            $reflector = new ReflectionClass($this->controller);
+            $reflector = new ReflectionClass($controller);
             
             if ($reflector->hasMethod($method)) {
                 $docs = new \Obullo\Application\Annotations\Controller($this->getContainer(), $reflector, $method);
@@ -186,9 +153,36 @@ class Http extends Application
      */
     public function call(Request $request, Response $response)
     {
-        if ($this->error) {
+        $router = $this->container->get('router');
+
+        $file      = FOLDERS .$router->getAncestor('/').$router->getFolder('/').$router->getClass().'.php';
+        $className = '\\'.$router->getNamespace().$router->getClass();
+        $method    = $router->getMethod();
+
+
+        if (! is_file($file)) {
+
+            $router->clear();  // Fix layer errors.
             return false;
+
+        } else {
+
+            include $file;
+
+            $controller = new $className($this->container);
+            $controller->container = $this->container;
+
+            if (! method_exists($controller, $method)
+                || substr($method, 0, 1) == '_'
+            ) {
+
+                $router->clear();  // Fix layer errors.
+                return false;
+            }
         }
+
+        $this->bootAnnotations($controller, $method);
+
         $this->container->share('response', $response);  // Refresh objects
         $this->container->share('request', $request);
 
@@ -196,17 +190,18 @@ class Http extends Application
 
         $result = call_user_func_array(
             array(
-                $this->controller,
+                $controller,
                 $router->getMethod()
             ),
-            array_slice($this->controller->request->getUri()->getRoutedSegments(), $router->getArity())
+            array_slice($controller->request->getUri()->getRoutedSegments(), $router->getArity())
         );
-        if ($router->getMethod() != 'index' && $this->controller instanceof HttpTestInterface) {
-            $result = $this->controller->__generateTestResults();
+        if ($router->getMethod() != 'index' && $controller instanceof HttpTestInterface) {
+            $result = $controller->__generateTestResults();
         }
         if ($result instanceof Response) {
             return $result;
         }
+
         return $response;   
     }
 
