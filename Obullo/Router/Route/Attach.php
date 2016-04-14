@@ -70,16 +70,19 @@ class Attach
         if (empty($options['middleware']) || ! $this->domain->match()) {
             return;
         }
+
+        $host = $this->domain->getHost();  // We have a problem when the host is subdomain 
+                                           // but config domain not. This fix the isssue.
+
         // Attach Regex Support
         // 
-        $host = str_replace(
-            $this->domain->getSubName($domain),
-            '',
-            $this->domain->getHost()
-        );
-        if (! $this->domain->isSub($domain) && $this->domain->isSub($this->domain->getHost())) {
-            $host = $this->domain->getHost();  // We have a problem when the host is subdomain 
-                                               // but config domain not. This fix the isssue.
+        if ($this->domain->isSub($domain)) {
+
+            $host = str_replace(
+                $this->domain->getSubName($domain),
+                '',
+                $this->domain->getHost()
+            );
         }
         if ($domain != $host) {
             return;
@@ -131,6 +134,8 @@ class Attach
      */
     public function getArray()
     {
+        // print_r($this->attach);
+
         if (! isset($this->attach[$this->domain->getHost()])) {  // Check first
             return array();
         }

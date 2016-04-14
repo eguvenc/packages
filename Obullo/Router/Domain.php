@@ -104,6 +104,13 @@ class Domain
         return $this->host;
     }
 
+    public function getBaseHost()
+    {
+        // strlen($this->getImmutable());
+
+        // substr($this->getHost(), -strlen($this->getImmutable()));
+    }
+
     /**
     * Detect static domain
     * 
@@ -169,7 +176,7 @@ class Domain
      */
     public function getSubName($domain)
     {
-        return str_replace($domain, '', $this->getHost());
+        return str_replace($domain, '', trim($this->getHost(), "."));
     }
 
     /**

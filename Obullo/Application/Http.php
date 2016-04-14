@@ -23,20 +23,6 @@ use Obullo\Application\MiddlewareStackInterface as Middleware;
 class Http extends Application
 {
     /**
-     * Dispatch error
-     * 
-     * @var boolean
-     */
-    protected $error;
-
-    /**
-     * Current controller
-     * 
-     * @var object
-     */
-    protected $controller;
-
-    /**
      * Constructor
      *
      * @return void
@@ -100,25 +86,23 @@ class Http extends Application
         if ($this->container->get('config')->get('config')['extra']['debugger']) {  // Boot debugger
             $middleware->add('Debugger');
         }
+        $this->inject();
     }
 
     /**
      * Inject controller object
      * 
-     * @param object $middleware middleware
-     * 
      * @return void
      */
-    protected function inject(Middleware $middleware)
+    protected function inject()
     {
+        $middleware = $this->container->get('middleware');
+
         foreach ($middleware->getNames() as $name) {
             $object = $middleware->get($name);
             if ($object instanceof ContainerAwareInterface) {
                 $object->setContainer($this->getContainer());
             }
-            // if ($this->controller != null && $object instanceof ControllerAwareInterface) {
-            //     $object->setController($this->controller);
-            // }
         }
     }
 
@@ -159,7 +143,6 @@ class Http extends Application
         $className = '\\'.$router->getNamespace().$router->getClass();
         $method    = $router->getMethod();
 
-
         if (! is_file($file)) {
 
             $router->clear();  // Fix layer errors.
@@ -172,6 +155,9 @@ class Http extends Application
             $controller = new $className($this->container);
             $controller->container = $this->container;
 
+            if (method_exists($controller, '__invoke')) {  // Assign layout variables
+                $controller();
+            }
             if (! method_exists($controller, $method)
                 || substr($method, 0, 1) == '_'
             ) {
