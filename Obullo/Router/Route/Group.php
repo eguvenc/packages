@@ -30,6 +30,13 @@ class Group
     protected $domain;
 
     /**
+     * Group match
+     * 
+     * @var boolean
+     */
+    protected $match = false;
+
+    /**
      * Route group data
      * 
      * @var array
@@ -52,7 +59,7 @@ class Group
     /**
      * Create grouped routes
      * 
-     * @param route  $uri     route
+     * @param string $uri     route
      * @param object $closure which contains $this->attach(); methods
      * @param array  $options domain, directions and middleware name
      * 
@@ -64,8 +71,8 @@ class Group
             return;
         }
         if (! $this->domain->match()) {  // When groups run, if domain not match with regex don't continue.
-            return false;                        // Forexample we define a sub domain but group 
-                                                 // domain doesn't match we need to stop the propagation.
+            return false;                // Forexample we define a sub domain but group 
+                                         // domain doesn't match we need to stop the propagation.
         }
         $this->options = $options;
         $closure = Closure::bind(
@@ -75,6 +82,8 @@ class Group
         );
         $subname = $this->getSubDomainValue();
         $closure(['subname' => $subname]);
+
+        $this->match = true;
     }
 
     /**
@@ -103,7 +112,14 @@ class Group
      */
     public function attach($route = "*")
     {
-        $this->router->getAttach()->toGroup($route);
+        if ($this->match) {
+            /**
+             * We have to use setGroup() functions otherwise
+             * single routes override attach object properties, so using set
+             * methods we keep the dynmaic values of group object.
+             */
+            $this->router->getAttach()->setDomain($this->domain)->setGroup($this)->toGroup($route);
+        }
         return $this;
     }
 
@@ -127,25 +143,26 @@ class Group
      */
     protected function getSubDomainValue()
     {
-        $matches = $this->domain->getMatches();
-        $domainName =  $this->domain->getName(); // (empty($options['domain'])) ? null : $options['domain'];
+        $matches    = $this->domain->getMatches();
+        $domainName = $this->domain->getName(); // (empty($options['domain'])) ? null : $options['domain'];
 
         $sub = false;
         if (isset($matches[$domainName])) {
-            $sub = strstr($matches[$domainName], '.', true);
+            $sub = $this->domain->getSubName($matches[$domainName]);
         }
         return $sub;
     }
 
     /**
-     * Reset group options
+     * Reset group variables
      * 
      * @return void
      */
     public function end()
     {
-        $this->domain->setName($this->domain->getImmutable());
+        $this->match = false;
         $this->options = array();
+        $this->domain->setName($this->domain->getImmutable());  // Restore domain
     }
 
     /**

@@ -8,6 +8,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use SplQueue;
 use Obullo\Utils\Benchmark;
 use InvalidArgumentException;
+use Obullo\Container\ContainerAwareInterface;
 use Obullo\Http\Middleware\MiddlewareInterface;
 use Interop\Container\ContainerInterface as Container;
 
@@ -61,24 +62,34 @@ class MiddlewarePipe implements MiddlewareInterface
     public function __construct(Container $container)
     {
         $this->container = $container;
-        $this->pipeline = new SplQueue;
-        
-        foreach ($this->container->get('middleware')->getQueue() as $middleware) {  // Inject burada olmalı.. !!
-
+        $this->pipeline  = new SplQueue;
+        $middlewareStack = $container->get('middleware');
+        /**
+         * Debugger
+         */
+        if ($container->get('config')->get('config')['extra']['debugger']) {
+            $middlewareStack->add('Debugger');
+        }
+        /**
+         * Injection
+         */
+        foreach ($middlewareStack->getQueue() as $middleware) {
+            if ($middleware instanceof ContainerAwareInterface) {
+                $middleware->setContainer($container);
+            }
             $this->pipe($middleware);
         }
         /**
          * App middleware must be at the end otherwise parsedBody
          * middleware does not work.
          */
-        $app = function ($request, $response) {
+        $app = function ($request, $response) use ($container) {
 
-            $result = $this->container->get('app')->call($request, $response);
+            $result = $container->get('app')->call($request, $response);
 
             if (! $result) {
                 
-                $body = $this->container
-                    ->get('view')
+                $body = $container->get('view')
                     ->withStream()
                     ->get('templates::404');
 

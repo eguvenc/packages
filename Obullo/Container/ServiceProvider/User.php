@@ -57,8 +57,9 @@ class User extends AbstractServiceProvider
             ->withArgument($params);
 
         $container->share('auth.model', $params['db.model'])
-            ->withArgument($container)
-            ->withArgument($params);
+            ->withArgument($params)
+            ->withMethodCall('setContainer', [$container])
+            ->withMethodCall('connect');
 
         $container->share('auth.adapter', $params['db.adapter'])
             ->withArgument($container)

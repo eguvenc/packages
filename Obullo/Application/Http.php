@@ -5,12 +5,9 @@ namespace Obullo\Application;
 use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
-use Obullo\Container\ParamsAwareInterface;
-use Obullo\Container\ContainerAwareInterface;
-use Obullo\Http\Controller\ControllerAwareInterface;
-
 use ReflectionClass;
 use Obullo\Tests\HttpTestInterface;
+use Obullo\Container\ParamsAwareInterface;
 use Obullo\Router\RouterInterface as Router;
 use Obullo\Application\MiddlewareStackInterface as Middleware;
 
@@ -68,9 +65,9 @@ class Http extends Application
         $uriString = $request->getUri()->getPath();
 
         if ($attach = $router->getAttach()) {
-            
-            foreach ($attach->getArray() as $value) {
 
+            foreach ($attach->getArray() as $value) {
+                
                 $attachRegex = str_replace('#', '\#', $value['attach']);  // Ignore delimiter
 
                 if ($value['route'] == $uriString) {     // if we have natural route match
@@ -81,27 +78,6 @@ class Http extends Application
                 if ($object instanceof ParamsAwareInterface && ! empty($value['options'])) {  // Inject parameters
                     $object->setParams($value['options']);
                 }
-            }
-        }
-        if ($this->container->get('config')->get('config')['extra']['debugger']) {  // Boot debugger
-            $middleware->add('Debugger');
-        }
-        $this->inject();
-    }
-
-    /**
-     * Inject controller object
-     * 
-     * @return void
-     */
-    protected function inject()
-    {
-        $middleware = $this->container->get('middleware');
-
-        foreach ($middleware->getNames() as $name) {
-            $object = $middleware->get($name);
-            if ($object instanceof ContainerAwareInterface) {
-                $object->setContainer($this->getContainer());
             }
         }
     }

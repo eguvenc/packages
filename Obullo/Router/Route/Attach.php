@@ -41,17 +41,31 @@ class Attach
     protected $attach = array();
 
     /**
-     * Constructor
+     * Set group object
      * 
-     * @param Router $router router
+     * @param object $group group
+     *
+     * @return void
      */
-    public function __construct(Router $router)
+    public function setGroup($group)
     {
-        $this->router = $router;
-        $this->domain = $router->getDomain();
-        $this->group  = $router->getGroup();
+        $this->group = $group;
+        return $this;  
     }
 
+    /**
+     * Set domain object
+     * 
+     * @param domain $domain domain
+     *
+     * @return void
+     */
+    public function setDomain($domain)
+    {
+        $this->domain = $domain;
+        return $this;
+    }
+    
     /**
      * Add middleware to current route
      * 
@@ -62,6 +76,9 @@ class Attach
     public function toGroup($routes)
     {
         $routes  = (array)$routes;
+
+        // var_dump($this->group);
+
         $options = $this->group->getOptions();
         $domain  = $this->domain->getName();
 
@@ -70,55 +87,56 @@ class Attach
         if (empty($options['middleware']) || ! $this->domain->match()) {
             return;
         }
-
-        $host = $this->domain->getHost();  // We have a problem when the host is subdomain 
-                                           // but config domain not. This fix the isssue.
-
+        $host = $this->domain->getBaseHost();   // We have a problem when the host is subdomain 
+                                                // but config domain not. This fix the isssue.
         // Attach Regex Support
         // 
         if ($this->domain->isSub($domain)) {
-
-            $host = str_replace(
-                $this->domain->getSubName($domain),
-                '',
-                $this->domain->getHost()
-            );
+            $host = $this->domain->getHost();
         }
         if ($domain != $host) {
             return;
         }
         foreach ($routes as $route) {
-            $this->toAttach($options['middleware'], $route, $options);
+            $this->toAttach($domain, $options['middleware'], $route, $options);
         }
     }
 
     /**
      * Add middleware to current route
-     * 
-     * @param mixed $middlewares string|array
+     *
+     * @param object $route       route
+     * @param mixed  $middlewares string|array
      * 
      * @return void
      */
-    public function toRoute($middlewares)
+    public function toRoute(Route $route, $middlewares)
     {
-        $routes = $this->router->getRoute()->getArray();
+        $routes = $route->getArray();
         $lastRoute = end($routes);
-        $this->toAttach($middlewares, $lastRoute['match']);
+
+        $domain = $this->domain->getName();
+
+        if ($this->domain->isSub($this->domain->getHost())) {
+            $domain = $this->domain->getHost();
+        }
+        $this->toAttach($domain, $middlewares, $lastRoute['match']);
     }
 
     /**
      * Configure attached middleware
      * 
+     * @param string       $domain      name
      * @param string|array $middlewares arguments
      * @param string       $route       route
      * @param array        $options     arguments
      * 
      * @return void
      */
-    public function toAttach($middlewares, $route, $options = array())
+    public function toAttach($domain, $middlewares, $route, $options = array())
     {
         foreach ((array)$middlewares as $middleware) {
-            $this->attach[$this->domain->getName()][] = array(
+            $this->attach[$domain][] = array(
                 'name' => $middleware,
                 'options' => $options,
                 'route' => $route, 
@@ -134,12 +152,17 @@ class Attach
      */
     public function getArray()
     {
-        // print_r($this->attach);
-
-        if (! isset($this->attach[$this->domain->getHost()])) {  // Check first
+        if ($this->domain == null) {
             return array();
         }
-        return $this->attach[$this->domain->getHost()];
+        $host = $this->domain->getBaseHost();
+        if ($this->domain->isSub($this->domain->getHost())) {
+            $host = $this->domain->getHost();
+        }
+        if (! isset($this->attach[$host])) {  // Check first
+            return array();
+        }
+        return $this->attach[$host];
     }
 
 }

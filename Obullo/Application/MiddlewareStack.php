@@ -109,7 +109,9 @@ class MiddlewareStack implements MiddlewareStackInterface
      */
     public function add($name)
     {
-        return $this->queueMiddleware($name);
+        if (! $this->exists($name)) {
+            return $this->queueMiddleware($name);
+        }
     }
 
     /**

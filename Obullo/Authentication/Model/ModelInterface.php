@@ -11,6 +11,13 @@ namespace Obullo\Authentication\Model;
 interface ModelInterface
 {
     /**
+     * Connect to database service
+     * 
+     * @return void
+     */
+    public function connect();
+
+    /**
      * Execute query
      *
      * @param array $credentials user credentials

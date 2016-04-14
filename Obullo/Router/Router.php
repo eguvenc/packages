@@ -553,7 +553,7 @@ class Router implements RouterInterface
      */
     public function add($middlewares)
     {
-        $this->getAttach()->toRoute($middlewares);
+        $this->getAttach()->setDomain($this->domain)->toRoute($this->getRoute(), $middlewares);
         return $this;
     }
 
@@ -565,7 +565,7 @@ class Router implements RouterInterface
     public function getAttach()
     {
         if ($this->attach == null) {
-            $this->attach = new Attach($this);
+            $this->attach = new Attach;
         }
         return $this->attach;
     }

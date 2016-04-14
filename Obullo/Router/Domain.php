@@ -104,11 +104,17 @@ class Domain
         return $this->host;
     }
 
+    /**
+     * Returns to root domain of host
+     * 
+     * @return void
+     */
     public function getBaseHost()
     {
-        // strlen($this->getImmutable());
-
-        // substr($this->getHost(), -strlen($this->getImmutable()));
+        if ($subname = $this->isSub($this->getHost())) {
+            return mb_substr($this->getHost(), mb_strlen($subname) + 1);
+        }
+        return $this->getHost();
     }
 
     /**
@@ -123,7 +129,7 @@ class Domain
         if (empty($domainName)) {
             $domainName = $this->getHost();
         }
-        if ($match = $this->hasMatch($domainName)) { // If host matched with $options['domain'] assign domain as $options['domain']
+        if ($match = $this->hasMatch($domainName)) { // If host matched with group domain assign as it.
             $this->setName($match);
             return true;                // Regex match.
         }
@@ -139,7 +145,7 @@ class Domain
      */
     public function hasMatch($domainName)
     {
-        if ($domainName == $this->getHost()) {
+        if ($domainName == $this->getBaseHost()) {
             return $domainName;
         }
         if (isset($this->matches[$domainName])) {
@@ -164,7 +170,7 @@ class Domain
             return false;
         }
         $subDomain = $this->getSubName($domain);
-        return (empty($subDomain)) ? false : true;
+        return (empty($subDomain)) ? false : $subDomain;
     }
 
     /**
@@ -176,7 +182,7 @@ class Domain
      */
     public function getSubName($domain)
     {
-        return str_replace($domain, '', trim($this->getHost(), "."));
+        return mb_strstr($domain, '.', true);
     }
 
     /**

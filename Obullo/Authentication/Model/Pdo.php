@@ -2,7 +2,6 @@
 
 namespace Obullo\Authentication\Model;
 
-use Pdo;
 use Obullo\Container\ContainerAwareTrait;
 use Obullo\Authentication\Model\ModelInterface;
 use Interop\Container\ContainerInterface as Container;
@@ -13,7 +12,7 @@ use Interop\Container\ContainerInterface as Container;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Database implements ModelInterface
+class Pdo implements ModelInterface
 {
     use ContainerAwareTrait;
 
@@ -28,19 +27,16 @@ class Database implements ModelInterface
     /**
      * Constructor
      * 
-     * @param Container $container container
-     * @param array     $params    service params
+     * @param array $params service params
      */
-    public function __construct(Container $container, array $params)
+    public function __construct(array $params)
     {
         $this->tablename           = $params['db.tablename'];
         $this->columnId            = $params['db.id'];
         $this->columnIdentifier    = $params['db.identifier'];
         $this->columnPassword      = $params['db.password'];
         $this->columnRememberToken = $params['db.rememberToken'];  // RememberMe token column name
-
-        $this->setContainer($container);
-        $this->connect();
+        
         $this->setFields();
     }
 
@@ -133,7 +129,7 @@ class Database implements ModelInterface
     public function query(array $credentials)
     {
         return $this->db->prepare(sprintf('SELECT %s FROM %s WHERE BINARY %s = ?', $this->getFields(), $this->getTablename(), $this->getColumnIdentifier()))
-            ->bindValue(1, $credentials[$this->getColumnIdentifier()], PDO::PARAM_STR)
+            ->bindValue(1, $credentials[$this->getColumnIdentifier()], \PDO::PARAM_STR)
             ->execute()
             ->rowArray();
     }
@@ -148,7 +144,7 @@ class Database implements ModelInterface
     public function recallerQuery($token)
     {
         return $this->db->prepare(sprintf('SELECT %s FROM %s WHERE %s = ?', $this->getFields(), $this->getTablename(), $this->getColumnRememberToken()))
-            ->bindValue(1, $token, PDO::PARAM_STR)
+            ->bindValue(1, $token, \PDO::PARAM_STR)
             ->execute()
             ->rowArray();
     }
@@ -164,8 +160,8 @@ class Database implements ModelInterface
     public function updateRememberToken($token, array $credentials)
     {
         return $this->db->prepare(sprintf('UPDATE %s SET %s = ? WHERE BINARY %s = ?', $this->getTablename(), $this->getColumnRememberToken(), $this->getColumnIdentifier()))
-            ->bindValue(1, $token, PDO::PARAM_STR)
-            ->bindValue(2, $credentials[$this->getColumnIdentifier()], PDO::PARAM_STR)
+            ->bindValue(1, $token, \PDO::PARAM_STR)
+            ->bindValue(2, $credentials[$this->getColumnIdentifier()], \PDO::PARAM_STR)
             ->execute();
     }
 }

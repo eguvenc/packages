@@ -8,6 +8,7 @@ Router sınıfı uygulamanızda index.php dosyasına gelen istekleri <kbd>app/ro
     <a href="#configuration">Konfigürasyon</a>
     <ul>
         <li><a href="#domain">Alan Adı</a></li>
+        <li><a href="#subfolders">Alt Klasör Limiti</a></li>
         <li><a href="#defaulPage">Açılış Sayfası</a></li>
         <li><a href="#index.php">Index.php</a></li>
         <li><a href="#404-errors">404 Hataları</a></li>
@@ -49,11 +50,7 @@ Router sınıfı konfigürasyon değerlerini aldıktan sonra router kuralların�
 Router sınıfı alan adı eşleşmeleri için geçerli <kbd>kök</kbd> adresinizi bilmek zorundadır.Kök adresinizi aşağıdaki gibi tanımlayabilirsiniz,
 
 ```php
-$router->configure(
-    [
-        'domain' => 'example.com'
-    ]
-);
+$router->setDomainRoot('example.com');
 ```
 
 Kök domain adresinizi başında <kbd>"www."</kbd> öneki olmadan girin.
@@ -62,18 +59,28 @@ Kök domain adresinizi başında <kbd>"www."</kbd> öneki olmadan girin.
 myproject.com 
 ```
 
+<a name="subfolders"></a>
+
+#### Alt Klasör Limiti
+
+Proje içerisinde <kbd>app/folders</kbd> klasörü altında alt alta istediğiniz sayıda klasörler yaratabilirsiniz. Bu sayıyı sub folder level komutu belirler.
+
+```php
+$router->setSubfolderLevel(3);
+```
+
 <a name="defaulPage"></a>
 
 #### Açılış Sayfası
-
-Konfigürasyon kısmında <kbd>defaulPage</kbd> anahtarı varsayılan açılış sayfasına ait kontrolör dosyasını belirler.
+ 
+Route dosyanızdaki tanımlı olan ilk route kuralı varsayılan açılış sayfasına ait kontrolör dosyasını belirler.
 
 ```php
-$router->configure(
-    [
-        'domain' => 'example.com',
-        'defaultPage' => 'welcome/index'
-    ]
+$router->match(['get', 'post'],
+    '/', 'welcome',
+    function () use ($container) {
+
+    }
 );
 ```
 
@@ -101,20 +108,17 @@ RewriteRule ^(.*)$ index.php/$1 [L]
 
 #### 404 Hataları
 
-404 hataları sayfa bulunamadı hataları <kbd>app/classes/Http/Middlewares/App</kbd> http katmanı içerisinde 404 şablonu kullanılarak oluşturulur.
+404 hataları çekirdek http katmanı içerisinde 404 şablonu kullanılarak oluşturulur.
 
 ```php
-if (! $result) {
+$body = $this->getContainer()
+    ->get('view')
+    ->withStream()
+    ->get('templates::404');
 
-    $body = $this->getContainer()
-        ->get('view')
-        ->withStream()
-        ->get('templates::404');
-
-    return $response->withStatus(404)
-        ->withHeader('Content-Type', 'text/html')
-        ->withBody($body);
-}
+return $response->withStatus(404)
+    ->withHeader('Content-Type', 'text/html')
+    ->withBody($body);
 ```
 
 <a name="accessing-methods"></a>
@@ -311,13 +315,27 @@ shop.example.com/123/electronic/mp3_player
 Route grupları bir kurallar bütününü topluca yönetmenizi sağlar. Grup kuralları belirli <kbd>alt domainler</kbd> için çalıştırılabildiği gibi belirli <kbd>http katmanlarına</kbd> da tayin edilebilirler. Bunun için <kbd>$this->attach()</kbd> metodu ile katmanı istediğiniz URL adreslerine tuturmanız gerekir.
 
 ```php
-$router->group(function () {
+$router->begin()
+    ->domain('test.example.com')
+    ->group(
+        'examples/',
+        function () {
 
-        $this->attach('welcome');
-        $this->attach('welcome/test');
-    },
-    ['middleware' => array('MethodNotAllowed')]
-);
+            $this->group(
+                'forms/', function () {
+
+                    // form dizini kuralları
+
+                }
+            );
+
+            // Route kuralları
+
+            $this->match(['get', 'post'], 'home', 'welcome');
+
+        }
+    )->add(['Maintenance'])->attach('.*')
+->end();
 ```
 
 Bu tanımlamadan sonra eğer buna benzer bir URL <kbd>/welcome</kbd> çağırırsanız <kbd>MethodNotAllowed</kbd> katmanı çalışır ve aşağıdaki hata ile karşılaşırsınız.
@@ -333,14 +351,14 @@ Http Error 405 Get method not allowed.
 Eğer bir gurubu belirli bir alt alan adına tayin ederseniz grup içerisindeki route kuralları yalnızca bu alan adı için geçerli olur.
 
 ```php
-$router->domain('shop.example.com')->group(function () {
+$router->begin()
+    ->domain('shop.example.com')
+    ->group(function () {
 
-        $this->defaultPage('welcome');
-
-        $this->get('welcome/.+', 'home/index');
-        $this->get('product/[0-9]', 'product/list/$1');
-    }
-);
+            $this->get('welcome/.+', 'home/index');
+            $this->get('product/[0-9]', 'product/list/$1');
+        }
+    )->end();
 ```
 
 Tarayıcınızdan bu URL yi çağırdığınızda bu alt alan adı için tanımlanan route kuralları çalışmaya başlar.
@@ -352,7 +370,9 @@ http://shop.example.com/product/123
 Aşağıda <kbd>account.example.com</kbd> adlı bir alt alan adı için kurallar tanımladık.
 
 ```php
-$router->domain('account.example.com')->group(function () {
+$router->begin()
+    ->domain('account.example.com')
+    ->group(function () {
 
         $this->get(
             '{id}/{name}/{any}', 'user/account/$1/$2/$3',
@@ -361,7 +381,7 @@ $router->domain('account.example.com')->group(function () {
             }
         )->where(array('id' => '[0-9]+', 'name' => '[a-z]+', 'any' => '.+'));
     }
-);
+)->end();
 ```
 
 Tarayıcınızdan aşağıdaki gibi bir URL çağırdığınızda bu alt alan adı için yazılan kurallar çalışmış olur.
@@ -373,15 +393,16 @@ http://account.example.com/123/john/test
 Alt alan adlarınız eğer <kbd>sports19.example.com</kbd>, <kbd>sports20.example.com</kbd> gibi dinamik ise alan adı kısmında düzenli ifadeler de kullanabilirsiniz.
 
 ```php
-$router->domain('sports.*\d.example.com')->group(function ($options) {
-
-        echo $options['subname'];  // sports20
-
-        $this->defaultPage('welcome');
-        $this->attach('.*');
-    },
-    ['middleware' => array('Maintenance')],
-);
+$router->begin()
+    ->domain('sports.*\d.example.com')
+    ->group(
+        function ($options) {
+            echo $options['subname'];  // sports20
+        }
+    )
+    ->add(['Maintenance'])
+    ->attach(['.*'])
+->end();
 ```
 
 <a name="folders"></a>
@@ -397,19 +418,22 @@ http://example.com/examples/forms
 Yukarıdaki gibi bir url için aşağıdaki gibi dizinlere göre iç içe route grupları da oluşturabilirsiniz.
 
 ```php
-$router->group('examples/', function () {
+$router
+    ->begin()
+    ->group(
+        'examples/',
+        function () {
 
-        // example directory routes
+            // example dizini kuralları
 
-        $this->group(
-            'forms/', function () {
-                
-                // forms directory routes
-            }
-        );
-    },
-    ['middleware' => array()]
-);
+            $this->group(
+                'forms/', function () {
+                    
+                    // forms dizini kuralları
+                }
+            );
+        }
+    )->end()
 ```
 
 <a name="middlewares"></a>
@@ -438,19 +462,24 @@ $router->get('membership/restricted')->middleware(array('auth', 'guest'));
 
 #### Bir Gruba Katman Atamak
 
-Bir grup için oluşturulan katmanı grup fonksiyonu içerisinde çalıştırabilmek için <kbd>$this->attach()</kbd> metodu kullanılır.
+Bir grup için oluşturulan katmanı grup fonksiyonu içerisinde çalıştırabilmek için <kbd>attach()</kbd> metodu kullanılır.
 
 ```php
-$router->group(function () {
+$router->begin()
+    ->group(
+    function () {
 
         $this->get('welcome/.+', 'home/index');
         $this->get('product/{id}', 'product/list/$1');
-
-        $this->attach('.*');
     },
-    ['middleware' => array('Https')],
-);
+)
+->add(['Https'])
+->attach(['.*'])
+->end();
 ```
+
+Attach metodu içerisinde dizi türü kullanarak birden fazla operasyon ekleyebilirsiniz.
+
 
 <a name="regex-md"></a>
  
@@ -467,25 +496,34 @@ http://www.example.com/test/good_segment2
 Yukarıdaki örneğe benzer adreslerimiz olduğunu varsayarsak,
 
 ```php
-$router->group(function () {
+$router->begin()
+    ->group(
+    function () {
 
-        $this->attach('^(test/(?!bad_segment).*)$');
+        // kurallar
     },
-    ['middleware' => array('Test')],
-);
+)
+->add(['Test'])
+->attach(['^(.*test/(?!bad_segment).*)$'])
+->end();
 ```
 
 Yukarıdaki kural gurubu için <kbd>bad_segment</kbd> segmenti dışındaki tüm url adreslerinde <kbd>Test</kbd> katmanı çalışmış olur.
 
 ```php
-$router->group(function () {
-        $this->attach('^(?!login|logout|test|cart|payment).*$');
-    },
-    ['middleware' => array('Auth', 'Guest')]
-);
+$router->begin()
+    ->group(
+        function () {
+
+            // kurallar
+        }
+    )
+    ->add(['Guest'])
+    ->attach('^(?!.*membership/login|.*membership/logout|.*checkout/payment).*$')
+    ->end();
 ```
 
-Yukarıdaki kural grubunda ise parentez içerisinde tanımlı sayfalar hariç tüm sayfalarda <kbd>Auth</kbd> ve <kbd>Guest</kbd> katmanları çalışmış olur.
+Yukarıdaki kural grubunda ise parentez içerisinde tanımlı sayfalar hariç tüm sayfalarda <kbd>Guest</kbd> katmanı çalışmış olur.
 
 <a name="method-reference"></a>
 
@@ -493,13 +531,13 @@ Yukarıdaki kural grubunda ise parentez içerisinde tanımlı sayfalar hariç t�
 
 ------
 
-##### $router->domainRoot($domain);
+##### $router->setDomainRoot(string $domain);
 
 Geçerli ve <kbd>değişmez</kbd> kök domain adresini belirler.
 
-##### $router->defaultPage($page);
+##### $router->setSubFolderLimit(int $num);
 
-Konfigüre edilmiş varsayılan açılış sayfasını yeniden konfigüre eder.
+Alt klasör açma limitini belirler.
 
 ##### $router->match(array $methods, string $match, string $rewrite, $closure = null)
 
@@ -521,6 +559,18 @@ Http PUT isteği türünde bir route kuralı oluşturur.
 
 Http DELETE isteği türünde bir route kuralı oluşturur.
 
+##### $router->where(array $replace);
+
+Bir route kuralı parameterelerini girilen düzenli ifadeler ile değiştirir.
+
+##### $router->add(string|array $middleware);
+
+Bir route kuralına http katmanı yada katmanlarını ekler.
+
+##### $router->begin();
+
+Bir route grubunu başlatır.
+
 ##### $router->domain($host);
 
 Bir route grubu için domain tayin eder.
@@ -529,33 +579,29 @@ Bir route grubu için domain tayin eder.
 
 Bir route grubu oluşturur.
 
-##### $router->where(array $replace);
+##### $router->add(string|array $middleware);
 
-Bir route kuralı parameterelerini girilen düzenli ifadeler ile değiştirir.
+Bir route grubuna attach metodu ile başlatılmak üzere http katmanı yada katmanlarını tayin eder.
 
-##### $router->attach(string $route|$regex)
+##### $router->attach(string|array $route|$regex)
 
-Geçerli grubun katmanlarını route grubuna tayin eder.
+Geçerli gruba add metodu ile tayin edilmiş katmanları route grubuna ekler.
 
-##### $router->middleware(string|array $middlewares);
+##### $router->end();
 
-Bir route kuralına girilen katmanları tayin eder.
+Bir route grubunu sonlandırır.
 
 #### Get Metotları
 
 ------
 
-##### $this->router->getDomain();
-
-<kbd>app/routes.php</kbd> dosyası içerisinde tanımlanmış alan adına geri döner.
-
 ##### $this->router->getAncestor();
 
-Eğer alt klasörü olan birincil bir klasör varsa bu klasör ismine aksi durumda boş bir string '' değerine geri döner.
+En üst seviyedeki birincil klasör ismine aksi durumda boş bir string '' değerine geri döner.
 
 ##### $this->router->getFolder();
 
-Çağırılan bir klasör adına geri döner.
+Çağırılan klasör yoluna geri döner.
 
 ##### $this->router->getClass();
 
