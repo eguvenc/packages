@@ -83,27 +83,6 @@ class Http extends Application
     }
 
     /**
-     * Read controller annotations
-     * 
-     * @param object $controller controller
-     * @param string $method     method
-     * 
-     * @return void
-     */
-    protected function bootAnnotations($controller, $method)
-    {
-        if ($this->container->get('config')->get('config')['extra']['annotations'] && $controller != null) {
-
-            $reflector = new ReflectionClass($controller);
-            
-            if ($reflector->hasMethod($method)) {
-                $docs = new \Obullo\Application\Annotations\Controller($this->getContainer(), $reflector, $method);
-                $docs->parse();
-            }
-        }
-    }
-
-    /**
      * Execute the controller
      *
      * @param Psr\Http\Message\RequestInterface  $request  request
@@ -137,14 +116,10 @@ class Http extends Application
             if (! method_exists($controller, $method)
                 || substr($method, 0, 1) == '_'
             ) {
-
                 $router->clear();  // Fix layer errors.
                 return false;
             }
         }
-
-        $this->bootAnnotations($controller, $method);
-
         $this->container->share('response', $response);  // Refresh objects
         $this->container->share('request', $request);
 

@@ -44,8 +44,8 @@ class LogFormatter
             $record['channel'],
             $record['level_name'],
             $record['message'],
-            (empty($record['context'])) ? '' : json_encode($record['context']),
-            (empty($record['extra'])) ? '' : json_encode($record['extra']),
+            (empty($record['context'])) ? '' : var_export($record['context'], true),
+            (empty($record['extra'])) ? '' : var_export($record['extra'], true),
         ];
 
         return str_replace($search, $replace, $formatted)."</div>\n";

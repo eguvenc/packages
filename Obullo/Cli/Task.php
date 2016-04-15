@@ -27,7 +27,7 @@ class Task
         $this->request = $request;
         $this->logger  = $logger;
 
-        if ($this->loggerExists()) {
+        if (is_object($this->logger) && method_exists($this->logger, 'debug')) {
             $this->logger->debug('Cli Task Class Initialized');
         }
     }
@@ -46,17 +46,18 @@ class Task
     {
         $delimiter = (strpos($uri, '/') > 0) ? '/' : ' ';
         $uri = explode($delimiter, trim($uri));
-        $directory = array_shift($uri);
-        $segments = self::getSegments($uri);
-        
-        $server = $this->request->getServerParams();
 
-        $host  = isset($server['HTTP_HOST']) ? '--host='.$server['HTTP_HOST'] : '';  // Add http host variable if request comes from http
+        $directory = array_shift($uri);
+        $segments  = self::getSegments($uri);
+        $server    = $this->request->getServerParams();
+
+        $host  = isset($server['HTTP_HOST']) ? '--host='.$server['HTTP_HOST'] : '';  // Add http host variable
         $shell = PHP_PATH .' '.ROOT .'/'. TASK_FILE .' '.$directory.' '. implode('/', $segments).' '. $host;
 
         if ($debug) {  // Enable debug output to log folder.
             $output = preg_replace(array('/\033\[36m/', '/\033\[31m/', '/\033\[0m/'), array('', '', ''), shell_exec($shell)); // Clean cli color codes
-            if ($this->exist) {
+            
+            if (is_object($this->logger) && method_exists($this->logger, 'debug')) {
                 $this->logger->debug(
                     'Cli request',
                     array(
@@ -67,7 +68,7 @@ class Task
             }
             return $output;
         }
-        if ($this->loggerExists()) {
+        if (is_object($this->logger) && method_exists($this->logger, 'debug')) {
             $this->logger->debug(
                 'Cli task executed', 
                 array('shell' => $shell)
@@ -118,19 +119,6 @@ class Task
             return implode('_', $newArray);
         }
         return $string;
-    }
-
-    /**
-     * If logger exists returns to true otherwise false
-     * 
-     * @return boolean
-     */
-    protected function loggerExists()
-    {
-        if (is_object($this->logger) && method_exists($this->logger, 'debug')) {
-            return true;
-        }
-        return false;
     }
 
 }

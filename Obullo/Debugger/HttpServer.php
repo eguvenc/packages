@@ -43,9 +43,9 @@ class HttpServer
     public function __construct(Container $container)
     {
         $this->container = $container;
-        $this->logger = $container->get('logger');
-        $this->config = $container->get('config')->get('providers::logger');
-        $this->debugger = $container->get('config')->get('debugger');
+        $this->logger    = $container->get('logger');
+        $this->config    = $container->get('config')->get('providers::logger');
+        $this->debugger  = $container->get('config')->get('debugger');
     }
 
     /**
@@ -93,7 +93,7 @@ class HttpServer
         )) {
             throw new RuntimeException("Debugger socket connection error, example web socket configuration: ws://127.0.0.1:9000");
         }
-        $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        $socket  = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         $connect = socket_connect($socket, $matches['host'], $matches['port']);
         if ($connect == 1) {
             return 1;

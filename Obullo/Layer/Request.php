@@ -160,9 +160,7 @@ class Request
             $method,
             $data
         );
-
         $id = $layer->getId();
-
         /**
          * Dispatch route errors
          */

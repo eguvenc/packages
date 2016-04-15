@@ -111,8 +111,15 @@ class Websocket
             $this->port
         );
         if ($this->connect == false) {
+            $uri = $this->container->get('app')->request->getUri();
+            $allowedRoutes = [
+                '/debugger/ping',
+                '/debugger/disconnect',
+            ];
+            if (in_array($uri->getPath(), $allowedRoutes)) {
+                return;
+            }
             $message = "Debugger seems enabled. Run debug server or disable it from your config.";
-
             if ($this->container->get('app')->request->isAjax()) {
                 $message = strip_tags($message);
             }
