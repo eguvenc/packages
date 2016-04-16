@@ -87,19 +87,19 @@ class Group
     }
 
     /**
-     * Add middleware
+     * Attach middlewars
      * 
-     * @param array $middleware middleware
+     * @param string $middleware middleware
+     * @param mixed  $params     middleware parameters
      *
      * @return void
      */
-    public function add($middleware)
+    public function add($middleware, $params = null)
     {
-        if (is_string($middleware)) {
-            $this->options['middleware'] = (array)$middleware;
-            return $this;
+        if (! is_string($middleware)) {
+            trigger_error("Middleware value must be string.");
         }
-        $this->options['middleware'] = $middleware;
+        $this->options['middleware'][] = array('name' => $middleware, 'params' => (array)$params);
         return $this;
     }
 

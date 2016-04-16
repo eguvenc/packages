@@ -22,20 +22,15 @@ class Parameters
      */ 
     public static function parse($uri, $val)
     {
-        $parameters = array();
-        
-        if (! is_null($val['scheme'])) {   // Do we have route scheme like {id}/{name} ?
+        $parameters = array();        
+        $parametersIndex   = preg_split('#{(.*?)}#', $val['scheme']); // Get parameter indexes
+        $parameterUri      = substr($uri, strlen($parametersIndex[0]));
+        $parametersReIndex = array_keys(array_slice($parametersIndex, 1));
 
-            $parametersIndex   = preg_split('#{(.*?)}#', $val['scheme']); // Get parameter indexes
-            $parameterUri      = substr($uri, strlen($parametersIndex[0]));
-            $parametersReIndex = array_keys(array_slice($parametersIndex, 1));
+        $segments = explode('/', $parameterUri);
 
-            $segments = explode('/', $parameterUri);
-
-            foreach ($parametersReIndex as $key) {  // Find parameters we will send it to closure($args)
-                $parameters[] = (isset($segments[$key])) ? $segments[$key] : null;
-            }
-            return $parameters;
+        foreach ($parametersReIndex as $key) {  // Find parameters we will send it to closure($args)
+            $parameters[] = (isset($segments[$key])) ? $segments[$key] : null;
         }
         return $parameters;
     }

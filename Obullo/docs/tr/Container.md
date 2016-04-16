@@ -431,7 +431,7 @@ Aşağıdaki tablo varolan konnektörlerin bir listesini gösteriyor.
         <tr>
             <td><a href="Container-Connectors.md#amqp">amqpLib</a></td>
             <td>queue.php</td>
-            <td>Uygulamanızdaki <a href="https://github.com/php-amqplib/php-amqplib" target="_blank">AMQPLib</a> (videlalvaro/php-amqplib) bağlantılarını yönetir.</td>
+            <td>Uygulamanızdaki <a href="https://github.com/php-amqplib/php-amqplib" target="_blank">AMQPLib</a> (php-amqplib/php-amqplib) bağlantılarını yönetir.</td>
         </tr>
         <tr>
             <td><a href="Container-Connectors.md#cacheFactory">cacheFactory</a></td>

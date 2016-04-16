@@ -3,7 +3,6 @@
 namespace Obullo\Router;
 
 use Closure;
-use LogicException;
 use Obullo\Http\Controller;
 use Psr\Log\LoggerInterface as Logger;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -135,7 +134,7 @@ class Router implements RouterInterface
         if ($this->route == null) {
             $this->route = new Route($this);
         }
-        $this->route->add(
+        $this->route->addRoute(
             $methods,
             $match,
             $rewrite,
@@ -237,20 +236,24 @@ class Router implements RouterInterface
      */
     protected function parseRoutes()
     {
-        $uri = $this->uri->getPath(); // fix route errors with trim()
+        $uri = trim($this->uri->getPath(), "/"); // fix route errors with trim()
 
         if (is_object($this->route) && $routes = $this->route->getArray()) {
-            foreach ($routes as $val) {   // Loop through the route array looking for wild-cards
-                
-                $parameters = Parameters::parse($uri, $val);
 
+            $parameters = array();
+            foreach ($routes as $val) {   // Loop through the route array looking for wild-cards
+
+                if (! empty($val['scheme'])) {
+                    $parameters = Parameters::parse($uri, $val);
+                }
                 if ($this->hasRegexMatch($val['match'], $uri)) {    // Does the route match ?
                     $this->dispatchRouteMatches($uri, $val, $parameters);
                     return;
                 }
             }
         }
-        $this->setRequest($this->uri->getSegments());  // If we got this far it means we didn't encounter a matching route so we'll set the site default route
+        $this->setRequest($this->uri->getSegments());  // If we got this far it means we didn't encounter 
+                                                       // a matching route so we'll set the site default route
     }
 
     /**
@@ -264,8 +267,16 @@ class Router implements RouterInterface
      */
     protected function dispatchRouteMatches($uri, $val, $parameters)
     {
-        if (count($val['when']) > 0) {  //  Dynamically add method not allowed middleware
-            $this->container->get('middleware')->add('NotAllowed')->setParams($val['when']);
+        if (count($val['when']) > 0) {  // Add method not allowed middleware
+            $method = strtolower($this->container->get('app')->request->getMethod());
+            if (! in_array($method, $val['when'])) {
+                $this->container->get('middleware')->add('NotAllowed', $val['when']);
+            }
+        }
+        if (! empty($val['middlewares'])) {
+            foreach ($val['middlewares'] as $mid) {
+                $this->container->get('middleware')->add($mid['name'], $mid['params']);
+            }
         }
         // Do we have a back-reference ?
         if (! empty($val['rewrite']) && strpos($val['rewrite'], '$') !== false 
@@ -486,26 +497,6 @@ class Router implements RouterInterface
     }
 
     /**
-     * Begin operation for a route group
-     * 
-     * @return object
-     */
-    public function begin()
-    {
-        return $this;
-    }
-
-    /**
-     * Reset group options
-     * 
-     * @return void
-     */
-    public function end()
-    {
-        $this->domain->setName($this->domain->getImmutable());
-    }
-
-    /**
      * Set a sub domain
      * 
      * @param string $domain [description]
@@ -519,6 +510,16 @@ class Router implements RouterInterface
         }
         $this->domain->setName($domain);
         return $this;
+    }
+
+    /**
+     * Reset group options
+     * 
+     * @return void
+     */
+    public function end()
+    {
+        $this->domain->setName($this->domain->getImmutable());
     }
 
     /**
@@ -540,20 +541,20 @@ class Router implements RouterInterface
         }
         $options['domain'] = $this->domain->getName();
         $this->group->addGroup($uri, $closure, $options);
-
         return $this->group;
     }
 
     /**
-     * Assign middleware(s) to current route
+     * Attach middlewars
      * 
-     * @param mixed $middlewares array|string
-     * 
-     * @return object
+     * @param string $middleware middleware
+     * @param mixed  $params     middleware parameters
+     *
+     * @return void
      */
-    public function add($middlewares)
+    public function add($middleware, $params = null)
     {
-        $this->getAttach()->setDomain($this->domain)->toRoute($this->getRoute(), $middlewares);
+        $this->getRoute()->add($middleware, $params);
         return $this;
     }
 

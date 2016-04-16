@@ -14,6 +14,13 @@ use Obullo\Router\RouterInterface as Router;
 class Route
 {
     /**
+     * Route number
+     * 
+     * @var integer
+     */
+    protected $count = 0;
+
+    /**
      * Router
      *
      * @var object
@@ -55,18 +62,40 @@ class Route
      * 
      * @return object router
      */
-    public function add($methods, $match, $rewrite = null, $closure = null)
+    public function addRoute($methods, $match, $rewrite = null, $closure = null)
     {
         $options = ($this->router->getGroup()) ? $this->router->getGroup()->getOptions() : array();
 
-        $this->routes[$this->domain->getName()][] = array(
+        ++$this->count;
+
+        $this->routes[$this->domain->getName()][$this->count] = array(
             'sub.domain' => $this->_getSubDomainValue($this->domain->getName(), $options),
             'when' => $methods, 
-            'match' => $match,
-            'rewrite' => $rewrite,
+            'match' => trim($match, "/"),
+            'rewrite' => trim($rewrite, "/"),
             'scheme' => $this->_getSchemeValue($match),
             'closure' => $closure,
+            'middlewares' => array()
         );
+    }
+
+    /**
+     * Attach middlewars
+     * 
+     * @param string $middleware middleware
+     * @param mixed  $params     middleware parameters
+     *
+     * @return void
+     */
+    public function add($middleware, $params = null)
+    {
+        if (! is_string($middleware)) {
+            trigger_error("Middleware value must be string.");
+        }
+        $this->routes[$this->domain->getName()][$this->count]['middlewares'][] = [
+            'name' => $middleware,
+            'params' => (array)$params
+        ];
     }
 
     /**
@@ -86,7 +115,11 @@ class Route
      */
     public function getArray()
     {
-        return (empty($this->routes[$this->domain->getName()])) ? false : $this->routes[$this->domain->getName()];
+        $host = $this->domain->getBaseHost();
+        if ($this->domain->isSub($this->domain->getHost())) {
+            $host = $this->domain->getHost();
+        }
+        return (empty($this->routes[$host])) ? false : $this->routes[$host];
     }
 
     /**
@@ -108,15 +141,11 @@ class Route
      */
     public function addWhere(array $replace)
     {
-        $count = count($this->routes) - 1;
-        if ($count == -1) {
-            return;
-        };
         $domain     = $this->domain->getName();
         $immutable  = $this->domain->getImmutable();
 
-        if (! empty($this->routes[$domain][$count]['sub.domain'])) {
-            $immutable = $this->routes[$domain][$count]['sub.domain'];
+        if (! empty($this->routes[$domain][$this->count]['sub.domain'])) {
+            $immutable = $this->routes[$domain][$this->count]['sub.domain'];
         }
         if ($domain == $immutable) {
 
@@ -126,14 +155,14 @@ class Route
             $scheme = str_replace(
                 array_keys($replace),
                 array_values($replace),
-                $this->routes[$domain][$count]['scheme']
+                $this->routes[$domain][$this->count]['scheme']
             );
             $scheme = str_replace(
                 array('{','}'),
                 array('',''),
                 $scheme
             );
-            $this->routes[$domain][$count]['match'] = $scheme;
+            $this->routes[$domain][$this->count]['match'] = $scheme;
         }
     }
 

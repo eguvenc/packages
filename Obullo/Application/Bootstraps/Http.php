@@ -28,7 +28,7 @@ require OBULLO .'Application/Http.php';
  */
 $container->share('config', 'Obullo\Config\Config')->withArgument($container);
 $container->share('app', 'Obullo\Application\Http')->withArgument($container);
-$container->share('middleware', 'Obullo\Application\MiddlewareStack')->withArgument($container);
+$container->share('middleware', 'Obullo\Application\Middleware')->withArgument($container);
 
 /**
  * Create test environment

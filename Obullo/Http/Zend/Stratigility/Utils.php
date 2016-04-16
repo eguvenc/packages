@@ -25,7 +25,6 @@ abstract class Utils
                 if (! method_exists($callable, $method)) {
                     continue;
                 }
-
                 $r = new ReflectionMethod($callable, $method);
                 return $r->getNumberOfRequiredParameters();
             }

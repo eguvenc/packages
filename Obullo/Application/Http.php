@@ -9,7 +9,6 @@ use ReflectionClass;
 use Obullo\Tests\HttpTestInterface;
 use Obullo\Container\ParamsAwareInterface;
 use Obullo\Router\RouterInterface as Router;
-use Obullo\Application\MiddlewareStackInterface as Middleware;
 
 /**
  * Http Application
@@ -65,18 +64,15 @@ class Http extends Application
         $uriString = $request->getUri()->getPath();
 
         if ($attach = $router->getAttach()) {
-
+            
             foreach ($attach->getArray() as $value) {
                 
                 $attachRegex = str_replace('#', '\#', $value['attach']);  // Ignore delimiter
 
                 if ($value['route'] == $uriString) {     // if we have natural route match
-                    $object = $middleware->add($value['name']);
+                    $object = $middleware->add($value['name'], $value['params']);
                 } elseif (ltrim($attachRegex, '.') == '*' || preg_match('#'. $attachRegex .'#', $uriString)) {
-                    $object = $middleware->add($value['name']);
-                }
-                if ($object instanceof ParamsAwareInterface && ! empty($value['options'])) {  // Inject parameters
-                    $object->setParams($value['options']);
+                    $object = $middleware->add($value['name'], $value['params']);
                 }
             }
         }

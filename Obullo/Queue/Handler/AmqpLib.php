@@ -11,7 +11,7 @@ use Obullo\Queue\JobHandler\AmqpLibJob;
 use Obullo\Container\ServiceProvider\ServiceProviderInterface as ServiceProvider;
 
 /**
- * AmqpLib Handler ( composer : videlalvaro/php-amqplib )
+ * AmqpLib Handler ( composer : php-amqplib/php-amqplib )
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license

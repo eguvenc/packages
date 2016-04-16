@@ -39,14 +39,14 @@ class Dispatch
      * will be assigned as the value of $err, and $next will be invoked
      * with it.
      *
-     * @param Route $route
-     * @param mixed $err
-     * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
-     * @param callable $next
+     * @param callable               $value    middleware data
+     * @param mixed                  $err      error
+     * @param ServerRequestInterface $request  request
+     * @param ResponseInterface      $response respone
+     * @param callable               $next     callable next
      */
     public function __invoke(
-        Route $route,
+        $value,
         $err,
         ServerRequestInterface $request,
         ResponseInterface $response,
@@ -54,8 +54,8 @@ class Dispatch
     ) {
         global $testEnvironment;
 
-        $handler  = $route->handler;
         $hasError = (null !== $err);
+        $handler  = $value['callable'];
 
         switch (true) {
         case ($handler instanceof ErrorMiddlewareInterface):
@@ -82,7 +82,7 @@ class Dispatch
                 return $handler($err, $request, $response, $next);
             }
             if (! $hasError && $arity < 4) {
-                return $handler($request, $response, $next);
+                return $handler($request, $response, $next, $value['params']);
             }
 
         } catch (Throwable $throwable) { // PHP 7 + throwable error support
@@ -102,7 +102,7 @@ class Dispatch
             return $next($request, $response, $exception);
         }
 
-        return $next($request, $response, $err);
+        return $next($request, $response, $err, $value['params']);
     }
 
     /**
@@ -116,9 +116,16 @@ class Dispatch
     protected function unitTestError($error, $response)
     {
         if (is_object($error) && $error instanceof Exception) {
-            return $response->json(array('message' => $error->getMessage(), 'file' => $error->getFile(), 'line' => $error->getLine()), 500);
+            return $response->json(
+                [
+                    'message' => $error->getMessage(),
+                    'file' => $error->getFile(),
+                    'line' => $error->getLine()
+                ],
+                500
+            );
         }
-        return $response->json(array('message' => $error, 'file' => 0, 'line' => 0), 500);
+        return $response->json(['message' => $error, 'file' => 0, 'line' => 0], 500);
     }
 
 }

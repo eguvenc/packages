@@ -76,9 +76,6 @@ class Attach
     public function toGroup($routes)
     {
         $routes  = (array)$routes;
-
-        // var_dump($this->group);
-
         $options = $this->group->getOptions();
         $domain  = $this->domain->getName();
 
@@ -103,27 +100,6 @@ class Attach
     }
 
     /**
-     * Add middleware to current route
-     *
-     * @param object $route       route
-     * @param mixed  $middlewares string|array
-     * 
-     * @return void
-     */
-    public function toRoute(Route $route, $middlewares)
-    {
-        $routes = $route->getArray();
-        $lastRoute = end($routes);
-
-        $domain = $this->domain->getName();
-
-        if ($this->domain->isSub($this->domain->getHost())) {
-            $domain = $this->domain->getHost();
-        }
-        $this->toAttach($domain, $middlewares, $lastRoute['match']);
-    }
-
-    /**
      * Configure attached middleware
      * 
      * @param string       $domain      name
@@ -135,10 +111,12 @@ class Attach
      */
     public function toAttach($domain, $middlewares, $route, $options = array())
     {
+        unset($options['middleware']);
+
         foreach ((array)$middlewares as $middleware) {
             $this->attach[$domain][] = array(
-                'name' => $middleware,
-                'options' => $options,
+                'name' => $middleware['name'],
+                'params' => array_merge($middleware['params'], $options),
                 'route' => $route, 
                 'attach' => $route
             );

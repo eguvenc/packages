@@ -7,7 +7,6 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 use SplQueue;
 use Obullo\Utils\Benchmark;
-use InvalidArgumentException;
 use Obullo\Container\ContainerAwareInterface;
 use Obullo\Http\Middleware\MiddlewareInterface;
 use Interop\Container\ContainerInterface as Container;
@@ -63,43 +62,22 @@ class MiddlewarePipe implements MiddlewareInterface
     {
         $this->container = $container;
         $this->pipeline  = new SplQueue;
-        $middlewareStack = $container->get('middleware');
+        $middleware      = $container->get('middleware');
         /**
          * Debugger
          */
         if ($container->get('config')->get('config')['extra']['debugger']) {
-            $middlewareStack->add('Debugger');
+            $middleware->add('Debugger');
         }
         /**
          * Injection
          */
-        foreach ($middlewareStack->getQueue() as $middleware) {
-            if ($middleware instanceof ContainerAwareInterface) {
-                $middleware->setContainer($container);
+        foreach ($middleware->getQueue() as $value) {
+            if ($value['callable'] instanceof ContainerAwareInterface) {
+                $value['callable']->setContainer($container);
             }
-            $this->pipe($middleware);
+            $this->pipeline->enqueue($value);
         }
-        /**
-         * App middleware must be at the end otherwise parsedBody
-         * middleware does not work.
-         */
-        $app = function ($request, $response) use ($container) {
-
-            $result = $container->get('app')->call($request, $response);
-
-            if (! $result) {
-                
-                $body = $container->get('view')
-                    ->withStream()
-                    ->get('templates::404');
-
-                return $response->withStatus(404)
-                    ->withHeader('Content-Type', 'text/html')
-                    ->withBody($body);
-            }
-            return $result;
-        };
-        $this->pipe($app);
     }
 
     /**
@@ -192,70 +170,4 @@ class MiddlewarePipe implements MiddlewareInterface
         return ($result instanceof Response ? $result : $response);
     }
 
-    /**
-     * Attach middleware to the pipeline.
-     *
-     * Each middleware can be associated with a particular path; if that
-     * path is matched when that middleware is invoked, it will be processed;
-     * otherwise it is skipped.
-     *
-     * No path means it should be executed every request cycle.
-     *
-     * A handler CAN implement MiddlewareInterface, but MUST be callable.
-     *
-     * Handlers with arity >= 4 or those implementing ErrorMiddlewareInterface
-     * are considered error handlers, and will be executed when a handler calls
-     * $next with an error or raises an exception.
-     *
-     * @param string|callable|object $path       Either a URI path prefix, or middleware.
-     * @param null|callable|object   $middleware Middleware
-     * 
-     * @return self
-     */
-    public function pipe($path, $middleware = null)
-    {
-        if (null === $middleware && is_callable($path)) {
-            $middleware = $path;
-            $path       = '/';
-        }
-
-        // Ensure we have a valid handler
-        if (! is_callable($middleware)) {
-            throw new InvalidArgumentException('Middleware must be callable');
-        }
-
-        $this->pipeline->enqueue(
-            new Route(
-                $this->normalizePipePath($path),
-                $middleware
-            )
-        );
-
-        // @todo Trigger event here with route details?
-        return $this;
-    }
-
-    /**
-     * Normalize a path used when defining a pipe
-     *
-     * Strips trailing slashes, and prepends a slash.
-     *
-     * @param string $path path
-     * 
-     * @return string
-     */
-    private function normalizePipePath($path)
-    {
-        // Prepend slash if missing
-        if (empty($path) || $path[0] !== '/') {
-            $path = '/' . $path;
-        }
-
-        // Trim trailing slash if present
-        if (strlen($path) > 1 && '/' === substr($path, -1)) {
-            $path = rtrim($path, '/');
-        }
-
-        return $path;
-    }
 }

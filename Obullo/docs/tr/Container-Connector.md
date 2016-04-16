@@ -16,7 +16,7 @@ $container->addServiceProvider('ServiceProvider\Memcached');
 
 <ul>
     <li><a href="#amqp">Amqp</a> ( PECL )</li>
-    <li><a href="#amqpLib">AmqpLib</a> ( videlalvaro/php-amqplib )</li>
+    <li><a href="#amqpLib">AmqpLib</a> ( php-amqplib/php-amqplib )</li>
     <li><a href="#cacheManager">CacheManager</a></li>
     <li><a href="#database">Database</a></li>
     <li><a href="#doctrineDbal">DoctrineDBAL</a></li>
@@ -61,9 +61,15 @@ $AMQPConnection = $container->get('amqp')->factory(
 ```
 <a name="amqpLib"></a>
 
-#### AmqpLib ( videlalvaro/php-amqplib )
+#### AmqpLib ( php-amqplib/php-amqplib )
 
-Composer <a href="https://github.com/videlalvaro/php-amqplib">AMQPLib</a> kütüphanesi için yazılmış servis sağlayıcısıdır. 
+Composer <a href="https://github.com/php-amqplib/php-amqplib">AMQPLib</a> kütüphanesi için yazılmış servis sağlayıcısıdır. 
+
+AmqpLib kütüphanesini yükleyin.
+
+```php
+composer require php-amqplib/php-amqplib
+```
 
 ```php
 // $container->share('amqp', 'Obullo\Container\ServiceProvider\Connector\Amqp')
@@ -112,7 +118,7 @@ var_dump($msg->body);
 $ch->close();
 ```
 
-Daha fazla örnek için <a href="https://github.com/videlalvaro/php-amqplib" target="_blank">https://github.com/videlalvaro/php-amqplib</a> <kbd>demo</kbd> sekmesini ziyaret edin.
+Daha fazla örnek için <a href="https://github.com/php-amqplib/php-amqplib" target="_blank">https://github.com/videlalvaro/php-amqplib</a> <kbd>demo</kbd> sekmesini ziyaret edin.
 
 <a name="cacheFactory"></a>
 

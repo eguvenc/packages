@@ -276,7 +276,7 @@ Eğer girilen bölümleri fonksiyon içerisinden belirli kriterlere göre parame
 
 ```php
 $router->get(
-    'welcome/index/{id}/{name}', null,
+    'welcome/index/{id}/{name}',
     function ($id, $name) use ($container) {
         $container->get('response')->getBody()->write($id.'-'.$name);
     }
@@ -315,7 +315,7 @@ shop.example.com/123/electronic/mp3_player
 Route grupları bir kurallar bütününü topluca yönetmenizi sağlar. Grup kuralları belirli <kbd>alt domainler</kbd> için çalıştırılabildiği gibi belirli <kbd>http katmanlarına</kbd> da tayin edilebilirler. Bunun için <kbd>$this->attach()</kbd> metodu ile katmanı istediğiniz URL adreslerine tuturmanız gerekir.
 
 ```php
-$router->begin()
+$router
     ->domain('test.example.com')
     ->group(
         'examples/',
@@ -351,14 +351,15 @@ Http Error 405 Get method not allowed.
 Eğer bir gurubu belirli bir alt alan adına tayin ederseniz grup içerisindeki route kuralları yalnızca bu alan adı için geçerli olur.
 
 ```php
-$router->begin()
+$router
     ->domain('shop.example.com')
     ->group(function () {
 
             $this->get('welcome/.+', 'home/index');
             $this->get('product/[0-9]', 'product/list/$1');
         }
-    )->end();
+    )
+->end();
 ```
 
 Tarayıcınızdan bu URL yi çağırdığınızda bu alt alan adı için tanımlanan route kuralları çalışmaya başlar.
@@ -370,7 +371,7 @@ http://shop.example.com/product/123
 Aşağıda <kbd>account.example.com</kbd> adlı bir alt alan adı için kurallar tanımladık.
 
 ```php
-$router->begin()
+$router
     ->domain('account.example.com')
     ->group(function () {
 
@@ -393,7 +394,7 @@ http://account.example.com/123/john/test
 Alt alan adlarınız eğer <kbd>sports19.example.com</kbd>, <kbd>sports20.example.com</kbd> gibi dinamik ise alan adı kısmında düzenli ifadeler de kullanabilirsiniz.
 
 ```php
-$router->begin()
+$router
     ->domain('sports.*\d.example.com')
     ->group(
         function ($options) {
@@ -419,7 +420,6 @@ Yukarıdaki gibi bir url için aşağıdaki gibi dizinlere göre iç içe route 
 
 ```php
 $router
-    ->begin()
     ->group(
         'examples/',
         function () {
@@ -433,7 +433,8 @@ $router
                 }
             );
         }
-    )->end()
+    )
+->end()
 ```
 
 <a name="middlewares"></a>
@@ -465,8 +466,7 @@ $router->get('membership/restricted')->middleware(array('auth', 'guest'));
 Bir grup için oluşturulan katmanı grup fonksiyonu içerisinde çalıştırabilmek için <kbd>attach()</kbd> metodu kullanılır.
 
 ```php
-$router->begin()
-    ->group(
+$router->group(
     function () {
 
         $this->get('welcome/.+', 'home/index');
@@ -496,8 +496,7 @@ http://www.example.com/test/good_segment2
 Yukarıdaki örneğe benzer adreslerimiz olduğunu varsayarsak,
 
 ```php
-$router->begin()
-    ->group(
+$router->group(
     function () {
 
         // kurallar
@@ -511,8 +510,7 @@ $router->begin()
 Yukarıdaki kural gurubu için <kbd>bad_segment</kbd> segmenti dışındaki tüm url adreslerinde <kbd>Test</kbd> katmanı çalışmış olur.
 
 ```php
-$router->begin()
-    ->group(
+$router->group(
         function () {
 
             // kurallar
@@ -567,10 +565,6 @@ Bir route kuralı parameterelerini girilen düzenli ifadeler ile değiştirir.
 
 Bir route kuralına http katmanı yada katmanlarını ekler.
 
-##### $router->begin();
-
-Bir route grubunu başlatır.
-
 ##### $router->domain($host);
 
 Bir route grubu için domain tayin eder.
@@ -589,7 +583,7 @@ Geçerli gruba add metodu ile tayin edilmiş katmanları route grubuna ekler.
 
 ##### $router->end();
 
-Bir route grubunu sonlandırır.
+Bir route grubunu bir sonraki group değerlerinden ayırt edebilmek için sonlandırır.
 
 #### Get Metotları
 
