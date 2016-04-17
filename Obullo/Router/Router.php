@@ -532,6 +532,7 @@ class Router implements RouterInterface
      */
     public function group($uri, $closure = null)
     {
+        echo "-";
         if (is_callable($uri)) {
             $closure = $uri;
             $uri = null;

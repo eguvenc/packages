@@ -43,6 +43,8 @@ class Group
      */
     protected $options = array();
 
+    protected $nestLevel = 0;
+
     /**
      * Constructor
      * 
@@ -67,6 +69,8 @@ class Group
      */
     public function addGroup($uri, Closure $closure, $options = array())
     {
+        ++$this->nestLevel;
+        
         if (! empty($uri) && ! $this->uriMatch($uri)) {
             return;
         }
@@ -75,15 +79,25 @@ class Group
                                          // domain doesn't match we need to stop the propagation.
         }
         $this->options = $options;
-        $closure = Closure::bind(
-            $closure,
-            $this->router,
-            get_class($this->router)
+        $closure = $closure->bindTo(
+            $this->router
         );
+        // $closure = Closure::bind(
+        //     $closure,
+        //     $this->router,
+        //     get_class($this->router)
+        // );
         $subname = $this->getSubDomainValue();
         $closure(['subname' => $subname]);
 
         $this->match = true;
+
+        // if ($this->nestLevel == 2) {
+        //     $this->end();
+        // }
+        echo $this->nestLevel;
+
+        // $this->end();
     }
 
     /**
@@ -120,6 +134,8 @@ class Group
              */
             $this->router->getAttach()->setDomain($this->domain)->setGroup($this)->toGroup($route);
         }
+        $this->match = false;
+        $this->options = array();
         return $this;
     }
 
@@ -160,8 +176,6 @@ class Group
      */
     public function end()
     {
-        $this->match = false;
-        $this->options = array();
         $this->domain->setName($this->domain->getImmutable());  // Restore domain
     }
 

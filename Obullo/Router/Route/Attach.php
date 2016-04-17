@@ -79,6 +79,7 @@ class Attach
         $options = $this->group->getOptions();
         $domain  = $this->domain->getName();
 
+
         // If we have not middlewares or no domain matches stop the run.
         // 
         if (empty($options['middleware']) || ! $this->domain->match()) {
@@ -112,7 +113,7 @@ class Attach
     public function toAttach($domain, $middlewares, $route, $options = array())
     {
         unset($options['middleware']);
-
+        
         foreach ((array)$middlewares as $middleware) {
             $this->attach[$domain][] = array(
                 'name' => $middleware['name'],
