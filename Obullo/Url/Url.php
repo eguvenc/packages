@@ -66,7 +66,7 @@ class Url implements UrlInterface
     {
         $this->logger = $logger;
         $this->params = $params;
-        $this->request = $container->get('app')->request;  // Assign global request object
+        $this->request = $container->get('request')->getFirst();  // Assign global request object
         $this->container = $container;
 
         $this->logger->debug('Url Class Initialized');

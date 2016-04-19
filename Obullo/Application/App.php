@@ -9,26 +9,93 @@ use ReflectionClass;
 use Obullo\Tests\HttpTestInterface;
 use Obullo\Container\ParamsAwareInterface;
 use Obullo\Router\RouterInterface as Router;
+use Obullo\Http\Zend\Stratigility\MiddlewarePipe;
 
 /**
- * Http Application
+ * Application
  * 
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Http extends Application
+class App extends MiddlewarePipe
 {
     /**
      * Constructor
      *
+     * @param object $container container
+     */
+    public function __construct($container)
+    {
+        $this->initEnvironment($container);
+        $this->initServices($container);
+        $this->initServerRequest($container);
+        $this->initTestServer($container);
+
+        parent::__construct($container);
+
+        $this->initApplication($container);
+    }
+
+    /**
+     * Create main services
+     * 
+     * @param object $container container
+     * 
      * @return void
      */
-    public function init()
+    protected function initServices($container)
     {
-        $container = $this->getContainer(); // Make global
+        $container->share('config', 'Obullo\Config\Config')->withArgument($container);
+        $container->share('middleware', 'Obullo\Application\Middleware')->withArgument($container);
+    }
 
-        $app = $container->get('app');  // Make global
-        
+    /**
+     * Create server request
+     * 
+     * @param object $container container
+     * 
+     * @return void
+     */
+    protected function initServerRequest($container)
+    {
+        $request = \Obullo\Http\ServerRequestFactory::fromGlobals(
+            $_SERVER,
+            $_GET,
+            $_POST,
+            $_COOKIE,
+            $_FILES
+        );
+        $request->setContainer($container);
+
+        $container->share('request', $request);
+        $container->share('response', 'Obullo\Http\Response');
+    }
+
+    /**
+     * Detect test server
+     * 
+     * @param object $container container
+     * 
+     * @return void
+     */
+    protected function initTestServer($container)
+    {
+        if (defined('STDIN') && ! empty($_SERVER['argv'][0]) && $_SERVER['SCRIPT_FILENAME'] == 'public/index.php') {
+            $testEnvironment = new \Obullo\Tests\TestEnvironment;
+            $testEnvironment->createServer();
+            $testEnvironment->setContainer($container);
+        }
+    }
+
+    /**
+     * Initialize to Application
+     *
+     * @param object $container container
+     * 
+     * @return void
+     */
+    public function initApplication($container)
+    {
         include APP .'providers.php';
 
         $container->share('router', 'Obullo\Router\Router')
@@ -37,42 +104,36 @@ class Http extends Application
             ->withArgument($container->get('logger'));
 
         $middleware = $container->get('middleware'); // Make global
-
         include APP .'middlewares.php';
 
         $router = $container->get('router'); // Make global
-
         include APP .'routes.php';
 
         $container->get('router')->init();
 
-        $this->bootMiddlewares();
+        $this->initMiddlewares($container);
     }
 
     /**
      * Boot middlewares
+     *
+     * @param object $container container
      * 
      * @return void
      */
-    protected function bootMiddlewares()
+    protected function initMiddlewares($container)
     {
         $object = null;
-        $request    = $this->container->get('request');
-        $router     = $this->container->get('router');
-        $middleware = $this->container->get('middleware');
+        $path   = $container->get('request')->getUri()->getPath();
 
-        $uriString = $request->getUri()->getPath();
-
-        if ($attach = $router->getAttach()) {
-            
+        if ($attach = $container->get('router')->getAttach()) {
             foreach ($attach->getArray() as $value) {
-                
                 $attachRegex = str_replace('#', '\#', $value['attach']);  // Ignore delimiter
-
-                if ($value['route'] == $uriString) {     // if we have natural route match
-                    $object = $middleware->add($value['name'], $value['params']);
-                } elseif (ltrim($attachRegex, '.') == '*' || preg_match('#'. $attachRegex .'#', $uriString)) {
-                    $object = $middleware->add($value['name'], $value['params']);
+                if ($value['route'] == $path) {     // if we have natural route match
+                    $object = $container->get('middleware')->add($value['name'], $value['params']);
+                } elseif (ltrim($attachRegex, '.') == '*' || preg_match('#'. $attachRegex .'#', $path)
+                ) {
+                    $object = $container->get('middleware')->add($value['name'], $value['params']);
                 }
             }
         }
@@ -133,7 +194,6 @@ class Http extends Application
         if ($result instanceof Response) {
             return $result;
         }
-
         return $response;   
     }
 

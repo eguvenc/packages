@@ -95,7 +95,10 @@ class ServerRequest implements ServerRequestInterface
      */
     public function getFirst()
     {
-        return $this->getContainer()->get('request.0');
+        if ($this->getContainer()->has('request.0')) {
+            return $this->getContainer()->get('request.0');
+        }
+        return $this->getContainer()->get('request');
     }
 
     /**

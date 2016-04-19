@@ -68,7 +68,10 @@ class Router implements RouterInterface
      */
     public function getFirst()
     {
-        return $this->getContainer()->get('router.0');
+        if ($this->container->has('router.0')) {
+            return $this->container->get('router.0');   
+        }
+        return $this->container->get('router');
     }
 
     /**
@@ -280,7 +283,7 @@ class Router implements RouterInterface
     protected function dispatchRouteMatches($uri, $val, $parameters)
     {
         if (count($val['when']) > 0) {  // Add method not allowed middleware
-            $method = strtolower($this->container->get('app')->request->getMethod());
+            $method = strtolower($this->container->get('request')->getFirst()->getMethod());
             if (! in_array($method, $val['when'])) {
                 $this->container->get('middleware')->add('NotAllowed', $val['when']);
             }

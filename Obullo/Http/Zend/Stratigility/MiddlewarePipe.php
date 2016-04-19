@@ -6,6 +6,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 use SplQueue;
+use Obullo\Http\Controller;
 use Obullo\Utils\Benchmark;
 use Obullo\Container\ContainerAwareInterface;
 use Obullo\Http\Middleware\MiddlewareInterface;
@@ -32,6 +33,11 @@ use Interop\Container\ContainerInterface as Container;
  */
 class MiddlewarePipe implements MiddlewareInterface
 {
+    /**
+     * Application version
+     */
+    const VERSION = '2.0';
+
     /**
      * Container
      * 
@@ -78,6 +84,29 @@ class MiddlewarePipe implements MiddlewareInterface
             }
             $this->pipeline->enqueue($value);
         }
+    }
+
+    /**
+     * Detect app environment
+     * 
+     * @param object $container container
+     * 
+     * @return void
+     */
+    protected function initEnvironment($container)
+    {
+        $env = null;
+        $environments = include ROOT .'app/environments.php';
+        foreach (array_keys($environments) as $current) {
+            if (in_array(gethostname(), $environments[$current])) {
+                $env = $current;
+                break;
+            }
+        }
+        if ($env == null) {
+            die('We could not detect your application environment, please correct your app/environments.php file.');
+        }
+        $container->add('env', new \League\Container\Argument\RawArgument($env));
     }
 
     /**
@@ -168,6 +197,59 @@ class MiddlewarePipe implements MiddlewareInterface
         $result = $next($request, $response);
 
         return ($result instanceof Response ? $result : $response);
+    }
+
+    /**
+     * Returns to current version of Obullo
+     * 
+     * @return string
+     */
+    public function getVersion()
+    {
+        return static::VERSION;
+    }
+
+    /**
+     * Returns to container object
+     * 
+     * @return string
+     */
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
+    /**
+     * Call controller methods from view files ( View files $this->method(); support ).
+     * 
+     * @param string $method    called method
+     * @param array  $arguments called arguments
+     * 
+     * @return mixed
+     */
+    public function __call($method, $arguments)
+    {
+        if ($method == '__invoke') {
+            return;
+        }
+        if (method_exists(Controller::$instance, $method)) {
+            return Controller::$instance->$method($arguments);
+        }
+    }
+
+    /**
+     * Container & controller proxy
+     * 
+     * @param string $key application object
+     * 
+     * @return object
+     */
+    public function __get($key)
+    {
+        if (class_exists('Controller', false) && Controller::$instance != null) {
+            return Controller::$instance->{$key};
+        }
+        return $this->container->get($key);
     }
 
 }

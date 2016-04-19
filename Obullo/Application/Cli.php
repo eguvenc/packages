@@ -4,6 +4,7 @@ namespace Obullo\Application;
 
 use Exception;
 use ErrorException;
+use Obullo\Http\Zend\Stratigility\MiddlewarePipe;
 
 /**
  * Run Cli Application ( Warning : Http middlewares & Layers disabled in Cli mode.)
@@ -11,18 +12,47 @@ use ErrorException;
  * @copyright 2009-2016 Obullo
  * @license   http://opensource.org/licenses/MIT MIT license
  */
-class Cli extends Application
+class Cli extends MiddlewarePipe
 {
     /**
      * Constructor
      *
+     * @param object $container container
+     */
+    public function __construct($container)
+    {
+        $this->initEnvironment($container);
+        $this->initServices($container);
+
+        parent::__construct($container);
+
+        $this->initApplication($container);
+    }
+
+    /**
+     * Init main services
+     * 
+     * @param container $container container
+     * 
      * @return void
      */
-    public function init()
+    protected function initServices($container)
     {
-        $container = $this->getContainer();
-        $app = $container->get('app');
+        $container->share('config', 'Obullo\Config\Config')->withArgument($container);
+        $container->share('middleware', 'Obullo\Cli\NullMiddleware');
+        $container->share('request', 'Obullo\Cli\NullRequest');
+        $container->share('response', 'Obullo\Cli\NullResponse');
+    }
 
+    /**
+     * Initialize to Application
+     *
+     * @param object $container container
+     * 
+     * @return void
+     */
+    public function initApplication($container)
+    {
         include APP .'providers.php';
 
         $logger  = $container->get('logger');
@@ -41,9 +71,9 @@ class Cli extends Application
         register_shutdown_function(
             function () use ($logger) {
                 $this->handleFatalError();
-                $logger->shutdown();
             }
         );
+        $this->call();
     }
 
     /**
@@ -96,11 +126,7 @@ class Cli extends Application
      */
     protected function printError($e)
     {
-        /**
-         * Log error message
-         */
-        $container = $this->getContainer();
-        $log = new \Log\Error($container->get('logger'));
+        $log = new \Obullo\Utils\Error\Log($this->container->get('logger'));
         $log->message($e);
 
         echo "\33[1;31mException Error\n". $e->getMessage()."\33[0m\n";
@@ -116,10 +142,8 @@ class Cli extends Application
      * 
      * @return void
      */
-    public function run()
+    public function call()
     {    
-        $this->init();
-
         $router  = $this->container->get('router');
         $logger  = $this->container->get('logger');
         $request = $this->container->get('request');
@@ -131,7 +155,8 @@ class Cli extends Application
         $controller->container = $this->container;
 
         if (! method_exists($className, $router->getMethod())) {
-            $this->router->methodNotFound();
+            echo Console::fail('The method "' .$router->getMethod(). '" not found.');
+            die;
         }
         $arguments = array_slice(
             $request->getUri()->getSegments(),

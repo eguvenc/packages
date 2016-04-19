@@ -182,7 +182,8 @@ class Router
             include_once OBULLO.'Cli/Task/'.$Class.'.php';
             return $segments;
         }
-        return $this->classNotFound($segments);
+        echo Console::fail('The task command not found.');
+        die;
     }
 
     /**
@@ -193,28 +194,6 @@ class Router
     public function getNamespace()
     {
         return $this->classNamespace;
-    }
-
-    /**
-     * Task not found
-     * 
-     * @return string
-     */
-    public function classNotFound()
-    {
-        echo Console::fail('The task command not found.');
-        die;
-    }
-
-    /**
-     * Task method not found
-     * 
-     * @return string
-     */
-    public function methodNotFound()
-    {
-        echo Console::fail('The method "' .$this->getMethod(). '" not found.');
-        die;
     }
 
     /**
