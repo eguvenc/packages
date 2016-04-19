@@ -63,13 +63,6 @@ class Layer
     protected $error = null;
 
     /**
-     * Original http Super Globals
-     * 
-     * @var array
-     */
-    protected $globals = array();
-
-    /**
      * Container
      * 
      * @var object
@@ -81,12 +74,10 @@ class Layer
      * 
      * @param object $container \Obullo\Container\ContainerInterface
      * @param array  $params    config parameters
-     * @param array  $globals   http super globals
      */
-    public function __construct(Container $container, array $params, array $globals)
+    public function __construct(Container $container, array $params)
     {
         $this->params = $params;
-        $this->globals = $globals;
         $this->container = $container;
 
         register_shutdown_function(array($this, 'close'));  // Close current layer
@@ -106,8 +97,6 @@ class Layer
     {
         $uri = '/'.trim($uri, '/');  // Normalize uri
         $this->hashString = '';      // Reset hash string otherwise it causes unique id errors.
-
-        $this->setMethod($method, $data);
         $this->setHash($uri);
 
         $this->controller = Controller::$instance;      // We need get backup object of main controller
@@ -118,6 +107,7 @@ class Layer
         $this->container->share('app.router', $this->router);
 
         $this->createUri($request, $uri);
+        $this->setMethod($method, $data); // Must be at the end otherwise POST GET data does not work
     }
 
     /**
@@ -151,31 +141,19 @@ class Layer
      */
     public function setMethod($method = 'GET', $data = array())
     {
-        $_SERVER['REQUEST_METHOD'] = strtoupper($method);
         $this->setHash($data);
+        $request = $this->container->get('request')->withMethod(strtoupper($method));
 
         if (empty($data)) {
             return;
         }
-        $this->withBody($data);
-    }
-
-    /**
-     * Http request withbody
-     * 
-     * @param array $data data
-     * 
-     * @return void
-     */
-    protected function withBody(array $data)
-    {
-        foreach ($data as $key => $val) { // Assign all post data to REQUEST variable.
-            if ($method == 'POST') {
-                $_POST[$key] = $val;
-            } 
-            if ($method == 'GET') {
-                $_GET[$key] = $val;
-            }
+        if ($method == 'POST') {
+            $request = $request->withParsedBody($data);
+            $this->container->share('request', $request);
+        } 
+        if ($method == 'GET') {
+            $request = $request->withQueryParams($data);
+            $this->container->share('request', $request);
         }
     }
 
@@ -273,12 +251,6 @@ class Layer
     public function restore()
     {
         $this->reset();
-
-        $_SERVER = $_GET = $_POST = array();
-        $_SERVER = &$this->globals['_SERVER'];
-        $_GET = &$this->globals['_GET'];
-        $_POST = &$this->globals['_POST'];
-
         $this->container->share('request', $this->request);
         $this->container->share('router', $this->router);
 

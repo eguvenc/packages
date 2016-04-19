@@ -31,13 +31,6 @@ class Request
     protected $params;
 
     /**
-     * Get backup of super globals
-     * 
-     * @var array
-     */
-    protected $globals;
-
-    /**
      * Container
      * 
      * @var object
@@ -56,23 +49,6 @@ class Request
         $this->container = $container;
         $this->logger = $logger;
         $this->params = $params;
-        
-        $this->createEnvironment();
-    }
-
-    /**
-     * Clone http super globals
-     * 
-     * @return void
-     */
-    protected function createEnvironment()
-    {
-        /**
-         * Backup original super globals
-         */
-        $this->globals['_SERVER'] = &$_SERVER;
-        $this->globals['_GET'] = &$_GET;
-        $this->globals['_POST'] = &$_POST;
     }
 
     /**
@@ -150,8 +126,7 @@ class Request
     {
         $layer = new Layer(
             $this->container,
-            $this->params,
-            $this->globals
+            $this->params
         );
         $layer->clear();
         $layer->newRequest(
