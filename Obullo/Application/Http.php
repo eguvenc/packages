@@ -95,7 +95,6 @@ class Http extends Application
         $method    = $router->getMethod();
 
         if (! is_file($file)) {
-
             $router->clear();  // Fix layer errors.
             return false;
 
