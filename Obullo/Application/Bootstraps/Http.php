@@ -48,6 +48,7 @@ $request = Obullo\Http\ServerRequestFactory::fromGlobals(
     $_COOKIE,
     $_FILES
 );
+$request->setContainer($container);
 /**
  * Register core components
  */

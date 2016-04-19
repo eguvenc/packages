@@ -60,6 +60,18 @@ class Router implements RouterInterface
     }
 
     /**
+     * After HMVC operation router object will changed.
+     * 
+     * This method returns to first original object of router.
+     * 
+     * @return object
+     */
+    public function getFirst()
+    {
+        return $this->getContainer()->get('router.0');
+    }
+
+    /**
      * Clean all data for Layers
      *
      * @return void

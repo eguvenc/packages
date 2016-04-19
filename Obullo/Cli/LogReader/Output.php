@@ -55,15 +55,15 @@ class Output
         if ($header) {
             $line  = "\033[0;37m".$break."\n".$line.$break."\033[0m";
         }
-        if ($this->has('$_')) {
-            $line = preg_replace('/\s+/', ' ', $line);
-            $line = preg_replace('/\[/', "[", $line);  // Do some cleaning
+        if ($this->has('Layer:')) {
 
-            if ($this->has('$_layer')) {
-                $line = "\033[0;37m".strip_tags($line)."\033[0m";
-            } else {
-                $line = "\033[0;37m".$line."\033[0m";
-            }
+            $exp  = explode('{', $line);
+            $last = explode(',', $exp[1]);
+            $line = $exp[0]."{".$last[0]."}";
+
+            $line = "\033[0;37m".strip_tags($line)."\033[0m";
+        } else {
+            $line = "\033[0;37m".$line."\033[0m";
         }
         return $line;
     }
@@ -77,9 +77,6 @@ class Output
      */
     protected function writeBody($line)
     {        
-        if ($this->has('$_task')) {
-            $line = "\033[0;37m".$line."\033[0m";
-        }
         if ($this->has('loaded:')) {
             $line = "\033[0;37m".$line."\033[0m";
         }
@@ -95,7 +92,7 @@ class Output
      */
     protected function writeSQL($line)
     {
-        if ($this->has('$_sql')) {   // Remove unnecessary spaces from sql output
+        if ($this->has('SQL-')) {   // Remove unnecessary spaces from sql output
             $line = "\033[1;32m".preg_replace('/[\s]+/', ' ', $line)."\033[0m";
             $line = preg_replace('/[\r\n]/', "\n", $line);
         }

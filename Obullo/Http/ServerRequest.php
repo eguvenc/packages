@@ -87,6 +87,18 @@ class ServerRequest implements ServerRequestInterface
     }
 
     /**
+     * After HMVC operation request object will changed.
+     * 
+     * This method returns to first original object of request.
+     * 
+     * @return object
+     */
+    public function getFirst()
+    {
+        return $this->getContainer()->get('request.0');
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getHeaders()
@@ -378,8 +390,9 @@ class ServerRequest implements ServerRequestInterface
      */
     public function all($key = null)
     {
-        $get  = $this->get();
-        $post = $this->post();
+        $get  = (array)$this->getQueryParams();
+        $post = (array)$this->getParsedBody();
+
         $request = array_merge($post, $get);
 
         if (is_null($key)) {

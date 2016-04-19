@@ -97,7 +97,7 @@ class SQLLogger implements SQLLoggerInterface
         $time = number_format(microtime(true) - $this->start, 4);
 
         $this->logger->debug(
-            '$_SQL '.$this->queryNumber.' :', 
+            'SQL-'.$this->queryNumber.' :', 
             [
                 'query' => $this->format($this->sql),
                 'time' => $time

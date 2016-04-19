@@ -51,7 +51,7 @@ class Mongo implements ModelInterface
                 'connection' => 'default'
             ]
         )
-            ->cms
+            ->database
             ->users;
     }
 
@@ -148,6 +148,7 @@ class Mongo implements ModelInterface
         if (empty($row)) {
             return false;
         }
+        $row['_id'] = (string)$row['_id'];
         return $row;
     }
 
@@ -169,9 +170,9 @@ class Mongo implements ModelInterface
         if (empty($row)) {
             return false;
         }
+        $row['_id'] = (string)$row['_id'];
         return $row;
     }
-
     /**
      * Update remember me token upon every login & logout
      * 

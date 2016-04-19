@@ -69,6 +69,11 @@ class Layer
      */
     protected $container = null;
 
+    protected $controller;
+    protected $request;
+    protected $router;
+    protected static $path = array();
+
     /**
      * Constructor
      * 
@@ -103,9 +108,12 @@ class Layer
         $this->request = clone Controller::$instance->request;
         $this->router = clone Controller::$instance->router;  // Create copy of original Router class.
 
-        $this->container->share('app.request', $this->request);
-        $this->container->share('app.router', $this->router);
+        static::$path[] = $this->request->getUri()->getPath();
 
+        if (static::$path[0] == $this->request->getUri()->getPath()) { // Only create global objects if the request is first.
+            $this->container->share('request.0', $this->request);
+            $this->container->share('router.0', $this->router);
+        }
         $this->createUri($request, $uri);
         $this->setMethod($method, $data); // Must be at the end otherwise POST GET data does not work
     }

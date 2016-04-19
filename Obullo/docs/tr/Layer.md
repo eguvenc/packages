@@ -205,7 +205,7 @@ class Header extends Controller
 {
     public function index()
     {
-        $selected = ($this->app->uri->segment(0)) ? $this->app->uri->segment(0) : 'welcome';
+        $selected = ($this->request->getFirst()->getUri()->segment(0)) ? $this->request->getFirst()->getUri()->segment(0) : 'welcome';
 
         $li = '';
         $navbar = array(

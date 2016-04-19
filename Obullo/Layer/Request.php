@@ -67,11 +67,13 @@ class Request
         $_SERVER['SCRIPT_NAME'] = 'index.php';
         $_SERVER['QUERY_STRING'] = '';
 
-        return ServerRequestFactory::fromGlobals(
+        $request = ServerRequestFactory::fromGlobals(
             $_SERVER,
             $_GET,
             $_POST
         );
+        $request->setContainer($this->container);
+        return $request;
     }
 
     /**

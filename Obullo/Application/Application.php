@@ -79,10 +79,6 @@ class Application
      */
     public function __get($key)
     {
-        $appCid = 'app.'.$key;
-        if ($this->container->has($appCid) ) {
-            return $this->container->get($appCid);
-        }
         if (class_exists('Controller', false) && Controller::$instance != null) {
             return Controller::$instance->{$key};
         }

@@ -236,7 +236,7 @@ class Navbar extends Controller
 {
     public function index()
     {
-        $link = ($this->app->request->get('link')) ? $this->app->request->get('link') : 'welcome';
+        $link = ($this->request->getFirst()->get('link')) ? $this->request->getFirst()->get('link') : 'welcome';
 
         $li = '';
         $navbar = [
@@ -273,11 +273,11 @@ Katmanların nasıl çalıştığını anlamak için oluşturduğunuz bir katman
 http://myproject/views/navbar
 ```
 
-Eğer bir uygulamada en dıştaki yani ilk oluşturulan katmana ait <kbd>$request</kbd> nesnesi değerlerine ulaşılmak isteniyorsa <kbd>$this->request</kbd> yöntemi yerine <kbd>$this->app->request</kbd> yöntemi kullanılmalıdır.
+Eğer bir uygulamada en dıştaki yani ilk oluşturulan katmana ait <kbd>$request</kbd> nesnesi değerlerine ulaşılmak isteniyorsa <kbd>$this->request->getFirst()</kbd> metodu kullanılır.
 
 
 ```php
-$this->app->request->get('link')
+$this->request->getFirst()->method();
 ```
 
-Böylece katman isteklerinden sonra değişime uğramamış orijinal request nesnesine ulaşılmış olur.
+Böylece katman isteklerinden sonra değişime uğramamış <b>orijinal</b> request nesnesine ulaşılmış olur.
