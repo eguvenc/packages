@@ -6,8 +6,8 @@ use Obullo\Authentication\AuthResult;
 use Interop\Container\ContainerInterface as Container;
 use Obullo\Authentication\Storage\StorageInterface as Storage;
 
-use Event\LoginEvent;
-use Event\LoginResultListener;
+use Auth\Event\LoginEvent;
+use Auth\Event\LoginResultListener;
 
 /**
  * Login

@@ -353,14 +353,14 @@ $mongoInstance = $container->get('mongo')->shared(['connection' => 'default']);
 Veritabanı seçiminden sonra mongo metotlarına erişilir.
 
 ```php
-$mongo = $mongoInstance->selectDb('dbname');
+$mongo = $mongoInstance->selectDb('dbname')->collection;
 $mongo->find();
 ```
 
 Yada method zincirleme yöntemi ile mongo metotlarına direkt erişilir.
 
 ```php
-$mongo = $container->get('mongo')->shared(['connection' => 'default'])->selectDb('dbname');
+$mongo = $container->get('mongo')->shared(['connection' => 'default'])->dbname->collection;
 $mongo->find();
 ```
 

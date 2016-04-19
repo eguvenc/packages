@@ -95,7 +95,7 @@ class Group
         // if ($this->nestLevel == 2) {
         //     $this->end();
         // }
-        echo $this->nestLevel;
+        // echo $this->nestLevel;
 
         // $this->end();
     }

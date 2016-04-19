@@ -130,7 +130,7 @@ class MiddlewarePipe implements MiddlewareInterface
      * 
      * @return object
      */
-    public function getFinalHandler($response)
+    protected function getFinalHandler($response)
     {
         $class = '\\Http\Middlewares\FinalHandler\\Zend';
         $handler = new $class(
