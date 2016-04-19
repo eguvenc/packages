@@ -4,7 +4,6 @@ namespace Obullo\Authentication\Model;
 
 use Obullo\Container\ContainerAwareTrait;
 use Obullo\Authentication\Model\ModelInterface;
-use Interop\Container\ContainerInterface as Container;
 
 /**
  * Database Model
