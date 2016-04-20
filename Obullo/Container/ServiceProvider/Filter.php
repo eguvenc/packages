@@ -2,7 +2,7 @@
 
 namespace Obullo\Container\ServiceProvider;
 
-class Clean extends AbstractServiceProvider
+class Filter extends AbstractServiceProvider
 {
     /**
      * The provides array is a way to let the container
@@ -14,7 +14,9 @@ class Clean extends AbstractServiceProvider
      * @var array
      */
     protected $provides = [
-        'clean'
+        'filter',
+        'filter.is',
+        'filter.clean',
     ];
 
     /**
@@ -27,6 +29,10 @@ class Clean extends AbstractServiceProvider
      */
     public function register()
     {
-        $this->getContainer()->share('clean', 'Obullo\Filters\Clean');
+        $container = $this->getContainer();
+
+        $container->share('filter', 'Obullo\Filters\Filter')->withArgument($container);
+        $container->share('filter.is', 'Obullo\Filters\Is');
+        $container->share('filter.clean', 'Obullo\Filters\Clean');
     }
 }

@@ -30,10 +30,9 @@ class App extends MiddlewarePipe
         $this->initServices($container);
         $this->initServerRequest($container);
         $this->initTestServer($container);
+        $this->initApplication($container);
 
         parent::__construct($container);
-
-        $this->initApplication($container);
     }
 
     /**
@@ -104,14 +103,17 @@ class App extends MiddlewarePipe
             ->withArgument($container->get('logger'));
 
         $middleware = $container->get('middleware'); // Make global
+
         include APP .'middlewares.php';
 
         $router = $container->get('router'); // Make global
+
         include APP .'routes.php';
 
         $container->get('router')->init();
 
         $this->initMiddlewares($container);
+
     }
 
     /**
