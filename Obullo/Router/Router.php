@@ -285,13 +285,12 @@ class Router implements RouterInterface
         if (count($val['when']) > 0) {  // Add method not allowed middleware
             $method = strtolower($this->container->get('request')->getFirst()->getMethod());
             if (! in_array($method, $val['when'])) {
-                $this->container->get('middleware')->add('NotAllowed', $val['when']);
+                
+                // $this->container->get('middleware')->add('NotAllowed', $val['when']);
             }
         }
         if (! empty($val['middlewares'])) {
-            foreach ($val['middlewares'] as $mid) {
-                $this->container->get('middleware')->add($mid['name'], $mid['params']);
-            }
+            $this->getAttach()->toAttach($this->domain->getName(), $val['middlewares']);
         }
         // Do we have a back-reference ?
         if (! empty($val['rewrite']) && strpos($val['rewrite'], '$') !== false 
@@ -582,6 +581,7 @@ class Router implements RouterInterface
     {
         if ($this->attach == null) {
             $this->attach = new Attach;
+            $this->attach->setDomain($this->domain); 
         }
         return $this->attach;
     }

@@ -3,6 +3,7 @@
 namespace Obullo\Router\Route;
 
 use Closure;
+use InvalidArgumentException;
 use Obullo\Router\Route\Attach;
 use Psr\Http\Message\UriInterface as Uri;
 use Obullo\Router\RouterInterface as Router;
@@ -111,7 +112,7 @@ class Group
     public function add($middleware, $params = null)
     {
         if (! is_string($middleware)) {
-            trigger_error("Middleware value must be string.");
+            throw new InvalidArgumentException("Middleware value must be string.");
         }
         $this->options['middleware'][] = array('name' => $middleware, 'params' => (array)$params);
         return $this;

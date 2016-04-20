@@ -97,48 +97,27 @@ class App extends MiddlewarePipe
     {
         include APP .'providers.php';
 
-        $container->share('router', 'Obullo\Router\Router')
-            ->withArgument($container)
-            ->withArgument($container->get('request'))
-            ->withArgument($container->get('logger'));
-
         $middleware = $container->get('middleware'); // Make global
 
         include APP .'middlewares.php';
-
-        $router = $container->get('router'); // Make global
-
-        include APP .'routes.php';
-
-        $container->get('router')->init();
-
-        $this->initMiddlewares($container);
-
     }
 
     /**
-     * Boot middlewares
-     *
-     * @param object $container container
+     * Add middlewares
      * 
-     * @return void
+     * @param [type] $middleware [description]
+     * @param array  $params     [description]
      */
-    protected function initMiddlewares($container)
+    public function add($middleware, $params = array())
     {
-        $object = null;
-        $path   = $container->get('request')->getUri()->getPath();
+        // spl object storage has ???
 
-        if ($attach = $container->get('router')->getAttach()) {
-            foreach ($attach->getArray() as $value) {
-                $attachRegex = str_replace('#', '\#', $value['attach']);  // Ignore delimiter
-                if ($value['route'] == $path) {     // if we have natural route match
-                    $object = $container->get('middleware')->add($value['name'], $value['params']);
-                } elseif (ltrim($attachRegex, '.') == '*' || preg_match('#'. $attachRegex .'#', $path)
-                ) {
-                    $object = $container->get('middleware')->add($value['name'], $value['params']);
-                }
-            }
-        }
+        $this->pipeline->enqueue(
+            [
+                'callable' => $middleware,
+                'params' => $params
+            ]
+        );
     }
 
     /**

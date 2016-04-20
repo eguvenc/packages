@@ -116,7 +116,7 @@ class MiddlewarePipe implements MiddlewareInterface
      */
     public function benchmarkStart()
     {
-        $this->benchmark = true;
+        Benchmark::start();
     }
 
     /**
@@ -126,7 +126,7 @@ class MiddlewarePipe implements MiddlewareInterface
      */
     public function benchmarkEnd()
     {
-        Benchmark::end($this->container->get('request'));
+        Benchmark::end($this->container);
     }
 
     /**
@@ -136,9 +136,6 @@ class MiddlewarePipe implements MiddlewareInterface
      */
     public function getRequest()
     {
-        if ($this->benchmark) {
-            return Benchmark::start($this->container->get('request'));
-        }
         return $this->container->get('request');
     }
 

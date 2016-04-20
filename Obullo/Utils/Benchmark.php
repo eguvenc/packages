@@ -18,35 +18,27 @@ class Benchmark
     /**
      * Start app benchmark
      * 
-     * @param Request $request object
-     * 
      * @return object
      */
-    public static function start(Request $request)
+    public static function start()
     {
         self::$time = microtime(true);
-
-        return $request->withAttribute('REQUEST_TIME_START', self::$time);
     }
 
     /**
      * Finalize benchmark
      * 
-     * @param Request $request request
-     * @param array   $extra   extra
+     * @param container $container container
+     * @param array     $extra     extra
      * 
      * @return void
      */
-    public static function end($request, $extra = array())
+    public static function end($container, $extra = array())
     {
-        global $container;
-        
         $logger = $container->get('logger');
         $config = $container->get('config')->get('config');
 
-        $time  = ($request == null) ? self::$time : $request->getAttribute('REQUEST_TIME_START');
-
-        $end = microtime(true) - $time;
+        $end = microtime(true) - self::$time;
         $usage = 'memory_get_usage() function not found on your php configuration.';
         
         if (function_exists('memory_get_usage') && ($usage = memory_get_usage()) != '') {

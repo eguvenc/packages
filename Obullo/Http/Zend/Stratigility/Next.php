@@ -77,6 +77,9 @@ class Next
         }
 
         $layer = $this->queue->dequeue();
+
+        echo get_class($layer['callable'])."<br>";
+
         $result = $dispatch($layer, $err, $request, $response, $this);
 
         return ($result instanceof ResponseInterface ? $result : $response);

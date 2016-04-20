@@ -3,6 +3,7 @@
 namespace Obullo\Router\Route;
 
 use Obullo\Router\Domain;
+use InvalidArgumentException;
 use Obullo\Router\RouterInterface as Router;
 
 /**
@@ -90,7 +91,7 @@ class Route
     public function add($middleware, $params = null)
     {
         if (! is_string($middleware)) {
-            trigger_error("Middleware value must be string.");
+            throw new InvalidArgumentException("Middleware value must be string.");
         }
         $this->routes[$this->domain->getName()][$this->count]['middlewares'][] = [
             'name' => $middleware,

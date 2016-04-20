@@ -110,7 +110,7 @@ class Attach
      * 
      * @return void
      */
-    public function toAttach($domain, $middlewares, $route, $options = array())
+    public function toAttach($domain, $middlewares, $route = 'global', $options = array())
     {
         unset($options['middleware']);
         
@@ -129,7 +129,7 @@ class Attach
      * 
      * @return array
      */
-    public function getArray()
+    public function getArray ()
     {
         if ($this->domain == null) {
             return array();
