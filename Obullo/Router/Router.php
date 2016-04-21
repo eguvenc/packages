@@ -262,7 +262,10 @@ class Router implements RouterInterface
                     $parameters = Parameters::parse($uri, $val);
                 }
                 if ($this->hasRegexMatch($val['match'], $uri)) {    // Does the route match ?
-                    $this->dispatchRouteMatches($uri, $val, $parameters);
+                    $result = $this->dispatchRouteMatches($uri, $val, $parameters);
+                    if (! empty($result)) {
+                        $this->container->get('middleware')->add('Route', $result);
+                    }
                     return;
                 }
             }

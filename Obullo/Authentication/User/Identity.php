@@ -98,6 +98,12 @@ class Identity extends AbstractIdentity
     {
         if ($this->storage->getCredentials('__permanent')) {
             $this->block = '__permanent';
+            /**
+             * We need extend the cache TTL of current user,
+             * thats why we need update last activity for each page request.
+             * Otherwise permanent storage TTL will be expired because of user has no activity.
+             */
+            $this->storage->update('__lastActivity', time());
             return;
         }
         $this->block = '__temporary';
