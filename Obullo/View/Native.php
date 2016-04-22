@@ -23,6 +23,13 @@ class Native implements ContainerAwareInterface
     protected $path;
 
     /**
+     * View filename
+     * 
+     * @var string
+     */
+    protected $filename;
+
+    /**
      * View folders
      * 
      * @var array
@@ -145,10 +152,12 @@ class Native implements ContainerAwareInterface
      */
     public function make($name, $data = array())
     {
+        $this->filename = $name; // Skip extract name collisions
+
         extract($data);
 
         ob_start();
-        include $this->getDefaultPath() . $name . '.php';
+        include $this->getDefaultPath() . $this->filename . '.php';
         $body = ob_get_clean();
         
         return $body;
