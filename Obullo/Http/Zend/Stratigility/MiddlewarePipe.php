@@ -84,6 +84,7 @@ class MiddlewarePipe implements MiddlewareInterface
             }
             $this->pipeline->enqueue($value);
         }
+        $this->pipeline->enqueue(['callable' => new \Http\Middlewares\App, 'params' => null]);
     }
 
     /**
