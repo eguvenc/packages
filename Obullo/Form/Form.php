@@ -587,4 +587,35 @@ class Form
         return $this->setSelect($field, $value, $default, ' checked="checked"');
     }
 
+    /**
+     * Get $_POST data or database $row using valid db field comparison.
+     * 
+     * @param object $row   database object row
+     * @param string $field field
+     * 
+     * @return string
+     */
+    public function getRowValue($row = null, $field = '')
+    {
+        if (is_array($field)) {
+            return;
+        }
+        $post = $this->request->getParsedBody();
+
+        $value = (isset($post[$field])) ? $this->getValue($field) : '';
+
+        if (! isset($post[$field])) { // If POST data not available use Database $row
+
+            if (is_object($row) && isset($row->{$field})) { // If field available in database $row Object
+
+                $value = $row->{$field};
+
+            } elseif (is_array($row) && isset($row[$field])) { // If field available in database $row Array
+
+                $value = $row[$field];   
+            }
+        }
+        return $value;
+    }
+
 }
