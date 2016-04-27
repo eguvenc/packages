@@ -469,7 +469,7 @@ class Form
             if (isset($fieldData[$field])) {
                 return $this->container->get('validator')->getValue($field, $default);
             }
-        } elseif ($value = $this->request->post($field)) {
+        } elseif ($value = $this->request->all($field)) {
 
             return $value;
         }
@@ -512,7 +512,7 @@ class Form
                 return $selectedString;
             }
             if ($default === false) {
-                $field = $this->request->post($field);
+                $field = $this->request->all($field);
             }
         }
         if (isset($fieldData[$field]['postdata'])) {
