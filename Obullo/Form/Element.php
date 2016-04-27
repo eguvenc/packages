@@ -616,7 +616,7 @@ class Element
     public function getRowValue($row = null, $field = '')
     {
         if (is_array($field)) {
-            $field = $field['name'];
+            return;
         }
         $post = $this->request->getParsedBody();
 
