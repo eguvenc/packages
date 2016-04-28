@@ -2,6 +2,7 @@
 
 namespace Obullo\View;
 
+use Obullo\Http\Controller;
 use Obullo\Container\ContainerAwareTrait;
 use Obullo\Container\ContainerAwareInterface;
 
@@ -172,7 +173,7 @@ class Native implements ContainerAwareInterface
      */
     public function __get($key)
     {
-        return $this->getContainer()->get($key);
+        return Controller::$instance->{$key};
     }
 
 }
