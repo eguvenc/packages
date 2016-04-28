@@ -13,7 +13,7 @@ use League\Plates\Template\Template as AbstractTemplate;
 class Template extends AbstractTemplate implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
-
+    
     /**
      * Make available controller variables in view files
      * 
@@ -23,6 +23,6 @@ class Template extends AbstractTemplate implements ContainerAwareInterface
      */
     public function __get($key)
     {
-        return $this->getContainer()->get($key);
+        return Controller::$instance->{$key};
     }
 }
