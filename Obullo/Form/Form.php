@@ -504,6 +504,12 @@ class Form
      */
     public function setSelect($field = '', $value = '', $default = false, $selectedString = ' selected="selected"')
     {
+        if (! is_bool($default)) {
+            $rowValue = $this->getRowValue($default, $field);
+            if ($rowValue == $value) {
+                $default = true;
+            }
+        }
         $fieldData = $this->container->get('validator')->getFieldData();
 
         if (! isset($fieldData[$field]) || ! isset($fieldData[$field]['postdata'])) {
