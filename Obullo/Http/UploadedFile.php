@@ -204,6 +204,17 @@ class UploadedFile implements UploadedFileInterface
     /**
      * {@inheritdoc}
      *
+     * @return string|null The filename sent by the /tmp dir or null if none
+     *     was provided.
+     */
+    public function getServerFilename()
+    {
+        return $this->file;
+    }
+    
+    /**
+     * {@inheritdoc}
+     *
      * @return string|null The filename sent by the client or null if none
      *     was provided.
      */
