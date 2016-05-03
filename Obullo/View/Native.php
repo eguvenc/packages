@@ -154,7 +154,7 @@ class Native implements ContainerAwareInterface
     public function make($name, $data = array())
     {
         $this->filename = $name; // Skip extract name collisions
-
+        unset($name);
         extract($data);
 
         ob_start();
