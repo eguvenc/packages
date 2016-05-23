@@ -22,7 +22,7 @@ class AlphaDashUnicode
      */
     public function __invoke(Field $field, Callable $next)
     {
-        if (preg_match("/^[\s_\-\pL]+$/u", $field->getValue())) {
+        if (preg_match("/^[_\-\pL]+$/u", $field->getValue())) {
 
             return $next($field);
         }
