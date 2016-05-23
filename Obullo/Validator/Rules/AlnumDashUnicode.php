@@ -22,7 +22,7 @@ class AlnumDashUnicode
      */
     public function __invoke(Field $field, Callable $next)
     {
-        if (preg_match("/^[\s0-9_\-\pL]+$/u", $field->getValue())) {
+        if (preg_match("/^[0-9_\-\pL]+$/u", $field->getValue())) {
 
             return $next($field);
         }
