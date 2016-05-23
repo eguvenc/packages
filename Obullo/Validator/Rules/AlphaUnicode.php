@@ -22,7 +22,7 @@ class AlphaUnicode
      */
     public function __invoke(Field $field, Callable $next)
     {
-        if (preg_match("/^[\s\pL]+$/u", $field->getValue())) {
+        if (preg_match("/^[\pL]+$/u", $field->getValue())) {
 
             return $next($field);
         }
