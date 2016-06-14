@@ -189,7 +189,7 @@ $cache = $cacheFactory->shared(
 'connections' => array(
 
     'default' => array(
-        'dsn'      => 'mysql:host=localhost;port=;dbname=test',
+        'dsn'      => 'pdo_mysql:host=localhost;port=;dbname=test',
         'username' => 'root',
         'password' => '123456',
         'options'  => [
@@ -198,7 +198,7 @@ $cache = $cacheFactory->shared(
         ]
     ),
     'failed' => array(
-        'dsn'      => 'mysql:host=localhost;port=;dbname=failed',
+        'dsn'      => 'pdo_mysql:host=localhost;port=;dbname=failed',
         'username' => 'root',
         'password' => '123456',
         'options'  => [
@@ -221,7 +221,7 @@ Konfigürasyonda olmayan yeni bir bağlantı yaratmak için factory metodu kulla
 ```php
 $db = $container->get('database')->factory(
     [
-        'dsn'      => 'mysql:host=localhost;port=;dbname=test',
+        'dsn'      => 'pdo_mysql:host=localhost;port=;dbname=test',
         'username' => 'root',
         'password' => '123456',
         'options' => [
